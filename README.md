@@ -1,0 +1,119 @@
+# Claude ETF trading agent
+
+A fully automated agent that, once per US trading day:
+
+1. Pulls a year of daily prices for ~75 ETFs (US indexes, sectors, themes, countries, bonds,
+   commodities, crypto, and a few leveraged/inverse funds) and computes trend, momentum, RSI,
+   MACD, volatility and **candlestick patterns** for each.
+2. Reads the last 36 hours of market headlines from Alpaca's news feed.
+3. Gives all of that to **Claude** with **web search**. Claude researches what is moving markets
+   (central banks, economic data, tariffs, wars, what world leaders and officials are saying),
+   then picks target weights for any ETFs it believes will beat the S&P 500.
+4. A **risk engine in code** clamps those weights, keeps the rest in SPY, and places the orders on
+   **Alpaca** (paper trading by default).
+5. Saves every decision, with Claude's reasoning, sources, orders and API cost, to `docs/data/`.
+   The dashboard reads those files.
+
+After the close, a second job records portfolio value against SPY so the dashboard can compare them.
+
+## Read this first
+
+- **Nothing here guarantees beating the S&P 500.** Most professional managers don't, over time.
+  This is an experiment that measures whether it can, honestly and against SPY.
+- Paper trade for at least 3–6 months before thinking about real money. A few good weeks are noise.
+- Claude only *proposes*. It can never place an order the risk engine has not approved.
+- "No strong view" means the money sits in SPY, so the agent only bets against the
+  index when Claude has a reason to.
+
+## Risk rules (enforced in code, in `trader/risk.py`)
+
+| Rule | Default | Env var |
+|---|---|---|
+| Unallocated money goes to | SPY | `IDLE_ASSET` |
+| Max weight in one ETF (other than SPY) | 30% | `MAX_POSITION_WEIGHT` |
+| Max number of ETFs | 8 | `MAX_POSITIONS` |
+| Max total in leveraged/inverse ETFs | 10% | `MAX_LEVERAGED_WEIGHT` |
+| Max traded per day (one-way) | 50% of equity | `MAX_DAILY_TURNOVER` |
+| Ignore weight changes smaller than | 2% of equity | `REBALANCE_BAND` |
+| Stop trading if down from peak by | 25% | `MAX_DRAWDOWN_HALT` |
+| Kill switch | on | `TRADING_ENABLED=false` |
+
+ETFs that Claude suggests from outside the built-in list must be active and tradable on Alpaca, be
+named like a fund, and trade at least $5M per day.
+
+## Setup (about 15 minutes)
+
+1. **Alpaca paper account.** Sign up at alpaca.markets. In the dashboard, switch to *Paper Trading*
+   and generate an API key and secret.
+2. **Anthropic API key.** Get one from console.anthropic.com and add some credit.
+3. **GitHub secrets.** In this repo: *Settings → Secrets and variables → Actions → New repository
+   secret*. Add `ANTHROPIC_API_KEY`, `ALPACA_API_KEY` and `ALPACA_SECRET_KEY`.
+4. **Merge to `main`.** Scheduled GitHub Actions only run from the default branch.
+5. **Dashboard.** *Settings → Pages → Build and deployment → Deploy from a branch*, then choose
+   `main` and the `/docs` folder. It will be at `https://<your-user>.github.io/larp-trading/`.
+6. **First run.** *Actions → Trading agent → Run workflow*, choosing `trade` with *dry run* ticked.
+   Read the decision on the dashboard, then let the schedule take over.
+
+The schedule runs on weekdays at 15:15 UTC (11:15 New York in summer, 10:15 in winter) and takes a
+snapshot at 21:30 UTC. GitHub may start scheduled jobs a few minutes late. Market holidays are
+skipped automatically.
+
+> This repository is **public**, so the dashboard and trade journal are visible to anyone.
+> Your API keys are not, because they live in GitHub secrets. To keep results private, make the repo
+> private. GitHub Pages on a private repo needs a paid GitHub plan; otherwise, open `docs/index.html`
+> locally as shown below.
+
+## Run locally
+
+```bash
+python -m venv .venv && . .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env            # fill in your keys
+python -m trader.main trade --dry-run --force   # decide, but send no orders
+python -m trader.main snapshot
+python -m pytest -q
+python -m http.server -d docs 8000   # dashboard at http://localhost:8000
+```
+
+## Costs
+
+- Alpaca paper trading and its market data and news: free.
+- Claude: one research run per day on `claude-opus-5-5` with up to 10 web searches. This is
+  typically somewhere around $0.50–$2 per day; the exact cost of each run shows on the dashboard.
+  Use `CLAUDE_EFFORT=medium` or `MAX_WEB_SEARCHES=5` to spend less.
+- GitHub Actions and Pages: free for public repos.
+
+The dashboard subtracts the Claude bill from the profit, so you see whether the agent pays for itself.
+
+## About tweets and social media
+
+The X (Twitter) API costs at least $200 a month, so it isn't wired in. Claude's web search still
+finds posts by world leaders and officials, and big shifts in online sentiment, once news outlets
+report them, which is when most of them move markets anyway. A paid social-data feed could be added
+later as one more input in `trader/market.py`.
+
+## Going live with real money
+
+Only after a long paper record that beats SPY *after* AI costs:
+
+1. Create live API keys in Alpaca and replace the two Alpaca secrets.
+2. Under *Settings → Secrets and variables → Actions → Variables*, set `ALPACA_PAPER=false` **and**
+   `LIVE_TRADING_CONFIRMED=yes`. The code refuses to trade real money unless both are set.
+3. Start with an amount you can afford to lose. Short-term gains are taxed as ordinary income.
+
+## Layout
+
+```
+trader/
+  main.py        daily run: data → Claude → risk engine → orders → journal
+  brain.py       Claude prompt, web search, structured decision, cost tracking
+  indicators.py  indicators + candlestick patterns
+  risk.py        position limits, rebalancing, turnover cap, drawdown halt
+  broker.py      Alpaca account, ETF vetting, order execution
+  market.py      Alpaca daily bars and news
+  universe.py    the ETF list
+docs/index.html  dashboard (reads docs/data/*.json)
+.github/workflows/trade.yml   schedule
+```
+
+Not financial advice.

@@ -1,0 +1,74 @@
+name: Trading agent
+
+on:
+  schedule:
+    # GitHub cron is UTC. 15:15 UTC = 11:15 New York in summer, 10:15 in winter.
+    - cron: "15 15 * * 1-5"
+    # 21:30 UTC is after the 16:00 New York close all year: record equity vs SPY.
+    - cron: "30 21 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      command:
+        description: "trade or snapshot"
+        default: trade
+        type: choice
+        options: [trade, snapshot]
+      dry_run:
+        description: "Decide but do not place orders"
+        default: false
+        type: boolean
+
+concurrency:
+  group: trading-agent
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      ALPACA_API_KEY: ${{ secrets.ALPACA_API_KEY }}
+      ALPACA_SECRET_KEY: ${{ secrets.ALPACA_SECRET_KEY }}
+      # Paper unless you set BOTH repository variables (Settings > Secrets and variables > Variables).
+      ALPACA_PAPER: ${{ vars.ALPACA_PAPER || 'true' }}
+      LIVE_TRADING_CONFIRMED: ${{ vars.LIVE_TRADING_CONFIRMED || 'no' }}
+      TRADING_ENABLED: ${{ vars.TRADING_ENABLED || 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+      - run: pip install -r requirements.txt
+
+      - name: Pick command
+        id: cmd
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            cmd="${{ inputs.command }}"
+            [ "${{ inputs.dry_run }}" = "true" ] && cmd="$cmd --dry-run"
+          elif [ "${{ github.event.schedule }}" = "30 21 * * 1-5" ]; then
+            cmd="snapshot"
+          else
+            cmd="trade"
+          fi
+          echo "args=$cmd" >> "$GITHUB_OUTPUT"
+
+      - name: Run agent
+        run: python -m trader.main ${{ steps.cmd.outputs.args }}
+
+      - name: Save journal for the dashboard
+        if: always()
+        run: |
+          git config user.name "trading-agent"
+          git config user.email "trading-agent@users.noreply.github.com"
+          git add docs/data
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "Journal: ${{ steps.cmd.outputs.args }} $(date -u +%Y-%m-%d)"
+          for i in 1 2 3; do git pull --rebase && git push && exit 0; sleep 5; done
+          exit 1
+
