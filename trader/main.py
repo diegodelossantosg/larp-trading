@@ -300,7 +300,7 @@ def watch(cfg, broker: Broker, market: Market, dry_run: bool, force: bool = Fals
 def main(argv: list[str] | None = None) -> int:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     parser = argparse.ArgumentParser(prog="trader")
-    parser.add_argument("command", choices=["trade", "snapshot", "watch"])
+    parser.add_argument("command", choices=["trade", "snapshot", "watch", "market-open"])
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--force", action="store_true")
     args = parser.parse_args(argv)
@@ -311,6 +311,8 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "snapshot":
         snapshot(cfg, broker, market)
         return 0
+    if args.command == "market-open":  # exit code 0 while the market is open, 1 when closed
+        return 0 if broker.market_open() else 1
     if args.command == "watch":
         return watch(cfg, broker, market, args.dry_run, args.force)
     return trade(cfg, broker, market, args.dry_run, args.force)
