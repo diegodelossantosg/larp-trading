@@ -171,7 +171,7 @@ function maxDip(values) {
 }
 
 function nextRun() {
-  // 11:15 New York on weekdays, shown in the viewer's own time zone.
+  // 10:05 New York on weekdays, shown in the viewer's own time zone.
   const now = new Date();
   for (let i = 0; i < 8; i++) {
     const d = new Date(now.getTime() + i * 864e5);
@@ -179,9 +179,9 @@ function nextRun() {
     const get = (t) => ny.find((p) => p.type === t).value;
     if (["Sat", "Sun"].includes(get("weekday"))) continue;
     for (const off of [4, 5]) { // EDT = UTC-4, EST = UTC-5
-      const t = new Date(Date.UTC(+get("year"), +get("month") - 1, +get("day"), 11 + off, 15));
+      const t = new Date(Date.UTC(+get("year"), +get("month") - 1, +get("day"), 10 + off, 5));
       const hh = new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", hour: "numeric", hour12: false }).format(t);
-      if (+hh === 11 && t > now) return t;
+      if (+hh === 10 && t > now) return t;
     }
   }
   return null;
