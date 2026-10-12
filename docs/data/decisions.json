@@ -163,5 +163,33 @@
    "QUAL": 0.1,
    "SPY": 0.45
   }
+ },
+ {
+  "date": "2026-10-12",
+  "time": "12:08",
+  "source": "watch",
+  "dry_run": false,
+  "orders": [
+   {
+    "symbol": "SPY",
+    "side": "sell",
+    "notional": 79.94,
+    "reason": "funding the watcher's buys",
+    "status": "pending_new",
+    "order_id": "4a67c40a-0c51-4141-9a25-dc3cb702d075"
+   },
+   {
+    "symbol": "XLE",
+    "side": "buy",
+    "notional": 80.0,
+    "reason": "5/6 signals: daily uptrend; up 1.4% today; above today's average price (VWAP); bullish candles: bullish_engulfing; new 20-day high",
+    "status": "pending_new",
+    "order_id": "1ac46912-4d26-4a96-9144-b1ee623e1c57"
+   }
+  ],
+  "notes": [
+   "sell SPY: funding the watcher's buys",
+   "buy XLE: 5/6 signals: daily uptrend; up 1.4% today; above today's average price (VWAP); bullish candles: bullish_engulfing; new 20-day high"
+  ]
  }
 ]
