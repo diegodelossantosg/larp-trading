@@ -49,6 +49,7 @@ class Config:
     max_drawdown_halt: float
     trading_enabled: bool
     max_web_searches: int
+    capital_usd: float  # money the agent may use; 0 = the whole Alpaca account
 
 
 def load_config() -> Config:
@@ -85,4 +86,5 @@ def load_config() -> Config:
         max_drawdown_halt=_float("MAX_DRAWDOWN_HALT", 0.25),
         trading_enabled=_bool("TRADING_ENABLED", True),
         max_web_searches=int(_float("MAX_WEB_SEARCHES", 10)),
+        capital_usd=_float("CAPITAL_USD", 1000),
     )

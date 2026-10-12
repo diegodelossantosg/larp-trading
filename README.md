@@ -29,6 +29,7 @@ After the close, a second job records portfolio value against SPY so the dashboa
 
 | Rule | Default | Env var |
 |---|---|---|
+| Money the agent may use (rest of the paper account is ignored) | $1,000 | `CAPITAL_USD` (0 = whole account) |
 | Unallocated money goes to | SPY | `IDLE_ASSET` |
 | Max weight in one ETF (other than SPY) | 30% | `MAX_POSITION_WEIGHT` |
 | Max number of ETFs | 8 | `MAX_POSITIONS` |

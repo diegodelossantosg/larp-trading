@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Trading Agent Dashboard</title>
+<title>My AI Investor</title>
 <style>
 :root {
   color-scheme: light;
@@ -20,147 +20,209 @@
   --good: #006300;
   --bad: #d03b3b;
   --chip: #f0efec;
+  --note: #eef4fc;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
     --page: #0d0d0d; --surface: #1a1a19; --ink: #f0efec; --ink-2: #c3c2b7; --muted: #898781;
     --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10);
-    --series-1: #3987e5; --series-2: #d95926; --good: #0ca30c; --bad: #e66767; --chip: #262624;
+    --series-1: #3987e5; --series-2: #d95926; --good: #0ca30c; --bad: #e66767; --chip: #262624; --note: #17222f;
   }
 }
 :root[data-theme="dark"] {
   color-scheme: dark;
   --page: #0d0d0d; --surface: #1a1a19; --ink: #f0efec; --ink-2: #c3c2b7; --muted: #898781;
   --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10);
-  --series-1: #3987e5; --series-2: #d95926; --good: #0ca30c; --bad: #e66767; --chip: #262624;
+  --series-1: #3987e5; --series-2: #d95926; --good: #0ca30c; --bad: #e66767; --chip: #262624; --note: #17222f;
 }
 * { box-sizing: border-box; }
-body {
-  margin: 0; background: var(--page); color: var(--ink);
-  font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
-}
-main { max-width: 1100px; margin: 0 auto; padding: 24px 16px 64px; }
-header { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: baseline; justify-content: space-between; }
-h1 { font-size: 22px; margin: 0; }
-h2 { font-size: 16px; margin: 0 0 12px; }
-.sub { color: var(--ink-2); font-size: 13px; }
-.badge { display: inline-block; padding: 1px 8px; border-radius: 99px; font-size: 12px; font-weight: 600;
-  background: var(--chip); color: var(--ink-2); vertical-align: middle; margin-left: 8px; }
-.badge.live { background: var(--bad); color: #fff; }
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-top: 16px; }
-.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-top: 16px; }
-.tile { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; }
-.tile .label { color: var(--ink-2); font-size: 12px; }
-.tile .value { font-size: 24px; font-weight: 600; margin-top: 2px; }
-.tile .hint { color: var(--muted); font-size: 12px; }
+body { margin: 0; background: var(--page); color: var(--ink); font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+main { max-width: 960px; margin: 0 auto; padding: 20px 16px 64px; }
+h1 { font-size: 24px; margin: 0; }
+h2 { font-size: 18px; margin: 0 0 4px; }
+p { margin: 6px 0; }
+.sub { color: var(--ink-2); font-size: 14px; }
+.small { font-size: 13px; color: var(--ink-2); }
+.banner { background: var(--note); border-radius: 10px; padding: 10px 14px; margin: 12px 0 0; font-size: 14px; }
+.banner.live { background: var(--bad); color: #fff; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-top: 16px; }
+.hero { font-size: 18px; line-height: 1.5; }
+.hero .big { font-size: 34px; font-weight: 700; display: block; margin: 2px 0 6px; }
+.verdict { display: inline-block; margin-top: 8px; padding: 6px 12px; border-radius: 99px; font-weight: 600; background: var(--chip); }
 .up { color: var(--good); } .down { color: var(--bad); }
-.legend { display: flex; gap: 16px; font-size: 13px; color: var(--ink-2); margin-bottom: 8px; flex-wrap: wrap; }
-.legend span::before { content: ""; display: inline-block; width: 14px; height: 2px; vertical-align: middle; margin-right: 6px; background: var(--c); }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 16px; }
+.tile { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px; }
+.tile .label { color: var(--ink-2); font-size: 13px; font-weight: 600; }
+.tile .value { font-size: 24px; font-weight: 700; margin: 2px 0; }
+.tile .hint { color: var(--ink-2); font-size: 13px; }
+.steps { margin: 8px 0 0; padding-left: 20px; }
+.steps li { margin: 4px 0; }
+.legend { display: flex; gap: 16px; font-size: 14px; color: var(--ink-2); margin: 10px 0 8px; flex-wrap: wrap; }
+.legend span::before { content: ""; display: inline-block; width: 16px; height: 3px; vertical-align: middle; margin-right: 6px; background: var(--c); border-radius: 2px; }
 .legend .dash::before { background: repeating-linear-gradient(90deg, var(--c) 0 4px, transparent 4px 7px); }
 .chart-wrap { position: relative; }
-svg { display: block; width: 100%; height: auto; overflow: visible; }
-.tooltip { position: absolute; pointer-events: none; background: var(--surface); border: 1px solid var(--border);
-  border-radius: 8px; padding: 8px 10px; font-size: 12px; box-shadow: 0 4px 16px rgba(0,0,0,.12); display: none; white-space: nowrap; }
-.tooltip b { font-variant-numeric: tabular-nums; }
-.toolbar { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
-button.link { background: none; border: 1px solid var(--border); color: var(--ink-2); border-radius: 8px; padding: 4px 10px; font: inherit; font-size: 12px; cursor: pointer; }
+svg { display: block; overflow: visible; }
+.tooltip { position: absolute; pointer-events: none; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; font-size: 13px; box-shadow: 0 4px 16px rgba(0,0,0,.12); display: none; white-space: nowrap; z-index: 2; }
+.toolbar { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; flex-wrap: wrap; }
+button.link { background: none; border: 1px solid var(--border); color: var(--ink-2); border-radius: 8px; padding: 4px 10px; font: inherit; font-size: 13px; cursor: pointer; }
 .table-scroll { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--grid); }
-th { color: var(--ink-2); font-weight: 500; }
-td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
-.decision { border-top: 1px solid var(--grid); padding: 14px 0; }
-.decision:first-of-type { border-top: 0; padding-top: 0; }
-.decision .meta { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; font-size: 13px; color: var(--ink-2); }
-.decision .meta strong { color: var(--ink); font-size: 14px; }
-.chip { background: var(--chip); border-radius: 99px; padding: 0 8px; font-size: 12px; }
-.pos { margin: 6px 0 0; padding-left: 18px; }
-.pos li { margin: 4px 0; }
-.pos .sym { font-weight: 600; }
-details { margin-top: 6px; color: var(--ink-2); font-size: 13px; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 8px; }
+th, td { text-align: left; padding: 8px; border-bottom: 1px solid var(--grid); vertical-align: top; }
+th { color: var(--ink-2); font-weight: 500; font-size: 13px; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.entry { border-top: 1px solid var(--grid); padding: 14px 0; }
+.entry:first-of-type { border-top: 0; }
+.entry .when { font-weight: 700; }
+.chip { display: inline-block; background: var(--chip); border-radius: 99px; padding: 0 9px; font-size: 12px; color: var(--ink-2); margin-left: 6px; }
+.action { margin: 6px 0; font-weight: 600; }
+ul.why { margin: 6px 0 0; padding-left: 18px; }
+ul.why li { margin: 4px 0; }
+details { margin-top: 8px; font-size: 14px; color: var(--ink-2); }
 details a { color: var(--series-1); }
-.error { color: var(--bad); font-weight: 600; }
-.empty { color: var(--ink-2); padding: 24px 0; text-align: center; }
-.disclaimer { color: var(--muted); font-size: 12px; margin-top: 24px; }
+summary { cursor: pointer; }
+.error { color: var(--bad); }
+.empty { color: var(--ink-2); padding: 16px 0; }
+dl.glossary dt { font-weight: 700; margin-top: 10px; }
+dl.glossary dd { margin: 2px 0 0; color: var(--ink-2); }
+.footer { color: var(--muted); font-size: 12px; margin-top: 24px; }
 </style>
 </head>
 <body>
 <main>
-  <header>
-    <h1>Trading Agent <span id="mode" class="badge">…</span></h1>
-    <div class="sub" id="updated"></div>
-  </header>
+  <h1>🤖 My AI Investor</h1>
+  <div class="sub" id="updated"></div>
+  <div class="banner" id="mode">🧪 <b>Practice mode.</b> Fake money, real stock-market prices. Nothing here can lose real money.</div>
+
+  <section class="card hero" id="hero"></section>
 
   <section class="tiles" id="tiles"></section>
 
   <section class="card">
     <div class="toolbar">
-      <h2>Portfolio vs S&amp;P 500 (SPY), same starting amount</h2>
-      <button class="link" id="toggle-table">Show table</button>
+      <div>
+        <h2>Your money over time</h2>
+        <div class="small">Blue: the AI's portfolio. Orange dashed: what the same money would be worth if you had simply bought the S&amp;P 500 (the 500 biggest US companies) and done nothing. Blue above orange means the AI is winning.</div>
+      </div>
+      <button class="link" id="toggle-table">Show as table</button>
     </div>
     <div class="legend">
-      <span style="--c: var(--series-1)">Agent portfolio</span>
-      <span class="dash" style="--c: var(--series-2)">SPY buy-and-hold</span>
+      <span style="--c: var(--series-1)">AI portfolio</span>
+      <span class="dash" style="--c: var(--series-2)">S&amp;P 500 (do nothing)</span>
     </div>
     <div class="chart-wrap" id="chart"></div>
     <div class="table-scroll" id="chart-table" hidden></div>
   </section>
 
   <section class="card">
-    <h2>Holdings</h2>
+    <h2>What the AI owns right now</h2>
+    <div class="small">Each row is an ETF: one purchase that holds a whole basket of companies or assets.</div>
     <div class="table-scroll" id="holdings"></div>
   </section>
 
   <section class="card">
-    <h2>Daily decisions</h2>
+    <h2>Daily diary</h2>
+    <div class="small">What the AI decided each day, and why, in its own words.</div>
     <div id="decisions"></div>
   </section>
 
-  <p class="disclaimer">Paper trading results are simulated and ignore taxes. Past performance does not predict future results. Not financial advice.</p>
+  <section class="card">
+    <h2>How it works</h2>
+    <ol class="steps">
+      <li><b>Once a day</b> (weekdays, about 17:15 Spain time, while the US market is open), the AI wakes up.</li>
+      <li>It reads the news, searches the web for what is moving markets (central banks, politics, wars, big company news) and studies recent price charts of about 75 ETFs.</li>
+      <li>It decides how to split the money: for example "70% S&amp;P 500, 20% energy, 10% gold". Money it has no strong idea for stays in the S&amp;P 500.</li>
+      <li>Safety rules in the code then check the plan (max 30% in one ETF, at most 8 ETFs, small limits on risky ETFs) and place the trades.</li>
+      <li>It does <b>not</b> trade all day long. Most days it changes little or nothing. Doing nothing is often the smart move.</li>
+      <li>After the market closes, it writes down how much the money is worth, so this page can compare it with the S&amp;P 500.</li>
+    </ol>
+  </section>
+
+  <section class="card">
+    <h2>Words you'll see</h2>
+    <dl class="glossary">
+      <dt>S&amp;P 500 / SPY</dt><dd>The 500 biggest US companies. SPY is an ETF that buys all of them. It's the benchmark: if the AI can't beat it, you'd be better off just buying SPY.</dd>
+      <dt>ETF</dt><dd>"Exchange-traded fund". One thing you can buy that holds many stocks, bonds or commodities at once, like a ready-made basket.</dd>
+      <dt>Paper trading</dt><dd>Practice trading with fake money at real prices.</dd>
+      <dt>Return</dt><dd>How much the money grew or shrank, as a percentage. +5% on $1,000 means $50 profit.</dd>
+      <dt>Biggest dip</dt><dd>The largest drop from a high point to a low point along the way. It shows how bumpy the ride was.</dd>
+      <dt>Confidence</dt><dd>How sure the AI said it was about that day's decision (low / medium / high).</dd>
+    </dl>
+  </section>
+
+  <p class="footer">Practice results only. They ignore taxes, and good results over a few weeks are mostly luck. Not financial advice.</p>
 </main>
 
 <div class="tooltip" id="tooltip"></div>
 
 <script>
 const $ = (id) => document.getElementById(id);
-const usd = (v, d = 0) => v == null ? "–" : v.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: d, minimumFractionDigits: d });
+const usd = (v, d = 2) => v == null ? "–" : v.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: d, minimumFractionDigits: d });
+const signedUsd = (v) => v == null ? "–" : (v > 0 ? "+" : v < 0 ? "−" : "") + usd(Math.abs(v));
 const pct = (v, d = 2) => v == null ? "–" : (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(d) + "%";
-const cls = (v) => v > 0 ? "up" : v < 0 ? "down" : "";
-const arrow = (v) => v > 0 ? "▲ " : v < 0 ? "▼ " : "";
+const cls = (v) => v > 0.005 ? "up" : v < -0.005 ? "down" : "";
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
 async function load(name, fallback) {
-  try {
-    const r = await fetch(`data/${name}?t=${Date.now()}`);
-    return r.ok ? await r.json() : fallback;
-  } catch { return fallback; }
+  try { const r = await fetch(`data/${name}?t=${Date.now()}`); return r.ok ? await r.json() : fallback; }
+  catch { return fallback; }
 }
 
-function maxDrawdown(values) {
+function maxDip(values) {
   let peak = -Infinity, worst = 0;
   for (const v of values) { peak = Math.max(peak, v); worst = Math.min(worst, v / peak - 1); }
   return worst * 100;
 }
 
+function nextRun() {
+  // 11:15 New York on weekdays, shown in the viewer's own time zone.
+  const now = new Date();
+  for (let i = 0; i < 8; i++) {
+    const d = new Date(now.getTime() + i * 864e5);
+    const ny = new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York", year: "numeric", month: "2-digit", day: "2-digit", weekday: "short" }).formatToParts(d);
+    const get = (t) => ny.find((p) => p.type === t).value;
+    if (["Sat", "Sun"].includes(get("weekday"))) continue;
+    for (const off of [4, 5]) { // EDT = UTC-4, EST = UTC-5
+      const t = new Date(Date.UTC(+get("year"), +get("month") - 1, +get("day"), 11 + off, 15));
+      const hh = new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", hour: "numeric", hour12: false }).format(t);
+      if (+hh === 11 && t > now) return t;
+    }
+  }
+  return null;
+}
+
+function hero(status, equity) {
+  const capital = status.capital || equity[0]?.equity || null;
+  const now = status.equity ?? equity.at(-1)?.equity ?? capital;
+  if (now == null) {
+    $("hero").innerHTML = `<p>Waiting for the AI's first day. Check back after the next run.</p>`;
+    return;
+  }
+  const start = capital ?? equity[0]?.equity;
+  const profit = now - start;
+  const spyNow = equity.length >= 2 ? start * equity.at(-1).spy_close / equity[0].spy_close : null;
+  const diff = spyNow == null ? null : now - spyNow;
+  let verdict = "Too early to compare with the S&P 500. The comparison starts after two days.";
+  if (diff != null) verdict = Math.abs(diff) < 0.01 ? "🤝 Exactly tied with the S&P 500"
+    : diff > 0 ? `✅ Beating the S&P 500 by ${usd(diff)}` : `⚠️ Behind the S&P 500 by ${usd(-diff)}`;
+  $("hero").innerHTML = `
+    <div>You started with ${usd(start)}. It's now worth</div>
+    <span class="big">${usd(now)}</span>
+    <div>That's <b class="${cls(profit)}">${signedUsd(profit)} (${pct(profit / start * 100)})</b>${equity[0] ? ` since ${equity[0].date}` : ""}.</div>
+    ${spyNow != null ? `<div>If you had just bought the S&amp;P 500, you'd have <b>${usd(spyNow)}</b>.</div>` : ""}
+    <div class="verdict">${verdict}</div>`;
+}
+
 function tiles(status, equity, decisions) {
-  const first = equity[0], last = equity[equity.length - 1];
-  const agentRet = first ? (last.equity / first.equity - 1) * 100 : null;
-  const spyRet = first ? (last.spy_close / first.spy_close - 1) * 100 : null;
-  const excess = agentRet == null ? null : agentRet - spyRet;
-  const aiCost = decisions.reduce((s, d) => s + (d.ai_cost_usd || 0), 0);
-  const onPlan = decisions.length > 0 && decisions.every((d) => d.usage?.billing === "subscription");
-  const netGain = first ? last.equity - first.equity - aiCost : null;
-  const dd = equity.length ? maxDrawdown(equity.map((r) => r.equity)) : null;
+  const days = decisions.filter((d) => !d.dry_run && d.market_view).length;
+  const trades = decisions.filter((d) => !d.dry_run).reduce((n, d) => n + (d.orders || []).filter((o) => !["error", "skipped"].includes(o.status)).length, 0);
+  const dip = equity.length ? maxDip(equity.map((r) => r.equity)) : null;
+  const next = nextRun();
   const items = [
-    ["Portfolio value", usd(status.equity ?? last?.equity, 2), first ? `started ${usd(first.equity)} on ${first.date}` : "no history yet"],
-    ["Agent return", `<span class="${cls(agentRet)}">${arrow(agentRet)}${pct(agentRet)}</span>`, "since start"],
-    ["SPY return", `<span class="${cls(spyRet)}">${arrow(spyRet)}${pct(spyRet)}</span>`, "buy-and-hold benchmark"],
-    ["Vs S&P 500", `<span class="${cls(excess)}">${arrow(excess)}${pct(excess)}</span>`, excess == null ? "" : excess >= 0 ? "ahead of SPY" : "behind SPY"],
-    ["Max drawdown", pct(dd), "worst peak-to-trough"],
-    onPlan
-      ? ["Claude cost", "Subscription", "runs on your Claude plan; no per-run charge"]
-      : ["Claude API cost", usd(aiCost, 2), netGain == null ? "" : `profit after AI cost: ${usd(netGain, 2)}`],
+    ["Days the AI has run", String(days), "one decision per weekday"],
+    ["Trades made", String(trades), "buys + sells so far"],
+    ["Biggest dip", dip == null ? "–" : pct(dip), "worst drop from a high point"],
+    ["Next decision", next ? next.toLocaleString([], { weekday: "short", hour: "2-digit", minute: "2-digit" }) : "–", "your local time"],
   ];
   $("tiles").innerHTML = items.map(([l, v, h]) =>
     `<div class="tile"><div class="label">${l}</div><div class="value">${v}</div><div class="hint">${esc(h)}</div></div>`).join("");
@@ -169,65 +231,60 @@ function tiles(status, equity, decisions) {
 function chart(equity) {
   const el = $("chart");
   if (equity.length < 2) {
-    el.innerHTML = `<div class="empty">The chart appears after two daily snapshots (taken after each market close).</div>`;
+    el.innerHTML = `<div class="empty">The chart appears after the AI's second day. A point is added every evening after the US market closes.</div>`;
     return;
   }
   const base = equity[0].equity;
   const rows = equity.map((r) => ({ date: r.date, agent: r.equity, spy: base * r.spy_close / equity[0].spy_close }));
-  const W = Math.max(300, el.clientWidth), H = W < 600 ? 240 : 340, m = { t: 12, r: 48, b: 28, l: 64 };
+  const W = Math.max(300, el.clientWidth), H = W < 600 ? 240 : 320, m = { t: 12, r: 70, b: 28, l: 64 };
   const xs = (i) => m.l + (i / (rows.length - 1)) * (W - m.l - m.r);
   const vals = rows.flatMap((r) => [r.agent, r.spy]);
   let lo = Math.min(...vals), hi = Math.max(...vals);
-  const pad = (hi - lo) * 0.08 || base * 0.01; lo -= pad; hi += pad;
+  const pad = (hi - lo) * 0.1 || base * 0.01; lo -= pad; hi += pad;
   const ys = (v) => m.t + (1 - (v - lo) / (hi - lo)) * (H - m.t - m.b);
-  const ticks = niceTicks(lo, hi, 5);
+  const ticks = niceTicks(lo, hi, 4);
   const line = (k) => rows.map((r, i) => `${i ? "L" : "M"}${xs(i).toFixed(1)},${ys(r[k]).toFixed(1)}`).join("");
   const xTickIdx = [...new Set(W < 600 ? [0, rows.length - 1] : [0, Math.floor((rows.length - 1) / 2), rows.length - 1])];
-  const lastR = rows[rows.length - 1];
-  let ya = ys(lastR.agent), yb = ys(lastR.spy);
-  if (Math.abs(ya - yb) < 14) { const mid = (ya + yb) / 2; ya = mid + (ya <= yb ? -7 : 7); yb = mid + (ya <= yb ? 7 : -7); }
-
+  const last = rows.at(-1);
+  let ya = ys(last.agent), yb = ys(last.spy);
+  if (Math.abs(ya - yb) < 14) { const mid = (ya + yb) / 2, up = ya <= yb; ya = mid + (up ? -7 : 7); yb = mid + (up ? 7 : -7); }
   el.innerHTML = `
-  <svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Agent portfolio value compared with SPY buy-and-hold">
-    ${ticks.map((t) => `<line x1="${m.l}" x2="${W - m.r}" y1="${ys(t)}" y2="${ys(t)}" stroke="var(--grid)" stroke-width="1"/>
-      <text x="${m.l - 8}" y="${ys(t) + 4}" text-anchor="end" font-size="11" fill="var(--muted)">${usd(t)}</text>`).join("")}
-    ${base >= lo && base <= hi ? `<line x1="${m.l}" x2="${W - m.r}" y1="${ys(base)}" y2="${ys(base)}" stroke="var(--axis)" stroke-width="1"/>` : ""}
+  <svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="AI portfolio value compared with the S&P 500">
+    ${ticks.map((t) => `<line x1="${m.l}" x2="${W - m.r}" y1="${ys(t)}" y2="${ys(t)}" stroke="var(--grid)"/>
+      <text x="${m.l - 8}" y="${ys(t) + 4}" text-anchor="end" font-size="11" fill="var(--muted)">${usd(t, 0)}</text>`).join("")}
+    ${base >= lo && base <= hi ? `<line x1="${m.l}" x2="${W - m.r}" y1="${ys(base)}" y2="${ys(base)}" stroke="var(--axis)" stroke-dasharray="2 3"/>
+      <text x="${m.l + 4}" y="${ys(base) - 5}" font-size="11" fill="var(--muted)">start</text>` : ""}
     ${xTickIdx.map((i) => `<text x="${xs(i)}" y="${H - 6}" text-anchor="${i === 0 ? "start" : i === rows.length - 1 ? "end" : "middle"}" font-size="11" fill="var(--muted)">${rows[i].date}</text>`).join("")}
     <path d="${line("spy")}" fill="none" stroke="var(--series-2)" stroke-width="2" stroke-dasharray="5 3" stroke-linejoin="round"/>
     <path d="${line("agent")}" fill="none" stroke="var(--series-1)" stroke-width="2" stroke-linejoin="round"/>
-    <text x="${W - m.r + 6}" y="${ya + 4}" font-size="11" fill="var(--ink-2)">Agent</text>
-    <text x="${W - m.r + 6}" y="${yb + 4}" font-size="11" fill="var(--ink-2)">SPY</text>
+    <text x="${W - m.r + 6}" y="${ya + 4}" font-size="11" fill="var(--ink-2)">AI</text>
+    <text x="${W - m.r + 6}" y="${yb + 4}" font-size="11" fill="var(--ink-2)">S&amp;P 500</text>
     <g id="hover" style="display:none">
-      <line id="hx" y1="${m.t}" y2="${H - m.b}" stroke="var(--axis)" stroke-width="1"/>
+      <line id="hx" y1="${m.t}" y2="${H - m.b}" stroke="var(--axis)"/>
       <circle id="ha" r="4" fill="var(--series-1)" stroke="var(--surface)" stroke-width="2"/>
       <circle id="hb" r="4" fill="var(--series-2)" stroke="var(--surface)" stroke-width="2"/>
     </g>
     <rect x="${m.l}" y="${m.t}" width="${W - m.l - m.r}" height="${H - m.t - m.b}" fill="transparent" id="hit"/>
   </svg>`;
-
   const svg = el.querySelector("svg"), tip = $("tooltip"), g = $("hover");
   const show = (evt) => {
-    const pt = svg.createSVGPoint(); pt.x = evt.clientX; pt.y = evt.clientY;
-    const p = pt.matrixTransform(svg.getScreenCTM().inverse());
-    const i = Math.max(0, Math.min(rows.length - 1, Math.round((p.x - m.l) / (W - m.l - m.r) * (rows.length - 1))));
+    const box = svg.getBoundingClientRect();
+    const x = (evt.clientX - box.left) * (W / box.width);
+    const i = Math.max(0, Math.min(rows.length - 1, Math.round((x - m.l) / (W - m.l - m.r) * (rows.length - 1))));
     const r = rows[i];
     g.style.display = "";
-    $("hx").setAttribute("x1", xs(i)); $("hx").setAttribute("x2", xs(i));
-    $("ha").setAttribute("cx", xs(i)); $("ha").setAttribute("cy", ys(r.agent));
-    $("hb").setAttribute("cx", xs(i)); $("hb").setAttribute("cy", ys(r.spy));
-    const diff = (r.agent / r.spy - 1) * 100;
-    tip.innerHTML = `<div>${r.date}</div><div>Agent <b>${usd(r.agent, 2)}</b></div><div>SPY <b>${usd(r.spy, 2)}</b></div>
-      <div class="${cls(diff)}">${arrow(diff)}${pct(diff)} vs SPY</div>`;
+    for (const [id, attr, v] of [["hx", "x1", xs(i)], ["hx", "x2", xs(i)], ["ha", "cx", xs(i)], ["ha", "cy", ys(r.agent)], ["hb", "cx", xs(i)], ["hb", "cy", ys(r.spy)]]) $(id).setAttribute(attr, v);
+    const diff = r.agent - r.spy;
+    tip.innerHTML = `<div><b>${r.date}</b></div><div>AI: <b>${usd(r.agent)}</b></div><div>S&amp;P 500: <b>${usd(r.spy)}</b></div>
+      <div class="${cls(diff)}">${diff >= 0 ? "AI ahead by " : "AI behind by "}${usd(Math.abs(diff))}</div>`;
     tip.style.display = "block";
-    const x = Math.min(evt.clientX + 14, window.innerWidth - tip.offsetWidth - 8);
-    tip.style.left = x + window.scrollX + "px"; tip.style.top = evt.clientY + window.scrollY + 14 + "px";
+    tip.style.left = Math.min(evt.clientX + 14, window.innerWidth - tip.offsetWidth - 8) + window.scrollX + "px";
+    tip.style.top = evt.clientY + window.scrollY + 14 + "px";
   };
-  const hide = () => { g.style.display = "none"; tip.style.display = "none"; };
   $("hit").addEventListener("pointermove", show);
-  $("hit").addEventListener("pointerleave", hide);
-
-  $("chart-table").innerHTML = `<table><thead><tr><th>Date</th><th class="num">Agent</th><th class="num">SPY (same start)</th><th class="num">Difference</th></tr></thead><tbody>
-    ${rows.slice().reverse().map((r) => `<tr><td>${r.date}</td><td class="num">${usd(r.agent, 2)}</td><td class="num">${usd(r.spy, 2)}</td><td class="num ${cls(r.agent - r.spy)}">${pct((r.agent / r.spy - 1) * 100)}</td></tr>`).join("")}
+  $("hit").addEventListener("pointerleave", () => { g.style.display = "none"; tip.style.display = "none"; });
+  $("chart-table").innerHTML = `<table><thead><tr><th>Day</th><th class="num">AI portfolio</th><th class="num">S&amp;P 500 (same start)</th><th class="num">AI ahead / behind</th></tr></thead><tbody>
+    ${rows.slice().reverse().map((r) => `<tr><td>${r.date}</td><td class="num">${usd(r.agent)}</td><td class="num">${usd(r.spy)}</td><td class="num ${cls(r.agent - r.spy)}">${signedUsd(r.agent - r.spy)}</td></tr>`).join("")}
   </tbody></table>`;
 }
 
@@ -241,44 +298,47 @@ function niceTicks(lo, hi, n) {
 
 function holdings(status) {
   const ps = status.positions || [];
-  if (!ps.length) { $("holdings").innerHTML = `<div class="empty">No positions yet.</div>`; return; }
-  $("holdings").innerHTML = `<table><thead><tr><th>ETF</th><th class="num">Weight</th><th class="num">Value</th><th class="num">Avg cost</th><th class="num">Price</th><th class="num">Unrealized P&amp;L</th></tr></thead><tbody>
-  ${ps.map((p) => `<tr><td><b>${esc(p.symbol)}</b></td><td class="num">${(p.weight * 100).toFixed(1)}%</td><td class="num">${usd(p.market_value, 2)}</td>
-    <td class="num">${usd(p.avg_entry_price, 2)}</td><td class="num">${usd(p.current_price, 2)}</td>
-    <td class="num ${cls(p.unrealized_pl)}">${usd(p.unrealized_pl, 2)} (${pct(p.unrealized_plpc * 100)})</td></tr>`).join("")}
+  if (!ps.length) { $("holdings").innerHTML = `<div class="empty">Nothing yet. The AI hasn't bought anything.</div>`; return; }
+  const cash = status.cash;
+  $("holdings").innerHTML = `<table><thead><tr><th>ETF</th><th>What it is</th><th class="num">Share of money</th><th class="num">Worth now</th><th class="num">Gain / loss</th></tr></thead><tbody>
+  ${ps.map((p) => `<tr><td><b>${esc(p.symbol)}</b></td><td>${esc(p.name || "")}</td><td class="num">${(p.weight * 100).toFixed(0)}%</td>
+    <td class="num">${usd(p.market_value)}</td><td class="num ${cls(p.unrealized_pl)}">${signedUsd(p.unrealized_pl)}</td></tr>`).join("")}
+  ${cash != null && Math.abs(cash) >= 0.5 ? `<tr><td><b>Cash</b></td><td>Not invested</td><td class="num">${(cash / status.equity * 100).toFixed(0)}%</td><td class="num">${usd(cash)}</td><td class="num">–</td></tr>` : ""}
   </tbody></table>`;
 }
 
+function describeOrders(orders) {
+  const ok = (orders || []).filter((o) => !["error", "skipped"].includes(o.status));
+  if (!ok.length) return "Kept everything the same, with no trades today.";
+  const sells = ok.filter((o) => o.side === "sell").map((o) => `${usd(o.notional, 0)} of ${o.symbol}`);
+  const buys = ok.filter((o) => o.side === "buy").map((o) => `${usd(o.notional, 0)} of ${o.symbol}`);
+  return [sells.length ? `Sold ${sells.join(", ")}.` : "", buys.length ? `Bought ${buys.join(", ")}.` : ""].join(" ");
+}
+
 function decisionsView(decisions) {
-  if (!decisions.length) { $("decisions").innerHTML = `<div class="empty">No decisions yet. The agent runs each weekday around 10–11am New York time.</div>`; return; }
-  $("decisions").innerHTML = decisions.slice().reverse().slice(0, 60).map((d) => {
-    const orders = (d.orders || []).map((o) => `${o.side === "buy" ? "Buy" : "Sell"} ${esc(o.symbol)} ${usd(o.notional, 0)} <span class="chip">${esc(o.status)}</span>`);
-    const targets = d.final_targets ? Object.entries(d.final_targets).sort((a, b) => b[1] - a[1]).map(([s, w]) => `${s} ${(w * 100).toFixed(0)}%`).join(" · ") : "";
-    return `<div class="decision">
-      <div class="meta"><strong>${esc(d.date)}</strong> ${esc(d.time || "")}
-        ${d.confidence ? `<span class="chip">confidence: ${esc(d.confidence)}</span>` : ""}
-        ${d.trade_today === false ? `<span class="chip">held</span>` : ""}
-        ${d.dry_run ? `<span class="chip">dry run</span>` : ""}
-        ${d.usage?.billing === "subscription" ? `<span>on Claude subscription</span>` : d.ai_cost_usd != null ? `<span>AI cost ${usd(d.ai_cost_usd, 2)}</span>` : ""}</div>
-      ${d.error ? `<p class="error">${esc(d.error)}</p>` : ""}
-      ${d.market_view ? `<p>${esc(d.market_view)}</p>` : ""}
-      ${targets ? `<div class="sub">Target: ${esc(targets)}</div>` : ""}
-      ${(d.positions || []).length ? `<ul class="pos">${d.positions.map((p) => `<li><span class="sym">${esc(p.symbol)} ${(p.weight * 100).toFixed(0)}%</span> ${esc(p.thesis)}
-        ${p.exit_plan ? `<div class="sub">Exit if: ${esc(p.exit_plan)}</div>` : ""}</li>`).join("")}</ul>` : ""}
-      ${orders.length ? `<details><summary>${orders.length} order${orders.length > 1 ? "s" : ""}</summary>${orders.join("<br>")}</details>` : ""}
-      ${(d.key_drivers || []).length ? `<details><summary>Key drivers</summary><ul>${d.key_drivers.map((k) => `<li>${esc(k)}</li>`).join("")}</ul></details>` : ""}
-      ${(d.notes || []).length ? `<details><summary>Risk engine notes</summary>${d.notes.map(esc).join("<br>")}</details>` : ""}
-      ${(d.sources || []).length ? `<details><summary>${d.sources.length} source${d.sources.length > 1 ? "s" : ""} read</summary>${d.sources.map((s) => /^https?:/.test(s.url) ? `<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a>` : esc(s.title)).join("<br>")}</details>` : ""}
+  const real = decisions.filter((d) => !d.dry_run);
+  if (!real.length) { $("decisions").innerHTML = `<div class="empty">No entries yet. The first one appears after the AI's first run (weekdays, about 17:15 Spain time).</div>`; return; }
+  $("decisions").innerHTML = real.slice().reverse().slice(0, 60).map((d) => {
+    const targets = d.final_targets ? Object.entries(d.final_targets).sort((a, b) => b[1] - a[1]).map(([s, w]) => `${s} ${(w * 100).toFixed(0)}%`).join(", ") : "";
+    return `<div class="entry">
+      <div><span class="when">${esc(d.date)}</span>${d.confidence ? `<span class="chip">confidence: ${esc(d.confidence)}</span>` : ""}</div>
+      ${d.error ? `<p class="error">Something went wrong, so no trades were made: ${esc(d.error)}</p>` : ""}
+      ${d.market_view ? `<p class="action">${esc(d.trade_today === false ? "Kept everything the same, with no trades today." : describeOrders(d.orders))}</p>
+        <p><b>How it saw the market:</b> ${esc(d.market_view)}</p>` : ""}
+      ${targets ? `<p class="small">Money split after today: ${esc(targets)}</p>` : ""}
+      ${(d.positions || []).length ? `<details><summary>Why it picked these</summary><ul class="why">${d.positions.map((p) => `<li><b>${esc(p.symbol)}</b>: ${esc(p.thesis)}${p.exit_plan ? `<br><span class="small">It will sell if: ${esc(p.exit_plan)}</span>` : ""}</li>`).join("")}</ul></details>` : ""}
+      ${(d.key_drivers || []).length ? `<details><summary>News it paid attention to</summary><ul class="why">${d.key_drivers.map((k) => `<li>${esc(k)}</li>`).join("")}</ul></details>` : ""}
+      ${(d.sources || []).length ? `<details><summary>Web pages it read (${d.sources.length})</summary>${d.sources.map((s) => /^https?:/.test(s.url) ? `<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a>` : esc(s.title)).join("<br>")}</details>` : ""}
+      ${(d.notes || []).length ? `<details><summary>Safety-rule adjustments</summary>${d.notes.map(esc).join("<br>")}</details>` : ""}
     </div>`;
   }).join("");
 }
 
 (async () => {
   const [status, equity, decisions] = await Promise.all([load("status.json", {}), load("equity.json", []), load("decisions.json", [])]);
-  const mode = status.mode || "paper";
-  $("mode").textContent = mode === "LIVE" ? "LIVE MONEY" : "Paper trading";
-  if (mode === "LIVE") $("mode").classList.add("live");
-  $("updated").textContent = status.updated ? `Updated ${status.updated.replace("T", " ")} New York` : "Waiting for the first run";
+  if (status.mode === "LIVE") { $("mode").className = "banner live"; $("mode").innerHTML = "💵 <b>Real money.</b> This account trades with real dollars."; }
+  $("updated").textContent = status.updated ? `Last updated ${new Date(status.updated).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}` : "";
+  hero(status, equity);
   tiles(status, equity, decisions);
   chart(equity);
   let lastW = $("chart").clientWidth;
@@ -287,7 +347,7 @@ function decisionsView(decisions) {
   decisionsView(decisions);
   $("toggle-table").addEventListener("click", () => {
     const t = $("chart-table"); t.hidden = !t.hidden;
-    $("toggle-table").textContent = t.hidden ? "Show table" : "Hide table";
+    $("toggle-table").textContent = t.hidden ? "Show as table" : "Hide table";
   });
 })();
 </script>

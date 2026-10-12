@@ -47,12 +47,31 @@ def _performance(rows: list[dict]) -> dict:
     }
 
 
+def _account(cfg, broker: Broker, positions: dict) -> dict:
+    """The agent's own money: CAPITAL_USD plus everything it has gained or lost since it started.
+
+    The Alpaca paper account may hold much more (e.g. $100,000); the agent only ever uses its
+    capital. Since nothing else trades in the account, its profit equals the account's change
+    in equity since the first run.
+    """
+    real = broker.account()
+    if not cfg.capital_usd:
+        return real
+    state = journal.read("capital.json", None)
+    if state is None or state.get("capital") != cfg.capital_usd:
+        state = {"capital": cfg.capital_usd, "baseline_equity": real["equity"], "started": _today()}
+        journal.write("capital.json", state)
+    equity = cfg.capital_usd + (real["equity"] - state["baseline_equity"])
+    invested = sum(p["market_value"] for p in positions.values())
+    return {"equity": equity, "cash": equity - invested, "buying_power": equity - invested}
+
+
 def snapshot(cfg, broker: Broker, market: Market) -> None:
     if not broker.is_trading_day(_today()):
         log.info("not a trading day; no snapshot")
         return
-    acct = broker.account()
     positions = broker.positions()
+    acct = _account(cfg, broker, positions)
     spy = market.daily_bars(["SPY"], days=10)["SPY"]
     rows = journal.upsert_equity({
         "date": _today(),
@@ -69,12 +88,14 @@ def _write_status(cfg, acct: dict, positions: dict, rows: list[dict]) -> None:
     journal.write("status.json", {
         "updated": datetime.now(ET).isoformat(timespec="minutes"),
         "mode": "paper" if cfg.paper else "LIVE",
+        "capital": cfg.capital_usd,
         "model": cfg.claude_model,
         "equity": round(acct["equity"], 2),
         "cash": round(acct["cash"], 2),
         "performance": _performance(rows),
         "positions": sorted(
             ({"symbol": s, **{k: round(v, 4) for k, v in p.items()},
+              "name": CORE_ETFS.get(s, ""),
               "weight": round(p["market_value"] / equity, 4)} for s, p in positions.items()),
             key=lambda p: -p["market_value"],
         ),
@@ -86,8 +107,8 @@ def trade(cfg, broker: Broker, market: Market, dry_run: bool, force: bool) -> in
         log.info("market closed; nothing to do")
         return 0
 
-    acct = broker.account()
     positions = broker.positions()
+    acct = _account(cfg, broker, positions)
     equity = acct["equity"]
     history = journal.read("equity.json", [])
     record: dict = {"date": _today(), "time": datetime.now(ET).strftime("%H:%M"), "equity": equity,
@@ -193,7 +214,8 @@ def trade(cfg, broker: Broker, market: Market, dry_run: bool, force: bool) -> in
         record["orders"] = broker.execute(orders, prices, positions)
 
     journal.append_decision(record)
-    _write_status(cfg, broker.account(), broker.positions(), history)
+    positions = broker.positions()
+    _write_status(cfg, _account(cfg, broker, positions), positions, history)
     for o in record["orders"]:
         log.info("%s %s $%.2f -> %s", o["side"], o["symbol"], o["notional"], o["status"])
     return 0
