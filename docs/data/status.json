@@ -1,9 +1,9 @@
 {
- "updated": "2026-10-12T15:11-04:00",
+ "updated": "2026-10-12T15:21-04:00",
  "mode": "paper",
  "capital": 1000.0,
  "model": "sonnet",
- "equity": 998.35,
+ "equity": 998.34,
  "cash": 10.01,
  "performance": {
   "days_tracked": 0
@@ -12,13 +12,13 @@
   {
    "symbol": "SPY",
    "qty": 0.47,
-   "market_value": 365.3298,
+   "market_value": 365.4003,
    "avg_entry_price": 777.926,
-   "current_price": 777.25,
-   "unrealized_pl": -0.3177,
-   "unrealized_plpc": -0.0009,
+   "current_price": 777.4,
+   "unrealized_pl": -0.2472,
+   "unrealized_plpc": -0.0007,
    "name": "S&P 500",
-   "weight": 0.3659
+   "weight": 0.366
   },
   {
    "symbol": "XLE",
@@ -34,32 +34,32 @@
   {
    "symbol": "IGV",
    "qty": 1.0603,
-   "market_value": 117.7255,
+   "market_value": 117.7053,
    "avg_entry_price": 112.034,
-   "current_price": 111.03,
-   "unrealized_pl": -1.0645,
-   "unrealized_plpc": -0.009,
+   "current_price": 111.011,
+   "unrealized_pl": -1.0847,
+   "unrealized_plpc": -0.0091,
    "name": "Software",
    "weight": 0.1179
   },
   {
    "symbol": "XLV",
    "qty": 0.5772,
-   "market_value": 99.087,
+   "market_value": 99.0581,
    "avg_entry_price": 171.512,
-   "current_price": 171.68,
-   "unrealized_pl": 0.097,
-   "unrealized_plpc": 0.001,
+   "current_price": 171.63,
+   "unrealized_pl": 0.0681,
+   "unrealized_plpc": 0.0007,
    "name": "Health care",
-   "weight": 0.0993
+   "weight": 0.0992
   },
   {
    "symbol": "QUAL",
    "qty": 0.435,
-   "market_value": 99.0248,
+   "market_value": 99.0205,
    "avg_entry_price": 227.54,
-   "current_price": 227.62,
-   "unrealized_pl": 0.0348,
+   "current_price": 227.61,
+   "unrealized_pl": 0.0305,
    "unrealized_plpc": 0.0003,
    "name": "US quality",
    "weight": 0.0992
@@ -67,11 +67,11 @@
   {
    "symbol": "XOP",
    "qty": 0.4075,
-   "market_value": 79.159,
+   "market_value": 79.1387,
    "avg_entry_price": 194.316,
-   "current_price": 194.24,
-   "unrealized_pl": -0.031,
-   "unrealized_plpc": -0.0004,
+   "current_price": 194.19,
+   "unrealized_pl": -0.0513,
+   "unrealized_plpc": -0.0006,
    "name": "Oil & gas exploration",
    "weight": 0.0793
   }
