@@ -15,8 +15,10 @@ A fully automated agent that, once per US trading day:
    The dashboard reads those files.
 
 Every 10 minutes while the market is open, a rules-only **watcher** (`trader/watch.py`, GitHub
-Actions, no Claude call) sells positions that fall 6% below their high and can buy up to two sharp
-breakouts a day (up 2%+ and 1.5x their usual range, at a new 20-day high, while SPY isn't falling).
+Actions, no Claude call) sells positions that fall 6% below their high, and scores every ETF on six
+buy signals: daily uptrend, a healthy rise today, price above today's VWAP, bullish 15-minute
+candles, a volume surge and a new 20-day high. When 5 of 6 agree (and SPY isn't falling, and the
+first half hour is over) it buys 8% of the money, up to 4 times a day, funded from SPY.
 
 After the close, a second job records portfolio value against SPY so the dashboard can compare them.
 
@@ -37,7 +39,7 @@ After the close, a second job records portfolio value against SPY so the dashboa
 | Unallocated money goes to | SPY | `IDLE_ASSET` |
 | Most that may sit in SPY | 50% | `MAX_IDLE_WEIGHT` |
 | Watcher: sell a position this far below its high | 6% | `STOP_TRAIL_PCT` |
-| Watcher: breakout buy size / max per day | 10% / 2 | `BREAKOUT_SIZE` / `MAX_BREAKOUTS_PER_DAY` |
+| Watcher: signals that must agree / buy size / max buys per day | 5 of 6 / 8% / 4 | `WATCH_MIN_SCORE` / `WATCH_BUY_SIZE` / `WATCH_MAX_BUYS_PER_DAY` |
 | Max weight in one ETF (other than SPY) | 30% | `MAX_POSITION_WEIGHT` |
 | Max number of ETFs | 8 | `MAX_POSITIONS` |
 | Max total in leveraged/inverse ETFs | 10% | `MAX_LEVERAGED_WEIGHT` |

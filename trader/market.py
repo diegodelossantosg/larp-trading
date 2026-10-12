@@ -11,10 +11,10 @@ from alpaca.data.enums import Adjustment, DataFeed
 from alpaca.data.historical import StockHistoricalDataClient
 from alpaca.data.historical.news import NewsClient
 from alpaca.data.requests import NewsRequest, StockBarsRequest, StockSnapshotRequest
-from alpaca.data.timeframe import TimeFrame
+from alpaca.data.timeframe import TimeFrame, TimeFrameUnit
 
 from .config import Config
-from .indicators import atr_pct
+from .indicators import atr_pct, candlestick_patterns
 
 log = logging.getLogger(__name__)
 
@@ -76,26 +76,57 @@ class Market:
         ]
 
     def quotes(self, symbols: list[str]):
-        """Live price, yesterday's close, previous 20-day high and typical range per symbol."""
+        """Live price plus the daily-trend and intraday-candle inputs the watcher scores."""
         from .watch import Quote
 
         snaps = self.bars_client.get_stock_snapshot(
             StockSnapshotRequest(symbol_or_symbols=symbols, feed=DataFeed.IEX)
         )
         today = datetime.now(timezone.utc).date()
-        bars = self.daily_bars(symbols, days=45)
+        daily = self.daily_bars(symbols, days=90)
+        intraday = self.intraday_bars(symbols)
         out = {}
         for sym, snap in snaps.items():
-            df = bars.get(sym)
+            df = daily.get(sym)
             if snap is None or snap.latest_trade is None or snap.previous_daily_bar is None or df is None:
                 continue
             past = df[[ts.date() < today for ts in df.index]]
-            if len(past) < 20:
+            if len(past) < 50:
                 continue
-            out[sym] = Quote(
+            closes = past["close"]
+            q = Quote(
                 price=float(snap.latest_trade.price),
                 prev_close=float(snap.previous_daily_bar.close),
-                high_20d=float(past["close"].tail(20).max()),
+                high_20d=float(closes.tail(20).max()),
                 atr_pct=atr_pct(past),
+                sma20=float(closes.tail(20).mean()),
+                sma50=float(closes.tail(50).mean()),
             )
+            bars = intraday.get(sym)
+            if bars is not None and len(bars) >= 2:
+                done = bars.iloc[:-1]  # the last bar is still forming
+                q.bars_today = len(done)
+                vol = bars["volume"].sum()
+                q.vwap = float((bars["vwap"] * bars["volume"]).sum() / vol) if vol else 0.0
+                q.candles = candlestick_patterns(done) if len(done) >= 3 else []
+                avg = done["volume"].mean()
+                q.volume_ratio = float(done["volume"].iloc[-1] / avg) if avg else 0.0
+            out[sym] = q
         return out
+
+    def intraday_bars(self, symbols: list[str]) -> dict[str, pd.DataFrame]:
+        """Today's 15-minute bars (IEX feed, real time), oldest first."""
+        now = datetime.now(timezone.utc)
+        start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        try:
+            df = self.bars_client.get_stock_bars(StockBarsRequest(
+                symbol_or_symbols=symbols, timeframe=TimeFrame(15, TimeFrameUnit.Minute),
+                start=start, feed=DataFeed.IEX,
+            )).df
+        except APIError as e:
+            log.warning("intraday bars failed: %s", e)
+            return {}
+        if df.empty:
+            return {}
+        return {sym: df.xs(sym, level="symbol").sort_index()
+                for sym in df.index.get_level_values("symbol").unique()}

@@ -2,7 +2,7 @@
 
     python -m trader.main trade      # research with Claude, then rebalance (market hours)
     python -m trader.main snapshot   # after the close: record equity vs SPY for the dashboard
-    python -m trader.main watch      # every 10 minutes: trailing stops and breakout buys (no Claude)
+    python -m trader.main watch      # every 10 minutes: trailing stops and signal-based buys (no Claude)
 
 Flags for trade: --dry-run (decide but place no orders), --force (run while the market is closed).
 """
@@ -231,7 +231,7 @@ def trade(cfg, broker: Broker, market: Market, dry_run: bool, force: bool) -> in
 
 
 def watch(cfg, broker: Broker, market: Market, dry_run: bool, force: bool = False) -> int:
-    """10-minute check: trailing stops and breakout buys. Rules only, no Claude."""
+    """10-minute check: trailing stops and signal-based buys. Rules only, no Claude."""
     if not force and not broker.market_open():
         log.info("market closed; nothing to do")
         return 0
@@ -252,20 +252,23 @@ def watch(cfg, broker: Broker, market: Market, dry_run: bool, force: bool = Fals
 
     orders = rules.stop_orders(positions, highs, quotes, cfg.idle_asset, cfg.stop_trail_pct)
     stopped = {o.symbol for o in orders}
-    used = state.get("breakouts", {}).get(today, 0)
-    slots = cfg.max_breakouts_per_day - used
+    used = state.get("buys", state.get("breakouts", {})).get(today, 0)
+    slots = cfg.watch_max_buys_per_day - used
     if slots > 0:
-        candidates = rules.breakout_candidates(quotes, set(positions), cfg.idle_asset, cfg.breakout_min_pct)
-        orders += rules.breakout_orders(
+        equity = acct["equity"] or 1
+        weights = {s: p["market_value"] / equity for s, p in positions.items() if s not in stopped}
+        candidates = rules.buy_candidates(quotes, weights, cfg.idle_asset, cfg.watch_min_score,
+                                          cfg.max_position_weight, cfg.watch_buy_size)
+        orders += rules.buy_orders(
             candidates, equity=acct["equity"],
             cash=acct["cash"] + sum(o.notional for o in orders),
             idle_value=positions.get(cfg.idle_asset, {}).get("market_value", 0.0),
-            idle_asset=cfg.idle_asset, n_positions=len(set(positions) - stopped - {cfg.idle_asset}),
-            max_positions=cfg.max_positions, size=cfg.breakout_size, slots=slots,
+            idle_asset=cfg.idle_asset, held=set(positions) - stopped,
+            max_positions=cfg.max_positions, size=cfg.watch_buy_size, slots=slots,
         )
 
     new_buys = sum(1 for o in orders if o.side == "buy")
-    state = {"highs": highs, "breakouts": {today: used + new_buys}, "last_check": datetime.now(ET).isoformat(timespec="minutes")}
+    state = {"highs": highs, "buys": {today: used + new_buys}, "last_check": datetime.now(ET).isoformat(timespec="minutes")}
     if not orders:
         if highs != journal.read("watch.json", {}).get("highs"):
             journal.write("watch.json", state)

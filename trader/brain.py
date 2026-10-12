@@ -33,8 +33,8 @@ How the portfolio works:
   MUST put at least half the portfolio into your best ideas other than SPY. Spread it over 2-6
   ETFs whose edge you can explain; if you under-allocate, code scales your picks up or leaves cash.
 - Between your daily runs, an automatic watcher checks prices every 10 minutes: it sells a
-  position that falls 6% below its high since purchase (trailing stop), and may buy up to two
-  sharp same-day breakouts. Recent "watch" entries in previous_decisions show what it did.
+  position that falls 6% below its high since purchase (trailing stop), and may make up to four
+  8% buys a day when at least 5 of 6 trend, intraday-candle, VWAP and volume signals agree. Recent "watch" entries in previous_decisions show what it did.
 - Positions you omit are sold. To keep a position, include it again with its weight.
 - Small weight changes are ignored by a rebalance band, so do not fiddle with weights.
 - Leveraged and inverse ETFs reset daily and decay in choppy markets; use them only for short,

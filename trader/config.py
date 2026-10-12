@@ -52,9 +52,9 @@ class Config:
     capital_usd: float  # money the agent may use; 0 = the whole Alpaca account
     max_idle_weight: float  # most that may sit in the idle asset (SPY)
     stop_trail_pct: float  # sell a position that falls this far below its high since bought
-    breakout_min_pct: float  # minimum same-day rise for a breakout buy
-    breakout_size: float  # share of capital per breakout buy
-    max_breakouts_per_day: int
+    watch_min_score: int  # how many of the watcher's 6 buy signals must agree
+    watch_buy_size: float  # share of capital per watcher buy
+    watch_max_buys_per_day: int
 
 
 def load_config() -> Config:
@@ -94,7 +94,7 @@ def load_config() -> Config:
         capital_usd=_float("CAPITAL_USD", 1000),
         max_idle_weight=_float("MAX_IDLE_WEIGHT", 0.50),
         stop_trail_pct=_float("STOP_TRAIL_PCT", 0.06),
-        breakout_min_pct=_float("BREAKOUT_MIN_PCT", 0.02),
-        breakout_size=_float("BREAKOUT_SIZE", 0.10),
-        max_breakouts_per_day=int(_float("MAX_BREAKOUTS_PER_DAY", 2)),
+        watch_min_score=int(_float("WATCH_MIN_SCORE", 5)),
+        watch_buy_size=_float("WATCH_BUY_SIZE", 0.08),
+        watch_max_buys_per_day=int(_float("WATCH_MAX_BUYS_PER_DAY", 4)),
     )

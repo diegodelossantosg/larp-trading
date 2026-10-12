@@ -2,10 +2,11 @@
 
 1. Trailing stop: sell any position (other than the idle asset) that has fallen
    STOP_TRAIL_PCT below its highest price since it was bought.
-2. Breakouts: buy an ETF that is rising sharply today (at least BREAKOUT_MIN_PCT and
-   1.5x its usual daily range), at a new 20-day high, while SPY is not falling.
-   Each buy is BREAKOUT_SIZE of capital, funded from the idle asset or cash, at most
-   MAX_BREAKOUTS_PER_DAY per day, and it gets the same trailing stop.
+2. Intraday buys: score every ETF on six signals from its daily trend and today's
+   15-minute candles. Buy when at least WATCH_MIN_SCORE agree, the market (SPY) is not
+   falling and the first half hour of the session is over. Each buy is WATCH_BUY_SIZE of
+   capital, funded from the idle asset or cash, at most WATCH_MAX_BUYS_PER_DAY per day,
+   and gets the same trailing stop.
 
 No Claude call is made here, so it is quick and free to run often.
 """
@@ -13,12 +14,14 @@ No Claude call is made here, so it is quick and free to run often.
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from .risk import Order
 from .universe import CORE_ETFS, LEVERAGED
 
 log = logging.getLogger(__name__)
+
+BULLISH_CANDLES = {"hammer", "inverted_hammer", "bullish_engulfing", "morning_star", "three_white_soldiers"}
 
 
 @dataclass
@@ -27,6 +30,12 @@ class Quote:
     prev_close: float  # yesterday's close
     high_20d: float  # highest close of the previous 20 sessions
     atr_pct: float  # typical daily range, % of price
+    sma20: float = 0.0  # daily moving averages (previous sessions)
+    sma50: float = 0.0
+    vwap: float = 0.0  # today's volume-weighted average price
+    candles: list[str] = field(default_factory=list)  # patterns on the latest 15-minute bars
+    volume_ratio: float = 0.0  # latest 15-minute volume vs today's average bar
+    bars_today: int = 0  # completed 15-minute bars so far today
 
 
 def update_highs(highs: dict[str, float], positions: dict[str, dict], quotes: dict[str, Quote]) -> dict[str, float]:
@@ -53,37 +62,61 @@ def stop_orders(positions: dict[str, dict], highs: dict[str, float], quotes: dic
     return orders
 
 
-def breakout_candidates(quotes: dict[str, Quote], held: set[str], idle_asset: str,
-                        min_pct: float) -> list[tuple[str, float]]:
-    """(symbol, today's % change) for qualifying breakouts, strongest first."""
+def score(q: Quote) -> tuple[int, list[str]]:
+    """How many of the six buy signals agree, and which ones."""
+    change = q.price / q.prev_close - 1
+    signals = {
+        "daily uptrend": q.sma20 > 0 and q.price > q.sma20 > q.sma50,
+        f"up {change:.1%} today": max(0.01, 0.75 * q.atr_pct / 100) <= change <= 0.06,
+        "above today's average price (VWAP)": q.vwap > 0 and q.price > q.vwap,
+        "bullish candles: " + ", ".join(sorted(BULLISH_CANDLES & set(q.candles))): bool(BULLISH_CANDLES & set(q.candles)),
+        f"volume {q.volume_ratio:.1f}x normal": q.volume_ratio >= 1.5,
+        "new 20-day high": q.price >= q.high_20d,
+    }
+    hits = [name for name, ok in signals.items() if ok]
+    return len(hits), hits
+
+
+def buy_candidates(quotes: dict[str, Quote], weights: dict[str, float], idle_asset: str,
+                   min_score: int, max_weight: float, size: float) -> list[tuple[str, int, list[str]]]:
+    """(symbol, score, reasons) for ETFs worth buying now, best first."""
     spy = quotes.get("SPY")
     if spy is None or spy.price / spy.prev_close - 1 < -0.005:
         return []  # don't chase rallies on a falling market
     found = []
     for sym, q in quotes.items():
-        if sym in held or sym == idle_asset or sym in LEVERAGED or sym not in CORE_ETFS:
+        if sym == idle_asset or sym in LEVERAGED or sym not in CORE_ETFS:
             continue
-        change = q.price / q.prev_close - 1
-        if change >= max(min_pct, 1.5 * q.atr_pct / 100) and q.price >= q.high_20d:
-            found.append((sym, change))
-    return sorted(found, key=lambda x: -x[1])
+        if q.bars_today < 2 or weights.get(sym, 0.0) + size > max_weight:
+            continue  # skip the opening half hour, and positions already at their cap
+        s, reasons = score(q)
+        if s >= min_score:
+            found.append((sym, s, reasons))
+    return sorted(found, key=lambda x: (-x[1], -(quotes[x[0]].price / quotes[x[0]].prev_close)))
 
 
-def breakout_orders(candidates: list[tuple[str, float]], *, equity: float, cash: float,
-                    idle_value: float, idle_asset: str, n_positions: int, max_positions: int,
-                    size: float, slots: int) -> list[Order]:
+def buy_orders(candidates: list[tuple[str, int, list[str]]], *, equity: float, cash: float,
+               idle_value: float, idle_asset: str, held: set[str], max_positions: int,
+               size: float, slots: int) -> list[Order]:
     """Buys for the best candidates, plus the idle-asset sale that pays for them."""
     buys: list[Order] = []
-    for sym, change in candidates[:slots]:
-        if n_positions + len(buys) >= max_positions:
-            break
-        buys.append(Order(sym, "buy", round(size * equity, 2), f"breakout: up {change:.1%} today, new 20-day high"))
+    n_positions = len(held - {idle_asset})
+    for sym, s, reasons in candidates[:slots]:
+        if sym not in held and n_positions >= max_positions:
+            continue
+        if sym not in held:
+            n_positions += 1
+        buys.append(Order(sym, "buy", round(size * equity, 2), f"{s}/6 signals: " + "; ".join(reasons)))
+    if not buys:
+        return []
     need = sum(o.notional for o in buys) - max(0.0, cash - 0.01 * equity)
-    if need > 0:
-        sell = min(need, idle_value)
-        if sell < need:  # can't fully fund: shrink the buys to what is available
-            scale = (sum(o.notional for o in buys) - (need - sell)) / sum(o.notional for o in buys)
-            buys = [Order(o.symbol, o.side, round(o.notional * scale, 2), o.reason) for o in buys if o.notional * scale >= 5]
-        if sell >= 5 and buys:
-            return [Order(idle_asset, "sell", round(sell, 2), "funding breakout buys")] + buys
+    if need <= 0:
+        return buys
+    sell = min(need, idle_value)
+    if sell < need:  # can't fully fund: shrink the buys to what is available
+        total = sum(o.notional for o in buys)
+        scale = (total - (need - sell)) / total
+        buys = [Order(o.symbol, o.side, round(o.notional * scale, 2), o.reason) for o in buys if o.notional * scale >= 5]
+    if sell >= 5 and buys:
+        return [Order(idle_asset, "sell", round(sell, 2), "funding the watcher's buys")] + buys
     return buys
