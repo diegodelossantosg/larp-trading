@@ -1,7 +1,7 @@
 name: Watcher (every 10 min)
 
 # Rules-only price check between Claude's daily decisions: trailing stops and breakout buys,
-# and a live portfolio value for the dashboard.
+# and a live portfolio value for the dashboard. Runs from the default branch (main).
 # No Claude call, so it needs only the Alpaca secrets. It does nothing while the market is closed.
 on:
   schedule:
