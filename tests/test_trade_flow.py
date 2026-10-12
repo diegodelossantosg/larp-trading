@@ -8,7 +8,7 @@ from trader.config import Config
 
 
 def cfg(**kw):
-    base = dict(anthropic_api_key="", alpaca_api_key="k", alpaca_secret_key="s", paper=True,
+    base = dict(anthropic_api_key="", claude_backend="api", alpaca_api_key="k", alpaca_secret_key="s", paper=True,
                 claude_model="claude-opus-5-5", claude_effort="high", idle_asset="SPY",
                 max_position_weight=0.30, max_positions=8, max_leveraged_weight=0.10,
                 max_daily_turnover=1.0, rebalance_band=0.02, min_order_usd=25,

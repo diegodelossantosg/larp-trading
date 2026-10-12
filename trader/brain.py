@@ -4,6 +4,9 @@ from __future__ import annotations
 
 import json
 import logging
+import os
+import subprocess
+import tempfile
 from dataclasses import dataclass, field
 
 import anthropic
@@ -54,8 +57,14 @@ Discipline:
   trade_today=false when nothing material changed.
 - Be honest about uncertainty in your confidence rating.
 
-When your research is done, call the submit_decision tool exactly once with your final decision.
+{finish}
 """
+
+FINISH_API = "When your research is done, call the submit_decision tool exactly once with your final decision."
+FINISH_SUBSCRIPTION = (
+    "When your research is done, reply with your final decision in the required JSON format, "
+    "listing the most useful web pages you read in `sources`."
+)
 
 DECISION_TOOL = {
     "name": "submit_decision",
@@ -98,6 +107,17 @@ DECISION_TOOL = {
 }
 
 
+SOURCES_SCHEMA = {
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {"title": {"type": "string"}, "url": {"type": "string"}},
+        "required": ["title", "url"],
+        "additionalProperties": False,
+    },
+}
+
+
 @dataclass
 class Usage:
     input_tokens: int = 0
@@ -106,6 +126,8 @@ class Usage:
     cache_write_tokens: int = 0
     web_searches: int = 0
     model: str = ""
+    billing: str = "api"  # "api" (pay per use) or "subscription" (included in your Claude plan)
+    api_equivalent_usd: float | None = None  # what the same run would cost on the API
 
     def add(self, u) -> None:
         self.input_tokens += u.input_tokens or 0
@@ -116,6 +138,8 @@ class Usage:
             self.web_searches += u.server_tool_use.web_search_requests or 0
 
     def cost_usd(self) -> float | None:
+        if self.billing == "subscription":
+            return 0.0
         p = PRICES.get(self.model)
         if p is None:
             return None
@@ -133,6 +157,65 @@ class Decision:
 
 
 def decide(cfg: Config, briefing: dict) -> Decision:
+    if cfg.claude_backend == "subscription":
+        return decide_with_claude_code(cfg, briefing)
+    return decide_with_api(cfg, briefing)
+
+
+def decide_with_claude_code(cfg: Config, briefing: dict, timeout_s: int = 1200) -> Decision:
+    """Run Claude Code headless, signed in with a Claude subscription token.
+
+    Needs the `claude` CLI and CLAUDE_CODE_OAUTH_TOKEN (from `claude setup-token`).
+    """
+    usage = Usage(model=cfg.claude_model, billing="subscription")
+    schema = json.loads(json.dumps(DECISION_TOOL["input_schema"]))
+    schema["properties"]["sources"] = SOURCES_SCHEMA
+    schema["required"].append("sources")
+    cmd = [
+        "claude", "-p",
+        "--output-format", "json",
+        "--json-schema", json.dumps(schema),
+        "--system-prompt", SYSTEM_PROMPT.format(finish=FINISH_SUBSCRIPTION),
+        "--tools", "WebSearch,WebFetch",
+        "--allowedTools", "WebSearch", "WebFetch",
+        "--permission-mode", "dontAsk",
+        "--strict-mcp-config",
+        "--no-session-persistence",
+        "--model", cfg.claude_model,
+        "--effort", cfg.claude_effort,
+    ]
+    prompt = "Today's briefing (JSON):\n" + json.dumps(briefing, separators=(",", ":"), default=str)
+    # Run from an empty folder so Claude Code picks up no project files or settings.
+    with tempfile.TemporaryDirectory() as workdir:
+        try:
+            proc = subprocess.run(cmd, input=prompt, capture_output=True, text=True,
+                                  timeout=timeout_s, cwd=workdir, env=os.environ.copy())
+        except FileNotFoundError:
+            return Decision(None, usage, "Claude Code CLI not installed (npm install -g @anthropic-ai/claude-code)")
+        except subprocess.TimeoutExpired:
+            return Decision(None, usage, f"Claude Code timed out after {timeout_s // 60} minutes")
+    try:
+        out = json.loads(proc.stdout)
+    except json.JSONDecodeError:
+        tail = (proc.stderr or proc.stdout or "").strip()[-500:]
+        return Decision(None, usage, f"Claude Code failed (exit {proc.returncode}): {tail}")
+
+    u = out.get("usage") or {}
+    usage.input_tokens = u.get("input_tokens", 0) or 0
+    usage.output_tokens = u.get("output_tokens", 0) or 0
+    usage.cache_read_tokens = u.get("cache_read_input_tokens", 0) or 0
+    usage.cache_write_tokens = u.get("cache_creation_input_tokens", 0) or 0
+    usage.api_equivalent_usd = out.get("total_cost_usd")
+
+    data = out.get("structured_output")
+    if out.get("is_error") or not isinstance(data, dict):
+        reason = out.get("result") or out.get("subtype") or "no structured output"
+        return Decision(None, usage, f"Claude Code error: {str(reason)[:500]}")
+    sources = [s for s in data.pop("sources", []) if isinstance(s, dict)]
+    return Decision(data, usage, None, sources)
+
+
+def decide_with_api(cfg: Config, briefing: dict) -> Decision:
     client = anthropic.Anthropic(api_key=cfg.anthropic_api_key or None)
     usage = Usage(model=cfg.claude_model)
     tools = [
@@ -150,7 +233,7 @@ def decide(cfg: Config, briefing: dict) -> Decision:
             with client.beta.messages.stream(
                 model=cfg.claude_model,
                 max_tokens=64000,
-                system=[{"type": "text", "text": SYSTEM_PROMPT, "cache_control": {"type": "ephemeral"}}],
+                system=[{"type": "text", "text": SYSTEM_PROMPT.format(finish=FINISH_API), "cache_control": {"type": "ephemeral"}}],
                 messages=messages,
                 tools=tools,
                 output_config={"effort": cfg.claude_effort},

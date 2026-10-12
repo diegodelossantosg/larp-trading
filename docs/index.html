@@ -149,6 +149,7 @@ function tiles(status, equity, decisions) {
   const spyRet = first ? (last.spy_close / first.spy_close - 1) * 100 : null;
   const excess = agentRet == null ? null : agentRet - spyRet;
   const aiCost = decisions.reduce((s, d) => s + (d.ai_cost_usd || 0), 0);
+  const onPlan = decisions.length > 0 && decisions.every((d) => d.usage?.billing === "subscription");
   const netGain = first ? last.equity - first.equity - aiCost : null;
   const dd = equity.length ? maxDrawdown(equity.map((r) => r.equity)) : null;
   const items = [
@@ -157,7 +158,9 @@ function tiles(status, equity, decisions) {
     ["SPY return", `<span class="${cls(spyRet)}">${arrow(spyRet)}${pct(spyRet)}</span>`, "buy-and-hold benchmark"],
     ["Vs S&P 500", `<span class="${cls(excess)}">${arrow(excess)}${pct(excess)}</span>`, excess == null ? "" : excess >= 0 ? "ahead of SPY" : "behind SPY"],
     ["Max drawdown", pct(dd), "worst peak-to-trough"],
-    ["Claude API cost", usd(aiCost, 2), netGain == null ? "" : `profit after AI cost: ${usd(netGain, 2)}`],
+    onPlan
+      ? ["Claude cost", "Subscription", "runs on your Claude plan; no per-run charge"]
+      : ["Claude API cost", usd(aiCost, 2), netGain == null ? "" : `profit after AI cost: ${usd(netGain, 2)}`],
   ];
   $("tiles").innerHTML = items.map(([l, v, h]) =>
     `<div class="tile"><div class="label">${l}</div><div class="value">${v}</div><div class="hint">${esc(h)}</div></div>`).join("");
@@ -256,7 +259,7 @@ function decisionsView(decisions) {
         ${d.confidence ? `<span class="chip">confidence: ${esc(d.confidence)}</span>` : ""}
         ${d.trade_today === false ? `<span class="chip">held</span>` : ""}
         ${d.dry_run ? `<span class="chip">dry run</span>` : ""}
-        ${d.ai_cost_usd != null ? `<span>AI cost ${usd(d.ai_cost_usd, 2)}</span>` : ""}</div>
+        ${d.usage?.billing === "subscription" ? `<span>on Claude subscription</span>` : d.ai_cost_usd != null ? `<span>AI cost ${usd(d.ai_cost_usd, 2)}</span>` : ""}</div>
       ${d.error ? `<p class="error">${esc(d.error)}</p>` : ""}
       ${d.market_view ? `<p>${esc(d.market_view)}</p>` : ""}
       ${targets ? `<div class="sub">Target: ${esc(targets)}</div>` : ""}

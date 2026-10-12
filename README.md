@@ -45,9 +45,15 @@ named like a fund, and trade at least $5M per day.
 
 1. **Alpaca paper account.** Sign up at alpaca.markets. In the dashboard, switch to *Paper Trading*
    and generate an API key and secret.
-2. **Anthropic API key.** Get one from console.anthropic.com and add some credit.
+2. **Claude access**, either of:
+   - **Your Claude subscription (default, no extra cost).** On your computer, install Claude Code
+     (`npm install -g @anthropic-ai/claude-code`), run `claude setup-token`, and log in. It prints a
+     long-lived token. Each daily run uses some of your plan's usage limits.
+   - **API credit.** Create a key at console.anthropic.com. You pay per run, and the exact cost
+     shows on the dashboard. If an API key is set, it is used instead of the subscription.
 3. **GitHub secrets.** In this repo: *Settings → Secrets and variables → Actions → New repository
-   secret*. Add `ANTHROPIC_API_KEY`, `ALPACA_API_KEY` and `ALPACA_SECRET_KEY`.
+   secret*. Add `ALPACA_API_KEY`, `ALPACA_SECRET_KEY`, and either `CLAUDE_CODE_OAUTH_TOKEN` (the
+   subscription token) or `ANTHROPIC_API_KEY`.
 4. **Merge to `main`.** Scheduled GitHub Actions only run from the default branch.
 5. **Dashboard.** *Settings → Pages → Build and deployment → Deploy from a branch*, then choose
    `main` and the `/docs` folder. It will be at `https://<your-user>.github.io/larp-trading/`.
@@ -78,12 +84,15 @@ python -m http.server -d docs 8000   # dashboard at http://localhost:8000
 ## Costs
 
 - Alpaca paper trading and its market data and news: free.
-- Claude: one research run per day on `claude-opus-5-5` with up to 10 web searches. This is
-  typically somewhere around $0.50–$2 per day; the exact cost of each run shows on the dashboard.
-  Use `CLAUDE_EFFORT=medium` or `MAX_WEB_SEARCHES=5` to spend less.
+- Claude on your subscription: no extra charge. It uses Sonnet by default. Set the repository
+  variable `CLAUDE_MODEL=opus` for deeper research, which uses more of your plan's limits.
+- Claude on API credit: one run per day on `claude-opus-5-5` with up to 10 web searches. This is
+  typically somewhere around $0.50–$2 per day, and the exact cost of each run shows on the
+  dashboard. Use `CLAUDE_EFFORT=medium` or `MAX_WEB_SEARCHES=5` to spend less.
 - GitHub Actions and Pages: free for public repos.
 
-The dashboard subtracts the Claude bill from the profit, so you see whether the agent pays for itself.
+On API credit, the dashboard subtracts the Claude bill from the profit, so you see whether the
+agent pays for itself.
 
 ## About tweets and social media
 
@@ -106,7 +115,7 @@ Only after a long paper record that beats SPY *after* AI costs:
 ```
 trader/
   main.py        daily run: data → Claude → risk engine → orders → journal
-  brain.py       Claude prompt, web search, structured decision, cost tracking
+  brain.py       Claude prompt, web search, structured decision (subscription or API)
   indicators.py  indicators + candlestick patterns
   risk.py        position limits, rebalancing, turnover cap, drawdown halt
   broker.py      Alpaca account, ETF vetting, order execution

@@ -33,6 +33,7 @@ def _float(name: str, default: float) -> float:
 @dataclass(frozen=True)
 class Config:
     anthropic_api_key: str
+    claude_backend: str  # "subscription" (Claude Code + your Claude plan) or "api" (API credit)
     alpaca_api_key: str
     alpaca_secret_key: str
     paper: bool
@@ -60,12 +61,19 @@ def load_config() -> Config:
     missing = [k for k in ("ALPACA_API_KEY", "ALPACA_SECRET_KEY") if not os.environ.get(k)]
     if missing:
         raise SystemExit(f"Missing settings: {', '.join(missing)} (see .env.example)")
+    backend = os.environ.get("CLAUDE_BACKEND", "").strip().lower()
+    if not backend:
+        backend = "api" if os.environ.get("ANTHROPIC_API_KEY") else "subscription"
+    if backend not in ("api", "subscription"):
+        raise SystemExit("CLAUDE_BACKEND must be 'api' or 'subscription'")
+    default_model = "claude-opus-5-5" if backend == "api" else "sonnet"
     return Config(
         anthropic_api_key=os.environ.get("ANTHROPIC_API_KEY", ""),
+        claude_backend=backend,
         alpaca_api_key=os.environ.get("ALPACA_API_KEY", ""),
         alpaca_secret_key=os.environ.get("ALPACA_SECRET_KEY", ""),
         paper=paper,
-        claude_model=os.environ.get("CLAUDE_MODEL", "claude-opus-5-5"),
+        claude_model=os.environ.get("CLAUDE_MODEL") or default_model,
         claude_effort=os.environ.get("CLAUDE_EFFORT", "high"),
         idle_asset=os.environ.get("IDLE_ASSET", "SPY").upper(),
         max_position_weight=_float("MAX_POSITION_WEIGHT", 0.30),

@@ -30,7 +30,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
+      # Claude: either your subscription token (from `claude setup-token`) or an API key.
+      CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      CLAUDE_MODEL: ${{ vars.CLAUDE_MODEL }}
       ALPACA_API_KEY: ${{ secrets.ALPACA_API_KEY }}
       ALPACA_SECRET_KEY: ${{ secrets.ALPACA_SECRET_KEY }}
       # Paper unless you set BOTH repository variables (Settings > Secrets and variables > Variables).
@@ -44,6 +47,11 @@ jobs:
           python-version: "3.13"
           cache: pip
       - run: pip install -r requirements.txt
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install Claude Code (used with a Claude subscription)
+        run: npm install -g @anthropic-ai/claude-code@2.1.296
 
       - name: Pick command
         id: cmd

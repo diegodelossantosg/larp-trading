@@ -53,3 +53,29 @@ def test_refusal_returns_error(monkeypatch):
         [NS(stop_reason="refusal", content=[], usage=usage())], []))
     d = brain.decide(cfg(), {})
     assert d.data is None and "declined" in d.error
+
+
+def test_subscription_backend_parses_claude_code_output(monkeypatch):
+    import json
+    seen = {}
+
+    def fake_run(cmd, input, **kw):
+        seen["cmd"], seen["input"] = cmd, input
+        out = {"is_error": False, "subtype": "success", "total_cost_usd": 0.42,
+               "usage": {"input_tokens": 10, "output_tokens": 5},
+               "structured_output": {"trade_today": False, "sources": [{"title": "Fed", "url": "https://x"}]}}
+        return NS(stdout=json.dumps(out), stderr="", returncode=0)
+
+    monkeypatch.setattr(brain.subprocess, "run", fake_run)
+    d = brain.decide(cfg(claude_backend="subscription", claude_model="sonnet"), {"date": "2026-10-12"})
+    assert d.data == {"trade_today": False}
+    assert d.sources == [{"title": "Fed", "url": "https://x"}]
+    assert d.usage.cost_usd() == 0.0 and d.usage.api_equivalent_usd == 0.42
+    assert "--json-schema" in seen["cmd"] and "2026-10-12" in seen["input"]
+
+
+def test_subscription_backend_reports_failures(monkeypatch):
+    monkeypatch.setattr(brain.subprocess, "run",
+                        lambda *a, **k: NS(stdout="", stderr="Invalid API key · Please run /login", returncode=1))
+    d = brain.decide(cfg(claude_backend="subscription"), {})
+    assert d.data is None and "Invalid API key" in d.error
