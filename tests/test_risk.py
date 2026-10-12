@@ -60,3 +60,18 @@ def test_turnover_limit_scales_orders():
 def test_drawdown():
     assert drawdown([100, 120, 90]) == pytest.approx(0.25)
     assert drawdown([]) == 0.0
+
+
+def test_spy_capped_at_half_and_excess_spread_to_picks():
+    t, notes = apply_limits({"XLE": 0.2, "GLD": 0.1}, allowed={"XLE", "GLD", "SPY"}, leveraged=set(),
+                            max_idle_weight=0.5, **LIMITS)
+    assert t["SPY"] == 0.5
+    assert t["XLE"] == pytest.approx(0.30) and t["GLD"] == pytest.approx(0.20)
+    assert any("capped at 50%" in n for n in notes)
+
+
+def test_spy_cap_leaves_cash_when_picks_are_full():
+    t, notes = apply_limits({"XLE": 0.3}, allowed={"XLE", "SPY"}, leveraged=set(),
+                            max_idle_weight=0.5, **LIMITS)
+    assert t == {"XLE": 0.3, "SPY": 0.5}
+    assert any("cash" in n for n in notes)

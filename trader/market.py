@@ -10,10 +10,11 @@ from alpaca.common.exceptions import APIError
 from alpaca.data.enums import Adjustment, DataFeed
 from alpaca.data.historical import StockHistoricalDataClient
 from alpaca.data.historical.news import NewsClient
-from alpaca.data.requests import NewsRequest, StockBarsRequest
+from alpaca.data.requests import NewsRequest, StockBarsRequest, StockSnapshotRequest
 from alpaca.data.timeframe import TimeFrame
 
 from .config import Config
+from .indicators import atr_pct
 
 log = logging.getLogger(__name__)
 
@@ -73,3 +74,28 @@ class Market:
             }
             for a in articles
         ]
+
+    def quotes(self, symbols: list[str]):
+        """Live price, yesterday's close, previous 20-day high and typical range per symbol."""
+        from .watch import Quote
+
+        snaps = self.bars_client.get_stock_snapshot(
+            StockSnapshotRequest(symbol_or_symbols=symbols, feed=DataFeed.IEX)
+        )
+        today = datetime.now(timezone.utc).date()
+        bars = self.daily_bars(symbols, days=45)
+        out = {}
+        for sym, snap in snaps.items():
+            df = bars.get(sym)
+            if snap is None or snap.latest_trade is None or snap.previous_daily_bar is None or df is None:
+                continue
+            past = df[[ts.date() < today for ts in df.index]]
+            if len(past) < 20:
+                continue
+            out[sym] = Quote(
+                price=float(snap.latest_trade.price),
+                prev_close=float(snap.previous_daily_bar.close),
+                high_20d=float(past["close"].tail(20).max()),
+                atr_pct=atr_pct(past),
+            )
+        return out

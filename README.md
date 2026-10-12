@@ -14,6 +14,10 @@ A fully automated agent that, once per US trading day:
 5. Saves every decision, with Claude's reasoning, sources, orders and API cost, to `docs/data/`.
    The dashboard reads those files.
 
+Every 15 minutes while the market is open, a rules-only **watcher** (`trader/watch.py`, GitHub
+Actions, no Claude call) sells positions that fall 6% below their high and can buy up to two sharp
+breakouts a day (up 2%+ and 1.5x their usual range, at a new 20-day high, while SPY isn't falling).
+
 After the close, a second job records portfolio value against SPY so the dashboard can compare them.
 
 ## Read this first
@@ -31,6 +35,9 @@ After the close, a second job records portfolio value against SPY so the dashboa
 |---|---|---|
 | Money the agent may use (rest of the paper account is ignored) | $1,000 | `CAPITAL_USD` (0 = whole account) |
 | Unallocated money goes to | SPY | `IDLE_ASSET` |
+| Most that may sit in SPY | 50% | `MAX_IDLE_WEIGHT` |
+| Watcher: sell a position this far below its high | 6% | `STOP_TRAIL_PCT` |
+| Watcher: breakout buy size / max per day | 10% / 2 | `BREAKOUT_SIZE` / `MAX_BREAKOUTS_PER_DAY` |
 | Max weight in one ETF (other than SPY) | 30% | `MAX_POSITION_WEIGHT` |
 | Max number of ETFs | 8 | `MAX_POSITIONS` |
 | Max total in leveraged/inverse ETFs | 10% | `MAX_LEVERAGED_WEIGHT` |

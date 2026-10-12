@@ -82,7 +82,7 @@ class Broker:
         side = OrderSide.BUY if o.side == "buy" else OrderSide.SELL
         asset = self.asset(o.symbol)
         held = positions.get(o.symbol, {})
-        record = {"symbol": o.symbol, "side": o.side, "notional": o.notional}
+        record = {"symbol": o.symbol, "side": o.side, "notional": o.notional, "reason": o.reason}
         try:
             if o.side == "sell" and held and o.notional >= held["market_value"] * 0.98:
                 # Full exit: close by quantity so no dust is left behind.

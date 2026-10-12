@@ -109,6 +109,7 @@ dl.glossary dd { margin: 2px 0 0; color: var(--ink-2); }
 .tag.buy { background: rgba(12,163,12,.14); color: var(--good); }
 .tag.sell { background: rgba(208,59,59,.14); color: var(--bad); }
 .tag.hold { background: var(--chip); color: var(--ink-2); }
+.chip.auto { background: rgba(237,161,0,.18); color: var(--ink); }
 h2 { display: flex; align-items: center; gap: 8px; }
 h2::before { content: ""; width: 4px; height: 18px; border-radius: 2px; background: var(--h, var(--series-1)); }
 </style>
@@ -316,7 +317,8 @@ function decisionsView(decisions) {
   $("decisions").innerHTML = real.slice().reverse().slice(0, 60).map((d) => {
     const targets = d.final_targets ? Object.entries(d.final_targets).sort((a, b) => b[1] - a[1]).map(([s, w]) => `${s} ${(w * 100).toFixed(0)}%`).join(", ") : "";
     return `<div class="entry">
-      <div><span class="when">${esc(d.date)}</span>${d.confidence ? `<span class="chip">confidence: ${esc(d.confidence)}</span>` : ""}</div>
+      <div><span class="when">${esc(d.date)}</span>${d.source === "watch" ? ` <span class="small">${esc(d.time || "")}</span><span class="chip auto">⚡ auto</span>` : ""}${d.confidence ? `<span class="chip">confidence: ${esc(d.confidence)}</span>` : ""}</div>
+      ${d.source === "watch" ? `<p class="action">${describeOrders(d.orders)}</p><p class="small">${(d.orders || []).map((o) => esc(o.reason || "")).filter(Boolean).join(" · ")}</p>` : ""}
       ${d.error ? `<p class="error">Error, no trades: ${esc(d.error)}</p>` : ""}
       ${d.market_view ? `<p class="action">${d.trade_today === false ? `<span class="tag hold">No changes</span>` : describeOrders(d.orders)}</p>` : ""}
       ${targets ? `<p class="small">${esc(targets)}</p>` : ""}

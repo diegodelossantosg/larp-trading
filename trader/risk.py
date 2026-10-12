@@ -33,8 +33,13 @@ def apply_limits(
     max_position_weight: float,
     max_positions: int,
     max_leveraged_weight: float,
+    max_idle_weight: float = 1.0,
 ) -> tuple[dict[str, float], list[str]]:
-    """Clamp proposed weights to the risk rules; the remainder goes to the idle asset."""
+    """Clamp proposed weights to the risk rules; the remainder goes to the idle asset.
+
+    The idle asset (SPY) may hold at most max_idle_weight. Anything above that is spread over
+    the other chosen ETFs (up to their own caps); what still doesn't fit stays in cash.
+    """
     notes: list[str] = []
     weights: dict[str, float] = {}
     for sym, w in proposed.items():
@@ -71,6 +76,27 @@ def apply_limits(
 
     if total < 1.0:
         weights[idle_asset] = weights.get(idle_asset, 0.0) + (1.0 - total)
+
+    excess = weights.get(idle_asset, 0.0) - max_idle_weight
+    if excess > 1e-9:
+        weights[idle_asset] = max_idle_weight
+        notes.append(f"{idle_asset} capped at {max_idle_weight:.0%}")
+        # Water-fill the excess into the other (non-leveraged) picks, pro rata, up to their caps.
+        for _ in range(10):
+            room = {s: max_position_weight - w for s, w in weights.items()
+                    if s != idle_asset and s not in leveraged and max_position_weight - w > 1e-9}
+            base = sum(weights[s] for s in room)
+            if excess <= 1e-9 or not room or base <= 0:
+                break
+            given = 0.0
+            for s in room:
+                add = min(room[s], excess * weights[s] / base)
+                weights[s] += add
+                given += add
+            excess -= given
+        if excess > 1e-4:
+            notes.append(f"{excess:.0%} kept in cash: not enough other ETFs to keep "
+                         f"{idle_asset} at or below {max_idle_weight:.0%}")
     return {s: round(w, 4) for s, w in weights.items() if w > 0.0001}, notes
 
 

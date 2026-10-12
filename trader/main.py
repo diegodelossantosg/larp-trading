@@ -2,6 +2,7 @@
 
     python -m trader.main trade      # research with Claude, then rebalance (market hours)
     python -m trader.main snapshot   # after the close: record equity vs SPY for the dashboard
+    python -m trader.main watch      # every 15 minutes: trailing stops and breakout buys (no Claude)
 
 Flags for trade: --dry-run (decide but place no orders), --force (run while the market is closed).
 """
@@ -22,6 +23,7 @@ from .indicators import summarize
 from .market import Market
 from .risk import apply_limits, drawdown, plan_orders
 from .universe import CORE_ETFS, LEVERAGED
+from . import watch as rules
 
 log = logging.getLogger("trader")
 ET = ZoneInfo("America/New_York")
@@ -130,6 +132,11 @@ def trade(cfg, broker: Broker, market: Market, dry_run: bool, force: bool) -> in
         | {"positions": [(p["symbol"], p["weight"]) for p in d.get("positions", [])]}
         for d in journal.read("decisions.json", [])[-5:] if "market_view" in d
     ]
+    watcher = [
+        {k: d.get(k) for k in ("date", "time", "notes")}
+        | {"orders": [(o["side"], o["symbol"], o["notional"], o.get("status")) for o in d.get("orders", [])]}
+        for d in journal.read("decisions.json", [])[-30:] if d.get("source") == "watch"
+    ][-10:]
     briefing = {
         "date": _today(),
         "account": {"equity": equity, "cash": acct["cash"]},
@@ -137,6 +144,7 @@ def trade(cfg, broker: Broker, market: Market, dry_run: bool, force: bool) -> in
                          "unrealized_pl_pct": round(p["unrealized_plpc"] * 100, 2)} for s, p in positions.items()},
         "risk_limits": {
             "idle_asset": cfg.idle_asset,
+            "max_weight_in_idle_asset": cfg.max_idle_weight,
             "max_weight_per_etf": cfg.max_position_weight,
             "max_positions": cfg.max_positions,
             "max_total_leveraged_or_inverse": cfg.max_leveraged_weight,
@@ -145,6 +153,7 @@ def trade(cfg, broker: Broker, market: Market, dry_run: bool, force: bool) -> in
         },
         "performance_vs_spy": _performance(history),
         "previous_decisions": previous,
+        "watcher_actions_recent": watcher,
         "headlines": market.news(hours=36, limit=50),
         "holding_headlines": market.news(hours=72, symbols=list(positions), limit=20) if positions else [],
         "technicals": technicals,
@@ -193,7 +202,7 @@ def trade(cfg, broker: Broker, market: Market, dry_run: bool, force: bool) -> in
     targets, notes = apply_limits(
         proposed, allowed=allowed, leveraged=leveraged, idle_asset=cfg.idle_asset,
         max_position_weight=cfg.max_position_weight, max_positions=cfg.max_positions,
-        max_leveraged_weight=cfg.max_leveraged_weight,
+        max_leveraged_weight=cfg.max_leveraged_weight, max_idle_weight=cfg.max_idle_weight,
     )
     record["notes"] += notes
     record["final_targets"] = targets
@@ -221,10 +230,73 @@ def trade(cfg, broker: Broker, market: Market, dry_run: bool, force: bool) -> in
     return 0
 
 
+def watch(cfg, broker: Broker, market: Market, dry_run: bool, force: bool = False) -> int:
+    """15-minute check: trailing stops and breakout buys. Rules only, no Claude."""
+    if not force and not broker.market_open():
+        log.info("market closed; nothing to do")
+        return 0
+    if cfg.capital_usd and journal.read("capital.json", None) is None:
+        log.info("waiting for the first daily run to set up the agent's capital")
+        return 0
+    positions = broker.positions()
+    acct = _account(cfg, broker, positions)
+    history = journal.read("equity.json", [])
+    if drawdown([r["equity"] for r in history] + [acct["equity"]]) >= cfg.max_drawdown_halt:
+        log.error("halted by drawdown limit; watcher does nothing")
+        return 1
+
+    today = _today()
+    state = journal.read("watch.json", {"highs": {}, "breakouts": {}})
+    quotes = market.quotes(sorted(set(CORE_ETFS) | set(positions)))
+    highs = rules.update_highs(state.get("highs", {}), positions, quotes)
+
+    orders = rules.stop_orders(positions, highs, quotes, cfg.idle_asset, cfg.stop_trail_pct)
+    stopped = {o.symbol for o in orders}
+    used = state.get("breakouts", {}).get(today, 0)
+    slots = cfg.max_breakouts_per_day - used
+    if slots > 0:
+        candidates = rules.breakout_candidates(quotes, set(positions), cfg.idle_asset, cfg.breakout_min_pct)
+        orders += rules.breakout_orders(
+            candidates, equity=acct["equity"],
+            cash=acct["cash"] + sum(o.notional for o in orders),
+            idle_value=positions.get(cfg.idle_asset, {}).get("market_value", 0.0),
+            idle_asset=cfg.idle_asset, n_positions=len(set(positions) - stopped - {cfg.idle_asset}),
+            max_positions=cfg.max_positions, size=cfg.breakout_size, slots=slots,
+        )
+
+    new_buys = sum(1 for o in orders if o.side == "buy")
+    state = {"highs": highs, "breakouts": {today: used + new_buys}, "last_check": datetime.now(ET).isoformat(timespec="minutes")}
+    if not orders:
+        if highs != journal.read("watch.json", {}).get("highs"):
+            journal.write("watch.json", state)
+        log.info("watch: no action (%d quotes checked)", len(quotes))
+        return 0
+
+    prices = {s: q.price for s, q in quotes.items()}
+    if dry_run or not cfg.trading_enabled:
+        results = [{"symbol": o.symbol, "side": o.side, "notional": o.notional, "reason": o.reason,
+                    "status": "not sent"} for o in orders]
+    else:
+        results = broker.execute(orders, prices, positions)
+    for r in results:
+        if r["side"] == "buy" and r["status"] not in ("error", "skipped", "not sent"):
+            highs[r["symbol"]] = prices.get(r["symbol"], 0.0)
+    journal.write("watch.json", state)
+    journal.append_decision({
+        "date": today, "time": datetime.now(ET).strftime("%H:%M"), "source": "watch", "dry_run": dry_run,
+        "orders": results, "notes": [f"{o.side} {o.symbol}: {o.reason}" for o in orders],
+    })
+    positions = broker.positions()
+    _write_status(cfg, _account(cfg, broker, positions), positions, history)
+    for r in results:
+        log.info("%s %s $%.2f -> %s (%s)", r["side"], r["symbol"], r["notional"], r["status"], r["reason"])
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     parser = argparse.ArgumentParser(prog="trader")
-    parser.add_argument("command", choices=["trade", "snapshot"])
+    parser.add_argument("command", choices=["trade", "snapshot", "watch"])
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--force", action="store_true")
     args = parser.parse_args(argv)
@@ -235,6 +307,8 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "snapshot":
         snapshot(cfg, broker, market)
         return 0
+    if args.command == "watch":
+        return watch(cfg, broker, market, args.dry_run, args.force)
     return trade(cfg, broker, market, args.dry_run, args.force)
 
 
