@@ -303,10 +303,10 @@ function holdings(status) {
   const colors = ["var(--series-1)", "var(--series-2)", "var(--c3)", "var(--c4)", "var(--c5)", "var(--c6)", "var(--c7)", "var(--c8)"];
   const col = (i) => colors[i % colors.length];
   const bar = ps.map((p, i) => `<span title="${esc(p.symbol)} ${(p.weight * 100).toFixed(0)}%" style="flex:${p.weight};background:${col(i)}"></span>`).join("");
-  $("holdings").innerHTML = `<div class="alloc">${bar}</div><table><thead><tr><th>ETF</th><th class="num">Share</th><th class="num">Value</th><th class="num">Gain</th></tr></thead><tbody>
+  $("holdings").innerHTML = `<div class="alloc">${bar}</div><table><thead><tr><th>ETF</th><th class="num">Share</th><th class="num">Value</th><th class="num">Gain $</th><th class="num">Gain %</th></tr></thead><tbody>
   ${ps.map((p, i) => `<tr><td><span class="dot" style="background:${col(i)}"></span><b>${esc(p.symbol)}</b> <span class="small">${esc(p.name || "")}</span></td><td class="num">${(p.weight * 100).toFixed(0)}%</td>
-    <td class="num">${usd(p.market_value)}</td><td class="num ${cls(p.unrealized_pl)}">${signedUsd(p.unrealized_pl)}</td></tr>`).join("")}
-  ${cash != null && Math.abs(cash) >= 0.5 ? `<tr><td><b>Cash</b></td><td class="num">${(cash / status.equity * 100).toFixed(0)}%</td><td class="num">${usd(cash)}</td><td class="num">–</td></tr>` : ""}
+    <td class="num">${usd(p.market_value)}</td><td class="num ${cls(p.unrealized_pl)}">${signedUsd(p.unrealized_pl)}</td><td class="num ${cls(p.unrealized_pl)}">${pct((p.unrealized_plpc || 0) * 100)}</td></tr>`).join("")}
+  ${cash != null && Math.abs(cash) >= 0.5 ? `<tr><td><b>Cash</b></td><td class="num">${(cash / status.equity * 100).toFixed(0)}%</td><td class="num">${usd(cash)}</td><td class="num">–</td><td class="num">–</td></tr>` : ""}
   </tbody></table>`;
 }
 
