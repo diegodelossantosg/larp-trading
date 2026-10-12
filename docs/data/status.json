@@ -1,0 +1,68 @@
+{
+ "updated": "2026-10-12T10:18-04:00",
+ "mode": "paper",
+ "capital": 1000.0,
+ "model": "sonnet",
+ "equity": 1000.0,
+ "cash": 158.55,
+ "performance": {
+  "days_tracked": 0
+ },
+ "positions": [
+  {
+   "symbol": "SPY",
+   "qty": 0.5727,
+   "market_value": 445.4923,
+   "avg_entry_price": 777.926,
+   "current_price": 777.93,
+   "unrealized_pl": 0.0023,
+   "unrealized_plpc": 0.0,
+   "name": "S&P 500",
+   "weight": 0.4455
+  },
+  {
+   "symbol": "IGV",
+   "qty": 1.0603,
+   "market_value": 118.7752,
+   "avg_entry_price": 112.034,
+   "current_price": 112.02,
+   "unrealized_pl": -0.0148,
+   "unrealized_plpc": -0.0001,
+   "name": "Software",
+   "weight": 0.1188
+  },
+  {
+   "symbol": "QUAL",
+   "qty": 0.435,
+   "market_value": 98.9992,
+   "avg_entry_price": 227.54,
+   "current_price": 227.5611,
+   "unrealized_pl": 0.0092,
+   "unrealized_plpc": 0.0001,
+   "name": "US quality",
+   "weight": 0.099
+  },
+  {
+   "symbol": "XLV",
+   "qty": 0.5772,
+   "market_value": 98.9888,
+   "avg_entry_price": 171.512,
+   "current_price": 171.51,
+   "unrealized_pl": -0.0012,
+   "unrealized_plpc": -0.0,
+   "name": "Health care",
+   "weight": 0.099
+  },
+  {
+   "symbol": "XOP",
+   "qty": 0.4075,
+   "market_value": 79.1957,
+   "avg_entry_price": 194.316,
+   "current_price": 194.33,
+   "unrealized_pl": 0.0057,
+   "unrealized_plpc": 0.0001,
+   "name": "Oil & gas exploration",
+   "weight": 0.0792
+  }
+ ]
+}
