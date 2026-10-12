@@ -1,4 +1,4 @@
-"""The 15-minute watcher: fast, rules-only reactions between Claude's daily decisions.
+"""The 10-minute watcher: fast, rules-only reactions between Claude's daily decisions.
 
 1. Trailing stop: sell any position (other than the idle asset) that has fallen
    STOP_TRAIL_PCT below its highest price since it was bought.

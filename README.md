@@ -14,7 +14,7 @@ A fully automated agent that, once per US trading day:
 5. Saves every decision, with Claude's reasoning, sources, orders and API cost, to `docs/data/`.
    The dashboard reads those files.
 
-Every 15 minutes while the market is open, a rules-only **watcher** (`trader/watch.py`, GitHub
+Every 10 minutes while the market is open, a rules-only **watcher** (`trader/watch.py`, GitHub
 Actions, no Claude call) sells positions that fall 6% below their high and can buy up to two sharp
 breakouts a day (up 2%+ and 1.5x their usual range, at a new 20-day high, while SPY isn't falling).
 

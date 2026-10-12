@@ -1,10 +1,11 @@
-name: Watcher (every 15 min)
+name: Watcher (every 10 min)
 
-# Rules-only price check between Claude's daily decisions: trailing stops and breakout buys.
+# Rules-only price check between Claude's daily decisions: trailing stops and breakout buys,
+# and a live portfolio value for the dashboard.
 # No Claude call, so it needs only the Alpaca secrets. It does nothing while the market is closed.
 on:
   schedule:
-    - cron: "*/15 13-21 * * 1-5"
+    - cron: "*/10 13-21 * * 1-5"
   workflow_dispatch:
 
 concurrency:

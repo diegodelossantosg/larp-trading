@@ -2,7 +2,7 @@
 
     python -m trader.main trade      # research with Claude, then rebalance (market hours)
     python -m trader.main snapshot   # after the close: record equity vs SPY for the dashboard
-    python -m trader.main watch      # every 15 minutes: trailing stops and breakout buys (no Claude)
+    python -m trader.main watch      # every 10 minutes: trailing stops and breakout buys (no Claude)
 
 Flags for trade: --dry-run (decide but place no orders), --force (run while the market is closed).
 """
@@ -231,7 +231,7 @@ def trade(cfg, broker: Broker, market: Market, dry_run: bool, force: bool) -> in
 
 
 def watch(cfg, broker: Broker, market: Market, dry_run: bool, force: bool = False) -> int:
-    """15-minute check: trailing stops and breakout buys. Rules only, no Claude."""
+    """10-minute check: trailing stops and breakout buys. Rules only, no Claude."""
     if not force and not broker.market_open():
         log.info("market closed; nothing to do")
         return 0
@@ -269,6 +269,7 @@ def watch(cfg, broker: Broker, market: Market, dry_run: bool, force: bool = Fals
     if not orders:
         if highs != journal.read("watch.json", {}).get("highs"):
             journal.write("watch.json", state)
+        _write_status(cfg, acct, positions, history)  # live value for the dashboard
         log.info("watch: no action (%d quotes checked)", len(quotes))
         return 0
 

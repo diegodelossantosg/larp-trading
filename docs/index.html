@@ -198,13 +198,18 @@ function hero(status, equity) {
   const profit = now - start;
   const spyNow = equity.length >= 2 ? start * equity.at(-1).spy_close / equity[0].spy_close : null;
   const diff = spyNow == null ? null : now - spyNow;
+  const todayStr = new Date().toLocaleDateString("en-CA", { timeZone: "America/New_York" });
+  const prev = equity.filter((r) => r.date < todayStr).at(-1);
+  const today = prev && status.equity != null ? status.equity - prev.equity : null;
+  const updated = status.updated ? new Date(status.updated).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false }) : "";
   let verdict = "vs S&P 500: from day 2";
   if (diff != null) verdict = Math.abs(diff) < 0.01 ? "🤝 Tied with S&P 500"
     : diff > 0 ? `✅ ${usd(diff)} ahead of S&P 500` : `⚠️ ${usd(-diff)} behind S&P 500`;
   $("hero").innerHTML = `
     <span class="big">${usd(now)}</span>
     <div><span class="delta ${cls(profit)}">${signedUsd(profit)} (${pct(profit / start * 100)})</span> <span class="small">from ${usd(start, 0)}</span></div>
-    <div class="verdict">${verdict}</div>`;
+    <div class="verdict">${verdict}</div>
+    ${today != null ? `<div class="small" style="margin-top:8px">Today: <b>${signedUsd(today)}</b>${updated ? ` · updated ${updated}` : ""}</div>` : updated ? `<div class="small" style="margin-top:8px">Updated ${updated}</div>` : ""}`;
 }
 
 function tiles(status, equity, decisions) {
@@ -331,6 +336,7 @@ function decisionsView(decisions) {
   }).join("");
 }
 
+setTimeout(() => location.reload(), 120000);  // pick up the watcher's 10-minute updates
 (async () => {
   const [status, equity, decisions] = await Promise.all([load("status.json", {}), load("equity.json", []), load("decisions.json", [])]);
   if (status.mode === "LIVE") { $("mode").hidden = false; $("mode").textContent = "💵 Real money"; }
