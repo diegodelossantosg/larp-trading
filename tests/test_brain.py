@@ -2,6 +2,8 @@
 
 from types import SimpleNamespace as NS
 
+import anthropic
+
 from trader import brain
 from tests.test_trade_flow import cfg
 
@@ -36,7 +38,7 @@ def test_resumes_pause_turn_then_returns_decision(monkeypatch):
     search = NS(type="web_search_tool_result", content=[NS(type="web_search_result", title="Fed", url="https://x")])
     decision = NS(type="tool_use", name="submit_decision", input={"trade_today": False})
     calls = []
-    monkeypatch.setattr(brain.anthropic, "Anthropic", fake_client([
+    monkeypatch.setattr(anthropic, "Anthropic", fake_client([
         NS(stop_reason="pause_turn", content=[search], usage=usage(3)),
         NS(stop_reason="tool_use", content=[decision], usage=usage()),
     ], calls))
@@ -49,7 +51,7 @@ def test_resumes_pause_turn_then_returns_decision(monkeypatch):
 
 
 def test_refusal_returns_error(monkeypatch):
-    monkeypatch.setattr(brain.anthropic, "Anthropic", fake_client(
+    monkeypatch.setattr(anthropic, "Anthropic", fake_client(
         [NS(stop_reason="refusal", content=[], usage=usage())], []))
     d = brain.decide(cfg(), {})
     assert d.data is None and "declined" in d.error

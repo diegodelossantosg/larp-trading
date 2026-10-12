@@ -9,8 +9,6 @@ import subprocess
 import tempfile
 from dataclasses import dataclass, field
 
-import anthropic
-
 from .config import Config
 
 log = logging.getLogger(__name__)
@@ -216,6 +214,8 @@ def decide_with_claude_code(cfg: Config, briefing: dict, timeout_s: int = 1200) 
 
 
 def decide_with_api(cfg: Config, briefing: dict) -> Decision:
+    import anthropic  # only needed for the API backend
+
     client = anthropic.Anthropic(api_key=cfg.anthropic_api_key or None)
     usage = Usage(model=cfg.claude_model)
     tools = [
