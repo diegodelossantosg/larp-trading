@@ -21,6 +21,7 @@
   --bad: #d03b3b;
   --chip: #f0efec;
   --note: #eef4fc;
+  --c3: #1baf7a; --c4: #eda100; --c5: #e87ba4; --c6: #008300; --c7: #6250d6; --c8: #e34948;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -28,6 +29,7 @@
     --page: #0d0d0d; --surface: #1a1a19; --ink: #f0efec; --ink-2: #c3c2b7; --muted: #898781;
     --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10);
     --series-1: #3987e5; --series-2: #d95926; --good: #0ca30c; --bad: #e66767; --chip: #262624; --note: #17222f;
+    --c3: #199e70; --c4: #c98500; --c5: #d55181; --c6: #008300; --c7: #9085e9; --c8: #e66767;
   }
 }
 :root[data-theme="dark"] {
@@ -35,10 +37,11 @@
   --page: #0d0d0d; --surface: #1a1a19; --ink: #f0efec; --ink-2: #c3c2b7; --muted: #898781;
   --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10);
   --series-1: #3987e5; --series-2: #d95926; --good: #0ca30c; --bad: #e66767; --chip: #262624; --note: #17222f;
+  --c3: #199e70; --c4: #c98500; --c5: #d55181; --c6: #008300; --c7: #9085e9; --c8: #e66767;
 }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--page); color: var(--ink); font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
-main { max-width: 960px; margin: 0 auto; padding: 20px 16px 64px; }
+main { max-width: 960px; margin: 0 auto; padding: 4px 16px 48px; }
 h1 { font-size: 24px; margin: 0; }
 h2 { font-size: 18px; margin: 0 0 4px; }
 p { margin: 6px 0; }
@@ -48,10 +51,10 @@ p { margin: 6px 0; }
 .banner.live { background: var(--bad); color: #fff; }
 .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-top: 16px; }
 .hero { font-size: 18px; line-height: 1.5; }
-.hero .big { font-size: 34px; font-weight: 700; display: block; margin: 2px 0 6px; }
+.hero .big { font-size: 38px; font-weight: 700; display: block; margin: 0 0 4px; }
 .verdict { display: inline-block; margin-top: 8px; padding: 6px 12px; border-radius: 99px; font-weight: 600; background: var(--chip); }
 .up { color: var(--good); } .down { color: var(--bad); }
-.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 16px; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-top: 16px; }
 .tile { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px; }
 .tile .label { color: var(--ink-2); font-size: 13px; font-weight: 600; }
 .tile .value { font-size: 24px; font-weight: 700; margin: 2px 0; }
@@ -64,7 +67,7 @@ p { margin: 6px 0; }
 .chart-wrap { position: relative; }
 svg { display: block; overflow: visible; }
 .tooltip { position: absolute; pointer-events: none; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; font-size: 13px; box-shadow: 0 4px 16px rgba(0,0,0,.12); display: none; white-space: nowrap; z-index: 2; }
-.toolbar { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; flex-wrap: wrap; }
+.toolbar { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
 button.link { background: none; border: 1px solid var(--border); color: var(--ink-2); border-radius: 8px; padding: 4px 10px; font: inherit; font-size: 13px; cursor: pointer; }
 .table-scroll { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 8px; }
@@ -86,13 +89,33 @@ summary { cursor: pointer; }
 dl.glossary dt { font-weight: 700; margin-top: 10px; }
 dl.glossary dd { margin: 2px 0 0; color: var(--ink-2); }
 .footer { color: var(--muted); font-size: 12px; margin-top: 24px; }
+
+.hero { background: linear-gradient(135deg, #2a78d6 0%, #6250d6 100%); color: #fff; border: 0; }
+.hero .small { color: rgba(255,255,255,.8); }
+.hero .up, .hero .down { color: #fff; }
+.hero .verdict { background: rgba(255,255,255,.18); color: #fff; }
+.hero .delta { display: inline-block; padding: 1px 10px; border-radius: 99px; font-weight: 700; }
+.hero .delta.up { background: rgba(12,163,12,.85); }
+.hero .delta.down { background: rgba(208,59,59,.9); }
+.tile { border-top: 4px solid var(--accent); }
+.tile:nth-child(1) { --accent: var(--series-1); }
+.tile:nth-child(2) { --accent: var(--c3); }
+.tile:nth-child(3) { --accent: var(--series-2); }
+.tile:nth-child(4) { --accent: var(--c7); }
+.alloc { display: flex; gap: 2px; height: 14px; border-radius: 7px; overflow: hidden; margin: 10px 0 4px; }
+.alloc span { display: block; height: 100%; }
+.dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 8px; vertical-align: baseline; }
+.tag { display: inline-block; padding: 1px 8px; border-radius: 6px; font-size: 13px; font-weight: 600; margin: 2px 4px 2px 0; }
+.tag.buy { background: rgba(12,163,12,.14); color: var(--good); }
+.tag.sell { background: rgba(208,59,59,.14); color: var(--bad); }
+.tag.hold { background: var(--chip); color: var(--ink-2); }
+h2 { display: flex; align-items: center; gap: 8px; }
+h2::before { content: ""; width: 4px; height: 18px; border-radius: 2px; background: var(--h, var(--series-1)); }
 </style>
 </head>
 <body>
 <main>
-  <h1>🤖 My AI Investor</h1>
-  <div class="sub" id="updated"></div>
-  <div class="banner" id="mode">🧪 <b>Practice mode.</b> Fake money, real stock-market prices. Nothing here can lose real money.</div>
+  <div class="banner live" id="mode" hidden></div>
 
   <section class="card hero" id="hero"></section>
 
@@ -100,57 +123,29 @@ dl.glossary dd { margin: 2px 0 0; color: var(--ink-2); }
 
   <section class="card">
     <div class="toolbar">
-      <div>
-        <h2>Your money over time</h2>
-        <div class="small">Blue: the AI's portfolio. Orange dashed: what the same money would be worth if you had simply bought the S&amp;P 500 (the 500 biggest US companies) and done nothing. Blue above orange means the AI is winning.</div>
-      </div>
-      <button class="link" id="toggle-table">Show as table</button>
+      <h2 style="--h: var(--series-1)">AI vs S&amp;P 500</h2>
+      <button class="link" id="toggle-table">Table</button>
     </div>
     <div class="legend">
       <span style="--c: var(--series-1)">AI portfolio</span>
-      <span class="dash" style="--c: var(--series-2)">S&amp;P 500 (do nothing)</span>
+      <span class="dash" style="--c: var(--series-2)">S&amp;P 500</span>
     </div>
     <div class="chart-wrap" id="chart"></div>
     <div class="table-scroll" id="chart-table" hidden></div>
   </section>
 
   <section class="card">
-    <h2>What the AI owns right now</h2>
-    <div class="small">Each row is an ETF: one purchase that holds a whole basket of companies or assets.</div>
+    <h2 style="--h: var(--c3)">Holdings</h2>
     <div class="table-scroll" id="holdings"></div>
   </section>
 
   <section class="card">
-    <h2>Daily diary</h2>
-    <div class="small">What the AI decided each day, and why, in its own words.</div>
+    <h2 style="--h: var(--c7)">Daily log</h2>
     <div id="decisions"></div>
   </section>
 
-  <section class="card">
-    <h2>How it works</h2>
-    <ol class="steps">
-      <li><b>Once a day</b> (weekdays, about 17:15 Spain time, while the US market is open), the AI wakes up.</li>
-      <li>It reads the news, searches the web for what is moving markets (central banks, politics, wars, big company news) and studies recent price charts of about 75 ETFs.</li>
-      <li>It decides how to split the money: for example "70% S&amp;P 500, 20% energy, 10% gold". Money it has no strong idea for stays in the S&amp;P 500.</li>
-      <li>Safety rules in the code then check the plan (max 30% in one ETF, at most 8 ETFs, small limits on risky ETFs) and place the trades.</li>
-      <li>It does <b>not</b> trade all day long. Most days it changes little or nothing. Doing nothing is often the smart move.</li>
-      <li>After the market closes, it writes down how much the money is worth, so this page can compare it with the S&amp;P 500.</li>
-    </ol>
-  </section>
 
-  <section class="card">
-    <h2>Words you'll see</h2>
-    <dl class="glossary">
-      <dt>S&amp;P 500 / SPY</dt><dd>The 500 biggest US companies. SPY is an ETF that buys all of them. It's the benchmark: if the AI can't beat it, you'd be better off just buying SPY.</dd>
-      <dt>ETF</dt><dd>"Exchange-traded fund". One thing you can buy that holds many stocks, bonds or commodities at once, like a ready-made basket.</dd>
-      <dt>Paper trading</dt><dd>Practice trading with fake money at real prices.</dd>
-      <dt>Return</dt><dd>How much the money grew or shrank, as a percentage. +5% on $1,000 means $50 profit.</dd>
-      <dt>Biggest dip</dt><dd>The largest drop from a high point to a low point along the way. It shows how bumpy the ride was.</dd>
-      <dt>Confidence</dt><dd>How sure the AI said it was about that day's decision (low / medium / high).</dd>
-    </dl>
-  </section>
 
-  <p class="footer">Practice results only. They ignore taxes, and good results over a few weeks are mostly luck. Not financial advice.</p>
 </main>
 
 <div class="tooltip" id="tooltip"></div>
@@ -195,21 +190,19 @@ function hero(status, equity) {
   const capital = status.capital || equity[0]?.equity || null;
   const now = status.equity ?? equity.at(-1)?.equity ?? capital;
   if (now == null) {
-    $("hero").innerHTML = `<p>Waiting for the AI's first day. Check back after the next run.</p>`;
+    $("hero").innerHTML = `<p class="small">Waiting for the first run.</p>`;
     return;
   }
   const start = capital ?? equity[0]?.equity;
   const profit = now - start;
   const spyNow = equity.length >= 2 ? start * equity.at(-1).spy_close / equity[0].spy_close : null;
   const diff = spyNow == null ? null : now - spyNow;
-  let verdict = "Too early to compare with the S&P 500. The comparison starts after two days.";
-  if (diff != null) verdict = Math.abs(diff) < 0.01 ? "🤝 Exactly tied with the S&P 500"
-    : diff > 0 ? `✅ Beating the S&P 500 by ${usd(diff)}` : `⚠️ Behind the S&P 500 by ${usd(-diff)}`;
+  let verdict = "vs S&P 500: from day 2";
+  if (diff != null) verdict = Math.abs(diff) < 0.01 ? "🤝 Tied with S&P 500"
+    : diff > 0 ? `✅ ${usd(diff)} ahead of S&P 500` : `⚠️ ${usd(-diff)} behind S&P 500`;
   $("hero").innerHTML = `
-    <div>You started with ${usd(start)}. It's now worth</div>
     <span class="big">${usd(now)}</span>
-    <div>That's <b class="${cls(profit)}">${signedUsd(profit)} (${pct(profit / start * 100)})</b>${equity[0] ? ` since ${equity[0].date}` : ""}.</div>
-    ${spyNow != null ? `<div>If you had just bought the S&amp;P 500, you'd have <b>${usd(spyNow)}</b>.</div>` : ""}
+    <div><span class="delta ${cls(profit)}">${signedUsd(profit)} (${pct(profit / start * 100)})</span> <span class="small">from ${usd(start, 0)}</span></div>
     <div class="verdict">${verdict}</div>`;
 }
 
@@ -219,19 +212,19 @@ function tiles(status, equity, decisions) {
   const dip = equity.length ? maxDip(equity.map((r) => r.equity)) : null;
   const next = nextRun();
   const items = [
-    ["Days the AI has run", String(days), "one decision per weekday"],
-    ["Trades made", String(trades), "buys + sells so far"],
-    ["Biggest dip", dip == null ? "–" : pct(dip), "worst drop from a high point"],
-    ["Next decision", next ? next.toLocaleString([], { weekday: "short", hour: "2-digit", minute: "2-digit" }) : "–", "your local time"],
+    ["Days", String(days)],
+    ["Trades", String(trades)],
+    ["Biggest dip", dip == null ? "–" : pct(dip)],
+    ["Next run", next ? next.toLocaleString([], { weekday: "short", hour: "2-digit", minute: "2-digit", hour12: false }) : "–"],
   ];
-  $("tiles").innerHTML = items.map(([l, v, h]) =>
-    `<div class="tile"><div class="label">${l}</div><div class="value">${v}</div><div class="hint">${esc(h)}</div></div>`).join("");
+  $("tiles").innerHTML = items.map(([l, v]) =>
+    `<div class="tile"><div class="label">${l}</div><div class="value">${v}</div></div>`).join("");
 }
 
 function chart(equity) {
   const el = $("chart");
   if (equity.length < 2) {
-    el.innerHTML = `<div class="empty">The chart appears after the AI's second day. A point is added every evening after the US market closes.</div>`;
+    el.innerHTML = `<div class="empty">Starts after day 2.</div>`;
     return;
   }
   const base = equity[0].equity;
@@ -252,11 +245,12 @@ function chart(equity) {
   <svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="AI portfolio value compared with the S&P 500">
     ${ticks.map((t) => `<line x1="${m.l}" x2="${W - m.r}" y1="${ys(t)}" y2="${ys(t)}" stroke="var(--grid)"/>
       <text x="${m.l - 8}" y="${ys(t) + 4}" text-anchor="end" font-size="11" fill="var(--muted)">${usd(t, 0)}</text>`).join("")}
-    ${base >= lo && base <= hi ? `<line x1="${m.l}" x2="${W - m.r}" y1="${ys(base)}" y2="${ys(base)}" stroke="var(--axis)" stroke-dasharray="2 3"/>
-      <text x="${m.l + 4}" y="${ys(base) - 5}" font-size="11" fill="var(--muted)">start</text>` : ""}
+    ${base >= lo && base <= hi ? `<line x1="${m.l}" x2="${W - m.r}" y1="${ys(base)}" y2="${ys(base)}" stroke="var(--axis)" stroke-dasharray="2 3"/>` : ""}
     ${xTickIdx.map((i) => `<text x="${xs(i)}" y="${H - 6}" text-anchor="${i === 0 ? "start" : i === rows.length - 1 ? "end" : "middle"}" font-size="11" fill="var(--muted)">${rows[i].date}</text>`).join("")}
+    <defs><linearGradient id="fillA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--series-1)" stop-opacity=".25"/><stop offset="1" stop-color="var(--series-1)" stop-opacity="0"/></linearGradient></defs>
+    <path d="${line("agent")}L${xs(rows.length - 1)},${H - m.b}L${xs(0)},${H - m.b}Z" fill="url(#fillA)"/>
     <path d="${line("spy")}" fill="none" stroke="var(--series-2)" stroke-width="2" stroke-dasharray="5 3" stroke-linejoin="round"/>
-    <path d="${line("agent")}" fill="none" stroke="var(--series-1)" stroke-width="2" stroke-linejoin="round"/>
+    <path d="${line("agent")}" fill="none" stroke="var(--series-1)" stroke-width="2.5" stroke-linejoin="round"/>
     <text x="${W - m.r + 6}" y="${ya + 4}" font-size="11" fill="var(--ink-2)">AI</text>
     <text x="${W - m.r + 6}" y="${yb + 4}" font-size="11" fill="var(--ink-2)">S&amp;P 500</text>
     <g id="hover" style="display:none">
@@ -298,46 +292,46 @@ function niceTicks(lo, hi, n) {
 
 function holdings(status) {
   const ps = status.positions || [];
-  if (!ps.length) { $("holdings").innerHTML = `<div class="empty">Nothing yet. The AI hasn't bought anything.</div>`; return; }
+  if (!ps.length) { $("holdings").innerHTML = `<div class="empty">Nothing yet.</div>`; return; }
   const cash = status.cash;
-  $("holdings").innerHTML = `<table><thead><tr><th>ETF</th><th>What it is</th><th class="num">Share of money</th><th class="num">Worth now</th><th class="num">Gain / loss</th></tr></thead><tbody>
-  ${ps.map((p) => `<tr><td><b>${esc(p.symbol)}</b></td><td>${esc(p.name || "")}</td><td class="num">${(p.weight * 100).toFixed(0)}%</td>
+  const colors = ["var(--series-1)", "var(--series-2)", "var(--c3)", "var(--c4)", "var(--c5)", "var(--c6)", "var(--c7)", "var(--c8)"];
+  const col = (i) => colors[i % colors.length];
+  const bar = ps.map((p, i) => `<span title="${esc(p.symbol)} ${(p.weight * 100).toFixed(0)}%" style="flex:${p.weight};background:${col(i)}"></span>`).join("");
+  $("holdings").innerHTML = `<div class="alloc">${bar}</div><table><thead><tr><th>ETF</th><th class="num">Share</th><th class="num">Value</th><th class="num">Gain</th></tr></thead><tbody>
+  ${ps.map((p, i) => `<tr><td><span class="dot" style="background:${col(i)}"></span><b>${esc(p.symbol)}</b> <span class="small">${esc(p.name || "")}</span></td><td class="num">${(p.weight * 100).toFixed(0)}%</td>
     <td class="num">${usd(p.market_value)}</td><td class="num ${cls(p.unrealized_pl)}">${signedUsd(p.unrealized_pl)}</td></tr>`).join("")}
-  ${cash != null && Math.abs(cash) >= 0.5 ? `<tr><td><b>Cash</b></td><td>Not invested</td><td class="num">${(cash / status.equity * 100).toFixed(0)}%</td><td class="num">${usd(cash)}</td><td class="num">–</td></tr>` : ""}
+  ${cash != null && Math.abs(cash) >= 0.5 ? `<tr><td><b>Cash</b></td><td class="num">${(cash / status.equity * 100).toFixed(0)}%</td><td class="num">${usd(cash)}</td><td class="num">–</td></tr>` : ""}
   </tbody></table>`;
 }
 
 function describeOrders(orders) {
   const ok = (orders || []).filter((o) => !["error", "skipped"].includes(o.status));
-  if (!ok.length) return "Kept everything the same, with no trades today.";
-  const sells = ok.filter((o) => o.side === "sell").map((o) => `${usd(o.notional, 0)} of ${o.symbol}`);
-  const buys = ok.filter((o) => o.side === "buy").map((o) => `${usd(o.notional, 0)} of ${o.symbol}`);
-  return [sells.length ? `Sold ${sells.join(", ")}.` : "", buys.length ? `Bought ${buys.join(", ")}.` : ""].join(" ");
+  if (!ok.length) return `<span class="tag hold">No changes</span>`;
+  return ok.map((o) => `<span class="tag ${o.side}">${o.side === "buy" ? "Buy" : "Sell"} ${esc(o.symbol)} ${usd(o.notional, 0)}</span>`).join("");
 }
 
 function decisionsView(decisions) {
   const real = decisions.filter((d) => !d.dry_run);
-  if (!real.length) { $("decisions").innerHTML = `<div class="empty">No entries yet. The first one appears after the AI's first run (weekdays, about 17:15 Spain time).</div>`; return; }
+  if (!real.length) { $("decisions").innerHTML = `<div class="empty">Nothing yet.</div>`; return; }
   $("decisions").innerHTML = real.slice().reverse().slice(0, 60).map((d) => {
     const targets = d.final_targets ? Object.entries(d.final_targets).sort((a, b) => b[1] - a[1]).map(([s, w]) => `${s} ${(w * 100).toFixed(0)}%`).join(", ") : "";
     return `<div class="entry">
       <div><span class="when">${esc(d.date)}</span>${d.confidence ? `<span class="chip">confidence: ${esc(d.confidence)}</span>` : ""}</div>
-      ${d.error ? `<p class="error">Something went wrong, so no trades were made: ${esc(d.error)}</p>` : ""}
-      ${d.market_view ? `<p class="action">${esc(d.trade_today === false ? "Kept everything the same, with no trades today." : describeOrders(d.orders))}</p>
-        <p><b>How it saw the market:</b> ${esc(d.market_view)}</p>` : ""}
-      ${targets ? `<p class="small">Money split after today: ${esc(targets)}</p>` : ""}
-      ${(d.positions || []).length ? `<details><summary>Why it picked these</summary><ul class="why">${d.positions.map((p) => `<li><b>${esc(p.symbol)}</b>: ${esc(p.thesis)}${p.exit_plan ? `<br><span class="small">It will sell if: ${esc(p.exit_plan)}</span>` : ""}</li>`).join("")}</ul></details>` : ""}
-      ${(d.key_drivers || []).length ? `<details><summary>News it paid attention to</summary><ul class="why">${d.key_drivers.map((k) => `<li>${esc(k)}</li>`).join("")}</ul></details>` : ""}
-      ${(d.sources || []).length ? `<details><summary>Web pages it read (${d.sources.length})</summary>${d.sources.map((s) => /^https?:/.test(s.url) ? `<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a>` : esc(s.title)).join("<br>")}</details>` : ""}
-      ${(d.notes || []).length ? `<details><summary>Safety-rule adjustments</summary>${d.notes.map(esc).join("<br>")}</details>` : ""}
+      ${d.error ? `<p class="error">Error, no trades: ${esc(d.error)}</p>` : ""}
+      ${d.market_view ? `<p class="action">${d.trade_today === false ? `<span class="tag hold">No changes</span>` : describeOrders(d.orders)}</p>` : ""}
+      ${targets ? `<p class="small">${esc(targets)}</p>` : ""}
+      ${d.market_view ? `<details><summary>Market view</summary><p>${esc(d.market_view)}</p></details>` : ""}
+      ${(d.positions || []).length ? `<details><summary>Why</summary><ul class="why">${d.positions.map((p) => `<li><b>${esc(p.symbol)}</b>: ${esc(p.thesis)}${p.exit_plan ? `<br><span class="small">Sell if: ${esc(p.exit_plan)}</span>` : ""}</li>`).join("")}</ul></details>` : ""}
+      ${(d.key_drivers || []).length ? `<details><summary>News</summary><ul class="why">${d.key_drivers.map((k) => `<li>${esc(k)}</li>`).join("")}</ul></details>` : ""}
+      ${(d.sources || []).length ? `<details><summary>Sources (${d.sources.length})</summary>${d.sources.map((s) => /^https?:/.test(s.url) ? `<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a>` : esc(s.title)).join("<br>")}</details>` : ""}
+      ${(d.notes || []).length ? `<details><summary>Risk rules</summary>${d.notes.map(esc).join("<br>")}</details>` : ""}
     </div>`;
   }).join("");
 }
 
 (async () => {
   const [status, equity, decisions] = await Promise.all([load("status.json", {}), load("equity.json", []), load("decisions.json", [])]);
-  if (status.mode === "LIVE") { $("mode").className = "banner live"; $("mode").innerHTML = "💵 <b>Real money.</b> This account trades with real dollars."; }
-  $("updated").textContent = status.updated ? `Last updated ${new Date(status.updated).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}` : "";
+  if (status.mode === "LIVE") { $("mode").hidden = false; $("mode").textContent = "💵 Real money"; }
   hero(status, equity);
   tiles(status, equity, decisions);
   chart(equity);
@@ -347,7 +341,7 @@ function decisionsView(decisions) {
   decisionsView(decisions);
   $("toggle-table").addEventListener("click", () => {
     const t = $("chart-table"); t.hidden = !t.hidden;
-    $("toggle-table").textContent = t.hidden ? "Show as table" : "Hide table";
+    $("toggle-table").textContent = t.hidden ? "Table" : "Chart only";
   });
 })();
 </script>
