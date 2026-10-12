@@ -1,9 +1,9 @@
 {
- "updated": "2026-10-12T12:28-04:00",
+ "updated": "2026-10-12T12:39-04:00",
  "mode": "paper",
  "capital": 1000.0,
  "model": "sonnet",
- "equity": 999.41,
+ "equity": 999.49,
  "cash": 10.01,
  "performance": {
   "days_tracked": 0
@@ -12,11 +12,11 @@
   {
    "symbol": "SPY",
    "qty": 0.47,
-   "market_value": 365.7528,
+   "market_value": 365.8327,
    "avg_entry_price": 777.926,
-   "current_price": 778.15,
-   "unrealized_pl": 0.1053,
-   "unrealized_plpc": 0.0003,
+   "current_price": 778.32,
+   "unrealized_pl": 0.1852,
+   "unrealized_plpc": 0.0005,
    "name": "S&P 500",
    "weight": 0.366
   },
@@ -34,46 +34,46 @@
   {
    "symbol": "IGV",
    "qty": 1.0603,
-   "market_value": 118.0951,
+   "market_value": 118.1496,
    "avg_entry_price": 112.034,
-   "current_price": 111.3786,
-   "unrealized_pl": -0.6949,
-   "unrealized_plpc": -0.0059,
+   "current_price": 111.43,
+   "unrealized_pl": -0.6404,
+   "unrealized_plpc": -0.0054,
    "name": "Software",
    "weight": 0.1182
   },
   {
    "symbol": "QUAL",
    "qty": 0.435,
-   "market_value": 99.151,
+   "market_value": 99.1684,
    "avg_entry_price": 227.54,
-   "current_price": 227.91,
-   "unrealized_pl": 0.161,
-   "unrealized_plpc": 0.0016,
+   "current_price": 227.95,
+   "unrealized_pl": 0.1784,
+   "unrealized_plpc": 0.0018,
    "name": "US quality",
    "weight": 0.0992
   },
   {
    "symbol": "XLV",
    "qty": 0.5772,
-   "market_value": 98.9023,
+   "market_value": 98.8631,
    "avg_entry_price": 171.512,
-   "current_price": 171.36,
-   "unrealized_pl": -0.0877,
-   "unrealized_plpc": -0.0009,
+   "current_price": 171.2922,
+   "unrealized_pl": -0.1269,
+   "unrealized_plpc": -0.0013,
    "name": "Health care",
-   "weight": 0.099
+   "weight": 0.0989
   },
   {
    "symbol": "XOP",
    "qty": 0.4075,
-   "market_value": 79.318,
+   "market_value": 79.2813,
    "avg_entry_price": 194.316,
-   "current_price": 194.63,
-   "unrealized_pl": 0.128,
-   "unrealized_plpc": 0.0016,
+   "current_price": 194.54,
+   "unrealized_pl": 0.0913,
+   "unrealized_plpc": 0.0011,
    "name": "Oil & gas exploration",
-   "weight": 0.0794
+   "weight": 0.0793
   }
  ]
 }
