@@ -1,11 +1,13 @@
 name: Trading agent
 
+# The daily schedule currently runs as Claude Code routines (see README).
+# To run it from GitHub instead, add the CLAUDE_CODE_OAUTH_TOKEN secret and uncomment:
 on:
-  schedule:
-    # GitHub cron is UTC. 15:15 UTC = 11:15 New York in summer, 10:15 in winter.
-    - cron: "15 15 * * 1-5"
-    # 21:30 UTC is after the 16:00 New York close all year: record equity vs SPY.
-    - cron: "30 21 * * 1-5"
+  # schedule:
+  #   # GitHub cron is UTC. 15:15 UTC = 11:15 New York in summer, 10:15 in winter.
+  #   - cron: "15 15 * * 1-5"
+  #   # 21:30 UTC is after the 16:00 New York close all year: record equity vs SPY.
+  #   - cron: "30 21 * * 1-5"
   workflow_dispatch:
     inputs:
       command:
