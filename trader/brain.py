@@ -60,7 +60,9 @@ Discipline:
 
 FINISH_API = "When your research is done, call the submit_decision tool exactly once with your final decision."
 FINISH_SUBSCRIPTION = (
-    "When your research is done, reply with your final decision in the required JSON format, "
+    "Before deciding, you MUST research with the WebSearch tool: run at least 3 searches covering "
+    "today's market-moving news, macro/central-bank developments, and any ETF you are considering. "
+    "Never skip this step. When your research is done, reply with your final decision in the required JSON format, "
     "listing the most useful web pages you read in `sources`."
 )
 
