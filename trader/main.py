@@ -151,7 +151,7 @@ def trade(cfg, broker: Broker, market: Market, dry_run: bool, force: bool) -> in
         | {"orders": [(o["side"], o["symbol"], o["notional"], o.get("status")) for o in d.get("orders", [])]}
         for d in journal.read("decisions.json", [])[-30:] if d.get("source") == "watch"
     ][-10:]
-    health = market_health.build(technicals)
+    health = market_health.build(technicals, bars)
     journal.write("health.json", health)
     briefing = {
         "date": _today(),

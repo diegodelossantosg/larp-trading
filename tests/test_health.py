@@ -23,9 +23,9 @@ def test_build_scores_mood():
             "C": {"vs_sma200_pct": -1, "vs_sma50_pct": 1}}
     h = health.build(tech, fetch=fake_fetch)
     g = h["gauges"]
-    assert g["fear_vix"]["label"] == "panic"  # 31
+    assert g["fear"]["label"] == "panic"  # 31
     assert g["rates"]["curve_10y_minus_2y"] > 0 and "rising fast" in g["rates"]["label"]  # +0.60 in 20 days
-    assert g["credit_spread"]["label"] == "relaxed"
+    assert g["credit"]["label"] == "relaxed"
     assert g["breadth"]["label"] == "weak"  # 1 of 3 above 200d
     assert h["mood"] == "stressed"
 
@@ -33,3 +33,16 @@ def test_build_scores_mood():
 def test_build_survives_no_network():
     h = health.build(None, fetch=lambda url: None)
     assert h["mood"] == "unknown" and h["gauges"] == {}
+
+
+def test_falls_back_to_alpaca_prices_when_sites_are_blocked():
+    import pandas as pd
+
+    idx = pd.date_range("2026-08-01", periods=40, freq="B")
+    flat = pd.DataFrame({"close": [100.0 + (i % 2) * 0.1 for i in range(40)]}, index=idx)
+    falling = pd.DataFrame({"close": [100.0 - i * 0.15 for i in range(40)]}, index=idx)
+    h = health.build(None, {"SPY": flat, "IEF": flat, "HYG": falling}, fetch=lambda url: None)
+    g = h["gauges"]
+    assert g["fear"]["label"] == "calm" and g["rates"]["label"] == "stable"
+    assert g["credit"]["label"] == "stressed"  # high-yield falling vs Treasuries
+    assert h["mood"] == "cautious"

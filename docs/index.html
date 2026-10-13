@@ -334,11 +334,7 @@ function moodView(status, decisions) {
   if (!h || !h.gauges || !Object.keys(h.gauges).length) return;
   $("mood-card").hidden = false;
   const icon = { healthy: "🟢 Healthy", cautious: "🟡 Cautious", stressed: "🔴 Stressed" }[h.mood] || h.mood;
-  const g = h.gauges, items = [];
-  if (g.fear_vix) items.push(["Fear (VIX)", g.fear_vix.value.toFixed(1), g.fear_vix.label]);
-  if (g.rates) items.push(["10-year rate", g.rates.ten_year_pct.toFixed(2) + "%", g.rates.label]);
-  if (g.credit_spread) items.push(["Credit stress", g.credit_spread.value_pct.toFixed(2) + "%", g.credit_spread.label]);
-  if (g.breadth) items.push(["ETFs in uptrend", g.breadth.above_200d_pct + "%", g.breadth.label]);
+  const items = Object.values(h.gauges).filter((g) => g.title).map((g) => [g.title, g.display, g.label]);
   const last = decisions.slice().reverse().find((d) => (d.upcoming_events || []).length);
   $("mood").innerHTML = `<span class="mood-badge mood-${esc(h.mood)}">${esc(icon)}</span>
     <div class="gauges">${items.map(([l, v, t]) => `<div class="gauge"><div class="label">${l}</div><div class="value">${esc(v)}</div><div class="label">${esc(t)}</div></div>`).join("")}</div>
