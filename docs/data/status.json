@@ -1,79 +1,132 @@
 {
- "updated": "2026-10-12T17:22-04:00",
+ "updated": "2026-10-13T10:07-04:00",
  "mode": "paper",
  "capital": 1000.0,
- "model": "sonnet",
- "equity": 999.67,
- "cash": 10.0,
+ "model": "opus",
+ "equity": 1000.66,
+ "cash": 9.98,
  "performance": {
   "days_tracked": 1
+ },
+ "scorecard": {
+  "claude": {
+   "buys": 5,
+   "avg_return_pct": -0.08,
+   "avg_vs_spy_pct": -0.08,
+   "beat_spy": 2,
+   "dollars": -0.53,
+   "dollars_vs_spy": -0.53
+  },
+  "watch": {
+   "buys": 2,
+   "avg_return_pct": 0.05,
+   "avg_vs_spy_pct": 0.05,
+   "beat_spy": 1,
+   "dollars": 0.08,
+   "dollars_vs_spy": 0.08
+  }
+ },
+ "health": {
+  "mood": "healthy",
+  "stress_points": 0,
+  "gauges": {
+   "fear": {
+    "title": "Fear (S&P swings)",
+    "display": "10%",
+    "value": 9.5,
+    "label": "calm",
+    "source": "SPY 20-day volatility (annualised)"
+   },
+   "rates": {
+    "title": "Bonds (rates)",
+    "display": "-1.1%",
+    "ief_return_20d_pct": -1.14,
+    "label": "stable",
+    "source": "IEF 7-10y Treasury ETF, 20-day change"
+   },
+   "credit": {
+    "title": "Credit stress",
+    "display": "-0.0%",
+    "hyg_vs_ief_20d_pct": -0.02,
+    "label": "normal",
+    "source": "high-yield (HYG) vs Treasuries (IEF), 20 days"
+   },
+   "breadth": {
+    "title": "ETFs in uptrend",
+    "display": "54%",
+    "above_200d_pct": 54,
+    "above_50d_pct": 38,
+    "label": "mixed"
+   }
+  },
+  "checked": "2026-10-13T14:07"
  },
  "positions": [
   {
    "symbol": "SPY",
    "qty": 0.3673,
-   "market_value": 285.7529,
+   "market_value": 285.5105,
    "avg_entry_price": 777.926,
-   "current_price": 777.96,
-   "unrealized_pl": 0.0125,
-   "unrealized_plpc": 0.0,
+   "current_price": 777.3,
+   "unrealized_pl": -0.2299,
+   "unrealized_plpc": -0.0008,
    "name": "S&P 500",
-   "weight": 0.2858
+   "weight": 0.2853
   },
   {
    "symbol": "XLE",
    "qty": 3.4576,
-   "market_value": 228.3045,
+   "market_value": 230.1716,
    "avg_entry_price": 66.0807,
-   "current_price": 66.03,
-   "unrealized_pl": -0.1755,
-   "unrealized_plpc": -0.0008,
+   "current_price": 66.57,
+   "unrealized_pl": 1.6916,
+   "unrealized_plpc": 0.0074,
    "name": "Energy",
-   "weight": 0.2284
+   "weight": 0.23
   },
   {
    "symbol": "XLV",
    "qty": 1.042,
-   "market_value": 179.2314,
+   "market_value": 176.965,
    "avg_entry_price": 171.7012,
-   "current_price": 172.0,
-   "unrealized_pl": 0.3114,
-   "unrealized_plpc": 0.0017,
+   "current_price": 169.825,
+   "unrealized_pl": -1.955,
+   "unrealized_plpc": -0.0109,
    "name": "Health care",
-   "weight": 0.1793
+   "weight": 0.1768
   },
   {
    "symbol": "IGV",
    "qty": 1.0603,
-   "market_value": 118.2132,
+   "market_value": 118.8706,
    "avg_entry_price": 112.034,
-   "current_price": 111.49,
-   "unrealized_pl": -0.5768,
-   "unrealized_plpc": -0.0049,
+   "current_price": 112.11,
+   "unrealized_pl": 0.0806,
+   "unrealized_plpc": 0.0007,
    "name": "Software",
-   "weight": 0.1183
+   "weight": 0.1188
   },
   {
    "symbol": "QUAL",
    "qty": 0.435,
-   "market_value": 99.0683,
+   "market_value": 99.0074,
    "avg_entry_price": 227.54,
-   "current_price": 227.72,
-   "unrealized_pl": 0.0783,
-   "unrealized_plpc": 0.0008,
+   "current_price": 227.58,
+   "unrealized_pl": 0.0174,
+   "unrealized_plpc": 0.0002,
    "name": "US quality",
-   "weight": 0.0991
+   "weight": 0.0989
   },
   {
    "symbol": "XOP",
    "qty": 0.4075,
-   "market_value": 79.102,
+   "market_value": 80.1575,
    "avg_entry_price": 194.316,
-   "current_price": 194.1,
-   "unrealized_pl": -0.088,
-   "unrealized_plpc": -0.0011,
+   "current_price": 196.69,
+   "unrealized_pl": 0.9675,
+   "unrealized_plpc": 0.0122,
    "name": "Oil & gas exploration",
-   "weight": 0.0791
+   "weight": 0.0801
   }
  ]
 }
