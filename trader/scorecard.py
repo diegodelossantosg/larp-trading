@@ -28,7 +28,7 @@ def record(results: list[dict], source: str, prices: dict[str, float], spy_price
     journal.write(FILE, rows)
 
 
-def update(prices: dict[str, float], spy_price: float | None, held: set[str]) -> None:
+def update(prices: dict[str, float], spy_price: float | None, held: set[str], date: str | None = None) -> None:
     """Refresh open buys with current prices; close the ones whose ETF is no longer held."""
     rows = journal.read(FILE, [])
     if not rows or not spy_price:
@@ -39,6 +39,7 @@ def update(prices: dict[str, float], spy_price: float | None, held: set[str]) ->
         row["last"], row["spy_last"] = prices[row["symbol"]], spy_price
         if row["symbol"] not in held:
             row["open"] = False
+            row["closed_date"] = date
     journal.write(FILE, rows)
 
 

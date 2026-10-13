@@ -160,6 +160,12 @@ h2::before { content: ""; width: 4px; height: 18px; border-radius: 2px; backgrou
   </section>
 
   <section class="card">
+    <h2 style="--h: var(--c6)">Closed trades</h2>
+    <div id="closed-summary" class="small"></div>
+    <div class="table-scroll" id="closed"></div>
+  </section>
+
+  <section class="card">
     <h2 style="--h: var(--c7)">Daily log</h2>
     <div id="decisions"></div>
   </section>
@@ -341,6 +347,40 @@ function moodView(status, decisions) {
     ${last ? `<details><summary>Coming up</summary><ul class="events">${last.upcoming_events.map((e) => `<li>${esc(e)}</li>`).join("")}</ul></details>` : ""}`;
 }
 
+function exitReason(t, decisions) {
+  // The sell that closed this trade: same ETF, on its close date.
+  for (const d of decisions.slice().reverse()) {
+    if (d.date !== t.closed_date) continue;
+    const o = (d.orders || []).find((o) => o.symbol === t.symbol && o.side === "sell");
+    if (!o) continue;
+    if ((o.reason || "").startsWith("trailing stop")) return "🛑 6% stop";
+    return d.source === "watch" ? "⚡ Watcher" : "🧠 Claude's decision";
+  }
+  return "–";
+}
+
+function closedView(trades, decisions) {
+  const closed = trades.filter((t) => !t.open).sort((a, b) => (b.closed_date || "").localeCompare(a.closed_date || ""));
+  if (!closed.length) {
+    $("closed-summary").textContent = "";
+    $("closed").innerHTML = `<div class="empty">No closed trades yet. A trade appears here once an ETF is fully sold.</div>`;
+    return;
+  }
+  const rows = closed.map((t) => {
+    const ret = t.last / t.entry - 1, vs = ret - (t.spy_last / t.spy_entry - 1);
+    const days = t.closed_date ? Math.max(0, Math.round((new Date(t.closed_date) - new Date(t.date)) / 864e5)) : null;
+    return { ...t, ret, vs, days, usdRes: t.amount * ret };
+  });
+  const won = rows.filter((r) => r.usdRes > 0).length, total = rows.reduce((a, r) => a + r.usdRes, 0);
+  $("closed-summary").innerHTML = `${rows.length} closed · <b class="up">${won} won</b> · <b class="down">${rows.length - won} lost</b> · total <b class="${cls(total)}">${signedUsd(total)}</b>`;
+  $("closed").innerHTML = `<table><thead><tr><th>ETF</th><th>Bought → Sold</th><th class="num">Days</th><th class="num">Invested</th><th class="num">Result $</th><th class="num">Result %</th><th class="num">vs S&amp;P</th><th>Why sold</th></tr></thead><tbody>
+  ${rows.map((r) => `<tr><td>${r.source === "watch" ? "⚡" : "🧠"} <b>${esc(r.symbol)}</b></td><td>${esc(r.date)} → ${esc(r.closed_date || "?")}</td>
+    <td class="num">${r.days ?? "–"}</td><td class="num">${usd(r.amount)}</td>
+    <td class="num ${cls(r.usdRes)}">${signedUsd(r.usdRes)}</td><td class="num ${cls(r.ret)}">${pct(r.ret * 100)}</td>
+    <td class="num ${cls(r.vs)}">${pct(r.vs * 100)}</td><td>${exitReason(r, decisions)}</td></tr>`).join("")}
+  </tbody></table>`;
+}
+
 function scorecardView(status) {
   const sc = status.scorecard || {};
   const rows = [["claude", "🧠 Claude's daily picks"], ["watch", "⚡ Watcher buys"]].filter(([k]) => sc[k]);
@@ -380,7 +420,7 @@ function decisionsView(decisions) {
 
 setTimeout(() => location.reload(), 120000);  // pick up the watcher's 10-minute updates
 (async () => {
-  const [status, equity, decisions] = await Promise.all([load("status.json", {}), load("equity.json", []), load("decisions.json", [])]);
+  const [status, equity, decisions, trades] = await Promise.all([load("status.json", {}), load("equity.json", []), load("decisions.json", []), load("scorecard.json", [])]);
   if (status.mode === "LIVE") { $("mode").hidden = false; $("mode").textContent = "💵 Real money"; }
   hero(status, equity);
   tiles(status, equity, decisions);
@@ -389,6 +429,7 @@ setTimeout(() => location.reload(), 120000);  // pick up the watcher's 10-minute
   window.addEventListener("resize", () => { const w = $("chart").clientWidth; if (w !== lastW) { lastW = w; chart(equity); } });
   holdings(status);
   scorecardView(status);
+  closedView(trades, decisions);
   moodView(status, decisions);
   decisionsView(decisions);
   $("toggle-table").addEventListener("click", () => {

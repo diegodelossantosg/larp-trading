@@ -244,7 +244,7 @@ def trade(cfg, broker: Broker, market: Market, dry_run: bool, force: bool) -> in
 
     journal.append_decision(record)
     positions = broker.positions()
-    scorecard.update(prices, prices.get("SPY"), set(positions))
+    scorecard.update(prices, prices.get("SPY"), set(positions), _today())
     _write_status(cfg, _account(cfg, broker, positions), positions, history)
     for o in record["orders"]:
         log.info("%s %s $%.2f -> %s", o["side"], o["symbol"], o["notional"], o["status"])
@@ -301,7 +301,7 @@ def watch(cfg, broker: Broker, market: Market, dry_run: bool, force: bool = Fals
     if not orders:
         if highs != journal.read("watch.json", {}).get("highs"):
             journal.write("watch.json", state)
-        scorecard.update({s: q.price for s, q in quotes.items()}, quotes["SPY"].price if "SPY" in quotes else None, set(positions))
+        scorecard.update({s: q.price for s, q in quotes.items()}, quotes["SPY"].price if "SPY" in quotes else None, set(positions), _today())
         _write_status(cfg, acct, positions, history)  # live value for the dashboard
         log.info("watch: no action (%d quotes checked)", len(quotes))
         return 0
@@ -322,7 +322,7 @@ def watch(cfg, broker: Broker, market: Market, dry_run: bool, force: bool = Fals
         "orders": results, "notes": notes + [f"{o.side} {o.symbol}: {o.reason}" for o in orders],
     })
     positions = broker.positions()
-    scorecard.update(prices, prices.get("SPY"), set(positions))
+    scorecard.update(prices, prices.get("SPY"), set(positions), _today())
     _write_status(cfg, _account(cfg, broker, positions), positions, history)
     for r in results:
         log.info("%s %s $%.2f -> %s (%s)", r["side"], r["symbol"], r["notional"], r["status"], r["reason"])
