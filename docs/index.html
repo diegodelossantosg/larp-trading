@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>My AI Investor</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232a78d6'/%3E%3Cpolyline points='10,46 24,32 34,40 52,18' fill='none' stroke='white' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpolyline points='40,18 52,18 52,30' fill='none' stroke='white' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <style>
 :root {
   color-scheme: light;
@@ -133,6 +134,10 @@ dl.glossary dd { margin: 2px 0 0; color: var(--ink-2); }
 .intervals { display: inline-flex; gap: 2px; background: var(--chip); border-radius: 8px; padding: 2px; margin-left: auto; margin-right: 8px; }
 .intervals button { border: 0; background: none; font: inherit; font-size: 12px; font-weight: 600; color: var(--ink-2); padding: 3px 9px; border-radius: 6px; cursor: pointer; }
 .intervals button.on { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.12); }
+.holdings-wrap { display: flex; gap: 20px; align-items: center; }
+.holdings-wrap table { flex: 1; min-width: 0; }
+.donut { flex: none; }
+@media (max-width: 700px) { .holdings-wrap { flex-direction: column; } }
 .chip.auto { background: rgba(237,161,0,.18); color: var(--ink); }
 h2 { display: flex; align-items: center; gap: 8px; }
 h2::before { content: ""; width: 4px; height: 18px; border-radius: 2px; background: var(--h, var(--series-1)); }
@@ -349,12 +354,28 @@ function holdings(status) {
   const cash = status.cash;
   const colors = ["var(--series-1)", "var(--series-2)", "var(--c3)", "var(--c4)", "var(--c5)", "var(--c6)", "var(--c7)", "var(--c8)"];
   const col = (i) => colors[i % colors.length];
-  const bar = ps.map((p, i) => `<span title="${esc(p.symbol)} ${(p.weight * 100).toFixed(0)}%" style="flex:${p.weight};background:${col(i)}"></span>`).join("");
-  $("holdings").innerHTML = `<div class="alloc">${bar}</div><table><thead><tr><th>ETF</th><th class="num">Share</th><th class="num">Value</th><th class="num">Gain $</th><th class="num">Gain %</th></tr></thead><tbody>
+  // Donut chart: one slice per holding (same colors as the table), plus cash in gray.
+  const slices = ps.map((p, i) => ({ label: p.symbol, v: p.market_value, c: col(i) }));
+  if (cash != null && cash >= 0.5) slices.push({ label: "Cash", v: cash, c: "var(--axis)" });
+  const total = slices.reduce((a, x) => a + x.v, 0) || 1;
+  const R = 70, r = 46, C = 80;
+  let a0 = -Math.PI / 2;
+  const arcs = slices.map((x) => {
+    const a1 = a0 + (x.v / total) * Math.PI * 2 - 0.012;  // small gap between slices
+    const big = a1 - a0 > Math.PI ? 1 : 0;
+    const pt = (rad, a) => `${(C + rad * Math.cos(a)).toFixed(2)},${(C + rad * Math.sin(a)).toFixed(2)}`;
+    const d = `M${pt(R, a0)}A${R},${R} 0 ${big} 1 ${pt(R, a1)}L${pt(r, a1)}A${r},${r} 0 ${big} 0 ${pt(r, a0)}Z`;
+    a0 = a1 + 0.012;
+    return `<path d="${d}" fill="${x.c}"><title>${esc(x.label)} ${(x.v / total * 100).toFixed(1)}% · ${usd(x.v)}</title></path>`;
+  }).join("");
+  const donut = `<svg class="donut" viewBox="0 0 160 160" width="160" height="160" role="img" aria-label="Holdings split">${arcs}
+    <text x="80" y="76" text-anchor="middle" font-size="11" fill="var(--ink-2)">Total</text>
+    <text x="80" y="94" text-anchor="middle" font-size="15" font-weight="700" fill="var(--ink)">${usd(total, 0)}</text></svg>`;
+  $("holdings").innerHTML = `<div class="holdings-wrap">${donut}<table><thead><tr><th>ETF</th><th class="num">Share</th><th class="num">Value</th><th class="num">Gain $</th><th class="num">Gain %</th></tr></thead><tbody>
   ${ps.map((p, i) => `<tr><td><span class="dot" style="background:${col(i)}"></span><b>${esc(p.symbol)}</b> <span class="small">${esc(p.name || "")}</span></td><td class="num">${(p.weight * 100).toFixed(0)}%</td>
     <td class="num">${usd(p.market_value)}</td><td class="num ${cls(p.unrealized_pl)}">${signedUsd(p.unrealized_pl)}</td><td class="num ${cls(p.unrealized_pl)}">${pct((p.unrealized_plpc || 0) * 100)}</td></tr>`).join("")}
-  ${cash != null && Math.abs(cash) >= 0.5 ? `<tr><td><b>Cash</b></td><td class="num">${(cash / status.equity * 100).toFixed(0)}%</td><td class="num">${usd(cash)}</td><td class="num">–</td><td class="num">–</td></tr>` : ""}
-  </tbody></table>`;
+  ${cash != null && Math.abs(cash) >= 0.5 ? `<tr><td><span class="dot" style="background:var(--axis)"></span><b>Cash</b></td><td class="num">${(cash / status.equity * 100).toFixed(0)}%</td><td class="num">${usd(cash)}</td><td class="num">–</td><td class="num">–</td></tr>` : ""}
+  </tbody></table></div>`;
 }
 
 function moodView(status, decisions) {

@@ -36,8 +36,8 @@ After the close, a second job records portfolio value against SPY so the dashboa
 | Rule | Default | Env var |
 |---|---|---|
 | Money the agent may use (rest of the paper account is ignored) | $1,000 | `CAPITAL_USD` (0 = whole account) |
-| Unallocated money goes to | SPY | `IDLE_ASSET` |
-| Most that may sit in SPY | 50% | `MAX_IDLE_WEIGHT` |
+| Unallocated money goes to | SSO (2x S&P 500, no trend filter) | `IDLE_ASSET` |
+| Most that may sit in the idle asset | 50% | `MAX_IDLE_WEIGHT` |
 | Watcher: sell a position this far below its high | 6% | `STOP_TRAIL_PCT` |
 | Watcher: signals that must agree / buy size / max buys per day | 5 of 6 / 8% / 4 | `WATCH_MIN_SCORE` / `WATCH_BUY_SIZE` / `WATCH_MAX_BUYS_PER_DAY` |
 | Max weight in one ETF (other than SPY) | 30% | `MAX_POSITION_WEIGHT` |

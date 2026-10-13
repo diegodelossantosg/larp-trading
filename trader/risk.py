@@ -60,11 +60,12 @@ def apply_limits(
         notes.append(f"dropped {sym}: more than {max_positions} positions")
         del weights[sym]
 
-    lev_total = sum(w for s, w in weights.items() if s in leveraged)
+    # The idle asset may itself be leveraged (e.g. SSO); it has its own cap, not this one.
+    lev_total = sum(w for s, w in weights.items() if s in leveraged and s != idle_asset)
     if lev_total > max_leveraged_weight:
         scale = max_leveraged_weight / lev_total
         for s in weights:
-            if s in leveraged:
+            if s in leveraged and s != idle_asset:
                 weights[s] *= scale
         notes.append(f"leveraged/inverse ETFs scaled {lev_total:.0%} -> {max_leveraged_weight:.0%}")
 

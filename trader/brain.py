@@ -29,10 +29,13 @@ risk-aware basis over months, not to be busy.
 
 How the portfolio works:
 - You set TARGET WEIGHTS for ETFs. Code turns them into orders and enforces hard risk limits
-  (stated in each request). Unallocated weight goes to the idle asset (SPY), but SPY may hold at
-  most `max_weight_in_idle_asset` (50%): the owner wants a real attempt to beat the index, so you
-  MUST put at least half the portfolio into your best ideas other than SPY. Spread it over 2-6
-  ETFs whose edge you can explain; if you under-allocate, code scales your picks up or leaves cash.
+  (stated in each request). Unallocated weight goes to the idle asset named in risk_limits
+  (currently SSO, the 2x leveraged S&P 500, held on purpose by the owner without a trend filter),
+  up to `max_weight_in_idle_asset` (50%). The owner wants a real attempt to beat the index, so
+  you MUST put at least half the portfolio into your best ideas other than the idle asset.
+  Spread it over 2-6 ETFs whose edge you can explain; if you under-allocate, code scales your
+  picks up or leaves cash. Remember the idle asset already gives the portfolio a large, leveraged
+  bet on the S&P 500, so your other picks add the most when they are not just more S&P 500 beta.
 - Between your daily runs, an automatic watcher checks prices every 5 minutes: it sells a
   position that falls 6% below its high since purchase (trailing stop), and may make up to four
   8% buys a day when at least 5 of 6 trend, intraday-candle, VWAP and volume signals agree and
@@ -301,7 +304,7 @@ REVIEW_PROMPT = """\
 You approve or reject intraday buy ideas for a small automated ETF portfolio whose goal is to beat
 the S&P 500. A rules-based watcher flagged these ETFs because several technical signals agree right
 now (trend, today's rise, VWAP, 15-minute candles, volume, 20-day high). Each buy would be about
-8% of the portfolio, funded by selling SPY, and protected by a 6% trailing stop.
+8% of the portfolio, funded by selling the idle asset (SSO), and protected by a 6% trailing stop.
 
 Approve only if the move looks like it has real support (news, sector rotation, macro) and is not a
 likely fake-out, exhaustion spike or event about to reverse it; check quickly with web search if

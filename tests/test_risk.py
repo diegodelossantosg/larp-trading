@@ -90,3 +90,10 @@ def test_buys_never_exceed_own_money():
                                 rebalance_band=0.02, min_order_usd=25, max_daily_turnover=1.0,
                                 cash_buffer=0.0, protected={"SPY"})
     assert sum(o.notional for o in orders if o.side == "buy") <= 100.01
+
+
+def test_leveraged_idle_asset_is_not_squeezed_by_leverage_cap():
+    t, _ = apply_limits({"XLE": 0.3, "XLV": 0.2}, allowed={"XLE", "XLV", "SSO"}, leveraged={"SSO", "TQQQ"},
+                        idle_asset="SSO", max_position_weight=0.30, max_positions=8,
+                        max_leveraged_weight=0.10, max_idle_weight=0.5)
+    assert t["SSO"] == 0.5 and t["XLE"] == 0.3 and t["XLV"] == 0.2

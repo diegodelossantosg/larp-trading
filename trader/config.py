@@ -83,7 +83,7 @@ def load_config() -> Config:
         paper=paper,
         claude_model=os.environ.get("CLAUDE_MODEL") or default_model,
         claude_effort=os.environ.get("CLAUDE_EFFORT", "high"),
-        idle_asset=os.environ.get("IDLE_ASSET", "SPY").upper(),
+        idle_asset=os.environ.get("IDLE_ASSET", "SSO").upper(),  # 2x S&P 500, held without a trend filter
         max_position_weight=_float("MAX_POSITION_WEIGHT", 0.30),
         max_positions=int(_float("MAX_POSITIONS", 8)),
         max_leveraged_weight=_float("MAX_LEVERAGED_WEIGHT", 0.10),
