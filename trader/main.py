@@ -36,6 +36,28 @@ def _today() -> str:
     return datetime.now(ET).strftime("%Y-%m-%d")
 
 
+def _write_intraday(cfg, broker: Broker, market: Market) -> None:
+    """Minute-by-minute value of the agent's money and SPY's price, last 5 sessions, for the chart."""
+    import pandas as pd
+
+    try:
+        hist = broker.equity_history()
+    except Exception as e:  # the chart is nice to have; never break the watcher for it
+        log.warning("intraday history failed: %s", e)
+        return
+    state = journal.read("capital.json", None)
+    if not hist or (cfg.capital_usd and state is None):
+        return
+    offset = cfg.capital_usd - state["baseline_equity"] if cfg.capital_usd else 0.0
+    spy = market.minute_closes("SPY")
+    ts = pd.to_datetime([t for t, _ in hist], unit="s", utc=True)
+    spy_at = spy.reindex(spy.index.union(ts)).ffill().reindex(ts) if len(spy) else pd.Series(index=ts, dtype=float)
+    points = [[t.isoformat(timespec="minutes"), round(e + offset, 2), None if pd.isna(p) else round(float(p), 2)]
+              for t, (_, e), p in zip(ts, hist, spy_at.to_numpy())]
+    days = sorted({p[0][:10] for p in points})[-5:]
+    journal.write("intraday.json", {"points": [p for p in points if p[0][:10] in days]})
+
+
 def _recent_watch_buys(days: int) -> set[str]:
     """ETFs the watcher bought within the last `days` trading days."""
     import pandas as pd
@@ -302,6 +324,7 @@ def watch(cfg, broker: Broker, market: Market, dry_run: bool, force: bool = Fals
         if highs != journal.read("watch.json", {}).get("highs"):
             journal.write("watch.json", state)
         scorecard.update({s: q.price for s, q in quotes.items()}, quotes["SPY"].price if "SPY" in quotes else None, set(positions), _today())
+        _write_intraday(cfg, broker, market)
         _write_status(cfg, acct, positions, history)  # live value for the dashboard
         log.info("watch: no action (%d quotes checked)", len(quotes))
         return 0
@@ -323,6 +346,7 @@ def watch(cfg, broker: Broker, market: Market, dry_run: bool, force: bool = Fals
     })
     positions = broker.positions()
     scorecard.update(prices, prices.get("SPY"), set(positions), _today())
+    _write_intraday(cfg, broker, market)
     _write_status(cfg, _account(cfg, broker, positions), positions, history)
     for r in results:
         log.info("%s %s $%.2f -> %s (%s)", r["side"], r["symbol"], r["notional"], r["status"], r["reason"])

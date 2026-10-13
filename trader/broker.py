@@ -9,7 +9,7 @@ import time
 from alpaca.common.exceptions import APIError
 from alpaca.trading.client import TradingClient
 from alpaca.trading.enums import AssetClass, AssetStatus, OrderSide, TimeInForce
-from alpaca.trading.requests import GetCalendarRequest, MarketOrderRequest
+from alpaca.trading.requests import GetCalendarRequest, GetPortfolioHistoryRequest, MarketOrderRequest
 
 from .config import Config
 from .risk import Order
@@ -28,6 +28,12 @@ class Broker:
 
     def is_trading_day(self, day: str) -> bool:
         return bool(self.client.get_calendar(GetCalendarRequest(start=day, end=day)))
+
+    def equity_history(self) -> list[tuple[int, float]]:
+        """(unix seconds, account equity) for each regular-hours minute of the last week."""
+        h = self.client.get_portfolio_history(GetPortfolioHistoryRequest(
+            period="1W", timeframe="1Min", intraday_reporting="market_hours"))
+        return [(t, float(e)) for t, e in zip(h.timestamp or [], h.equity or []) if e]
 
     def account(self) -> dict:
         a = self.client.get_account()

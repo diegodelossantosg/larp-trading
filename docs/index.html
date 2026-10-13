@@ -118,6 +118,9 @@ dl.glossary dd { margin: 2px 0 0; color: var(--ink-2); }
 .gauge .label { font-size: 12px; color: var(--ink-2); }
 .gauge .value { font-size: 18px; font-weight: 700; }
 .events { margin: 10px 0 0; padding-left: 18px; font-size: 14px; }
+.intervals { display: inline-flex; gap: 2px; background: var(--chip); border-radius: 8px; padding: 2px; margin-left: auto; margin-right: 8px; }
+.intervals button { border: 0; background: none; font: inherit; font-size: 12px; font-weight: 600; color: var(--ink-2); padding: 3px 9px; border-radius: 6px; cursor: pointer; }
+.intervals button.on { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.12); }
 .chip.auto { background: rgba(237,161,0,.18); color: var(--ink); }
 h2 { display: flex; align-items: center; gap: 8px; }
 h2::before { content: ""; width: 4px; height: 18px; border-radius: 2px; background: var(--h, var(--series-1)); }
@@ -139,6 +142,9 @@ h2::before { content: ""; width: 4px; height: 18px; border-radius: 2px; backgrou
   <section class="card">
     <div class="toolbar">
       <h2 style="--h: var(--series-1)">AI vs S&amp;P 500</h2>
+      <div class="intervals" id="intervals">
+        <button data-iv="1m">1m</button><button data-iv="5m">5m</button><button data-iv="15m">15m</button><button data-iv="1H">1H</button><button data-iv="1D">1D</button>
+      </div>
       <button class="link" id="toggle-table">Table</button>
     </div>
     <div class="legend">
@@ -257,10 +263,45 @@ function tiles(status, equity, decisions) {
     `<div class="tile"><div class="label">${l}</div><div class="value">${v}</div></div>`).join("");
 }
 
-function chart(equity) {
+const DATA = { status: {}, equity: [], intraday: {} };
+const INTERVALS = { "1m": [1, 1], "5m": [5, 2], "15m": [15, 5], "1H": [60, 5], "1D": [0, 0] };  // minutes, sessions shown
+let interval = (() => { try { return localStorage.getItem("interval") || "5m"; } catch { return "5m"; } })();
+
+function seriesFor(iv, equity, intraday, status) {
+  if (iv === "1D") {
+    const rows = equity.slice();
+    const pts = intraday.points || [];
+    const today = new Date().toLocaleDateString("en-CA", { timeZone: "America/New_York" });
+    if (pts.length && status.equity != null && !rows.some((r) => r.date === today))
+      rows.push({ date: today, equity: status.equity, spy_close: pts.at(-1)[2] });
+    return { rows, empty: "Starts after day 2." };
+  }
+  const [mins, sessions] = INTERVALS[iv];
+  const pts = (intraday.points || []).filter((p) => p[1] != null && p[2] != null);
+  const nyDay = (ts) => new Date(ts).toLocaleDateString("en-CA", { timeZone: "America/New_York" });
+  const days = [...new Set(pts.map((p) => nyDay(p[0])))].slice(-sessions);
+  const buckets = new Map();
+  for (const p of pts) {
+    if (!days.includes(nyDay(p[0]))) continue;
+    buckets.set(Math.floor(Date.parse(p[0]) / 60000 / mins), p);  // last point in each bucket wins
+  }
+  const multi = days.length > 1;
+  const fmt = (ts) => new Date(ts).toLocaleString([], multi ? { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit", hour12: false } : { hour: "2-digit", minute: "2-digit", hour12: false });
+  const rows = [...buckets.values()].map((p) => ({ date: fmt(p[0]), equity: p[1], spy_close: p[2] }));
+  return { rows, empty: "Intraday data appears while the market is open." };
+}
+
+function renderChart() {
+  const { rows, empty } = seriesFor(interval, DATA.equity, DATA.intraday, DATA.status);
+  document.querySelectorAll("#intervals button").forEach((b) => b.classList.toggle("on", b.dataset.iv === interval));
+  chart(rows, empty);
+}
+
+function chart(equity, emptyMsg = "Starts after day 2.") {
   const el = $("chart");
   if (equity.length < 2) {
-    el.innerHTML = `<div class="empty">Starts after day 2.</div>`;
+    el.innerHTML = `<div class="empty">${emptyMsg}</div>`;
+    $("chart-table").innerHTML = "";
     return;
   }
   const base = equity[0].equity;
@@ -425,13 +466,19 @@ function decisionsView(decisions) {
 
 setTimeout(() => location.reload(), 60000);  // pick up the watcher's 5-minute updates
 (async () => {
-  const [status, equity, decisions, trades] = await Promise.all([load("status.json", {}), load("equity.json", []), load("decisions.json", []), load("scorecard.json", [])]);
+  const [status, equity, decisions, trades, intraday] = await Promise.all([load("status.json", {}), load("equity.json", []), load("decisions.json", []), load("scorecard.json", []), load("intraday.json", {})]);
+  Object.assign(DATA, { status, equity, intraday });
+  document.querySelectorAll("#intervals button").forEach((b) => b.addEventListener("click", () => {
+    interval = b.dataset.iv;
+    try { localStorage.setItem("interval", interval); } catch {}
+    renderChart();
+  }));
   if (status.mode === "LIVE") { $("mode").hidden = false; $("mode").textContent = "💵 Real money"; }
   hero(status, equity);
   tiles(status, equity, decisions);
-  chart(equity);
+  renderChart();
   let lastW = $("chart").clientWidth;
-  window.addEventListener("resize", () => { const w = $("chart").clientWidth; if (w !== lastW) { lastW = w; chart(equity); } });
+  window.addEventListener("resize", () => { const w = $("chart").clientWidth; if (w !== lastW) { lastW = w; renderChart(); } });
   holdings(status);
   scorecardView(status);
   closedView(trades, decisions);

@@ -1,11 +1,11 @@
-name: Watcher (every 5 min)
+name: Watcher (every minute)
 
 # Price check between Claude's daily decisions: trailing stops (instant, rules) and signal-based
 # buys (each approved by Opus),
 # and a live portfolio value for the dashboard.
 #
 # GitHub's own timer is unreliable for every-10-minute jobs, so instead one job per trading day
-# loops: check, save, wait 5 minutes, repeat, and stops when the market closes. The schedule
+# loops: check, save, wait a minute, repeat, and stops when the market closes. The schedule
 # below starts it a few times as a safety net; extra starts just wait in line and exit at once.
 on:
   schedule:
@@ -48,21 +48,36 @@ jobs:
           node-version: "22"
       - name: Install Claude Code (for Opus approval of buys)
         run: npm install -g @anthropic-ai/claude-code@2.1.296
-      - name: Check every 5 minutes until the close
+      - name: Check every minute until the close
         run: |
           git config user.name "trading-agent"
           git config user.email "trading-agent@users.noreply.github.com"
-          save() {
-            git add docs/data
-            git diff --cached --quiet && return 0
-            git commit -q -m "Watch: $(date -u +%Y-%m-%dT%H:%MZ)"
-            for i in 1 2 3; do git pull -q --rebase origin main && git push -q origin HEAD:main && return 0; sleep 5; done
+          # Check every minute. Changes are folded into one local commit and published every
+          # 5 minutes, or right away after a trade, so GitHub isn't flooded with commits.
+          sync() {
+            git pull -q --rebase -X theirs origin main || { git rebase --abort; echo "sync failed"; }
+          }
+          publish() {
+            [ -n "$(git log origin/main..HEAD --oneline)" ] || return 0
+            for j in 1 2 3; do sync; git push -q origin HEAD:main && return 0; sleep 5; done
             echo "push failed"
           }
+          i=0
           while python -m trader.main market-open; do
-            git pull -q --rebase origin main || true
+            before=$(md5sum docs/data/decisions.json 2>/dev/null)
             python -m trader.main watch || echo "watch run failed"
-            save
-            sleep 300
+            git add docs/data
+            if ! git diff --cached --quiet; then
+              if [ -n "$(git log origin/main..HEAD --oneline)" ]; then git commit -q --amend --no-edit
+              else git commit -q -m "Watch: $(date -u +%Y-%m-%dT%H:%MZ)"; fi
+            fi
+            if [ $((i % 5)) -eq 4 ] || [ "$before" != "$(md5sum docs/data/decisions.json 2>/dev/null)" ]; then
+              publish
+            else
+              sync
+            fi
+            i=$((i + 1))
+            sleep 60
           done
+          publish
           echo "market closed; done for today"

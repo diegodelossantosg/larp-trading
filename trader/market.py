@@ -130,3 +130,14 @@ class Market:
             return {}
         return {sym: df.xs(sym, level="symbol").sort_index()
                 for sym in df.index.get_level_values("symbol").unique()}
+
+    def minute_closes(self, symbol: str, days: int = 8) -> "pd.Series":
+        """1-minute closes (IEX feed, real time) for the last few days."""
+        try:
+            df = self.bars_client.get_stock_bars(StockBarsRequest(
+                symbol_or_symbols=symbol, timeframe=TimeFrame.Minute,
+                start=datetime.now(timezone.utc) - timedelta(days=days), feed=DataFeed.IEX)).df
+        except APIError as e:
+            log.warning("minute bars failed: %s", e)
+            return pd.Series(dtype=float)
+        return df.xs(symbol, level="symbol")["close"].sort_index() if not df.empty else pd.Series(dtype=float)
