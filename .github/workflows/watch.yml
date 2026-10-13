@@ -1,11 +1,11 @@
-name: Watcher (every 10 min)
+name: Watcher (every 5 min)
 
 # Price check between Claude's daily decisions: trailing stops (instant, rules) and signal-based
 # buys (each approved by Opus),
 # and a live portfolio value for the dashboard.
 #
 # GitHub's own timer is unreliable for every-10-minute jobs, so instead one job per trading day
-# loops: check, save, wait 10 minutes, repeat, and stops when the market closes. The schedule
+# loops: check, save, wait 5 minutes, repeat, and stops when the market closes. The schedule
 # below starts it a few times as a safety net; extra starts just wait in line and exit at once.
 on:
   schedule:
@@ -48,7 +48,7 @@ jobs:
           node-version: "22"
       - name: Install Claude Code (for Opus approval of buys)
         run: npm install -g @anthropic-ai/claude-code@2.1.296
-      - name: Check every 10 minutes until the close
+      - name: Check every 5 minutes until the close
         run: |
           git config user.name "trading-agent"
           git config user.email "trading-agent@users.noreply.github.com"
@@ -63,6 +63,6 @@ jobs:
             git pull -q --rebase origin main || true
             python -m trader.main watch || echo "watch run failed"
             save
-            sleep 600
+            sleep 300
           done
           echo "market closed; done for today"

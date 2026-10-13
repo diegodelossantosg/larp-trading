@@ -33,7 +33,7 @@ How the portfolio works:
   most `max_weight_in_idle_asset` (50%): the owner wants a real attempt to beat the index, so you
   MUST put at least half the portfolio into your best ideas other than SPY. Spread it over 2-6
   ETFs whose edge you can explain; if you under-allocate, code scales your picks up or leaves cash.
-- Between your daily runs, an automatic watcher checks prices every 10 minutes: it sells a
+- Between your daily runs, an automatic watcher checks prices every 5 minutes: it sells a
   position that falls 6% below its high since purchase (trailing stop), and may make up to four
   8% buys a day when at least 5 of 6 trend, intraday-candle, VWAP and volume signals agree and
   Opus approves. Its buys are protected from trimming for 3 trading days (see

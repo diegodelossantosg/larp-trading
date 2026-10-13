@@ -184,9 +184,14 @@ const pct = (v, d = 2) => v == null ? "–" : (v > 0 ? "+" : v < 0 ? "−" : "")
 const cls = (v) => v > 0.005 ? "up" : v < -0.005 ? "down" : "";
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
+// Read the data straight from the repo (updated every 5 minutes) so the page doesn't wait for a
+// GitHub Pages rebuild; fall back to the copy published with the page.
+const RAW = "https://raw.githubusercontent.com/diegodelossantosg/larp-trading/main/docs/data/";
 async function load(name, fallback) {
-  try { const r = await fetch(`data/${name}?t=${Date.now()}`); return r.ok ? await r.json() : fallback; }
-  catch { return fallback; }
+  for (const url of [`${RAW}${name}?t=${Date.now()}`, `data/${name}?t=${Date.now()}`]) {
+    try { const r = await fetch(url, { cache: "no-store" }); if (r.ok) return await r.json(); } catch {}
+  }
+  return fallback;
 }
 
 function maxDip(values) {
@@ -418,7 +423,7 @@ function decisionsView(decisions) {
   }).join("");
 }
 
-setTimeout(() => location.reload(), 120000);  // pick up the watcher's 10-minute updates
+setTimeout(() => location.reload(), 60000);  // pick up the watcher's 5-minute updates
 (async () => {
   const [status, equity, decisions, trades] = await Promise.all([load("status.json", {}), load("equity.json", []), load("decisions.json", []), load("scorecard.json", [])]);
   if (status.mode === "LIVE") { $("mode").hidden = false; $("mode").textContent = "💵 Real money"; }

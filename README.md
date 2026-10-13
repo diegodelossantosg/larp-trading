@@ -14,7 +14,7 @@ A fully automated agent that, once per US trading day:
 5. Saves every decision, with Claude's reasoning, sources, orders and API cost, to `docs/data/`.
    The dashboard reads those files.
 
-Every 10 minutes while the market is open, a rules-only **watcher** (`trader/watch.py`, GitHub
+Every 5 minutes while the market is open, a rules-only **watcher** (`trader/watch.py`, GitHub
 Actions, no Claude call) sells positions that fall 6% below their high, and scores every ETF on six
 buy signals: daily uptrend, a healthy rise today, price above today's VWAP, bullish 15-minute
 candles, a volume surge and a new 20-day high. When 5 of 6 agree (and SPY isn't falling, and the
