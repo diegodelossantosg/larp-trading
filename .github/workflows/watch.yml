@@ -71,7 +71,7 @@ jobs:
               if [ -n "$(git log origin/main..HEAD --oneline)" ]; then git commit -q --amend --no-edit
               else git commit -q -m "Watch: $(date -u +%Y-%m-%dT%H:%MZ)"; fi
             fi
-            if [ $((i % 5)) -eq 4 ] || [ "$before" != "$(md5sum docs/data/decisions.json 2>/dev/null)" ]; then
+            if [ $((i % 5)) -eq 0 ] || [ "$before" != "$(md5sum docs/data/decisions.json 2>/dev/null)" ]; then
               publish
             else
               sync
