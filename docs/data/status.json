@@ -4,7 +4,7 @@
  "capital": 1000.0,
  "idle_asset": "SSO",
  "model": "opus",
- "equity": 1001.48,
+ "equity": 1001.38,
  "cash": 9.99,
  "performance": {
   "days_tracked": 1
@@ -12,19 +12,19 @@
  "scorecard": {
   "claude": {
    "buys": 5,
-   "avg_return_pct": 0.27,
-   "avg_vs_spy_pct": 0.34,
+   "avg_return_pct": 0.26,
+   "avg_vs_spy_pct": 0.33,
    "beat_spy": 3,
-   "dollars": 1.42,
-   "dollars_vs_spy": 1.79
+   "dollars": 1.38,
+   "dollars_vs_spy": 1.78
   },
   "watch": {
    "buys": 2,
-   "avg_return_pct": 0.12,
-   "avg_vs_spy_pct": 0.19,
+   "avg_return_pct": 0.1,
+   "avg_vs_spy_pct": 0.17,
    "beat_spy": 1,
-   "dollars": 0.19,
-   "dollars_vs_spy": 0.3
+   "dollars": 0.16,
+   "dollars_vs_spy": 0.28
   }
  },
  "health": {
@@ -66,10 +66,10 @@
   {
    "symbol": "SSO",
    "qty": 3.97,
-   "market_value": 285.561,
+   "market_value": 285.5411,
    "avg_entry_price": 71.95,
-   "current_price": 71.9301,
-   "unrealized_pl": -0.079,
+   "current_price": 71.9251,
+   "unrealized_pl": -0.0989,
    "unrealized_plpc": -0.0003,
    "name": "2x S&P 500",
    "weight": 0.2851
@@ -77,33 +77,33 @@
   {
    "symbol": "XLE",
    "qty": 3.4576,
-   "market_value": 230.8977,
+   "market_value": 230.9185,
    "avg_entry_price": 66.0807,
-   "current_price": 66.78,
-   "unrealized_pl": 2.4177,
-   "unrealized_plpc": 0.0106,
+   "current_price": 66.786,
+   "unrealized_pl": 2.4385,
+   "unrealized_plpc": 0.0107,
    "name": "Energy",
    "weight": 0.2306
   },
   {
    "symbol": "XLV",
    "qty": 1.042,
-   "market_value": 177.4078,
+   "market_value": 177.3714,
    "avg_entry_price": 171.7012,
-   "current_price": 170.25,
-   "unrealized_pl": -1.5122,
-   "unrealized_plpc": -0.0084,
+   "current_price": 170.215,
+   "unrealized_pl": -1.5486,
+   "unrealized_plpc": -0.0087,
    "name": "Health care",
    "weight": 0.1771
   },
   {
    "symbol": "IGV",
    "qty": 1.0603,
-   "market_value": 118.1761,
+   "market_value": 118.1178,
    "avg_entry_price": 112.034,
-   "current_price": 111.455,
-   "unrealized_pl": -0.6139,
-   "unrealized_plpc": -0.0052,
+   "current_price": 111.4,
+   "unrealized_pl": -0.6722,
+   "unrealized_plpc": -0.0057,
    "name": "Software",
    "weight": 0.118
   },
@@ -127,7 +127,7 @@
    "unrealized_pl": 1.2731,
    "unrealized_plpc": 0.0161,
    "name": "Oil & gas exploration",
-   "weight": 0.0803
+   "weight": 0.0804
   }
  ]
 }
