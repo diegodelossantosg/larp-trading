@@ -23,6 +23,7 @@ from .indicators import summarize
 from .market import Market
 from .risk import Order, apply_limits, drawdown, plan_orders
 from .universe import CORE_ETFS, LEVERAGED
+from . import health as market_health
 from . import scorecard
 from . import watch as rules
 
@@ -107,6 +108,7 @@ def _write_status(cfg, acct: dict, positions: dict, rows: list[dict]) -> None:
         "cash": round(acct["cash"], 2),
         "performance": _performance(rows),
         "scorecard": scorecard.summary(journal.read("scorecard.json", [])),
+        "health": journal.read("health.json", None),
         "positions": sorted(
             ({"symbol": s, **{k: round(v, 4) for k, v in p.items()},
               "name": CORE_ETFS.get(s, ""),
@@ -149,8 +151,11 @@ def trade(cfg, broker: Broker, market: Market, dry_run: bool, force: bool) -> in
         | {"orders": [(o["side"], o["symbol"], o["notional"], o.get("status")) for o in d.get("orders", [])]}
         for d in journal.read("decisions.json", [])[-30:] if d.get("source") == "watch"
     ][-10:]
+    health = market_health.build(technicals)
+    journal.write("health.json", health)
     briefing = {
         "date": _today(),
+        "market_health": health,
         "account": {"equity": equity, "cash": acct["cash"]},
         "holdings": {s: {"weight": round(p["market_value"] / equity, 4),
                          "unrealized_pl_pct": round(p["unrealized_plpc"] * 100, 2)} for s, p in positions.items()},
@@ -274,7 +279,9 @@ def watch(cfg, broker: Broker, market: Market, dry_run: bool, force: bool = Fals
     if slots > 0:
         equity = acct["equity"] or 1
         weights = {s: p["market_value"] / equity for s, p in positions.items() if s not in stopped}
-        candidates = rules.buy_candidates(quotes, weights, cfg.idle_asset, cfg.watch_min_score,
+        mood = (journal.read("health.json", {}) or {}).get("mood")
+        min_score = min(6, cfg.watch_min_score + 1) if mood == "stressed" else cfg.watch_min_score
+        candidates = rules.buy_candidates(quotes, weights, cfg.idle_asset, min_score,
                                           cfg.max_position_weight, cfg.watch_buy_size)
         orders += rules.buy_orders(
             candidates, equity=acct["equity"],

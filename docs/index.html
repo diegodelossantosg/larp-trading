@@ -109,6 +109,15 @@ dl.glossary dd { margin: 2px 0 0; color: var(--ink-2); }
 .tag.buy { background: rgba(12,163,12,.14); color: var(--good); }
 .tag.sell { background: rgba(208,59,59,.14); color: var(--bad); }
 .tag.hold { background: var(--chip); color: var(--ink-2); }
+.mood-badge { display: inline-block; font-weight: 700; font-size: 16px; padding: 4px 12px; border-radius: 99px; margin: 4px 0 10px; }
+.mood-healthy { background: rgba(12,163,12,.15); color: var(--good); }
+.mood-cautious { background: rgba(237,161,0,.2); color: var(--ink); }
+.mood-stressed { background: rgba(208,59,59,.15); color: var(--bad); }
+.gauges { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+.gauge { background: var(--chip); border-radius: 10px; padding: 8px 10px; }
+.gauge .label { font-size: 12px; color: var(--ink-2); }
+.gauge .value { font-size: 18px; font-weight: 700; }
+.events { margin: 10px 0 0; padding-left: 18px; font-size: 14px; }
 .chip.auto { background: rgba(237,161,0,.18); color: var(--ink); }
 h2 { display: flex; align-items: center; gap: 8px; }
 h2::before { content: ""; width: 4px; height: 18px; border-radius: 2px; background: var(--h, var(--series-1)); }
@@ -121,6 +130,11 @@ h2::before { content: ""; width: 4px; height: 18px; border-radius: 2px; backgrou
   <section class="card hero" id="hero"></section>
 
   <section class="tiles" id="tiles"></section>
+
+  <section class="card" id="mood-card" hidden>
+    <h2 style="--h: var(--c5)">Market mood</h2>
+    <div id="mood"></div>
+  </section>
 
   <section class="card">
     <div class="toolbar">
@@ -315,6 +329,22 @@ function holdings(status) {
   </tbody></table>`;
 }
 
+function moodView(status, decisions) {
+  const h = status.health;
+  if (!h || !h.gauges || !Object.keys(h.gauges).length) return;
+  $("mood-card").hidden = false;
+  const icon = { healthy: "🟢 Healthy", cautious: "🟡 Cautious", stressed: "🔴 Stressed" }[h.mood] || h.mood;
+  const g = h.gauges, items = [];
+  if (g.fear_vix) items.push(["Fear (VIX)", g.fear_vix.value.toFixed(1), g.fear_vix.label]);
+  if (g.rates) items.push(["10-year rate", g.rates.ten_year_pct.toFixed(2) + "%", g.rates.label]);
+  if (g.credit_spread) items.push(["Credit stress", g.credit_spread.value_pct.toFixed(2) + "%", g.credit_spread.label]);
+  if (g.breadth) items.push(["ETFs in uptrend", g.breadth.above_200d_pct + "%", g.breadth.label]);
+  const last = decisions.slice().reverse().find((d) => (d.upcoming_events || []).length);
+  $("mood").innerHTML = `<span class="mood-badge mood-${esc(h.mood)}">${esc(icon)}</span>
+    <div class="gauges">${items.map(([l, v, t]) => `<div class="gauge"><div class="label">${l}</div><div class="value">${esc(v)}</div><div class="label">${esc(t)}</div></div>`).join("")}</div>
+    ${last ? `<details><summary>Coming up</summary><ul class="events">${last.upcoming_events.map((e) => `<li>${esc(e)}</li>`).join("")}</ul></details>` : ""}`;
+}
+
 function scorecardView(status) {
   const sc = status.scorecard || {};
   const rows = [["claude", "🧠 Claude's daily picks"], ["watch", "⚡ Watcher buys"]].filter(([k]) => sc[k]);
@@ -363,6 +393,7 @@ setTimeout(() => location.reload(), 120000);  // pick up the watcher's 10-minute
   window.addEventListener("resize", () => { const w = $("chart").clientWidth; if (w !== lastW) { lastW = w; chart(equity); } });
   holdings(status);
   scorecardView(status);
+  moodView(status, decisions);
   decisionsView(decisions);
   $("toggle-table").addEventListener("click", () => {
     const t = $("chart-table"); t.hidden = !t.hidden;
