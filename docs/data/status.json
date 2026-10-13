@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-13T12:47-04:00",
+ "updated": "2026-10-13T12:48-04:00",
  "mode": "paper",
  "capital": 1000.0,
  "idle_asset": "SSO",
@@ -13,18 +13,18 @@
   "claude": {
    "buys": 5,
    "avg_return_pct": 0.22,
-   "avg_vs_spy_pct": 0.26,
+   "avg_vs_spy_pct": 0.27,
    "beat_spy": 2,
    "dollars": 1.1,
-   "dollars_vs_spy": 1.35
+   "dollars_vs_spy": 1.38
   },
   "watch": {
    "buys": 2,
    "avg_return_pct": 0.04,
-   "avg_vs_spy_pct": 0.09,
+   "avg_vs_spy_pct": 0.1,
    "beat_spy": 1,
    "dollars": 0.07,
-   "dollars_vs_spy": 0.14
+   "dollars_vs_spy": 0.15
   }
  },
  "health": {
@@ -66,21 +66,21 @@
   {
    "symbol": "SSO",
    "qty": 3.97,
-   "market_value": 285.7194,
+   "market_value": 285.6797,
    "avg_entry_price": 71.95,
-   "current_price": 71.97,
-   "unrealized_pl": 0.0794,
-   "unrealized_plpc": 0.0003,
+   "current_price": 71.96,
+   "unrealized_pl": 0.0397,
+   "unrealized_plpc": 0.0001,
    "name": "2x S&P 500",
    "weight": 0.2853
   },
   {
    "symbol": "XLE",
    "qty": 3.4576,
-   "market_value": 230.915,
+   "market_value": 230.9323,
    "avg_entry_price": 66.0807,
-   "current_price": 66.785,
-   "unrealized_pl": 2.435,
+   "current_price": 66.79,
+   "unrealized_pl": 2.4523,
    "unrealized_plpc": 0.0107,
    "name": "Energy",
    "weight": 0.2306
@@ -88,11 +88,11 @@
   {
    "symbol": "XLV",
    "qty": 1.042,
-   "market_value": 177.1577,
+   "market_value": 177.1369,
    "avg_entry_price": 171.7012,
-   "current_price": 170.01,
-   "unrealized_pl": -1.7623,
-   "unrealized_plpc": -0.0098,
+   "current_price": 169.99,
+   "unrealized_pl": -1.7831,
+   "unrealized_plpc": -0.01,
    "name": "Health care",
    "weight": 0.1769
   },
@@ -121,13 +121,13 @@
   {
    "symbol": "XOP",
    "qty": 0.4075,
-   "market_value": 80.724,
+   "market_value": 80.7606,
    "avg_entry_price": 194.316,
-   "current_price": 198.08,
-   "unrealized_pl": 1.534,
-   "unrealized_plpc": 0.0194,
+   "current_price": 198.17,
+   "unrealized_pl": 1.5706,
+   "unrealized_plpc": 0.0198,
    "name": "Oil & gas exploration",
-   "weight": 0.0806
+   "weight": 0.0807
   }
  ]
 }
