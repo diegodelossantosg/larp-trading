@@ -1,0 +1,49 @@
+{
+ "days": 64,
+ "symbols": [
+  "DIA",
+  "GLD",
+  "IWM",
+  "QQQ",
+  "SMH",
+  "SPY",
+  "TLT",
+  "XLE",
+  "XLF",
+  "XLK"
+ ],
+ "strategies": {
+  "breakout": {
+   "trades": 2012,
+   "trades_per_day": 31.4,
+   "win_rate_after_costs": 0.278,
+   "avg_gross_pct": -0.0041,
+   "avg_net_pct": -0.0567,
+   "total_net_pct_sum": -114.04,
+   "t_stat_net": -26.9,
+   "per_1000_usd_per_trade_net": -0.567
+  },
+  "vwap_reversion": {
+   "trades": 553,
+   "trades_per_day": 8.6,
+   "win_rate_after_costs": 0.387,
+   "avg_gross_pct": 0.0003,
+   "avg_net_pct": -0.0538,
+   "total_net_pct_sum": -29.77,
+   "t_stat_net": -6.12,
+   "per_1000_usd_per_trade_net": -0.538
+  },
+  "opening_range": {
+   "trades": 420,
+   "trades_per_day": 6.6,
+   "win_rate_after_costs": 0.41,
+   "avg_gross_pct": -0.0138,
+   "avg_net_pct": -0.0655,
+   "total_net_pct_sum": -27.51,
+   "t_stat_net": -5.21,
+   "per_1000_usd_per_trade_net": -0.655
+  }
+ },
+ "generated": "2026-10-13T12:24+00:00",
+ "months": 3
+}
