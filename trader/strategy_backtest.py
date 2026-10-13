@@ -119,8 +119,13 @@ def evaluate(px: pd.DataFrame) -> dict:
     start = max(w.dropna(how="all").index[0] for w in ws.values())
     series = {k: v.loc[v.index > start] for k, v in series.items()}
     bench = series["spy_hold"]
+    covid = (bench.index >= pd.Timestamp("2020-02-19")) & (bench.index <= pd.Timestamp("2020-04-30"))
+    since21 = bench.index >= pd.Timestamp("2021-01-01")
     return {"from": str(bench.index[0].date()), "to": str(bench.index[-1].date()),
-            "results": {k: stats(v, bench) for k, v in series.items()}}
+            "results": {k: stats(v, bench) for k, v in series.items()},
+            # What-if views: the COVID crash and rebound (19 Feb - 30 Apr 2020) removed, and 2021 onwards only.
+            "without_covid": {k: stats(v[~covid], bench[~covid]) for k, v in series.items()},
+            "since_2021": {k: stats(v[since21], bench[since21]) for k, v in series.items()}}
 
 
 def fetch() -> pd.DataFrame:
@@ -147,7 +152,9 @@ def main() -> None:
     result["generated"] = datetime.now(timezone.utc).isoformat(timespec="minutes")
     with open("docs/data/strategy_backtest.json", "w") as f:
         json.dump(result, f, indent=1)
-    print(json.dumps({k: {m: v[m] for m in v if m != "yearly_pct"} for k, v in result["results"].items()}, indent=1))
+    for view in ("results", "without_covid", "since_2021"):
+        print(view)
+        print(json.dumps({k: {m: v[m] for m in v if m != "yearly_pct"} for k, v in result[view].items()}, indent=1))
     print("from", result["from"], "to", result["to"])
 
 
