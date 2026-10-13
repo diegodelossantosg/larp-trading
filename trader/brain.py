@@ -334,7 +334,10 @@ def claude_available(cfg: Config) -> bool:
     """True when this machine can ask Claude (subscription token + CLI, or an API key)."""
     if cfg.claude_backend == "api":
         return bool(cfg.anthropic_api_key)
-    return shutil.which("claude") is not None and bool(os.environ.get("CLAUDE_CODE_OAUTH_TOKEN"))
+    # A subscription token (GitHub), or a machine already signed in to Claude Code (the cloud
+    # runner session sets CLAUDE_REVIEW_ENABLED=1).
+    return shutil.which("claude") is not None and bool(
+        os.environ.get("CLAUDE_CODE_OAUTH_TOKEN") or os.environ.get("CLAUDE_REVIEW_ENABLED"))
 
 
 def review_buys(cfg: Config, context: dict, timeout_s: int = 300) -> tuple[dict[str, tuple[bool, str]] | None, str | None]:
