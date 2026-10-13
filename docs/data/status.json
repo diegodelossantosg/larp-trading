@@ -4,7 +4,7 @@
  "capital": 1000.0,
  "idle_asset": "SSO",
  "model": "opus",
- "equity": 1001.72,
+ "equity": 1001.81,
  "cash": 295.63,
  "performance": {
   "days_tracked": 1
@@ -12,19 +12,19 @@
  "scorecard": {
   "claude": {
    "buys": 5,
-   "avg_return_pct": 0.29,
-   "avg_vs_spy_pct": 0.34,
+   "avg_return_pct": 0.3,
+   "avg_vs_spy_pct": 0.35,
    "beat_spy": 3,
-   "dollars": 1.58,
-   "dollars_vs_spy": 1.86
+   "dollars": 1.62,
+   "dollars_vs_spy": 1.87
   },
   "watch": {
    "buys": 2,
-   "avg_return_pct": 0.01,
-   "avg_vs_spy_pct": 0.07,
+   "avg_return_pct": -0.01,
+   "avg_vs_spy_pct": 0.04,
    "beat_spy": 1,
-   "dollars": 0.02,
-   "dollars_vs_spy": 0.11
+   "dollars": -0.01,
+   "dollars_vs_spy": 0.07
   }
  },
  "health": {
@@ -41,14 +41,14 @@
    "rates": {
     "title": "Bonds (rates)",
     "display": "-1.1%",
-    "ief_return_20d_pct": -1.14,
+    "ief_return_20d_pct": -1.07,
     "label": "stable",
     "source": "IEF 7-10y Treasury ETF, 20-day change"
    },
    "credit": {
     "title": "Credit stress",
-    "display": "-0.0%",
-    "hyg_vs_ief_20d_pct": -0.02,
+    "display": "-0.1%",
+    "hyg_vs_ief_20d_pct": -0.11,
     "label": "normal",
     "source": "high-yield (HYG) vs Treasuries (IEF), 20 days"
    },
@@ -60,17 +60,17 @@
     "label": "mixed"
    }
   },
-  "checked": "2026-10-13T14:07"
+  "checked": "2026-10-13T14:28"
  },
  "positions": [
   {
    "symbol": "XLE",
    "qty": 3.4576,
-   "market_value": 230.7076,
+   "market_value": 230.7594,
    "avg_entry_price": 66.0807,
-   "current_price": 66.725,
-   "unrealized_pl": 2.2276,
-   "unrealized_plpc": 0.0097,
+   "current_price": 66.74,
+   "unrealized_pl": 2.2794,
+   "unrealized_plpc": 0.01,
    "name": "Energy",
    "weight": 0.2303
   },
@@ -88,11 +88,11 @@
   {
    "symbol": "IGV",
    "qty": 1.0603,
-   "market_value": 118.6161,
+   "market_value": 118.6267,
    "avg_entry_price": 112.034,
-   "current_price": 111.87,
-   "unrealized_pl": -0.1739,
-   "unrealized_plpc": -0.0015,
+   "current_price": 111.88,
+   "unrealized_pl": -0.1633,
+   "unrealized_plpc": -0.0014,
    "name": "Software",
    "weight": 0.1184
   },
@@ -110,13 +110,13 @@
   {
    "symbol": "XOP",
    "qty": 0.4075,
-   "market_value": 80.4876,
+   "market_value": 80.508,
    "avg_entry_price": 194.316,
-   "current_price": 197.5,
-   "unrealized_pl": 1.2976,
-   "unrealized_plpc": 0.0164,
+   "current_price": 197.55,
+   "unrealized_pl": 1.318,
+   "unrealized_plpc": 0.0166,
    "name": "Oil & gas exploration",
-   "weight": 0.0803
+   "weight": 0.0804
   }
  ]
 }
