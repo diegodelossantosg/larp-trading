@@ -44,7 +44,7 @@ body { margin: 0; background: var(--page); color: var(--ink); font: 15px/1.55 sy
 main { margin: 0 auto; padding: 16px 24px 48px; }
 .top-grid { display: grid; grid-template-columns: minmax(0, 2.2fr) minmax(380px, 1fr); gap: 16px; margin-top: 16px; align-items: start; }
 .bottom-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; margin-top: 16px; align-items: start; }
-.top-grid > .card { margin-top: 0; }
+.top-grid > .card, .bottom-grid > .card { margin-top: 0; }
 .col { display: flex; flex-direction: column; gap: 16px; }
 .col > .card { margin-top: 0; }
 @media (max-width: 1100px) { .top-grid, .bottom-grid { grid-template-columns: minmax(0, 1fr); } }
@@ -162,36 +162,32 @@ h2::before { content: ""; width: 4px; height: 18px; border-radius: 2px; backgrou
     </section>
 
     <section class="card">
-      <h2 style="--h: var(--c3)">Holdings</h2>
-      <div class="table-scroll" id="holdings"></div>
+      <h2 style="--h: var(--c6)">Closed trades</h2>
+      <div id="closed-summary" class="small"></div>
+      <div class="table-scroll" id="closed"></div>
     </section>
   </div>
 
   <div class="bottom-grid">
-    <div class="col">
-      <section class="card" id="mood-card" hidden>
-        <h2 style="--h: var(--c5)">Market mood</h2>
-        <div id="mood"></div>
-      </section>
+    <section class="card">
+      <h2 style="--h: var(--c3)">Holdings</h2>
+      <div class="table-scroll" id="holdings"></div>
+    </section>
 
-      <section class="card">
-        <h2 style="--h: var(--c4)">Who's earning</h2>
-        <div class="table-scroll" id="scorecard"></div>
-      </section>
+    <section class="card" id="mood-card">
+      <h2 style="--h: var(--c5)">Market mood</h2>
+      <div id="mood"></div>
+    </section>
 
-      <section class="card">
-        <h2 style="--h: var(--c6)">Closed trades</h2>
-        <div id="closed-summary" class="small"></div>
-        <div class="table-scroll" id="closed"></div>
-      </section>
-    </div>
+    <section class="card">
+      <h2 style="--h: var(--c4)">Who's earning</h2>
+      <div class="table-scroll" id="scorecard"></div>
+    </section>
 
-    <div class="col">
-      <section class="card">
-        <h2 style="--h: var(--c7)">Daily log</h2>
-        <div id="decisions"></div>
-      </section>
-    </div>
+    <section class="card">
+      <h2 style="--h: var(--c7)">Daily log</h2>
+      <div id="decisions"></div>
+    </section>
   </div>
 </main>
 
@@ -363,8 +359,10 @@ function holdings(status) {
 
 function moodView(status, decisions) {
   const h = status.health;
-  if (!h || !h.gauges || !Object.keys(h.gauges).length) return;
-  $("mood-card").hidden = false;
+  if (!h || !h.gauges || !Object.keys(h.gauges).length) {
+    $("mood").innerHTML = `<div class="empty">Appears after the next daily decision.</div>`;
+    return;
+  }
   const icon = { healthy: "🟢 Healthy", cautious: "🟡 Cautious", stressed: "🔴 Stressed" }[h.mood] || h.mood;
   const items = Object.values(h.gauges).filter((g) => g.title).map((g) => [g.title, g.display, g.label]);
   const last = decisions.slice().reverse().find((d) => (d.upcoming_events || []).length);
