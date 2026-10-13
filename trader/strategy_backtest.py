@@ -125,7 +125,7 @@ def evaluate(px: pd.DataFrame) -> dict:
             "results": {k: stats(v, bench) for k, v in series.items()},
             # What-if views: the COVID crash and rebound (19 Feb - 30 Apr 2020) removed, and 2021 onwards only.
             "without_covid": {k: stats(v[~covid], bench[~covid]) for k, v in series.items()},
-            "since_2021": {k: stats(v[since21], bench[since21]) for k, v in series.items()}}
+            "since_2021": {k: stats(v[since21], bench[since21]) for k, v in series.items()} if since21.sum() > 20 else {}}
 
 
 def fetch() -> pd.DataFrame:
