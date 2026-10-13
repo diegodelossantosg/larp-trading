@@ -1,0 +1,87 @@
+{
+ "generated": "2026-10-13T11:05+00:00",
+ "months": 12,
+ "results": {
+  "score>=4, hold<=3d": {
+   "trades": 907,
+   "avg_return_pct": 0.104,
+   "avg_vs_spy_pct": -0.08,
+   "median_vs_spy_pct": -0.074,
+   "beat_spy_rate": 0.481,
+   "t_stat": -0.84,
+   "stopped_out_rate": 0.08
+  },
+  "score>=4, hold<=5d": {
+   "trades": 907,
+   "avg_return_pct": 0.08,
+   "avg_vs_spy_pct": -0.255,
+   "median_vs_spy_pct": -0.334,
+   "beat_spy_rate": 0.443,
+   "t_stat": -2.13,
+   "stopped_out_rate": 0.148
+  },
+  "score>=4, hold<=10d": {
+   "trades": 907,
+   "avg_return_pct": 0.229,
+   "avg_vs_spy_pct": -0.306,
+   "median_vs_spy_pct": -0.527,
+   "beat_spy_rate": 0.433,
+   "t_stat": -1.97,
+   "stopped_out_rate": 0.273
+  },
+  "score>=5, hold<=3d": {
+   "trades": 642,
+   "avg_return_pct": 0.312,
+   "avg_vs_spy_pct": 0.181,
+   "median_vs_spy_pct": 0.06,
+   "beat_spy_rate": 0.517,
+   "t_stat": 1.66,
+   "stopped_out_rate": 0.083
+  },
+  "score>=5, hold<=5d": {
+   "trades": 642,
+   "avg_return_pct": 0.291,
+   "avg_vs_spy_pct": 0.095,
+   "median_vs_spy_pct": -0.182,
+   "beat_spy_rate": 0.466,
+   "t_stat": 0.66,
+   "stopped_out_rate": 0.156
+  },
+  "score>=5, hold<=10d": {
+   "trades": 642,
+   "avg_return_pct": 0.638,
+   "avg_vs_spy_pct": 0.263,
+   "median_vs_spy_pct": -0.267,
+   "beat_spy_rate": 0.46,
+   "t_stat": 1.34,
+   "stopped_out_rate": 0.304
+  },
+  "score>=6, hold<=3d": {
+   "trades": 166,
+   "avg_return_pct": -0.006,
+   "avg_vs_spy_pct": 0.044,
+   "median_vs_spy_pct": -0.18,
+   "beat_spy_rate": 0.47,
+   "t_stat": 0.16,
+   "stopped_out_rate": 0.114
+  },
+  "score>=6, hold<=5d": {
+   "trades": 166,
+   "avg_return_pct": 0.16,
+   "avg_vs_spy_pct": 0.143,
+   "median_vs_spy_pct": -0.168,
+   "beat_spy_rate": 0.488,
+   "t_stat": 0.44,
+   "stopped_out_rate": 0.157
+  },
+  "score>=6, hold<=10d": {
+   "trades": 166,
+   "avg_return_pct": 0.074,
+   "avg_vs_spy_pct": -0.022,
+   "median_vs_spy_pct": -0.432,
+   "beat_spy_rate": 0.452,
+   "t_stat": -0.06,
+   "stopped_out_rate": 0.325
+  }
+ }
+}
