@@ -125,6 +125,7 @@ def _write_status(cfg, acct: dict, positions: dict, rows: list[dict]) -> None:
         "updated": datetime.now(ET).isoformat(timespec="minutes"),
         "mode": "paper" if cfg.paper else "LIVE",
         "capital": cfg.capital_usd,
+        "idle_asset": cfg.idle_asset,
         "model": cfg.claude_model,
         "equity": round(acct["equity"], 2),
         "cash": round(acct["cash"], 2),

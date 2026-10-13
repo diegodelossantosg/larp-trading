@@ -144,7 +144,9 @@ details.log > summary::after { content: "▾"; color: var(--ink-2); font-size: 1
 details.log:not([open]) > summary::after { transform: rotate(-90deg); }
 details.log > summary h2 { margin: 0; }
 details.log[open] > summary { margin-bottom: 8px; }
-.entry .action { margin: 6px 0 2px; }
+.moves { display: grid; grid-template-columns: max-content 1fr; gap: 6px 12px; margin-top: 8px; align-items: center; }
+.move { display: contents; }
+.move > span:last-child { font-size: 14px; color: var(--ink-2); }
 .chip.auto { background: rgba(237,161,0,.18); color: var(--ink); }
 h2 { display: flex; align-items: center; gap: 8px; }
 h2::before { content: ""; width: 4px; height: 18px; border-radius: 2px; background: var(--h, var(--series-1)); }
@@ -450,34 +452,47 @@ function describeOrders(orders) {
   return ok.map((o) => `<span class="tag ${o.side}">${o.side === "buy" ? "Buy" : "Sell"} ${esc(o.symbol)} ${usd(o.notional, 0)}</span>`).join("");
 }
 
-function shortWhy(d) {
-  if (d.error) return "Error, so no trades were made.";
-  if (d.source === "watch") {
-    return (d.orders || []).filter((o) => !(o.reason || "").startsWith("funding")).map((o) => {
-      const r = o.reason || "";
-      if (r.startsWith("trailing stop")) return `${o.symbol}: fell ${r.replace(/^trailing stop: /, "")}`;
-      const [sig, claude] = r.split(" · Claude: ");
-      const list = (sig.split(": ").slice(1).join(": ") || sig).split("; ")
-        .map((x) => x.replace("daily uptrend", "uptrend").replace(/above today's average price \(VWAP\)/, "above VWAP")
-          .replace(/bullish candles: .*/, "bullish candles")).join(", ");
-      return `${o.symbol}: ${claude || list}`;
-    }).join(" · ");
+const NAMES = {};  // filled from holdings: symbol -> short description
+
+function firstSentence(t, max = 110) {
+  const f = (t || "").split(/(?<=[.!?])\s/)[0];
+  return f.length > max ? f.slice(0, max - 1) + "…" : f;
+}
+
+function plainReason(d, o, idle) {
+  const r = o.reason || "";
+  const buys = (d.orders || []).filter((x) => x.side === "buy").map((x) => x.symbol);
+  if (r.startsWith("trailing stop")) return "Sold to limit the loss: it dropped 6% from its best price.";
+  if (r.startsWith("funding")) return `Sold a little to pay for ${buys.join(" and ")}.`;
+  if (d.source === "watch" && o.side === "buy") {
+    const claude = r.split(" · Claude: ")[1];
+    const n = (r.match(/^(\d)\/6/) || [])[1];
+    return claude || `Rising strongly today with lots of buyers${n ? ` (${n} of 6 buy signals)` : ""}.`;
   }
-  const view = d.market_view || "";
-  const first = view.split(/(?<=[.!?])\s/)[0];
-  return first.length > 220 ? first.slice(0, 217) + "…" : first;
+  if (o.symbol === idle) return o.side === "buy" ? "Spare money goes to the S&P 500 ×2." : "Took money from the S&P 500 ×2 for stronger ideas.";
+  if (o.side === "buy") {
+    const p = (d.positions || []).find((x) => x.symbol === o.symbol);
+    return p ? p.plain_reason || firstSentence(p.thesis) : "Claude expects it to beat the market.";
+  }
+  const e = (d.exits || []).find((x) => x.symbol === o.symbol);
+  return e ? e.plain_reason : "Claude sees better places for this money.";
 }
 
 function decisionsView(decisions) {
   const real = decisions.filter((d) => !d.dry_run && (d.market_view || d.error || (d.orders || []).length));
   if (!real.length) { $("decisions").innerHTML = `<div class="empty">Nothing yet.</div>`; return; }
+  const idle = DATA.status.idle_asset || "SSO";
   $("decisions").innerHTML = real.slice().reverse().slice(0, 40).map((d) => {
-    const moves = d.trade_today === false ? `<span class="tag hold">No changes</span>` : describeOrders(d.orders);
     const who = d.source === "watch" ? `<span class="chip auto">⚡ watcher</span>` : `<span class="chip">🧠 Claude</span>`;
+    const orders = (d.orders || []).filter((o) => !["error", "skipped"].includes(o.status));
+    let rows;
+    if (d.error) rows = `<div class="move"><span class="tag sell">Error</span><span>Something went wrong, so nothing was traded.</span></div>`;
+    else if (d.trade_today === false || !orders.length)
+      rows = `<div class="move"><span class="tag hold">No changes</span><span>${esc(d.plain_summary || "Nothing worth changing today.")}</span></div>`;
+    else rows = orders.map((o) => `<div class="move"><span class="tag ${o.side}">${o.side === "buy" ? "Buy" : "Sell"} ${esc(o.symbol)} ${usd(o.notional, 0)}</span><span>${esc(plainReason(d, o, idle))}</span></div>`).join("");
     return `<div class="entry">
       <div><span class="when">${esc(d.date)}</span> <span class="small">${esc(d.time || "")}</span>${who}</div>
-      ${d.error ? "" : `<p class="action">${moves}</p>`}
-      <p class="small ${d.error ? "error" : ""}">${esc(shortWhy(d))}</p>
+      <div class="moves">${rows}</div>
     </div>`;
   }).join("");
   try {

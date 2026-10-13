@@ -113,8 +113,26 @@ DECISION_TOOL = {
                         "thesis": {"type": "string", "description": "Why this beats SPY from here."},
                         "signals": {"type": "array", "items": {"type": "string"}},
                         "exit_plan": {"type": "string", "description": "What would make you sell."},
+                        "plain_reason": {"type": "string", "description": (
+                            "Why you hold it, in one short sentence (max 15 words) a complete beginner "
+                            "understands. No jargon or ticker codes.")},
                     },
-                    "required": ["symbol", "weight", "thesis", "signals", "exit_plan"],
+                    "required": ["symbol", "weight", "thesis", "signals", "exit_plan", "plain_reason"],
+                    "additionalProperties": False,
+                },
+            },
+            "plain_summary": {"type": "string", "description": (
+                "Today's decision in one short sentence (max 20 words) for a complete beginner. No jargon.")},
+            "exits": {
+                "type": "array",
+                "description": "Every ETF you are selling or reducing today, with a beginner-friendly reason.",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "symbol": {"type": "string"},
+                        "plain_reason": {"type": "string", "description": "Max 15 words, no jargon."},
+                    },
+                    "required": ["symbol", "plain_reason"],
                     "additionalProperties": False,
                 },
             },
@@ -125,7 +143,7 @@ DECISION_TOOL = {
             "confidence": {"type": "string", "enum": ["low", "medium", "high"]},
             "watchlist": {"type": "array", "items": {"type": "string"}},
         },
-        "required": ["market_view", "key_drivers", "trade_today", "positions", "upcoming_events", "confidence", "watchlist"],
+        "required": ["market_view", "key_drivers", "trade_today", "positions", "plain_summary", "exits", "upcoming_events", "confidence", "watchlist"],
         "additionalProperties": False,
     },
 }
@@ -321,7 +339,7 @@ REVIEW_SCHEMA = {
                 "properties": {
                     "symbol": {"type": "string"},
                     "approve": {"type": "boolean"},
-                    "reason": {"type": "string"},
+                    "reason": {"type": "string", "description": "One short sentence (max 15 words) a beginner understands; no jargon."},
                 },
                 "required": ["symbol", "approve", "reason"],
                 "additionalProperties": False,
