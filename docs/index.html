@@ -268,6 +268,13 @@ function seriesFor(iv, equity, intraday, status) {
   }
   const [mins, sessions] = INTERVALS[iv];
   const pts = (intraday.points || []).filter((p) => p[1] != null && p[2] != null);
+  // Finish the line at the headline value so both always show the same number: the headline is the
+  // account's live value, the chart's minute points come from Alpaca's minute-by-minute history.
+  if (pts.length && status.equity != null && status.updated) {
+    const last = pts.at(-1), liveTs = new Date(status.updated).toISOString();
+    if (Math.floor(Date.parse(liveTs) / 60000) === Math.floor(Date.parse(last[0]) / 60000)) pts[pts.length - 1] = [last[0], status.equity, last[2]];
+    else if (Date.parse(liveTs) > Date.parse(last[0])) pts.push([liveTs, status.equity, last[2]]);
+  }
   const nyDay = (ts) => new Date(ts).toLocaleDateString("en-CA", { timeZone: "America/New_York" });
   const days = [...new Set(pts.map((p) => nyDay(p[0])))].slice(-sessions);
   const buckets = new Map();
