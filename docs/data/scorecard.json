@@ -6,8 +6,8 @@
   "amount": 148.5,
   "entry": 66.0807,
   "spy_entry": 778.1,
-  "last": 67.025,
-  "spy_last": 777.35,
+  "last": 67.06,
+  "spy_last": 777.73,
   "open": true,
   "approx": true
  },
@@ -18,8 +18,8 @@
   "amount": 118.8,
   "entry": 112.034,
   "spy_entry": 778.1,
-  "last": 111.45,
-  "spy_last": 777.35,
+  "last": 111.59,
+  "spy_last": 777.73,
   "open": true,
   "approx": true
  },
@@ -31,7 +31,7 @@
   "entry": 227.54,
   "spy_entry": 778.1,
   "last": 226.88,
-  "spy_last": 777.35,
+  "spy_last": 777.73,
   "open": true,
   "approx": true
  },
@@ -42,8 +42,8 @@
   "amount": 99.0,
   "entry": 171.7012,
   "spy_entry": 778.1,
-  "last": 169.8,
-  "spy_last": 777.35,
+  "last": 169.78,
+  "spy_last": 777.73,
   "open": true,
   "approx": true
  },
@@ -55,7 +55,7 @@
   "entry": 194.316,
   "spy_entry": 778.1,
   "last": 199.285,
-  "spy_last": 777.35,
+  "spy_last": 777.73,
   "open": true,
   "approx": true
  },
@@ -66,8 +66,8 @@
   "amount": 80.0,
   "entry": 66.0807,
   "spy_entry": 778.1,
-  "last": 67.025,
-  "spy_last": 777.35,
+  "last": 67.06,
+  "spy_last": 777.73,
   "open": true,
   "approx": true
  },
@@ -78,8 +78,8 @@
   "amount": 79.94,
   "entry": 171.7012,
   "spy_entry": 778.1,
-  "last": 169.8,
-  "spy_last": 777.35,
+  "last": 169.78,
+  "spy_last": 777.73,
   "open": true,
   "approx": true
  }
