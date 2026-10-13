@@ -110,3 +110,19 @@ def test_capital_limits_agent_to_its_own_money(tmp_path, monkeypatch):
     # Later the account gained $50: the agent now has $1,050.
     broker.account = lambda: {"equity": 10_050.0, "cash": 0.0, "buying_power": 0.0}
     assert main._account(cfg(capital_usd=1000), broker, {})["equity"] == 1050
+
+
+def test_hold_still_moves_spare_money_to_new_idle_asset(tmp_path, monkeypatch):
+    monkeypatch.setattr(journal, "DATA_DIR", tmp_path)
+    monkeypatch.setattr(main, "decide", fake_decide({
+        "market_view": "-", "key_drivers": [], "trade_today": False, "confidence": "low", "watchlist": [],
+        "positions": [{"symbol": "XLE", "weight": 0.5, "thesis": "", "signals": [], "exit_plan": ""}]}))
+    broker = FakeBroker()
+    broker.positions = lambda: {
+        "SPY": {"qty": 1, "market_value": 5000.0, "avg_entry_price": 1, "current_price": 1, "unrealized_pl": 0, "unrealized_plpc": 0},
+        "XLE": {"qty": 1, "market_value": 4900.0, "avg_entry_price": 1, "current_price": 1, "unrealized_pl": 0, "unrealized_plpc": 0}}
+    main.trade(cfg(idle_asset="SSO", max_position_weight=0.5, max_idle_weight=0.5), broker, FakeMarket(),
+               dry_run=False, force=False)
+    sent = {(o.side, o.symbol) for o in broker.sent}
+    assert ("sell", "SPY") in sent and ("buy", "SSO") in sent
+    assert not any(o.symbol == "XLE" for o in broker.sent)  # XLE is already at target

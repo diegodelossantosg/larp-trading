@@ -212,10 +212,9 @@ def trade(cfg, broker: Broker, market: Market, dry_run: bool, force: bool) -> in
     record.update(decision.data)
 
     if not decision.data["trade_today"]:
-        record["notes"].append("Claude chose to hold; no orders.")
-        journal.append_decision(record)
-        _write_status(cfg, acct, positions, history)
-        return 0
+        # Holding keeps Claude's picks as they are, but the risk rules still apply (for example
+        # moving spare money into a newly chosen idle asset). Small drifts stay inside the band.
+        record["notes"].append("Claude chose to hold its picks; only rule-based adjustments are made.")
 
     proposed = {p["symbol"].upper(): float(p["weight"]) for p in decision.data["positions"]}
     allowed = set(technicals)
