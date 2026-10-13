@@ -138,6 +138,13 @@ dl.glossary dd { margin: 2px 0 0; color: var(--ink-2); }
 .holdings-wrap table { flex: 1; min-width: 0; }
 .donut { flex: none; }
 @media (max-width: 700px) { .holdings-wrap { flex-direction: column; } }
+details.log > summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; }
+details.log > summary::-webkit-details-marker { display: none; }
+details.log > summary::after { content: "▾"; color: var(--ink-2); font-size: 16px; transition: transform .15s; }
+details.log:not([open]) > summary::after { transform: rotate(-90deg); }
+details.log > summary h2 { margin: 0; }
+details.log[open] > summary { margin-bottom: 8px; }
+.entry .action { margin: 6px 0 2px; }
 .chip.auto { background: rgba(237,161,0,.18); color: var(--ink); }
 h2 { display: flex; align-items: center; gap: 8px; }
 h2::before { content: ""; width: 4px; height: 18px; border-radius: 2px; background: var(--h, var(--series-1)); }
@@ -189,10 +196,10 @@ h2::before { content: ""; width: 4px; height: 18px; border-radius: 2px; backgrou
       <div class="table-scroll" id="scorecard"></div>
     </section>
 
-    <section class="card">
-      <h2 style="--h: var(--c7)">Daily log</h2>
+    <details class="card log" id="log-card" open>
+      <summary><h2 style="--h: var(--c7)">Daily log</h2></summary>
       <div id="decisions"></div>
-    </section>
+    </details>
   </div>
 </main>
 
@@ -443,24 +450,41 @@ function describeOrders(orders) {
   return ok.map((o) => `<span class="tag ${o.side}">${o.side === "buy" ? "Buy" : "Sell"} ${esc(o.symbol)} ${usd(o.notional, 0)}</span>`).join("");
 }
 
+function shortWhy(d) {
+  if (d.error) return "Error, so no trades were made.";
+  if (d.source === "watch") {
+    return (d.orders || []).filter((o) => !(o.reason || "").startsWith("funding")).map((o) => {
+      const r = o.reason || "";
+      if (r.startsWith("trailing stop")) return `${o.symbol}: fell ${r.replace(/^trailing stop: /, "")}`;
+      const [sig, claude] = r.split(" · Claude: ");
+      const list = (sig.split(": ").slice(1).join(": ") || sig).split("; ")
+        .map((x) => x.replace("daily uptrend", "uptrend").replace(/above today's average price \(VWAP\)/, "above VWAP")
+          .replace(/bullish candles: .*/, "bullish candles")).join(", ");
+      return `${o.symbol}: ${claude || list}`;
+    }).join(" · ");
+  }
+  const view = d.market_view || "";
+  const first = view.split(/(?<=[.!?])\s/)[0];
+  return first.length > 220 ? first.slice(0, 217) + "…" : first;
+}
+
 function decisionsView(decisions) {
-  const real = decisions.filter((d) => !d.dry_run);
+  const real = decisions.filter((d) => !d.dry_run && (d.market_view || d.error || (d.orders || []).length));
   if (!real.length) { $("decisions").innerHTML = `<div class="empty">Nothing yet.</div>`; return; }
-  $("decisions").innerHTML = real.slice().reverse().slice(0, 60).map((d) => {
-    const targets = d.final_targets ? Object.entries(d.final_targets).sort((a, b) => b[1] - a[1]).map(([s, w]) => `${s} ${(w * 100).toFixed(0)}%`).join(", ") : "";
+  $("decisions").innerHTML = real.slice().reverse().slice(0, 40).map((d) => {
+    const moves = d.trade_today === false ? `<span class="tag hold">No changes</span>` : describeOrders(d.orders);
+    const who = d.source === "watch" ? `<span class="chip auto">⚡ watcher</span>` : `<span class="chip">🧠 Claude</span>`;
     return `<div class="entry">
-      <div><span class="when">${esc(d.date)}</span>${d.source === "watch" ? ` <span class="small">${esc(d.time || "")}</span><span class="chip auto">⚡ auto</span>` : ""}${d.confidence ? `<span class="chip">confidence: ${esc(d.confidence)}</span>` : ""}</div>
-      ${d.source === "watch" ? `<p class="action">${describeOrders(d.orders)}</p><p class="small">${(d.orders || []).map((o) => esc(o.reason || "")).filter(Boolean).join(" · ")}</p>` : ""}
-      ${d.error ? `<p class="error">Error, no trades: ${esc(d.error)}</p>` : ""}
-      ${d.market_view ? `<p class="action">${d.trade_today === false ? `<span class="tag hold">No changes</span>` : describeOrders(d.orders)}</p>` : ""}
-      ${targets ? `<p class="small">${esc(targets)}</p>` : ""}
-      ${d.market_view ? `<details><summary>Market view</summary><p>${esc(d.market_view)}</p></details>` : ""}
-      ${(d.positions || []).length ? `<details><summary>Why</summary><ul class="why">${d.positions.map((p) => `<li><b>${esc(p.symbol)}</b>: ${esc(p.thesis)}${p.exit_plan ? `<br><span class="small">Sell if: ${esc(p.exit_plan)}</span>` : ""}</li>`).join("")}</ul></details>` : ""}
-      ${(d.key_drivers || []).length ? `<details><summary>News</summary><ul class="why">${d.key_drivers.map((k) => `<li>${esc(k)}</li>`).join("")}</ul></details>` : ""}
-      ${(d.sources || []).length ? `<details><summary>Sources (${d.sources.length})</summary>${d.sources.map((s) => /^https?:/.test(s.url) ? `<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a>` : esc(s.title)).join("<br>")}</details>` : ""}
-      ${(d.notes || []).length ? `<details><summary>Risk rules</summary>${d.notes.map(esc).join("<br>")}</details>` : ""}
+      <div><span class="when">${esc(d.date)}</span> <span class="small">${esc(d.time || "")}</span>${who}</div>
+      ${d.error ? "" : `<p class="action">${moves}</p>`}
+      <p class="small ${d.error ? "error" : ""}">${esc(shortWhy(d))}</p>
     </div>`;
   }).join("");
+  try {
+    const card = $("log-card");
+    if (localStorage.getItem("log-open") === "0") card.open = false;
+    card.addEventListener("toggle", () => { try { localStorage.setItem("log-open", card.open ? "1" : "0"); } catch {} });
+  } catch {}
 }
 
 setTimeout(() => location.reload(), 60000);  // pick up the watcher's 5-minute updates
