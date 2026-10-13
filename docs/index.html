@@ -41,7 +41,19 @@
 }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--page); color: var(--ink); font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
-main { max-width: 960px; margin: 0 auto; padding: 4px 16px 48px; }
+main { margin: 0 auto; padding: 16px 24px 48px; }
+.top-grid { display: grid; grid-template-columns: minmax(0, 2.2fr) minmax(380px, 1fr); gap: 16px; margin-top: 16px; align-items: start; }
+.bottom-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; margin-top: 16px; align-items: start; }
+.top-grid > .card { margin-top: 0; }
+.col { display: flex; flex-direction: column; gap: 16px; }
+.col > .card { margin-top: 0; }
+@media (max-width: 1100px) { .top-grid, .bottom-grid { grid-template-columns: minmax(0, 1fr); } }
+.hero { display: flex; justify-content: space-between; align-items: center; gap: 24px; flex-wrap: wrap; margin-top: 0; }
+.hero .label { font-size: 13px; font-weight: 600; opacity: .85; text-transform: uppercase; letter-spacing: .04em; }
+.hero .today { text-align: right; }
+.hero .today .big { font-size: 38px; }
+.hero .today .pill { display: inline-block; font-size: 18px; font-weight: 700; padding: 2px 12px; border-radius: 99px; }
+.hero .up-bg { background: rgba(12,163,12,.85); } .hero .down-bg { background: rgba(208,59,59,.9); } .hero .flat-bg { background: rgba(255,255,255,.18); }
 h1 { font-size: 24px; margin: 0; }
 h2 { font-size: 18px; margin: 0 0 4px; }
 p { margin: 6px 0; }
@@ -132,52 +144,55 @@ h2::before { content: ""; width: 4px; height: 18px; border-radius: 2px; backgrou
 
   <section class="card hero" id="hero"></section>
 
-  <section class="tiles" id="tiles"></section>
-
-  <section class="card" id="mood-card" hidden>
-    <h2 style="--h: var(--c5)">Market mood</h2>
-    <div id="mood"></div>
-  </section>
-
-  <section class="card">
-    <div class="toolbar">
-      <h2 style="--h: var(--series-1)">AI vs S&amp;P 500</h2>
-      <div class="intervals" id="intervals">
-        <button data-iv="1m">1m</button><button data-iv="5m">5m</button><button data-iv="15m">15m</button><button data-iv="1H">1H</button><button data-iv="1D">1D</button>
+  <div class="top-grid">
+    <section class="card">
+      <div class="toolbar">
+        <h2 style="--h: var(--series-1)">AI vs S&amp;P 500</h2>
+        <div class="intervals" id="intervals">
+          <button data-iv="1m">1m</button><button data-iv="5m">5m</button><button data-iv="15m">15m</button><button data-iv="1H">1H</button><button data-iv="1D">1D</button>
+        </div>
+        <button class="link" id="toggle-table">Table</button>
       </div>
-      <button class="link" id="toggle-table">Table</button>
+      <div class="legend">
+        <span style="--c: var(--series-1)">AI portfolio</span>
+        <span class="dash" style="--c: var(--series-2)">S&amp;P 500</span>
+      </div>
+      <div class="chart-wrap" id="chart"></div>
+      <div class="table-scroll" id="chart-table" hidden></div>
+    </section>
+
+    <section class="card">
+      <h2 style="--h: var(--c3)">Holdings</h2>
+      <div class="table-scroll" id="holdings"></div>
+    </section>
+  </div>
+
+  <div class="bottom-grid">
+    <div class="col">
+      <section class="card" id="mood-card" hidden>
+        <h2 style="--h: var(--c5)">Market mood</h2>
+        <div id="mood"></div>
+      </section>
+
+      <section class="card">
+        <h2 style="--h: var(--c4)">Who's earning</h2>
+        <div class="table-scroll" id="scorecard"></div>
+      </section>
+
+      <section class="card">
+        <h2 style="--h: var(--c6)">Closed trades</h2>
+        <div id="closed-summary" class="small"></div>
+        <div class="table-scroll" id="closed"></div>
+      </section>
     </div>
-    <div class="legend">
-      <span style="--c: var(--series-1)">AI portfolio</span>
-      <span class="dash" style="--c: var(--series-2)">S&amp;P 500</span>
+
+    <div class="col">
+      <section class="card">
+        <h2 style="--h: var(--c7)">Daily log</h2>
+        <div id="decisions"></div>
+      </section>
     </div>
-    <div class="chart-wrap" id="chart"></div>
-    <div class="table-scroll" id="chart-table" hidden></div>
-  </section>
-
-  <section class="card">
-    <h2 style="--h: var(--c3)">Holdings</h2>
-    <div class="table-scroll" id="holdings"></div>
-  </section>
-
-  <section class="card">
-    <h2 style="--h: var(--c4)">Who's earning</h2>
-    <div class="table-scroll" id="scorecard"></div>
-  </section>
-
-  <section class="card">
-    <h2 style="--h: var(--c6)">Closed trades</h2>
-    <div id="closed-summary" class="small"></div>
-    <div class="table-scroll" id="closed"></div>
-  </section>
-
-  <section class="card">
-    <h2 style="--h: var(--c7)">Daily log</h2>
-    <div id="decisions"></div>
-  </section>
-
-
-
+  </div>
 </main>
 
 <div class="tooltip" id="tooltip"></div>
@@ -200,29 +215,6 @@ async function load(name, fallback) {
   return fallback;
 }
 
-function maxDip(values) {
-  let peak = -Infinity, worst = 0;
-  for (const v of values) { peak = Math.max(peak, v); worst = Math.min(worst, v / peak - 1); }
-  return worst * 100;
-}
-
-function nextRun() {
-  // 10:05 New York on weekdays, shown in the viewer's own time zone.
-  const now = new Date();
-  for (let i = 0; i < 8; i++) {
-    const d = new Date(now.getTime() + i * 864e5);
-    const ny = new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York", year: "numeric", month: "2-digit", day: "2-digit", weekday: "short" }).formatToParts(d);
-    const get = (t) => ny.find((p) => p.type === t).value;
-    if (["Sat", "Sun"].includes(get("weekday"))) continue;
-    for (const off of [4, 5]) { // EDT = UTC-4, EST = UTC-5
-      const t = new Date(Date.UTC(+get("year"), +get("month") - 1, +get("day"), 10 + off, 5));
-      const hh = new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", hour: "numeric", hour12: false }).format(t);
-      if (+hh === 10 && t > now) return t;
-    }
-  }
-  return null;
-}
-
 function hero(status, equity) {
   const capital = status.capital || equity[0]?.equity || null;
   const now = status.equity ?? equity.at(-1)?.equity ?? capital;
@@ -232,35 +224,23 @@ function hero(status, equity) {
   }
   const start = capital ?? equity[0]?.equity;
   const profit = now - start;
-  const spyNow = equity.length >= 2 ? start * equity.at(-1).spy_close / equity[0].spy_close : null;
-  const diff = spyNow == null ? null : now - spyNow;
   const todayStr = new Date().toLocaleDateString("en-CA", { timeZone: "America/New_York" });
-  const prev = equity.filter((r) => r.date < todayStr).at(-1);
-  const today = prev && status.equity != null ? status.equity - prev.equity : null;
+  const prevVal = equity.filter((r) => r.date < todayStr).at(-1)?.equity ?? start;
+  const today = now - prevVal;
+  const bg = (v) => (v > 0.005 ? "up-bg" : v < -0.005 ? "down-bg" : "flat-bg");
   const updated = status.updated ? new Date(status.updated).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false }) : "";
-  let verdict = "vs S&P 500: from day 2";
-  if (diff != null) verdict = Math.abs(diff) < 0.01 ? "🤝 Tied with S&P 500"
-    : diff > 0 ? `✅ ${usd(diff)} ahead of S&P 500` : `⚠️ ${usd(-diff)} behind S&P 500`;
   $("hero").innerHTML = `
-    <span class="big">${usd(now)}</span>
-    <div><span class="delta ${cls(profit)}">${signedUsd(profit)} (${pct(profit / start * 100)})</span> <span class="small">from ${usd(start, 0)}</span></div>
-    <div class="verdict">${verdict}</div>
-    ${today != null ? `<div class="small" style="margin-top:8px">Today: <b>${signedUsd(today)}</b>${updated ? ` · updated ${updated}` : ""}</div>` : updated ? `<div class="small" style="margin-top:8px">Updated ${updated}</div>` : ""}`;
-}
-
-function tiles(status, equity, decisions) {
-  const days = decisions.filter((d) => !d.dry_run && d.market_view).length;
-  const trades = decisions.filter((d) => !d.dry_run).reduce((n, d) => n + (d.orders || []).filter((o) => !["error", "skipped"].includes(o.status)).length, 0);
-  const dip = equity.length ? maxDip(equity.map((r) => r.equity)) : null;
-  const next = nextRun();
-  const items = [
-    ["Days", String(days)],
-    ["Trades", String(trades)],
-    ["Biggest dip", dip == null ? "–" : pct(dip)],
-    ["Next run", next ? next.toLocaleString([], { weekday: "short", hour: "2-digit", minute: "2-digit", hour12: false }) : "–"],
-  ];
-  $("tiles").innerHTML = items.map(([l, v]) =>
-    `<div class="tile"><div class="label">${l}</div><div class="value">${v}</div></div>`).join("");
+    <div>
+      <div class="label">Portfolio</div>
+      <span class="big">${usd(now)}</span>
+      <span class="delta ${cls(profit)}">${signedUsd(profit)} (${pct(profit / start * 100)})</span>
+      ${updated ? `<div class="small" style="margin-top:6px">Updated ${updated}</div>` : ""}
+    </div>
+    <div class="today">
+      <div class="label">Today</div>
+      <span class="big">${signedUsd(today)}</span>
+      <div><span class="pill ${bg(today)}">${today >= 0 ? "▲" : "▼"} ${pct(today / prevVal * 100)}</span></div>
+    </div>`;
 }
 
 const DATA = { status: {}, equity: [], intraday: {} };
@@ -306,7 +286,7 @@ function chart(equity, emptyMsg = "Starts after day 2.") {
   }
   const base = equity[0].equity;
   const rows = equity.map((r) => ({ date: r.date, agent: r.equity, spy: base * r.spy_close / equity[0].spy_close }));
-  const W = Math.max(300, el.clientWidth), H = W < 600 ? 240 : 320, m = { t: 12, r: 70, b: 28, l: 64 };
+  const W = Math.max(300, el.clientWidth), H = W < 600 ? 240 : Math.min(520, Math.max(340, Math.round(W * 0.42))), m = { t: 12, r: 70, b: 28, l: 64 };
   const xs = (i) => m.l + (i / (rows.length - 1)) * (W - m.l - m.r);
   const vals = rows.flatMap((r) => [r.agent, r.spy]);
   let lo = Math.min(...vals), hi = Math.max(...vals);
@@ -475,7 +455,6 @@ setTimeout(() => location.reload(), 60000);  // pick up the watcher's 5-minute u
   }));
   if (status.mode === "LIVE") { $("mode").hidden = false; $("mode").textContent = "💵 Real money"; }
   hero(status, equity);
-  tiles(status, equity, decisions);
   renderChart();
   let lastW = $("chart").clientWidth;
   window.addEventListener("resize", () => { const w = $("chart").clientWidth; if (w !== lastW) { lastW = w; renderChart(); } });
