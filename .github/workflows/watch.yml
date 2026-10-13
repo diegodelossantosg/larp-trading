@@ -62,10 +62,21 @@ jobs:
             for j in 1 2 3; do sync; git push -q origin HEAD:main && return 0; sleep 5; done
             echo "push failed"
           }
+          # Every minute: a tiny live.json (value, holdings, latest chart points) is force-pushed as
+          # the only file of the "live" branch. That branch doesn't rebuild the GitHub Pages site, and
+          # the dashboard reads it through the GitHub API, so it can refresh every minute.
+          publish_live() {
+            python -m trader.live > /tmp/live.json || return 0
+            blob=$(git hash-object -w /tmp/live.json)
+            tree=$(printf "100644 blob %s\tlive.json\n" "$blob" | git mktree)
+            commit=$(git commit-tree "$tree" -m "live $(date -u +%H:%M)")
+            git push -q -f origin "$commit:refs/heads/live" || echo "live push failed"
+          }
           i=0
           while python -m trader.main market-open; do
             before=$(md5sum docs/data/decisions.json 2>/dev/null)
             python -m trader.main watch || echo "watch run failed"
+            publish_live
             git add docs/data
             if ! git diff --cached --quiet; then
               if [ -n "$(git log origin/main..HEAD --oneline)" ]; then git commit -q --amend --no-edit

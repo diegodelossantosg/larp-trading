@@ -502,7 +502,30 @@ function decisionsView(decisions) {
   } catch {}
 }
 
-setTimeout(() => location.reload(), 60000);  // pick up the watcher's 5-minute updates
+// Live refresh: the watcher publishes live.json every minute on the "live" branch; the GitHub API
+// serves it fresh (the normal file links are cached for 5 minutes). The API allows 60 requests an
+// hour per visitor, so poll about once a minute and only while the tab is visible.
+const LIVE = "https://api.github.com/repos/diegodelossantosg/larp-trading/contents/live.json?ref=live";
+async function refreshLive() {
+  if (document.visibilityState !== "visible") return;
+  try {
+    const r = await fetch(LIVE, { headers: { Accept: "application/vnd.github.raw" }, cache: "no-store" });
+    if (!r.ok) return;
+    const live = await r.json();
+    const st = live.status || {};
+    if (st.updated && (!DATA.status.updated || new Date(st.updated) >= new Date(DATA.status.updated))) DATA.status = st;
+    const pts = (DATA.intraday.points || []).slice();
+    const seen = new Set(pts.map((p) => p[0]));
+    for (const p of live.intraday_tail || []) if (!seen.has(p[0])) pts.push(p);
+    DATA.intraday = { points: pts.sort((a, b) => a[0].localeCompare(b[0])) };
+    hero(DATA.status, DATA.equity);
+    holdings(DATA.status);
+    renderChart();
+  } catch {}
+}
+setInterval(refreshLive, 61000);
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") refreshLive(); });
+setTimeout(() => location.reload(), 15 * 60000);  // full reload now and then for everything else
 (async () => {
   const [status, equity, decisions, trades, intraday] = await Promise.all([load("status.json", {}), load("equity.json", []), load("decisions.json", []), load("scorecard.json", []), load("intraday.json", {})]);
   Object.assign(DATA, { status, equity, intraday });
@@ -517,6 +540,7 @@ setTimeout(() => location.reload(), 60000);  // pick up the watcher's 5-minute u
   let lastW = $("chart").clientWidth;
   window.addEventListener("resize", () => { const w = $("chart").clientWidth; if (w !== lastW) { lastW = w; renderChart(); } });
   holdings(status);
+  refreshLive();
   scorecardView(status);
   closedView(trades, decisions);
   moodView(status, decisions);
