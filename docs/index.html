@@ -141,6 +141,11 @@ h2::before { content: ""; width: 4px; height: 18px; border-radius: 2px; backgrou
   </section>
 
   <section class="card">
+    <h2 style="--h: var(--c4)">Who's earning</h2>
+    <div class="table-scroll" id="scorecard"></div>
+  </section>
+
+  <section class="card">
     <h2 style="--h: var(--c7)">Daily log</h2>
     <div id="decisions"></div>
   </section>
@@ -310,6 +315,17 @@ function holdings(status) {
   </tbody></table>`;
 }
 
+function scorecardView(status) {
+  const sc = status.scorecard || {};
+  const rows = [["claude", "🧠 Claude's daily picks"], ["watch", "⚡ Watcher buys"]].filter(([k]) => sc[k]);
+  if (!rows.length) { $("scorecard").innerHTML = `<div class="empty">Starts with the next buy.</div>`; return; }
+  $("scorecard").innerHTML = `<table><thead><tr><th>Source</th><th class="num">Buys</th><th class="num">Avg return</th><th class="num">vs S&amp;P 500</th><th class="num">Beat S&amp;P</th><th class="num">$ vs S&amp;P</th></tr></thead><tbody>
+  ${rows.map(([k, label]) => { const r = sc[k]; return `<tr><td><b>${label}</b></td><td class="num">${r.buys}</td>
+    <td class="num ${cls(r.avg_return_pct)}">${pct(r.avg_return_pct)}</td><td class="num ${cls(r.avg_vs_spy_pct)}">${pct(r.avg_vs_spy_pct)}</td>
+    <td class="num">${r.beat_spy}/${r.buys}</td><td class="num ${cls(r.dollars_vs_spy)}">${signedUsd(r.dollars_vs_spy)}</td></tr>`; }).join("")}
+  </tbody></table>`;
+}
+
 function describeOrders(orders) {
   const ok = (orders || []).filter((o) => !["error", "skipped"].includes(o.status));
   if (!ok.length) return `<span class="tag hold">No changes</span>`;
@@ -346,6 +362,7 @@ setTimeout(() => location.reload(), 120000);  // pick up the watcher's 10-minute
   let lastW = $("chart").clientWidth;
   window.addEventListener("resize", () => { const w = $("chart").clientWidth; if (w !== lastW) { lastW = w; chart(equity); } });
   holdings(status);
+  scorecardView(status);
   decisionsView(decisions);
   $("toggle-table").addEventListener("click", () => {
     const t = $("chart-table"); t.hidden = !t.hidden;

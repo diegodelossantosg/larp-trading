@@ -109,8 +109,14 @@ def plan_orders(
     min_order_usd: float,
     max_daily_turnover: float,
     cash_buffer: float = 0.01,
+    protected: set[str] | frozenset = frozenset(),
 ) -> tuple[list[Order], list[str]]:
-    """Dollar orders to move current holdings toward targets. Sells come first."""
+    """Dollar orders to move current holdings toward targets. Sells come first.
+
+    Positions in `protected` (recent watcher buys) are never trimmed here, so a buy isn't undone
+    the next morning; their trailing stop still applies. Buys never spend more than the agent's
+    cash plus what it sells.
+    """
     notes: list[str] = []
     investable = equity * (1 - cash_buffer)
     deltas: dict[str, float] = {}
@@ -122,6 +128,9 @@ def plan_orders(
             continue
         if abs(delta) < min_order_usd:
             continue
+        if delta < 0 and sym in protected:
+            notes.append(f"kept {sym}: bought by the watcher recently (minimum holding period)")
+            continue
         deltas[sym] = delta
 
     turnover = sum(abs(d) for d in deltas.values()) / 2  # one-way
@@ -130,6 +139,14 @@ def plan_orders(
         scale = limit / turnover
         deltas = {s: d * scale for s, d in deltas.items()}
         notes.append(f"turnover {turnover:,.0f} USD > limit {limit:,.0f} USD; orders scaled by {scale:.2f}")
+
+    cash = investable - sum(current_values.values())
+    spend = sum(d for d in deltas.values() if d > 0)
+    budget = max(0.0, cash + sum(-d for d in deltas.values() if d < 0))
+    if spend > budget + 0.01:
+        scale = budget / spend
+        deltas = {s: (d * scale if d > 0 else d) for s, d in deltas.items()}
+        notes.append(f"buys scaled by {scale:.2f} to stay within the agent's own money")
 
     sells = [Order(s, "sell", round(-d, 2)) for s, d in deltas.items() if d < 0]
     buys = [Order(s, "buy", round(d, 2)) for s, d in deltas.items() if d > 0]

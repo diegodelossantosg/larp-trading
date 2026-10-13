@@ -16,13 +16,14 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 
 from . import journal
-from .brain import decide
+from .brain import claude_available, decide, review_buys
 from .broker import Broker
 from .config import load_config
 from .indicators import summarize
 from .market import Market
-from .risk import apply_limits, drawdown, plan_orders
+from .risk import Order, apply_limits, drawdown, plan_orders
 from .universe import CORE_ETFS, LEVERAGED
+from . import scorecard
 from . import watch as rules
 
 log = logging.getLogger("trader")
@@ -32,6 +33,16 @@ MIN_DOLLAR_VOLUME_M = 5.0  # extra ETFs Claude proposes must trade at least $5M/
 
 def _today() -> str:
     return datetime.now(ET).strftime("%Y-%m-%d")
+
+
+def _recent_watch_buys(days: int) -> set[str]:
+    """ETFs the watcher bought within the last `days` trading days."""
+    import pandas as pd
+
+    cutoff = (pd.Timestamp(_today()) - pd.offsets.BDay(days)).strftime("%Y-%m-%d")
+    return {o["symbol"] for d in journal.read("decisions.json", [])
+            if d.get("source") == "watch" and not d.get("dry_run") and d["date"] > cutoff
+            for o in d.get("orders", []) if o["side"] == "buy" and o.get("status") not in ("error", "skipped")}
 
 
 def _performance(rows: list[dict]) -> dict:
@@ -95,6 +106,7 @@ def _write_status(cfg, acct: dict, positions: dict, rows: list[dict]) -> None:
         "equity": round(acct["equity"], 2),
         "cash": round(acct["cash"], 2),
         "performance": _performance(rows),
+        "scorecard": scorecard.summary(journal.read("scorecard.json", [])),
         "positions": sorted(
             ({"symbol": s, **{k: round(v, 4) for k, v in p.items()},
               "name": CORE_ETFS.get(s, ""),
@@ -154,6 +166,7 @@ def trade(cfg, broker: Broker, market: Market, dry_run: bool, force: bool) -> in
         "performance_vs_spy": _performance(history),
         "previous_decisions": previous,
         "watcher_actions_recent": watcher,
+        "protected_recent_watcher_buys": sorted(_recent_watch_buys(cfg.min_hold_days) & set(positions)),
         "headlines": market.news(hours=36, limit=50),
         "holding_headlines": market.news(hours=72, symbols=list(positions), limit=20) if positions else [],
         "technicals": technicals,
@@ -211,6 +224,7 @@ def trade(cfg, broker: Broker, market: Market, dry_run: bool, force: bool) -> in
     orders, notes = plan_orders(
         targets, current, equity, rebalance_band=cfg.rebalance_band,
         min_order_usd=cfg.min_order_usd, max_daily_turnover=cfg.max_daily_turnover,
+        protected=_recent_watch_buys(cfg.min_hold_days) & set(positions),
     )
     record["notes"] += notes
     prices = {s: t["price"] for s, t in technicals.items()}
@@ -221,9 +235,11 @@ def trade(cfg, broker: Broker, market: Market, dry_run: bool, force: bool) -> in
         record["notes"].append("dry run: no orders sent" if dry_run else "TRADING_ENABLED=false: no orders sent")
     else:
         record["orders"] = broker.execute(orders, prices, positions)
+        scorecard.record(record["orders"], "claude", prices, prices.get("SPY"), _today(), cfg.idle_asset)
 
     journal.append_decision(record)
     positions = broker.positions()
+    scorecard.update(prices, prices.get("SPY"), set(positions))
     _write_status(cfg, _account(cfg, broker, positions), positions, history)
     for o in record["orders"]:
         log.info("%s %s $%.2f -> %s", o["side"], o["symbol"], o["notional"], o["status"])
@@ -252,6 +268,7 @@ def watch(cfg, broker: Broker, market: Market, dry_run: bool, force: bool = Fals
 
     orders = rules.stop_orders(positions, highs, quotes, cfg.idle_asset, cfg.stop_trail_pct)
     stopped = {o.symbol for o in orders}
+    candidates: list = []
     used = state.get("buys", state.get("breakouts", {})).get(today, 0)
     slots = cfg.watch_max_buys_per_day - used
     if slots > 0:
@@ -267,11 +284,17 @@ def watch(cfg, broker: Broker, market: Market, dry_run: bool, force: bool = Fals
             max_positions=cfg.max_positions, size=cfg.watch_buy_size, slots=slots,
         )
 
+    notes: list[str] = []
+    if any(o.side == "buy" for o in orders):
+        orders, review_notes = _review(cfg, orders, quotes, positions, acct, candidates)
+        notes += review_notes
+
     new_buys = sum(1 for o in orders if o.side == "buy")
     state = {"highs": highs, "buys": {today: used + new_buys}, "last_check": datetime.now(ET).isoformat(timespec="minutes")}
     if not orders:
         if highs != journal.read("watch.json", {}).get("highs"):
             journal.write("watch.json", state)
+        scorecard.update({s: q.price for s, q in quotes.items()}, quotes["SPY"].price if "SPY" in quotes else None, set(positions))
         _write_status(cfg, acct, positions, history)  # live value for the dashboard
         log.info("watch: no action (%d quotes checked)", len(quotes))
         return 0
@@ -282,19 +305,63 @@ def watch(cfg, broker: Broker, market: Market, dry_run: bool, force: bool = Fals
                     "status": "not sent"} for o in orders]
     else:
         results = broker.execute(orders, prices, positions)
+        scorecard.record(results, "watch", prices, prices.get("SPY"), today, cfg.idle_asset)
     for r in results:
         if r["side"] == "buy" and r["status"] not in ("error", "skipped", "not sent"):
             highs[r["symbol"]] = prices.get(r["symbol"], 0.0)
     journal.write("watch.json", state)
     journal.append_decision({
         "date": today, "time": datetime.now(ET).strftime("%H:%M"), "source": "watch", "dry_run": dry_run,
-        "orders": results, "notes": [f"{o.side} {o.symbol}: {o.reason}" for o in orders],
+        "orders": results, "notes": notes + [f"{o.side} {o.symbol}: {o.reason}" for o in orders],
     })
     positions = broker.positions()
+    scorecard.update(prices, prices.get("SPY"), set(positions))
     _write_status(cfg, _account(cfg, broker, positions), positions, history)
     for r in results:
         log.info("%s %s $%.2f -> %s (%s)", r["side"], r["symbol"], r["notional"], r["status"], r["reason"])
     return 0
+
+
+def _review(cfg, orders, quotes, positions, acct, candidates):
+    """Keep only the watcher buys Claude approves; drop the SPY sale that funded rejected ones.
+
+    Protective sells (trailing stops) never wait for Claude.
+    """
+    buys = [o for o in orders if o.side == "buy"]
+    if not claude_available(cfg):
+        if not cfg.watch_require_claude:
+            return orders, []
+        kept = [o for o in orders if o.side == "sell" and o.reason.startswith("trailing stop")]
+        return kept, [f"skipped {len(buys)} buy idea(s): Claude isn't available to approve them "
+                      "(add the CLAUDE_CODE_OAUTH_TOKEN secret)"]
+    equity = acct["equity"] or 1
+    last = next((d for d in reversed(journal.read("decisions.json", [])) if d.get("market_view")), {})
+    context = {
+        "candidates": [{"symbol": s, "name": CORE_ETFS.get(s, ""), "signals": f"{sc}/6: " + "; ".join(r),
+                        "price": quotes[s].price, "change_today_pct": round((quotes[s].price / quotes[s].prev_close - 1) * 100, 2)}
+                       for s, sc, r in candidates if any(o.symbol == s for o in buys)],
+        "holdings": {s: round(p["market_value"] / equity, 3) for s, p in positions.items()},
+        "todays_market_view": last.get("market_view"),
+        "spy_change_today_pct": round((quotes["SPY"].price / quotes["SPY"].prev_close - 1) * 100, 2) if "SPY" in quotes else None,
+    }
+    verdicts, error = review_buys(cfg, context)
+    if verdicts is None:
+        kept = [o for o in orders if o.side == "sell" and o.reason.startswith("trailing stop")]
+        return kept, [f"skipped buys: {error}"]
+    notes, approved = [], []
+    for o in buys:
+        ok, why = verdicts.get(o.symbol, (False, "no verdict"))
+        notes.append(f"Claude {'approved' if ok else 'rejected'} {o.symbol}: {why}")
+        if ok:
+            approved.append(Order(o.symbol, o.side, o.notional, o.reason + " · Claude: " + why))
+    stops = [o for o in orders if o.side == "sell" and o.reason.startswith("trailing stop")]
+    funding = [o for o in orders if o.side == "sell" and not o.reason.startswith("trailing stop")]
+    if funding and approved:
+        share = sum(o.notional for o in approved) / sum(o.notional for o in buys)
+        funding = [Order(f.symbol, "sell", round(f.notional * share, 2), f.reason) for f in funding]
+    else:
+        funding = []
+    return stops + funding + approved, notes
 
 
 def main(argv: list[str] | None = None) -> int:

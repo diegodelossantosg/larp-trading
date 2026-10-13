@@ -14,7 +14,7 @@ def cfg(**kw):
                 max_daily_turnover=1.0, rebalance_band=0.02, min_order_usd=25,
                 max_drawdown_halt=0.25, trading_enabled=True, max_web_searches=5, capital_usd=0,
                 max_idle_weight=1.0, stop_trail_pct=0.06, watch_min_score=5, watch_buy_size=0.08,
-                watch_max_buys_per_day=4)
+                watch_max_buys_per_day=4, watch_require_claude=True, min_hold_days=3)
     base.update(kw)
     return Config(**base)
 

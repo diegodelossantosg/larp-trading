@@ -75,3 +75,18 @@ def test_spy_cap_leaves_cash_when_picks_are_full():
                             max_idle_weight=0.5, **LIMITS)
     assert t == {"XLE": 0.3, "SPY": 0.5}
     assert any("cash" in n for n in notes)
+
+
+def test_protected_positions_are_not_trimmed():
+    orders, notes = plan_orders({"SPY": 0.85, "XLE": 0.15}, {"SPY": 7700, "XLE": 2300}, 10_000,
+                                rebalance_band=0.02, min_order_usd=25, max_daily_turnover=1.0,
+                                cash_buffer=0.0, protected={"XLE"})
+    assert orders == [] or all(o.symbol != "XLE" for o in orders)
+    assert any("kept XLE" in n for n in notes)
+
+
+def test_buys_never_exceed_own_money():
+    orders, notes = plan_orders({"XLE": 0.5, "SPY": 0.5}, {"SPY": 9900}, 10_000,
+                                rebalance_band=0.02, min_order_usd=25, max_daily_turnover=1.0,
+                                cash_buffer=0.0, protected={"SPY"})
+    assert sum(o.notional for o in orders if o.side == "buy") <= 100.01

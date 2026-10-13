@@ -55,6 +55,8 @@ class Config:
     watch_min_score: int  # how many of the watcher's 6 buy signals must agree
     watch_buy_size: float  # share of capital per watcher buy
     watch_max_buys_per_day: int
+    watch_require_claude: bool  # watcher buys only with Claude's approval
+    min_hold_days: int  # the daily rebalance won't trim a watcher buy younger than this
 
 
 def load_config() -> Config:
@@ -72,7 +74,7 @@ def load_config() -> Config:
         backend = "api" if os.environ.get("ANTHROPIC_API_KEY") else "subscription"
     if backend not in ("api", "subscription"):
         raise SystemExit("CLAUDE_BACKEND must be 'api' or 'subscription'")
-    default_model = "claude-opus-5-5" if backend == "api" else "sonnet"
+    default_model = "claude-opus-5-5" if backend == "api" else "opus"
     return Config(
         anthropic_api_key=os.environ.get("ANTHROPIC_API_KEY", ""),
         claude_backend=backend,
@@ -97,4 +99,6 @@ def load_config() -> Config:
         watch_min_score=int(_float("WATCH_MIN_SCORE", 5)),
         watch_buy_size=_float("WATCH_BUY_SIZE", 0.08),
         watch_max_buys_per_day=int(_float("WATCH_MAX_BUYS_PER_DAY", 4)),
+        watch_require_claude=_bool("WATCH_REQUIRE_CLAUDE", True),
+        min_hold_days=int(_float("MIN_HOLD_DAYS", 3)),
     )

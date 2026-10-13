@@ -1,7 +1,8 @@
 name: Watcher (every 10 min)
 
-# Rules-only price check between Claude's daily decisions: trailing stops and signal-based buys,
-# and a live portfolio value for the dashboard. No Claude call, so it needs only the Alpaca secrets.
+# Price check between Claude's daily decisions: trailing stops (instant, rules) and signal-based
+# buys (each approved by Opus),
+# and a live portfolio value for the dashboard.
 #
 # GitHub's own timer is unreliable for every-10-minute jobs, so instead one job per trading day
 # loops: check, save, wait 10 minutes, repeat, and stops when the market closes. The schedule
@@ -31,6 +32,9 @@ jobs:
       ALPACA_PAPER: ${{ vars.ALPACA_PAPER || 'true' }}
       LIVE_TRADING_CONFIRMED: ${{ vars.LIVE_TRADING_CONFIRMED || 'no' }}
       TRADING_ENABLED: ${{ vars.TRADING_ENABLED || 'true' }}
+      # Opus approves every watcher buy. Without this token the watcher still runs its stops,
+      # but makes no buys. Create it with `claude setup-token`.
+      CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -39,6 +43,11 @@ jobs:
         with:
           python-version: "3.13"
       - run: ./setup.sh
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install Claude Code (for Opus approval of buys)
+        run: npm install -g @anthropic-ai/claude-code@2.1.296
       - name: Check every 10 minutes until the close
         run: |
           git config user.name "trading-agent"
