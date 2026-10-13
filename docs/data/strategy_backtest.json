@@ -150,5 +150,275 @@
    }
   }
  },
- "generated": "2026-10-13T12:41+00:00"
+ "without_covid": {
+  "spy_hold": {
+   "final_value_of_1000": 4566.0,
+   "total_return_pct": 356.6,
+   "cagr_pct": 17.4,
+   "max_drawdown_pct": -24.5,
+   "volatility_pct": 15.7,
+   "sharpe": 1.1,
+   "years_beating_spy": "0/10",
+   "yearly_pct": {
+    "2017": 19.6,
+    "2018": -5.0,
+    "2019": 31.1,
+    "2020": 36.4,
+    "2021": 28.6,
+    "2022": -18.2,
+    "2023": 26.2,
+    "2024": 24.9,
+    "2025": 17.7,
+    "2026": 15.0
+   }
+  },
+  "spy_trend": {
+   "final_value_of_1000": 3464.0,
+   "total_return_pct": 246.4,
+   "cagr_pct": 14.02,
+   "max_drawdown_pct": -20.4,
+   "volatility_pct": 11.9,
+   "sharpe": 1.17,
+   "years_beating_spy": "2/10",
+   "yearly_pct": {
+    "2017": 19.6,
+    "2018": -2.9,
+    "2019": 16.4,
+    "2020": 32.4,
+    "2021": 28.6,
+    "2022": -15.0,
+    "2023": 14.7,
+    "2024": 24.9,
+    "2025": 12.1,
+    "2026": 10.3
+   }
+  },
+  "sso_trend": {
+   "final_value_of_1000": 7751.0,
+   "total_return_pct": 675.1,
+   "cagr_pct": 24.15,
+   "max_drawdown_pct": -37.4,
+   "volatility_pct": 23.7,
+   "sharpe": 1.03,
+   "years_beating_spy": "6/10",
+   "yearly_pct": {
+    "2017": 39.5,
+    "2018": -9.1,
+    "2019": 30.0,
+    "2020": 69.5,
+    "2021": 60.2,
+    "2022": -28.3,
+    "2023": 23.1,
+    "2024": 43.5,
+    "2025": 18.0,
+    "2026": 15.7
+   }
+  },
+  "sso_hold": {
+   "final_value_of_1000": 11340.0,
+   "total_return_pct": 1034.0,
+   "cagr_pct": 29.24,
+   "max_drawdown_pct": -46.7,
+   "volatility_pct": 31.1,
+   "sharpe": 0.98,
+   "years_beating_spy": "8/10",
+   "yearly_pct": {
+    "2017": 39.5,
+    "2018": -14.6,
+    "2019": 63.5,
+    "2020": 79.3,
+    "2021": 60.2,
+    "2022": -39.0,
+    "2023": 46.7,
+    "2024": 43.5,
+    "2025": 26.2,
+    "2026": 25.1
+   }
+  },
+  "sector_momentum": {
+   "final_value_of_1000": 4026.0,
+   "total_return_pct": 302.6,
+   "cagr_pct": 15.85,
+   "max_drawdown_pct": -19.9,
+   "volatility_pct": 16.0,
+   "sharpe": 1.0,
+   "years_beating_spy": "2/10",
+   "yearly_pct": {
+    "2017": 12.9,
+    "2018": -6.4,
+    "2019": 21.7,
+    "2020": 35.2,
+    "2021": 20.7,
+    "2022": 9.1,
+    "2023": 13.3,
+    "2024": 18.4,
+    "2025": 11.9,
+    "2026": 17.1
+   }
+  },
+  "sector_mom_filter": {
+   "final_value_of_1000": 3841.0,
+   "total_return_pct": 284.1,
+   "cagr_pct": 15.27,
+   "max_drawdown_pct": -19.9,
+   "volatility_pct": 15.9,
+   "sharpe": 0.98,
+   "years_beating_spy": "2/10",
+   "yearly_pct": {
+    "2017": 12.9,
+    "2018": -6.4,
+    "2019": 20.8,
+    "2020": 33.2,
+    "2021": 20.7,
+    "2022": 7.0,
+    "2023": 12.6,
+    "2024": 18.4,
+    "2025": 11.9,
+    "2026": 17.1
+   }
+  },
+  "dual_momentum": {
+   "final_value_of_1000": 2943.0,
+   "total_return_pct": 194.3,
+   "cagr_pct": 12.08,
+   "max_drawdown_pct": -23.1,
+   "volatility_pct": 14.2,
+   "sharpe": 0.87,
+   "years_beating_spy": "1/10",
+   "yearly_pct": {
+    "2017": 16.7,
+    "2018": -8.0,
+    "2019": 18.4,
+    "2020": 31.0,
+    "2021": 28.6,
+    "2022": -17.0,
+    "2023": 7.1,
+    "2024": 24.9,
+    "2025": 11.3,
+    "2026": 11.2
+   }
+  }
+ },
+ "since_2021": {
+  "spy_hold": {
+   "final_value_of_1000": 2245.0,
+   "total_return_pct": 124.5,
+   "cagr_pct": 15.09,
+   "max_drawdown_pct": -24.5,
+   "volatility_pct": 16.6,
+   "sharpe": 0.93,
+   "years_beating_spy": "0/6",
+   "yearly_pct": {
+    "2021": 28.6,
+    "2022": -18.2,
+    "2023": 26.2,
+    "2024": 24.9,
+    "2025": 17.7,
+    "2026": 15.0
+   }
+  },
+  "spy_trend": {
+   "final_value_of_1000": 1934.0,
+   "total_return_pct": 93.4,
+   "cagr_pct": 12.15,
+   "max_drawdown_pct": -20.4,
+   "volatility_pct": 11.6,
+   "sharpe": 1.05,
+   "years_beating_spy": "1/6",
+   "yearly_pct": {
+    "2021": 28.6,
+    "2022": -15.0,
+    "2023": 14.7,
+    "2024": 24.9,
+    "2025": 12.1,
+    "2026": 10.3
+   }
+  },
+  "sso_trend": {
+   "final_value_of_1000": 2771.0,
+   "total_return_pct": 177.1,
+   "cagr_pct": 19.38,
+   "max_drawdown_pct": -37.4,
+   "volatility_pct": 23.0,
+   "sharpe": 0.88,
+   "years_beating_spy": "4/6",
+   "yearly_pct": {
+    "2021": 60.2,
+    "2022": -28.3,
+    "2023": 23.1,
+    "2024": 43.5,
+    "2025": 18.0,
+    "2026": 15.7
+   }
+  },
+  "sso_hold": {
+   "final_value_of_1000": 3248.0,
+   "total_return_pct": 224.8,
+   "cagr_pct": 22.72,
+   "max_drawdown_pct": -46.7,
+   "volatility_pct": 32.8,
+   "sharpe": 0.79,
+   "years_beating_spy": "5/6",
+   "yearly_pct": {
+    "2021": 60.2,
+    "2022": -39.0,
+    "2023": 46.7,
+    "2024": 43.5,
+    "2025": 26.2,
+    "2026": 25.1
+   }
+  },
+  "sector_momentum": {
+   "final_value_of_1000": 2316.0,
+   "total_return_pct": 131.6,
+   "cagr_pct": 15.72,
+   "max_drawdown_pct": -15.3,
+   "volatility_pct": 16.6,
+   "sharpe": 0.96,
+   "years_beating_spy": "2/6",
+   "yearly_pct": {
+    "2021": 20.7,
+    "2022": 9.1,
+    "2023": 13.3,
+    "2024": 18.4,
+    "2025": 11.9,
+    "2026": 17.1
+   }
+  },
+  "sector_mom_filter": {
+   "final_value_of_1000": 2258.0,
+   "total_return_pct": 125.8,
+   "cagr_pct": 15.2,
+   "max_drawdown_pct": -15.3,
+   "volatility_pct": 16.5,
+   "sharpe": 0.94,
+   "years_beating_spy": "2/6",
+   "yearly_pct": {
+    "2021": 20.7,
+    "2022": 7.0,
+    "2023": 12.6,
+    "2024": 18.4,
+    "2025": 11.9,
+    "2026": 17.1
+   }
+  },
+  "dual_momentum": {
+   "final_value_of_1000": 1766.0,
+   "total_return_pct": 76.6,
+   "cagr_pct": 10.39,
+   "max_drawdown_pct": -23.1,
+   "volatility_pct": 14.9,
+   "sharpe": 0.74,
+   "years_beating_spy": "1/6",
+   "yearly_pct": {
+    "2021": 28.6,
+    "2022": -17.0,
+    "2023": 7.1,
+    "2024": 24.9,
+    "2025": 11.3,
+    "2026": 11.2
+   }
+  }
+ },
+ "generated": "2026-10-13T13:05+00:00"
 }
