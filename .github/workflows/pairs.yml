@@ -1,0 +1,37 @@
+name: "Backtest pairs trading"
+
+# Coke/Pepsi-style pairs trading on 12 twin pairs since 2016, after costs and borrow fees.
+on:
+  workflow_dispatch:
+    inputs:
+      years:
+        description: "How many years of history"
+        default: "10"
+
+permissions:
+  contents: write
+
+jobs:
+  pairs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      ALPACA_API_KEY: ${{ secrets.ALPACA_API_KEY }}
+      ALPACA_SECRET_KEY: ${{ secrets.ALPACA_SECRET_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: ./setup.sh
+      - run: python -m trader.pairs_backtest --years ${{ inputs.years }}
+      - name: Save results
+        run: |
+          git config user.name "trading-agent"
+          git config user.email "trading-agent@users.noreply.github.com"
+          git add docs/data/pairs_backtest.json
+          git commit -q -m "Backtest: pairs trading"
+          for i in 1 2 3; do git pull -q --rebase origin main && git push -q origin HEAD:main && exit 0; sleep 5; done
+          exit 1
