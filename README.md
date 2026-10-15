@@ -15,11 +15,13 @@ A fully automated agent that, once per US trading day:
 5. Saves every decision, with Claude's reasoning, sources, orders and API cost, to `docs/data/`.
    The dashboard reads those files.
 
-Every 5 minutes while the market is open, a rules-only **watcher** (`trader/watch.py`, GitHub
-Actions, no Claude call) sells positions that fall 6% below their high, and scores every ETF on six
-buy signals: daily uptrend, a healthy rise today, price above today's VWAP, bullish 15-minute
-candles, a volume surge and a new 20-day high. When 5 of 6 agree (and SPY isn't falling, and the
-first half hour is over) it buys 8% of the money, up to 4 times a day, funded from SPY.
+Every minute while the market is open, a rules-only **watcher** (`trader/watch.py`, GitHub Actions,
+no Claude call) sells any position that falls too far below its high (6% for ETFs, 10% for stocks)
+and updates the dashboard. It used to also buy ETFs on intraday signals; 8 years of tests showed
+those buys lose to the S&P 500, so that is off (`WATCH_MAX_BUYS_PER_DAY=0`).
+
+Every hour, the **News Hunter** (`python -m trader.main news`, Opus with web search) reads the latest
+headlines and may buy big companies that overreacted to news (at most 2 buys a day, 5% each).
 
 After the close, a second job records portfolio value against SPY so the dashboard can compare them.
 
@@ -40,7 +42,7 @@ After the close, a second job records portfolio value against SPY so the dashboa
 | Unallocated money goes to | SSO (2x S&P 500, no trend filter) | `IDLE_ASSET` |
 | Most that may sit in the idle asset | 50% | `MAX_IDLE_WEIGHT` |
 | Watcher: sell a position this far below its high | 6% | `STOP_TRAIL_PCT` |
-| Watcher: signals that must agree / buy size / max buys per day | 5 of 6 / 8% / 4 | `WATCH_MIN_SCORE` / `WATCH_BUY_SIZE` / `WATCH_MAX_BUYS_PER_DAY` |
+| Watcher: signals that must agree / buy size / max buys per day | 5 of 6 / 8% / 0 (off) | `WATCH_MIN_SCORE` / `WATCH_BUY_SIZE` / `WATCH_MAX_BUYS_PER_DAY` |
 | Max weight in one ETF (other than SPY) | 30% | `MAX_POSITION_WEIGHT` |
 | Max number of positions | 12 | `MAX_POSITIONS` |
 | Max weight in one big, well-known company | 10% | `MAX_STOCK_WEIGHT` |

@@ -104,7 +104,7 @@ def load_config() -> Config:
         stop_trail_pct=_float("STOP_TRAIL_PCT", 0.06),
         watch_min_score=int(_float("WATCH_MIN_SCORE", 5)),
         watch_buy_size=_float("WATCH_BUY_SIZE", 0.08),
-        watch_max_buys_per_day=int(_float("WATCH_MAX_BUYS_PER_DAY", 4)),
+        watch_max_buys_per_day=int(_float("WATCH_MAX_BUYS_PER_DAY", 0)),  # 0: the Guard only protects (its buys lost to SPY in every test)
         watch_require_claude=_bool("WATCH_REQUIRE_CLAUDE", True),
         min_hold_days=int(_float("MIN_HOLD_DAYS", 3)),
         max_stock_weight=_float("MAX_STOCK_WEIGHT", 0.10),

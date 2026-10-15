@@ -6,7 +6,8 @@
    Hunter: in a 12-month test the same signals on big stocks lost to the S&P 500) from its daily trend and today's
    15-minute candles. Buy when at least WATCH_MIN_SCORE agree, the market (SPY) is not
    falling and the first half hour of the session is over. Each buy is WATCH_BUY_SIZE of
-   capital, funded from the idle asset or cash, at most WATCH_MAX_BUYS_PER_DAY per day,
+   capital, funded from the idle asset or cash, at most WATCH_MAX_BUYS_PER_DAY per day (default 0:
+   switched off after 8 years of tests showed these buys lose to the S&P 500; stops still run),
    and gets the same trailing stop.
 
 No Claude call is made here, so it is quick and free to run often.
