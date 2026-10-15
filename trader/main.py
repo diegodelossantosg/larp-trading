@@ -21,8 +21,8 @@ from .broker import Broker
 from .config import load_config
 from .indicators import summarize
 from .market import Market
-from .risk import Order, apply_limits, drawdown, plan_orders
-from .universe import CORE_ETFS, LEVERAGED
+from .risk import Order, apply_limits, drawdown, earnings_blackout, plan_orders
+from .universe import BIG_STOCKS, CORE_ETFS, LEVERAGED, NAMES
 from . import health as market_health
 from . import scorecard
 from . import watch as rules
@@ -30,6 +30,8 @@ from . import watch as rules
 log = logging.getLogger("trader")
 ET = ZoneInfo("America/New_York")
 MIN_DOLLAR_VOLUME_M = 5.0  # extra ETFs Claude proposes must trade at least $5M/day
+MIN_SMALL_STOCK_DOLLAR_VOLUME_M = 20.0  # smaller companies: at least $20M/day...
+MIN_SMALL_STOCK_PRICE = 5.0  # ...and no penny stocks
 
 
 def _today() -> str:
@@ -140,7 +142,7 @@ def _write_status(cfg, acct: dict, positions: dict, rows: list[dict]) -> None:
         "health": journal.read("health.json", None),
         "positions": sorted(
             ({"symbol": s, **{k: round(v, 4) for k, v in p.items()},
-              "name": CORE_ETFS.get(s, ""),
+              "name": NAMES.get(s, ""),
               "weight": round(p["market_value"] / equity, 4)} for s, p in positions.items()),
             key=lambda p: -p["market_value"],
         ),
@@ -166,9 +168,9 @@ def trade(cfg, broker: Broker, market: Market, dry_run: bool, force: bool) -> in
         log.error(record["error"])
         return 1
 
-    universe = sorted(set(CORE_ETFS) | set(positions) | {cfg.idle_asset})
+    universe = sorted(set(CORE_ETFS) | set(BIG_STOCKS) | set(positions) | {cfg.idle_asset})
     bars = market.daily_bars(universe)
-    technicals = {s: {"name": CORE_ETFS.get(s, ""), **summarize(df)} for s, df in bars.items() if len(df) > 30}
+    technicals = {s: {"name": NAMES.get(s, ""), **summarize(df)} for s, df in bars.items() if len(df) > 30}
 
     previous = [
         {k: d.get(k) for k in ("date", "market_view", "confidence", "trade_today")}
@@ -180,7 +182,7 @@ def trade(cfg, broker: Broker, market: Market, dry_run: bool, force: bool) -> in
         | {"orders": [(o["side"], o["symbol"], o["notional"], o.get("status")) for o in d.get("orders", [])]}
         for d in journal.read("decisions.json", [])[-30:] if d.get("source") == "watch"
     ][-10:]
-    health = market_health.build(technicals, bars)
+    health = market_health.build({s: t for s, t in technicals.items() if s in CORE_ETFS}, bars)  # breadth: ETFs only
     journal.write("health.json", health)
     briefing = {
         "date": _today(),
@@ -196,6 +198,11 @@ def trade(cfg, broker: Broker, market: Market, dry_run: bool, force: bool) -> in
             "max_total_leveraged_or_inverse": cfg.max_leveraged_weight,
             "max_daily_turnover": cfg.max_daily_turnover,
             "rebalance_band": cfg.rebalance_band,
+            "max_weight_per_big_company_stock": cfg.max_stock_weight,
+            "max_weight_per_smaller_company_stock": cfg.max_small_stock_weight,
+            "max_total_in_smaller_companies": cfg.max_small_stocks_total,
+            "max_total_in_single_stocks": cfg.max_stocks_total,
+            "no_stock_buys_this_many_trading_days_before_earnings": cfg.earnings_blackout_days,
         },
         "performance_vs_spy": _performance(history),
         "previous_decisions": previous,
@@ -225,30 +232,50 @@ def trade(cfg, broker: Broker, market: Market, dry_run: bool, force: bool) -> in
     proposed = {p["symbol"].upper(): float(p["weight"]) for p in decision.data["positions"]}
     allowed = set(technicals)
     leveraged = set(LEVERAGED)
+    stocks = {s: "big" for s in BIG_STOCKS}
+    for s in set(positions) - set(CORE_ETFS) - set(BIG_STOCKS):  # holdings from outside our lists
+        ok, lev, kind, _ = broker.vet(s)
+        if lev:
+            leveraged.add(s)
+        if kind in ("big", "small"):
+            stocks[s] = kind
     extra = [s for s in proposed if s not in technicals]
     if extra:
         extra_bars = market.daily_bars(extra)
         for s in extra:
-            ok, lev, why = broker.vet_etf(s)
+            ok, lev, kind, why = broker.vet(s)
             df = extra_bars.get(s)
             if ok and df is not None and len(df) > 30:
                 summary = summarize(df)
-                if summary["avg_dollar_vol_m"] >= MIN_DOLLAR_VOLUME_M:
-                    technicals[s] = summary
+                small = kind == "small"
+                min_vol = MIN_SMALL_STOCK_DOLLAR_VOLUME_M if small else MIN_DOLLAR_VOLUME_M
+                if small and summary["price"] < MIN_SMALL_STOCK_PRICE:
+                    why = f"price ${summary['price']} is too low (penny stock)"
+                elif summary["avg_dollar_vol_m"] >= min_vol:
+                    technicals[s] = {"name": "", **summary}
                     allowed.add(s)
                     if lev:
                         leveraged.add(s)
+                    if kind in ("big", "small"):
+                        stocks[s] = kind
                     continue
-                why = f"too illiquid (${summary['avg_dollar_vol_m']}M/day)"
+                else:
+                    why = f"too illiquid (${summary['avg_dollar_vol_m']}M/day)"
             record["notes"].append(f"rejected {s}: {why or 'no price history'}")
-    for s in allowed - set(CORE_ETFS) - leveraged:  # held ETFs from outside the core list
-        if broker.vet_etf(s)[1]:
-            leveraged.add(s)
+    stocks = {s: k for s, k in stocks.items() if s in allowed}
+
+    held_weights = {s: p["market_value"] / (equity or 1) for s, p in positions.items()}
+    earnings = {p["symbol"].upper(): p.get("next_earnings", "") for p in decision.data["positions"]}
+    proposed, notes = earnings_blackout(proposed, held_weights, set(stocks), earnings, _today(),
+                                        cfg.earnings_blackout_days)
+    record["notes"] += notes
 
     targets, notes = apply_limits(
         proposed, allowed=allowed, leveraged=leveraged, idle_asset=cfg.idle_asset,
         max_position_weight=cfg.max_position_weight, max_positions=cfg.max_positions,
         max_leveraged_weight=cfg.max_leveraged_weight, max_idle_weight=cfg.max_idle_weight,
+        stocks=stocks, max_stock_weight=cfg.max_stock_weight, max_small_stock_weight=cfg.max_small_stock_weight,
+        max_small_stocks_total=cfg.max_small_stocks_total, max_stocks_total=cfg.max_stocks_total,
     )
     record["notes"] += notes
     record["final_targets"] = targets
@@ -296,10 +323,13 @@ def watch(cfg, broker: Broker, market: Market, dry_run: bool, force: bool = Fals
 
     today = _today()
     state = journal.read("watch.json", {"highs": {}, "breakouts": {}})
-    quotes = market.quotes(sorted(set(CORE_ETFS) | set(positions)))
+    quotes = market.quotes(sorted(set(CORE_ETFS) | set(BIG_STOCKS) | set(positions)))
     highs = rules.update_highs(state.get("highs", {}), positions, quotes)
+    stocks = set(BIG_STOCKS) | {s for s in set(positions) - set(CORE_ETFS) - set(BIG_STOCKS)
+                                if broker.vet(s)[2] in ("big", "small")}
 
-    orders = rules.stop_orders(positions, highs, quotes, cfg.idle_asset, cfg.stop_trail_pct)
+    orders = rules.stop_orders(positions, highs, quotes, cfg.idle_asset, cfg.stop_trail_pct,
+                               stocks=stocks, stock_trail_pct=cfg.stop_trail_pct_stock)
     stopped = {o.symbol for o in orders}
     candidates: list = []
     used = state.get("buys", state.get("breakouts", {})).get(today, 0)
@@ -310,7 +340,9 @@ def watch(cfg, broker: Broker, market: Market, dry_run: bool, force: bool = Fals
         mood = (journal.read("health.json", {}) or {}).get("mood")
         min_score = min(6, cfg.watch_min_score + 1) if mood == "stressed" else cfg.watch_min_score
         candidates = rules.buy_candidates(quotes, weights, cfg.idle_asset, min_score,
-                                          cfg.max_position_weight, cfg.watch_buy_size)
+                                          cfg.max_position_weight, cfg.watch_buy_size,
+                                          max_stock_weight=cfg.max_stock_weight,
+                                          max_stocks_total=cfg.max_stocks_total, stocks=stocks)
         orders += rules.buy_orders(
             candidates, equity=acct["equity"],
             cash=acct["cash"] + sum(o.notional for o in orders),
@@ -374,7 +406,7 @@ def _review(cfg, orders, quotes, positions, acct, candidates):
     equity = acct["equity"] or 1
     last = next((d for d in reversed(journal.read("decisions.json", [])) if d.get("market_view")), {})
     context = {
-        "candidates": [{"symbol": s, "name": CORE_ETFS.get(s, ""), "signals": f"{sc}/6: " + "; ".join(r),
+        "candidates": [{"symbol": s, "name": NAMES.get(s, ""), "signals": f"{sc}/6: " + "; ".join(r),
                         "price": quotes[s].price, "change_today_pct": round((quotes[s].price / quotes[s].prev_close - 1) * 100, 2)}
                        for s, sc, r in candidates if any(o.symbol == s for o in buys)],
         "holdings": {s: round(p["market_value"] / equity, 3) for s, p in positions.items()},

@@ -34,22 +34,38 @@ def apply_limits(
     max_positions: int,
     max_leveraged_weight: float,
     max_idle_weight: float = 1.0,
+    stocks: dict[str, str] | None = None,
+    max_stock_weight: float = 0.10,
+    max_small_stock_weight: float = 0.05,
+    max_small_stocks_total: float = 0.10,
+    max_stocks_total: float = 0.40,
 ) -> tuple[dict[str, float], list[str]]:
     """Clamp proposed weights to the risk rules; the remainder goes to the idle asset.
 
-    The idle asset (SPY) may hold at most max_idle_weight. Anything above that is spread over
+    `stocks` maps each single-company stock to "big" or "small"; stocks have their own, smaller
+    caps per company, for small companies together, and for all stocks together.
+    The idle asset (SSO) may hold at most max_idle_weight. Anything above that is spread over
     the other chosen ETFs (up to their own caps); what still doesn't fit stays in cash.
     """
+    stocks = stocks or {}
     notes: list[str] = []
     weights: dict[str, float] = {}
+
+    def cap_for(sym: str) -> float:
+        if sym == idle_asset:
+            return 1.0
+        if sym in stocks:
+            return max_stock_weight if stocks[sym] == "big" else max_small_stock_weight
+        return max_position_weight
+
     for sym, w in proposed.items():
         sym = sym.upper()
         if sym not in allowed:
-            notes.append(f"dropped {sym}: not an approved, tradable ETF")
+            notes.append(f"dropped {sym}: not an approved, tradable ETF or stock")
             continue
         if w <= 0:
             continue
-        cap = 1.0 if sym == idle_asset else max_position_weight
+        cap = cap_for(sym)
         if w > cap:
             notes.append(f"{sym} capped {w:.0%} -> {cap:.0%}")
             w = cap
@@ -69,6 +85,16 @@ def apply_limits(
                 weights[s] *= scale
         notes.append(f"leveraged/inverse ETFs scaled {lev_total:.0%} -> {max_leveraged_weight:.0%}")
 
+    for group, members, limit in (
+        ("smaller companies", [s for s in weights if stocks.get(s) == "small"], max_small_stocks_total),
+        ("single-company stocks", [s for s in weights if s in stocks], max_stocks_total),
+    ):
+        group_total = sum(weights[s] for s in members)
+        if group_total > limit:
+            for s in members:
+                weights[s] *= limit / group_total
+            notes.append(f"{group} scaled {group_total:.0%} -> {limit:.0%}")
+
     total = sum(weights.values())
     if total > 1.0:
         weights = {s: w / total for s, w in weights.items()}
@@ -85,7 +111,7 @@ def apply_limits(
         # Water-fill the excess into the other (non-leveraged) picks, pro rata, up to their caps.
         for _ in range(10):
             room = {s: max_position_weight - w for s, w in weights.items()
-                    if s != idle_asset and s not in leveraged and max_position_weight - w > 1e-9}
+                    if s != idle_asset and s not in leveraged and s not in stocks and max_position_weight - w > 1e-9}
             base = sum(weights[s] for s in room)
             if excess <= 1e-9 or not room or base <= 0:
                 break
@@ -154,6 +180,39 @@ def plan_orders(
     sells.sort(key=lambda o: -o.notional)
     buys.sort(key=lambda o: -o.notional)
     return sells + buys, notes
+
+
+def earnings_blackout(
+    proposed: dict[str, float],
+    current_weights: dict[str, float],
+    stocks: set[str],
+    earnings: dict[str, str],
+    today: str,
+    days: int,
+) -> tuple[dict[str, float], list[str]]:
+    """Don't add to a stock that reports earnings within `days` trading days (or whose date is unknown).
+
+    A single company can drop 10-20% overnight on a bad report, and a stop can't catch a gap.
+    Holding what we already own is allowed; only the increase is blocked.
+    """
+    import numpy as np
+
+    out, notes = dict(proposed), []
+    for sym, w in proposed.items():
+        held = current_weights.get(sym, 0.0)
+        if sym not in stocks or w <= held + 0.005:
+            continue
+        date = (earnings.get(sym) or "").strip()[:10]
+        try:
+            until = int(np.busday_count(today, date))
+        except ValueError:
+            out[sym] = held
+            notes.append(f"didn't add to {sym}: its next earnings date isn't confirmed")
+            continue
+        if 0 <= until <= days:
+            out[sym] = held
+            notes.append(f"didn't add to {sym}: it reports earnings on {date}, too soon to buy")
+    return out, notes
 
 
 def drawdown(equity_history: list[float]) -> float:

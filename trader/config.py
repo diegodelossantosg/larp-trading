@@ -57,6 +57,12 @@ class Config:
     watch_max_buys_per_day: int
     watch_require_claude: bool  # watcher buys only with Claude's approval
     min_hold_days: int  # the daily rebalance won't trim a watcher buy younger than this
+    max_stock_weight: float = 0.10  # per big, well-known company
+    max_small_stock_weight: float = 0.05  # per smaller, speculative company
+    max_small_stocks_total: float = 0.10  # all smaller companies together
+    max_stocks_total: float = 0.40  # all single-company stocks together
+    earnings_blackout_days: int = 3  # no buying a stock this many trading days or fewer before its earnings
+    stop_trail_pct_stock: float = 0.10  # trailing stop for single stocks (they swing more than ETFs)
 
 
 def load_config() -> Config:
@@ -85,7 +91,7 @@ def load_config() -> Config:
         claude_effort=os.environ.get("CLAUDE_EFFORT", "high"),
         idle_asset=os.environ.get("IDLE_ASSET", "SSO").upper(),  # 2x S&P 500, held without a trend filter
         max_position_weight=_float("MAX_POSITION_WEIGHT", 0.30),
-        max_positions=int(_float("MAX_POSITIONS", 8)),
+        max_positions=int(_float("MAX_POSITIONS", 12)),
         max_leveraged_weight=_float("MAX_LEVERAGED_WEIGHT", 0.10),
         max_daily_turnover=_float("MAX_DAILY_TURNOVER", 0.50),
         rebalance_band=_float("REBALANCE_BAND", 0.02),
@@ -101,4 +107,10 @@ def load_config() -> Config:
         watch_max_buys_per_day=int(_float("WATCH_MAX_BUYS_PER_DAY", 4)),
         watch_require_claude=_bool("WATCH_REQUIRE_CLAUDE", True),
         min_hold_days=int(_float("MIN_HOLD_DAYS", 3)),
+        max_stock_weight=_float("MAX_STOCK_WEIGHT", 0.10),
+        max_small_stock_weight=_float("MAX_SMALL_STOCK_WEIGHT", 0.05),
+        max_small_stocks_total=_float("MAX_SMALL_STOCKS_TOTAL", 0.10),
+        max_stocks_total=_float("MAX_STOCKS_TOTAL", 0.40),
+        earnings_blackout_days=int(_float("EARNINGS_BLACKOUT_DAYS", 3)),
+        stop_trail_pct_stock=_float("STOP_TRAIL_PCT_STOCK", 0.10),
     )

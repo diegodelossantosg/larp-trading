@@ -1,14 +1,15 @@
-# Claude ETF trading agent
+# Claude ETF and stock trading agent
 
 A fully automated agent that, once per US trading day:
 
-1. Pulls a year of daily prices for ~75 ETFs (US indexes, sectors, themes, countries, bonds,
-   commodities, crypto, and a few leveraged/inverse funds) and computes trend, momentum, RSI,
+1. Pulls a year of daily prices for ~80 ETFs (US indexes, sectors, themes, countries, bonds,
+   commodities, crypto, and a few leveraged/inverse funds) and ~60 big, well-known company stocks,
+   and computes trend, momentum, RSI,
    MACD, volatility and **candlestick patterns** for each.
 2. Reads the last 36 hours of market headlines from Alpaca's news feed.
 3. Gives all of that to **Claude** with **web search**. Claude researches what is moving markets
    (central banks, economic data, tariffs, wars, what world leaders and officials are saying),
-   then picks target weights for any ETFs it believes will beat the S&P 500.
+   then picks target weights for any ETFs or company stocks it believes will beat the S&P 500.
 4. A **risk engine in code** clamps those weights, keeps the rest in SPY, and places the orders on
    **Alpaca** (paper trading by default).
 5. Saves every decision, with Claude's reasoning, sources, orders and API cost, to `docs/data/`.
@@ -41,15 +42,21 @@ After the close, a second job records portfolio value against SPY so the dashboa
 | Watcher: sell a position this far below its high | 6% | `STOP_TRAIL_PCT` |
 | Watcher: signals that must agree / buy size / max buys per day | 5 of 6 / 8% / 4 | `WATCH_MIN_SCORE` / `WATCH_BUY_SIZE` / `WATCH_MAX_BUYS_PER_DAY` |
 | Max weight in one ETF (other than SPY) | 30% | `MAX_POSITION_WEIGHT` |
-| Max number of ETFs | 8 | `MAX_POSITIONS` |
+| Max number of positions | 12 | `MAX_POSITIONS` |
+| Max weight in one big, well-known company | 10% | `MAX_STOCK_WEIGHT` |
+| Max weight in one smaller company / all smaller companies | 5% / 10% | `MAX_SMALL_STOCK_WEIGHT` / `MAX_SMALL_STOCKS_TOTAL` |
+| Max total in single-company stocks | 40% | `MAX_STOCKS_TOTAL` |
+| No buying a stock this close to its earnings report (trading days; unknown date = no buy) | 3 | `EARNINGS_BLACKOUT_DAYS` |
+| Watcher: trailing stop for single stocks | 10% | `STOP_TRAIL_PCT_STOCK` |
 | Max total in leveraged/inverse ETFs | 10% | `MAX_LEVERAGED_WEIGHT` |
 | Max traded per day (one-way) | 50% of equity | `MAX_DAILY_TURNOVER` |
 | Ignore weight changes smaller than | 2% of equity | `REBALANCE_BAND` |
 | Stop trading if down from peak by | 25% | `MAX_DRAWDOWN_HALT` |
 | Kill switch | on | `TRADING_ENABLED=false` |
 
-ETFs that Claude suggests from outside the built-in list must be active and tradable on Alpaca, be
-named like a fund, and trade at least $5M per day.
+ETFs and stocks that Claude suggests from outside the built-in lists must be active and tradable on
+Alpaca (no over-the-counter shares). ETFs must trade at least $5M per day; smaller companies at least
+$20M per day and $5 a share.
 
 ## Setup (about 15 minutes)
 

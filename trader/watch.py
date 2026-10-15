@@ -1,8 +1,8 @@
 """The 5-minute watcher: fast, rules-only reactions between Claude's daily decisions.
 
 1. Trailing stop: sell any position (other than the idle asset) that has fallen
-   STOP_TRAIL_PCT below its highest price since it was bought.
-2. Intraday buys: score every ETF on six signals from its daily trend and today's
+   STOP_TRAIL_PCT (STOP_TRAIL_PCT_STOCK for single stocks) below its highest price since it was bought.
+2. Intraday buys: score every ETF and big company stock on six signals from its daily trend and today's
    15-minute candles. Buy when at least WATCH_MIN_SCORE agree, the market (SPY) is not
    falling and the first half hour of the session is over. Each buy is WATCH_BUY_SIZE of
    capital, funded from the idle asset or cash, at most WATCH_MAX_BUYS_PER_DAY per day,
@@ -17,7 +17,7 @@ import logging
 from dataclasses import dataclass, field
 
 from .risk import Order
-from .universe import CORE_ETFS, LEVERAGED
+from .universe import BIG_STOCKS, CORE_ETFS, LEVERAGED
 
 log = logging.getLogger(__name__)
 
@@ -49,13 +49,15 @@ def update_highs(highs: dict[str, float], positions: dict[str, dict], quotes: di
 
 
 def stop_orders(positions: dict[str, dict], highs: dict[str, float], quotes: dict[str, Quote],
-                idle_asset: str, trail_pct: float) -> list[Order]:
+                idle_asset: str, trail_pct: float, stocks: set[str] | frozenset = frozenset(),
+                stock_trail_pct: float | None = None) -> list[Order]:
     orders = []
     for sym, p in positions.items():
         if sym == idle_asset or sym not in quotes:
             continue
         price, high = quotes[sym].price, highs.get(sym, p["avg_entry_price"])
-        if price <= high * (1 - trail_pct):
+        trail = stock_trail_pct if sym in stocks and stock_trail_pct else trail_pct
+        if price <= high * (1 - trail):
             drop = 1 - price / high
             orders.append(Order(sym, "sell", round(p["market_value"], 2),
                                 f"trailing stop: {drop:.1%} below its high of ${high:.2f}"))
@@ -78,21 +80,37 @@ def score(q: Quote) -> tuple[int, list[str]]:
 
 
 def buy_candidates(quotes: dict[str, Quote], weights: dict[str, float], idle_asset: str,
-                   min_score: int, max_weight: float, size: float) -> list[tuple[str, int, list[str]]]:
-    """(symbol, score, reasons) for ETFs worth buying now, best first."""
+                   min_score: int, max_weight: float, size: float, *, max_stock_weight: float = 0.10,
+                   max_stocks_total: float = 0.40, stocks: set[str] | frozenset = frozenset()
+                   ) -> list[tuple[str, int, list[str]]]:
+    """(symbol, score, reasons) for ETFs and big company stocks worth buying now, best first.
+
+    `stocks` lists every single-company stock (held or scanned) so the 40% total for stocks holds.
+    """
+    stocks = set(stocks) | set(BIG_STOCKS)
     spy = quotes.get("SPY")
     if spy is None or spy.price / spy.prev_close - 1 < -0.005:
         return []  # don't chase rallies on a falling market
     found = []
     for sym, q in quotes.items():
-        if sym == idle_asset or sym in LEVERAGED or sym not in CORE_ETFS:
+        if sym == idle_asset or sym in LEVERAGED or (sym not in CORE_ETFS and sym not in BIG_STOCKS):
             continue
-        if q.bars_today < 2 or weights.get(sym, 0.0) + size > max_weight:
+        cap = max_stock_weight if sym in stocks else max_weight
+        if q.bars_today < 2 or weights.get(sym, 0.0) + size > cap + 1e-9:
             continue  # skip the opening half hour, and positions already at their cap
         s, reasons = score(q)
         if s >= min_score:
             found.append((sym, s, reasons))
-    return sorted(found, key=lambda x: (-x[1], -(quotes[x[0]].price / quotes[x[0]].prev_close)))
+    found.sort(key=lambda x: (-x[1], -(quotes[x[0]].price / quotes[x[0]].prev_close)))
+    stock_total = sum(w for s, w in weights.items() if s in stocks)
+    out = []
+    for c in found:
+        if c[0] in stocks:
+            if stock_total + size > max_stocks_total + 1e-9:
+                continue
+            stock_total += size
+        out.append(c)
+    return out
 
 
 def buy_orders(candidates: list[tuple[str, int, list[str]]], *, equity: float, cash: float,

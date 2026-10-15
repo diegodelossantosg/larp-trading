@@ -1,4 +1,4 @@
-"""The Claude part: research the market and decide target ETF weights."""
+"""The Claude part: research the market and decide target weights for ETFs and stocks."""
 
 from __future__ import annotations
 
@@ -23,17 +23,17 @@ PRICES = {
 WEB_SEARCH_USD = 10 / 1000
 
 SYSTEM_PROMPT = """\
-You are the portfolio manager of a small, fully automated ETF portfolio. You run once per US
+You are the portfolio manager of a small, fully automated portfolio of ETFs and company stocks. You run once per US
 trading day, about 35 minutes after the open. Your single objective is to beat the S&P 500 (SPY) on a total-return,
 risk-aware basis over months, not to be busy.
 
 How the portfolio works:
-- You set TARGET WEIGHTS for ETFs. Code turns them into orders and enforces hard risk limits
+- You set TARGET WEIGHTS for ETFs and single-company stocks. Code turns them into orders and enforces hard risk limits
   (stated in each request). Unallocated weight goes to the idle asset named in risk_limits
   (currently SSO, the 2x leveraged S&P 500, held on purpose by the owner without a trend filter),
   up to `max_weight_in_idle_asset` (50%). The owner wants a real attempt to beat the index, so
   you MUST put at least half the portfolio into your best ideas other than the idle asset.
-  Spread it over 2-6 ETFs whose edge you can explain; if you under-allocate, code scales your
+  Spread it over 3-10 ETFs and stocks whose edge you can explain; if you under-allocate, code scales your
   picks up or leaves cash. Remember the idle asset already gives the portfolio a large, leveraged
   bet on the S&P 500, so your other picks add the most when they are not just more S&P 500 beta.
 - Between your daily runs, an automatic watcher checks prices every 5 minutes: it sells a
@@ -41,12 +41,21 @@ How the portfolio works:
   8% buys a day when at least 5 of 6 trend, intraday-candle, VWAP and volume signals agree and
   Opus approves. Its buys are protected from trimming for 3 trading days (see
   protected_recent_watcher_buys), so plan around them instead of fighting them. Recent "watch" entries in previous_decisions show what it did.
+- Company stocks (owner's wishes and hard limits in risk_limits): mostly big, well-known companies
+  (the technical table includes about 60 of them; others you name are vetted), at most 10% each.
+  The owner also wants some risk in smaller companies you believe can grow explosively: at most 5%
+  each and 10% together, and only with a concrete catalyst (product launch, contract, approval,
+  accelerating sales) you found in your research, never hype. All single stocks together: at most
+  40%. Earnings rule: a company can fall 10-20% overnight on a bad report and a stop can't catch
+  that gap, so for every stock give its next earnings date in `next_earnings` (YYYY-MM-DD, checked
+  with web search). Code will not add to a stock that reports within 3 trading days, or whose date
+  you leave unknown. Single stocks get a 10% trailing stop (ETFs 6%).
 - Positions you omit are sold. To keep a position, include it again with its weight.
 - Small weight changes are ignored by a rebalance band, so do not fiddle with weights.
 - Leveraged and inverse ETFs reset daily and decay in choppy markets; use them only for short,
   high-conviction tactical views, and expect them to be capped.
 
-Inputs you get each day: current holdings and P&L, a technical table for the ETF universe (returns,
+Inputs you get each day: current holdings and P&L, a technical table for the ETF and big-stock universe (returns,
 trend vs moving averages, RSI, MACD, volatility, and candlestick patterns on the latest bar),
 recent headlines, your previous decisions, and performance versus SPY so far.
 
@@ -81,7 +90,8 @@ Discipline:
 FINISH_API = "When your research is done, call the submit_decision tool exactly once with your final decision."
 FINISH_SUBSCRIPTION = (
     "Before deciding, you MUST research with the WebSearch tool: run at least 3 searches covering "
-    "today's market-moving news, macro/central-bank developments, and any ETF you are considering. "
+    "today's market-moving news, macro/central-bank developments, and any ETF or stock you are considering "
+    "(for stocks: recent news and the next earnings date). "
     "Never skip this step. When your research is done, reply with your final decision in the required JSON format, "
     "listing the most useful web pages you read in `sources`."
 )
@@ -104,7 +114,7 @@ DECISION_TOOL = {
             },
             "positions": {
                 "type": "array",
-                "description": "Target weights (0-1) for every ETF to hold besides the idle asset.",
+                "description": "Target weights (0-1) for every ETF and stock to hold besides the idle asset.",
                 "items": {
                     "type": "object",
                     "properties": {
@@ -116,8 +126,11 @@ DECISION_TOOL = {
                         "plain_reason": {"type": "string", "description": (
                             "Why you hold it, in one short sentence (max 15 words) a complete beginner "
                             "understands. No jargon or ticker codes.")},
+                        "next_earnings": {"type": "string", "description": (
+                            "Single stocks: next earnings report date as YYYY-MM-DD (verified), or 'unknown'. "
+                            "ETFs: 'n/a'.")},
                     },
-                    "required": ["symbol", "weight", "thesis", "signals", "exit_plan", "plain_reason"],
+                    "required": ["symbol", "weight", "thesis", "signals", "exit_plan", "plain_reason", "next_earnings"],
                     "additionalProperties": False,
                 },
             },
@@ -125,7 +138,7 @@ DECISION_TOOL = {
                 "Today's decision in one short sentence (max 20 words) for a complete beginner. No jargon.")},
             "exits": {
                 "type": "array",
-                "description": "Every ETF you are selling or reducing today, with a beginner-friendly reason.",
+                "description": "Every ETF or stock you are selling or reducing today, with a beginner-friendly reason.",
                 "items": {
                     "type": "object",
                     "properties": {
@@ -319,10 +332,12 @@ def _sources(content) -> list[dict]:
 
 
 REVIEW_PROMPT = """\
-You approve or reject intraday buy ideas for a small automated ETF portfolio whose goal is to beat
-the S&P 500. A rules-based watcher flagged these ETFs because several technical signals agree right
+You approve or reject intraday buy ideas for a small automated portfolio of ETFs and big company
+stocks whose goal is to beat the S&P 500. A rules-based watcher flagged these because several technical signals agree right
 now (trend, today's rise, VWAP, 15-minute candles, volume, 20-day high). Each buy would be about
-8% of the portfolio, funded by selling the idle asset (SSO), and protected by a 6% trailing stop.
+8% of the portfolio, funded by selling the idle asset (SSO), and protected by a trailing stop (6% for
+ETFs, 10% for stocks). Always reject a company stock that reports earnings within the next 3 trading
+days (check the date with web search): a bad report can drop it 10-20% overnight.
 
 Approve only if the move looks like it has real support (news, sector rotation, macro) and is not a
 likely fake-out, exhaustion spike or event about to reverse it; check quickly with web search if

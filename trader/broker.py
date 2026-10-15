@@ -13,7 +13,7 @@ from alpaca.trading.requests import GetCalendarRequest, GetPortfolioHistoryReque
 
 from .config import Config
 from .risk import Order
-from .universe import CORE_ETFS, is_leveraged, looks_like_fund
+from .universe import BIG_STOCKS, CORE_ETFS, is_leveraged, looks_like_fund
 
 log = logging.getLogger(__name__)
 
@@ -60,16 +60,21 @@ class Broker:
                 self._assets[symbol] = None
         return self._assets[symbol]
 
-    def vet_etf(self, symbol: str) -> tuple[bool, bool, str]:
-        """(ok, leveraged, reason) for an ETF Claude wants to trade."""
+    def vet(self, symbol: str) -> tuple[bool, bool, str, str]:
+        """(ok, leveraged, kind, reason) for any ETF or stock Claude wants to trade.
+
+        kind is "etf", "big" (a big, well-known company) or "small" (any other company).
+        """
         a = self.asset(symbol)
         if a is None:
-            return False, False, "unknown symbol"
+            return False, False, "", "unknown symbol"
         if a.status != AssetStatus.ACTIVE or not a.tradable or a.asset_class != AssetClass.US_EQUITY:
-            return False, False, "not active/tradable"
-        if symbol not in CORE_ETFS and not looks_like_fund(a.name or ""):
-            return False, False, f"'{a.name}' does not look like an ETF"
-        return True, is_leveraged(symbol, a.name or ""), ""
+            return False, False, "", "not active/tradable"
+        if symbol in CORE_ETFS or looks_like_fund(a.name or ""):
+            return True, is_leveraged(symbol, a.name or ""), "etf", ""
+        if str(getattr(a.exchange, "value", a.exchange)).upper() in ("OTC", ""):
+            return False, False, "", "only trades over the counter"
+        return True, False, "big" if symbol in BIG_STOCKS else "small", ""
 
     def execute(self, orders: list[Order], prices: dict[str, float], positions: dict[str, dict]) -> list[dict]:
         """Submit sells, wait for them to settle into buying power, then buys."""

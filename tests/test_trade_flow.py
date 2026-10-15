@@ -46,8 +46,10 @@ class FakeBroker:
     def positions(self):
         return {}
 
-    def vet_etf(self, s):
-        return (False, False, "unknown symbol") if s == "NOPE" else (True, False, "")
+    def vet(self, s):
+        if s == "NOPE":
+            return False, False, "", "unknown symbol"
+        return True, False, ("small" if s == "TINY" else "etf"), ""
 
     def execute(self, orders, prices, positions):
         self.sent = orders
