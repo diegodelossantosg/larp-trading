@@ -1,0 +1,37 @@
+name: Backtest overnight trades
+
+# Tests buying near the close and selling the next morning, many variations, after costs.
+on:
+  workflow_dispatch:
+    inputs:
+      years:
+        description: "How many years of 5-minute history"
+        default: "3"
+
+permissions:
+  contents: write
+
+jobs:
+  overnight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      ALPACA_API_KEY: ${{ secrets.ALPACA_API_KEY }}
+      ALPACA_SECRET_KEY: ${{ secrets.ALPACA_SECRET_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: ./setup.sh
+      - run: python -m trader.overnight_backtest --years ${{ inputs.years }}
+      - name: Save results
+        run: |
+          git config user.name "trading-agent"
+          git config user.email "trading-agent@users.noreply.github.com"
+          git add docs/data/overnight_backtest.json
+          git commit -q -m "Backtest: overnight, ${{ inputs.years }} years"
+          for i in 1 2 3; do git pull -q --rebase origin main && git push -q origin HEAD:main && exit 0; sleep 5; done
+          exit 1
