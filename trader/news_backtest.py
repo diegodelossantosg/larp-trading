@@ -87,7 +87,8 @@ def _measure(px: pd.DataFrame, spy: pd.DataFrame, ts: pd.Timestamp, pc: dict, sc
         return None
     before, entry = px["close"].iloc[i0], px["open"].iloc[i1]
     spy_before, spy_entry = spy["close"].iloc[s0], spy["open"].iloc[s1]
-    out = {"reaction": float((entry / before) - (spy_entry / spy_before))}
+    out = {"reaction": float((entry / before) - (spy_entry / spy_before)), "day": str(ts.date()),
+           "entry_price": float(entry), "spy_entry": float(spy_entry)}
     k = bisect.bisect_left(pc["days"], ts.date())
     for name, h in HORIZONS.items():
         if k + h >= len(pc["days"]):
