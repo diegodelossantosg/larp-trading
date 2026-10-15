@@ -1,0 +1,88 @@
+{
+ "days": 751,
+ "first_day": "2023-10-17",
+ "last_day": "2026-10-14",
+ "symbols": [
+  "DIA",
+  "GLD",
+  "IWM",
+  "QLD",
+  "QQQ",
+  "SMH",
+  "SPY",
+  "SSO",
+  "TLT",
+  "XBI",
+  "XLE",
+  "XLF",
+  "XLI",
+  "XLK",
+  "XLV",
+  "XLY"
+ ],
+ "pot_start": 200.0,
+ "spy_hold_end": 366.01,
+ "strategies": {
+  "orb30": {
+   "trades": 7339,
+   "trades_per_day": 9.77,
+   "win_rate_after_costs": 0.445,
+   "avg_gross_pct": 0.0141,
+   "avg_net_pct": -0.045,
+   "t_stat_net": -5.01,
+   "pot_end": 88.54,
+   "pot_yearly_pct": -23.9
+  },
+  "orb30_trend": {
+   "trades": 5134,
+   "trades_per_day": 6.84,
+   "win_rate_after_costs": 0.436,
+   "avg_gross_pct": 0.0,
+   "avg_net_pct": -0.0589,
+   "t_stat_net": -7.38,
+   "pot_end": 112.46,
+   "pot_yearly_pct": -17.6
+  },
+  "morning_momentum": {
+   "trades": 3446,
+   "trades_per_day": 4.59,
+   "win_rate_after_costs": 0.47,
+   "avg_gross_pct": -0.0156,
+   "avg_net_pct": -0.0782,
+   "t_stat_net": -5.73,
+   "pot_end": 108.63,
+   "pot_yearly_pct": -18.5
+  },
+  "last_half_hour": {
+   "trades": 6560,
+   "trades_per_day": 8.74,
+   "win_rate_after_costs": 0.381,
+   "avg_gross_pct": 0.0056,
+   "avg_net_pct": -0.054,
+   "t_stat_net": -16.43,
+   "pot_end": 142.88,
+   "pot_yearly_pct": -10.7
+  },
+  "dip_buy": {
+   "trades": 676,
+   "trades_per_day": 0.9,
+   "win_rate_after_costs": 0.493,
+   "avg_gross_pct": -0.0129,
+   "avg_net_pct": -0.0798,
+   "t_stat_net": -1.96,
+   "pot_end": 149.85,
+   "pot_yearly_pct": -9.2
+  },
+  "baseline": {
+   "trades": 11967,
+   "trades_per_day": 15.93,
+   "win_rate_after_costs": 0.498,
+   "avg_gross_pct": 0.0162,
+   "avg_net_pct": -0.0438,
+   "t_stat_net": -4.68,
+   "pot_end": 161.76,
+   "pot_yearly_pct": -6.9
+  }
+ },
+ "generated": "2026-10-15T09:20+00:00"
+}
