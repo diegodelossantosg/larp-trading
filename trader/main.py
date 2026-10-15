@@ -16,7 +16,7 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 
 from . import journal
-from .brain import claude_available, decide, review_buys
+from .brain import claude_available, decide, hunt_news, review_buys
 from .broker import Broker
 from .config import load_config
 from .indicators import summarize
@@ -94,7 +94,7 @@ def _recent_watch_buys(days: int) -> set[str]:
 
     cutoff = (pd.Timestamp(_today()) - pd.offsets.BDay(days)).strftime("%Y-%m-%d")
     return {o["symbol"] for d in journal.read("decisions.json", [])
-            if d.get("source") == "watch" and not d.get("dry_run") and d["date"] > cutoff
+            if d.get("source") in ("watch", "news") and not d.get("dry_run") and d["date"] > cutoff
             for o in d.get("orders", []) if o["side"] == "buy" and o.get("status") not in ("error", "skipped")}
 
 
@@ -456,10 +456,132 @@ def _review(cfg, orders, quotes, positions, acct, candidates):
     return stops + funding + approved, notes
 
 
+NEWS_BUY_SIZE = 0.05  # share of the agent's money per News Hunter buy
+NEWS_MAX_BUYS_PER_DAY = 2
+
+
+def news(cfg, broker: Broker, market: Market, dry_run: bool, force: bool = False) -> int:
+    """Hourly News Hunter: Opus reads the latest headlines and may buy what it thinks isn't priced in."""
+    if not force and not broker.market_open():
+        log.info("market closed; nothing to do")
+        return 0
+    if cfg.capital_usd and journal.read("capital.json", None) is None:
+        log.info("waiting for the first daily run to set up the agent's capital")
+        return 0
+    if not claude_available(cfg):
+        log.info("News Hunter needs Claude; skipping")
+        return 0
+    positions = broker.positions()
+    acct = _account(cfg, broker, positions)
+    history = journal.read("equity.json", [])
+    if drawdown([r["equity"] for r in history] + [acct["equity"]]) >= cfg.max_drawdown_halt:
+        log.error("halted by drawdown limit; News Hunter does nothing")
+        return 1
+    today = _today()
+    state = journal.read("news.json", {})
+    used = state.get("buys", {}).get(today, 0)
+    if used >= NEWS_MAX_BUYS_PER_DAY:
+        log.info("News Hunter already made %d buys today", used)
+        return 0
+    headlines = market.news(hours=2, limit=50)
+    if not headlines:
+        log.info("no fresh headlines")
+        return 0
+
+    equity = acct["equity"] or 1
+    weights = {s: p["market_value"] / equity for s, p in positions.items()}
+    mentioned = sorted({s for h in headlines for s in h["symbols"] if s.isalpha() and len(s) <= 5})[:40]
+    quotes = market.quotes(sorted(set(mentioned) | {"SPY"})) if mentioned else {}
+    last = next((d for d in reversed(journal.read("decisions.json", [])) if d.get("market_view")), {})
+    context = {
+        "now_new_york": datetime.now(ET).strftime("%Y-%m-%d %H:%M"),
+        "headlines": headlines,
+        "prices_of_mentioned": {s: {"price": q.price, "change_today_pct": round((q.price / q.prev_close - 1) * 100, 2)}
+                                for s, q in quotes.items()},
+        "holdings": {s: round(w, 3) for s, w in weights.items()},
+        "todays_market_view": last.get("market_view"),
+        "buys_left_today": NEWS_MAX_BUYS_PER_DAY - used,
+    }
+    data, error = hunt_news(cfg, context)
+    record = {"date": today, "time": datetime.now(ET).strftime("%H:%M"), "source": "news", "dry_run": dry_run,
+              "orders": [], "notes": []}
+    if data is None:
+        log.error("News Hunter failed: %s", error)
+        return 1
+    record["plain_summary"] = data.get("summary", "")
+    record["ideas"] = data.get("ideas", [])
+
+    size = NEWS_BUY_SIZE * equity
+    stocks_total = sum(w for s, w in weights.items() if s in BIG_STOCKS or (s not in CORE_ETFS and broker.vet(s)[2] in ("big", "small")))
+    small_total = sum(w for s, w in weights.items() if s not in CORE_ETFS and s not in BIG_STOCKS and broker.vet(s)[2] == "small")
+    buys: list[Order] = []
+    for idea in data.get("ideas", [])[: NEWS_MAX_BUYS_PER_DAY - used]:
+        sym = idea["symbol"].upper().strip()
+        ok, lev, kind, why = broker.vet(sym)
+        if ok and lev:
+            ok, why = False, "leveraged or inverse fund"
+        if ok:
+            df = market.daily_bars([sym]).get(sym)
+            t = summarize(df) if df is not None and len(df) > 30 else None
+            if t is None:
+                ok, why = False, "no price history"
+            elif kind == "small" and t["price"] < MIN_SMALL_STOCK_PRICE:
+                ok, why = False, f"price ${t['price']} is too low (penny stock)"
+            elif t["avg_dollar_vol_m"] < (MIN_SMALL_STOCK_DOLLAR_VOLUME_M if kind == "small" else MIN_DOLLAR_VOLUME_M):
+                ok, why = False, f"too illiquid (${t['avg_dollar_vol_m']}M/day)"
+        if ok and kind in ("big", "small"):
+            _, notes = earnings_blackout({sym: weights.get(sym, 0) + NEWS_BUY_SIZE}, weights, {sym},
+                                         {sym: idea.get("next_earnings", "")}, today, cfg.earnings_blackout_days)
+            if notes:
+                ok, why = False, notes[0].replace(f"didn't add to {sym}: ", "")
+        cap = {"big": cfg.max_stock_weight, "small": cfg.max_small_stock_weight}.get(kind, cfg.max_position_weight)
+        room = cap - weights.get(sym, 0.0)
+        if kind in ("big", "small"):
+            room = min(room, cfg.max_stocks_total - stocks_total)
+        if kind == "small":
+            room = min(room, cfg.max_small_stocks_total - small_total)
+        amount = min(size, room * equity)
+        if ok and amount < cfg.min_order_usd:
+            ok, why = False, "already at its size limit"
+        if not ok:
+            record["notes"].append(f"skipped {sym}: {why}")
+            continue
+        buys.append(Order(sym, "buy", round(amount, 2), idea["plain_reason"]))
+        if kind in ("big", "small"):
+            stocks_total += amount / equity
+        if kind == "small":
+            small_total += amount / equity
+    orders = rules.fund_buys(buys, equity=acct["equity"], cash=acct["cash"],
+                             idle_value=positions.get(cfg.idle_asset, {}).get("market_value", 0.0),
+                             idle_asset=cfg.idle_asset)
+    if orders:
+        prices = {s: q.price for s, q in quotes.items()}
+        for o in orders:
+            if o.symbol not in prices:
+                q = market.quotes([o.symbol]).get(o.symbol)
+                if q:
+                    prices[o.symbol] = q.price
+        if dry_run or not cfg.trading_enabled:
+            record["orders"] = [{"symbol": o.symbol, "side": o.side, "notional": o.notional, "reason": o.reason,
+                                 "status": "not sent"} for o in orders]
+        else:
+            record["orders"] = broker.execute(orders, prices, positions)
+            scorecard.record(record["orders"], "news", prices, prices.get("SPY"), today, cfg.idle_asset)
+        n = sum(1 for o in record["orders"] if o["side"] == "buy" and o["status"] not in ("error", "skipped", "not sent"))
+        journal.write("news.json", {"buys": {today: used + n}})
+        positions = broker.positions()
+        _write_status(cfg, _account(cfg, broker, positions), positions, history)
+    journal.append_decision(record)
+    log.info("News Hunter: %s", record["plain_summary"])
+    for o in record["orders"]:
+        log.info("%s %s $%.2f -> %s (%s)", o["side"], o["symbol"], o["notional"], o["status"], o.get("reason", ""))
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     parser = argparse.ArgumentParser(prog="trader")
-    parser.add_argument("command", choices=["trade", "snapshot", "watch", "market-open"])
+    parser.add_argument("command", choices=["trade", "snapshot", "watch", "news", "market-open"])
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--force", action="store_true")
     args = parser.parse_args(argv)
@@ -474,6 +596,8 @@ def main(argv: list[str] | None = None) -> int:
         return 0 if broker.market_open() else 1
     if args.command == "watch":
         return watch(cfg, broker, market, args.dry_run, args.force)
+    if args.command == "news":
+        return news(cfg, broker, market, args.dry_run, args.force)
     return trade(cfg, broker, market, args.dry_run, args.force)
 
 

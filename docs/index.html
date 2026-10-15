@@ -152,6 +152,7 @@ details.log[open] > summary { margin-bottom: 8px; }
 .move { display: contents; }
 .move > span:last-child { font-size: 14px; color: var(--ink-2); }
 .chip.auto { background: rgba(237,161,0,.18); color: var(--ink); }
+.chip.news { background: rgba(214,65,140,.16); color: var(--ink); }
 h2 { display: flex; align-items: center; gap: 8px; }
 h2::before { content: ""; width: 4px; height: 18px; border-radius: 2px; background: var(--h, var(--series-1)); }
 </style>
@@ -430,17 +431,19 @@ function exitReason(t, decisions) {
     if (d.date !== t.closed_date) continue;
     const o = (d.orders || []).find((o) => o.symbol === t.symbol && o.side === "sell");
     if (!o) continue;
-    if ((o.reason || "").startsWith("trailing stop")) return "🛑 6% stop";
-    return d.source === "watch" ? "⚡ Watcher" : "🧠 Claude's decision";
+    if ((o.reason || "").startsWith("trailing stop")) return "🛑 Stop";
+    return d.source === "watch" ? "⚡ Watcher" : d.source === "news" ? "📰 News Hunter" : "🧠 Claude's decision";
   }
   return "–";
 }
+
+const SOURCE_ICON = { claude: "🧠", watch: "⚡", news: "📰" };
 
 function closedView(trades, decisions) {
   const closed = trades.filter((t) => !t.open).sort((a, b) => (b.closed_date || "").localeCompare(a.closed_date || ""));
   if (!closed.length) {
     $("closed-summary").textContent = "";
-    $("closed").innerHTML = `<div class="empty">No closed trades yet. A trade appears here once an ETF is fully sold.</div>`;
+    $("closed").innerHTML = `<div class="empty">No closed trades yet. A trade appears here once something is fully sold.</div>`;
     return;
   }
   const rows = closed.map((t) => {
@@ -450,8 +453,8 @@ function closedView(trades, decisions) {
   });
   const won = rows.filter((r) => r.usdRes > 0).length, total = rows.reduce((a, r) => a + r.usdRes, 0);
   $("closed-summary").innerHTML = `${rows.length} closed · <b class="up">${won} won</b> · <b class="down">${rows.length - won} lost</b> · total <b class="${cls(total)}">${signedUsd(total)}</b>`;
-  $("closed").innerHTML = `<table><thead><tr><th>ETF</th><th>Bought → Sold</th><th class="num">Days</th><th class="num">Invested</th><th class="num">Result $</th><th class="num">Result %</th><th class="num">vs S&amp;P</th><th>Why sold</th></tr></thead><tbody>
-  ${rows.map((r) => `<tr><td>${r.source === "watch" ? "⚡" : "🧠"} <b>${esc(r.symbol)}</b></td><td>${esc(r.date)} → ${esc(r.closed_date || "?")}</td>
+  $("closed").innerHTML = `<table><thead><tr><th>What</th><th>Bought → Sold</th><th class="num">Days</th><th class="num">Invested</th><th class="num">Result $</th><th class="num">Result %</th><th class="num">vs S&amp;P</th><th>Why sold</th></tr></thead><tbody>
+  ${rows.map((r) => `<tr><td>${SOURCE_ICON[r.source] || "🧠"} <b>${esc(r.symbol)}</b></td><td>${esc(r.date)} → ${esc(r.closed_date || "?")}</td>
     <td class="num">${r.days ?? "–"}</td><td class="num">${usd(r.amount)}</td>
     <td class="num ${cls(r.usdRes)}">${signedUsd(r.usdRes)}</td><td class="num ${cls(r.ret)}">${pct(r.ret * 100)}</td>
     <td class="num ${cls(r.vs)}">${pct(r.vs * 100)}</td><td>${exitReason(r, decisions)}</td></tr>`).join("")}
@@ -460,7 +463,7 @@ function closedView(trades, decisions) {
 
 function scorecardView(status) {
   const sc = status.scorecard || {};
-  const rows = [["claude", "🧠 Claude's daily picks"], ["watch", "⚡ Watcher buys"]].filter(([k]) => sc[k]);
+  const rows = [["claude", "🧠 Claude's daily picks"], ["watch", "⚡ Watcher buys"], ["news", "📰 News Hunter buys"]].filter(([k]) => sc[k]);
   if (!rows.length) { $("scorecard").innerHTML = `<div class="empty">Starts with the next buy.</div>`; return; }
   $("scorecard").innerHTML = `<table><thead><tr><th>Source</th><th class="num">Buys</th><th class="num">Avg return</th><th class="num">vs S&amp;P 500</th><th class="num">Beat S&amp;P</th><th class="num">$ vs S&amp;P</th></tr></thead><tbody>
   ${rows.map(([k, label]) => { const r = sc[k]; return `<tr><td><b>${label}</b></td><td class="num">${r.buys}</td>
@@ -485,7 +488,8 @@ function firstSentence(t, max = 110) {
 function plainReason(d, o, idle) {
   const r = o.reason || "";
   const buys = (d.orders || []).filter((x) => x.side === "buy").map((x) => x.symbol);
-  if (r.startsWith("trailing stop")) return "Sold to limit the loss: it dropped 6% from its best price.";
+  if (r.startsWith("trailing stop")) return `Sold to limit the loss: it dropped ${(r.match(/([\d.]+)% below/) || [])[1] || "6"}% from its best price.`;
+  if (d.source === "news" && o.side === "buy") return r || "Breaking news that should push it up.";
   if (r.startsWith("funding")) return `Sold a little to pay for ${buys.join(" and ")}.`;
   if (d.source === "watch" && o.side === "buy") {
     const claude = r.split(" · Claude: ")[1];
@@ -506,7 +510,8 @@ function decisionsView(decisions) {
   if (!real.length) { $("decisions").innerHTML = `<div class="empty">Nothing yet.</div>`; return; }
   const idle = DATA.status.idle_asset || "SSO";
   $("decisions").innerHTML = real.slice().reverse().slice(0, 40).map((d) => {
-    const who = d.source === "watch" ? `<span class="chip auto">⚡ watcher</span>` : `<span class="chip">🧠 Claude</span>`;
+    const who = d.source === "watch" ? `<span class="chip auto">⚡ watcher</span>`
+      : d.source === "news" ? `<span class="chip news">📰 News Hunter</span>` : `<span class="chip">🧠 Claude</span>`;
     const orders = (d.orders || []).filter((o) => !["error", "skipped"].includes(o.status));
     let rows;
     if (d.error) rows = `<div class="move"><span class="tag sell">Error</span><span>Something went wrong, so nothing was traded.</span></div>`;

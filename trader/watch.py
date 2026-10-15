@@ -125,6 +125,11 @@ def buy_orders(candidates: list[tuple[str, int, list[str]]], *, equity: float, c
         if sym not in held:
             n_positions += 1
         buys.append(Order(sym, "buy", round(size * equity, 2), f"{s}/6 signals: " + "; ".join(reasons)))
+    return fund_buys(buys, equity=equity, cash=cash, idle_value=idle_value, idle_asset=idle_asset)
+
+
+def fund_buys(buys: list[Order], *, equity: float, cash: float, idle_value: float, idle_asset: str) -> list[Order]:
+    """The buys plus the idle-asset sale that pays for them (buys shrink if there isn't enough)."""
     if not buys:
         return []
     need = sum(o.notional for o in buys) - max(0.0, cash - 0.01 * equity)
@@ -136,5 +141,5 @@ def buy_orders(candidates: list[tuple[str, int, list[str]]], *, equity: float, c
         scale = (total - (need - sell)) / total
         buys = [Order(o.symbol, o.side, round(o.notional * scale, 2), o.reason) for o in buys if o.notional * scale >= 5]
     if sell >= 5 and buys:
-        return [Order(idle_asset, "sell", round(sell, 2), "funding the watcher's buys")] + buys
+        return [Order(idle_asset, "sell", round(sell, 2), "funding the buys")] + buys
     return buys

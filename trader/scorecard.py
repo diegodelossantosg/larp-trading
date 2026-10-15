@@ -45,7 +45,7 @@ def update(prices: dict[str, float], spy_price: float | None, held: set[str], da
 
 def summary(rows: list[dict]) -> dict[str, dict]:
     out: dict[str, dict] = {}
-    for source in ("claude", "watch"):
+    for source in ("claude", "watch", "news"):
         mine = [r for r in rows if r["source"] == source]
         if not mine:
             continue
