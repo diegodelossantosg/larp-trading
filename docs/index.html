@@ -301,8 +301,12 @@ function chart(equity, emptyMsg = "Starts after day 2.") {
     $("chart-table").innerHTML = "";
     return;
   }
-  const base = equity[0].equity;
-  const rows = equity.map((r) => ({ date: r.date, agent: r.equity, spy: base * r.spy_close / equity[0].spy_close }));
+  // S&P 500 line: what the starting capital would be worth had it gone into SPY on day one.
+  const { capital, spy_start } = DATA.status;
+  const fromStart = capital && spy_start;
+  const base = fromStart ? capital : equity[0].equity;
+  const spyBase = fromStart ? spy_start : equity[0].spy_close;
+  const rows = equity.map((r) => ({ date: r.date, agent: r.equity, spy: base * r.spy_close / spyBase }));
   const W = Math.max(300, el.clientWidth), H = W < 600 ? 240 : Math.min(520, Math.max(340, Math.round(W * 0.42))), m = { t: 12, r: 70, b: 28, l: 64 };
   const xs = (i) => m.l + (i / (rows.length - 1)) * (W - m.l - m.r);
   const vals = rows.flatMap((r) => [r.agent, r.spy]);

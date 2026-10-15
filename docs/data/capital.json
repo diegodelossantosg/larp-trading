@@ -1,5 +1,6 @@
 {
  "capital": 1000.0,
  "baseline_equity": 100000.0,
- "started": "2026-10-12"
+ "started": "2026-10-12",
+ "spy_start": 779.38
 }

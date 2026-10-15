@@ -56,6 +56,11 @@ def _write_intraday(cfg, broker: Broker, market: Market) -> None:
               for t, (_, e), p in zip(ts, hist, spy_at.to_numpy())]
     days = sorted({p[0][:10] for p in points})[-5:]
     journal.write("intraday.json", {"points": [p for p in points if p[0][:10] in days]})
+    if state is not None and "spy_start" not in state:
+        # SPY's price when the capital started, so the chart can show what the same money in the S&P 500 is worth.
+        first = next((p for p in points if p[0][:10] >= state.get("started", "") and p[2] is not None), None)
+        if first:
+            journal.write("capital.json", {**state, "spy_start": first[2]})
 
 
 def _recent_watch_buys(days: int) -> set[str]:
@@ -125,6 +130,7 @@ def _write_status(cfg, acct: dict, positions: dict, rows: list[dict]) -> None:
         "updated": datetime.now(ET).isoformat(timespec="minutes"),
         "mode": "paper" if cfg.paper else "LIVE",
         "capital": cfg.capital_usd,
+        "spy_start": (journal.read("capital.json", None) or {}).get("spy_start"),
         "idle_asset": cfg.idle_asset,
         "model": cfg.claude_model,
         "equity": round(acct["equity"], 2),
