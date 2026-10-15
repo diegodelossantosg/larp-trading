@@ -19,14 +19,12 @@ log = logging.getLogger(__name__)
 FEEDS: dict[str, str] = {
     # Companies announce here first (contracts, approvals, results, deals).
     "PR Newswire": "https://www.prnewswire.com/rss/news-releases-list.rss",
-    "GlobeNewswire": "https://www.globenewswire.com/RssFeed/orgclass/1/feedTitle/GlobeNewswire%20-%20News%20about%20Public%20Companies",
     "Business Wire": "https://feed.businesswire.com/rss/home/?rss=G1QFDERJXkJeGVtRWA==",
     # Official filings: an 8-K is filed within days of any major company event, often before the press.
     "SEC 8-K filings": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcurrent&type=8-K&count=40&output=atom",
     # Market news.
     "CNBC": "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=100003114",
     "MarketWatch": "https://feeds.content.dowjones.io/public/rss/mw_topstories",
-    "Yahoo Finance": "https://finance.yahoo.com/news/rssindex",
     "Seeking Alpha market news": "https://seekingalpha.com/market_currents.xml",
     # Policy: central bank and the White House.
     "Federal Reserve": "https://www.federalreserve.gov/feeds/press_all.xml",
@@ -35,6 +33,8 @@ FEEDS: dict[str, str] = {
 
 PER_SOURCE = 15
 USER_AGENT = "Mozilla/5.0 (compatible; larp-trading-news/1.0; paper-trading research)"
+# The SEC asks automated readers to say who they are; point it at the project page.
+SEC_USER_AGENT = "larp-trading paper-trading research github.com/diegodelossantosg/larp-trading"
 _TICKER = re.compile(r"\((?:NASDAQ|NYSE|NYSE American|NYSE Arca|AMEX|Nasdaq|NasdaqGS|NasdaqGM|OTCQX|CBOE)\s*:\s*([A-Z.]{1,6})\)")
 _TAG = re.compile(r"<[^>]+>")
 
@@ -92,7 +92,8 @@ def fetch_all(hours: float = 2, timeout: float = 8) -> tuple[list[dict], dict[st
     headlines, status = [], {}
     for name, url in FEEDS.items():
         try:
-            req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+            agent = SEC_USER_AGENT if "sec.gov" in url else USER_AGENT
+            req = urllib.request.Request(url, headers={"User-Agent": agent, "Accept-Encoding": "identity"})
             with urllib.request.urlopen(req, timeout=timeout) as resp:
                 items = parse(resp.read(), name, since)
             headlines += items

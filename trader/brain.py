@@ -432,9 +432,9 @@ any of them is a real, still-tradeable opportunity to BUY: news that should push
 stock up over the next days, which the market has NOT fully priced in yet.
 
 Your headlines come from several places: Alpaca's real-time feed (Benzinga), company press-release
-wires (PR Newswire, GlobeNewswire, Business Wire), fresh SEC 8-K filings (official notices of major
-company events; they name the company, not the ticker), market news (CNBC, MarketWatch, Yahoo
-Finance, Seeking Alpha) and policy news (Federal Reserve, White House). A press release or filing
+wires (PR Newswire, Business Wire), fresh SEC 8-K filings (official notices of major
+company events; they name the company, not the ticker), market news (CNBC, MarketWatch,
+Seeking Alpha) and policy news (Federal Reserve, White House). A press release or filing
 that the price hasn't reacted to yet is the best kind of opportunity; for 8-Ks, look up what was filed.
 
 Be realistic: professional traders react to headlines within seconds, so by the time you read one,
