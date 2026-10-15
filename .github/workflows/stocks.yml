@@ -1,4 +1,4 @@
-name: Backtest: ETFs only vs ETFs + company stocks
+name: "Backtest ETFs only vs ETFs + company stocks"
 
 # Compares the old way (ETFs only) with the new way (ETFs + company stocks) on past data.
 on:
