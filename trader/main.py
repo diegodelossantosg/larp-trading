@@ -494,14 +494,20 @@ def news(cfg, broker: Broker, market: Market, dry_run: bool, force: bool = False
     equity = acct["equity"] or 1
     weights = {s: p["market_value"] / equity for s, p in positions.items()}
     mentioned = sorted({s for h in headlines for s in h["symbols"] if s.isalpha() and len(s) <= 5})[:40]
-    quotes = market.quotes(sorted(set(mentioned) | {"SPY"})) if mentioned else {}
+    quotes = market.quotes(sorted(set(mentioned) | set(BIG_STOCKS) | {"SPY"}))
+    spy_move = quotes["SPY"].price / quotes["SPY"].prev_close - 1 if "SPY" in quotes else 0.0
+    vs_spy = {s: q.price / q.prev_close - 1 - spy_move for s, q in quotes.items() if s in BIG_STOCKS}
+    big_moves = sorted((s for s, m in vs_spy.items() if abs(m) >= 0.02), key=lambda s: vs_spy[s])[:15]
     last = next((d for d in reversed(journal.read("decisions.json", [])) if d.get("market_view")), {})
     context = {
         "now_new_york": datetime.now(ET).strftime("%Y-%m-%d %H:%M"),
         "headlines": headlines,
         "news_sources_status": {"Alpaca (Benzinga)": f"ok ({len(headlines) - len(extra)})", **sources},
         "prices_of_mentioned": {s: {"price": q.price, "change_today_pct": round((q.price / q.prev_close - 1) * 100, 2)}
-                                for s, q in quotes.items()},
+                                for s, q in quotes.items() if s in mentioned},
+        "spy_change_today_pct": round(spy_move * 100, 2),
+        "big_company_moves_today": {s: {"name": BIG_STOCKS[s], "vs_spy_today_pct": round(vs_spy[s] * 100, 2)}
+                                    for s in big_moves},
         "holdings": {s: round(w, 3) for s, w in weights.items()},
         "todays_market_view": last.get("market_view"),
         "buys_left_today": NEWS_MAX_BUYS_PER_DAY - used,
