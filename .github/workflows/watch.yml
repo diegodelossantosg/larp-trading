@@ -67,9 +67,14 @@ jobs:
           # the only file of the "live" branch. That branch doesn't rebuild the GitHub Pages site, and
           # the dashboard reads it through the GitHub API, so it can refresh every minute.
           publish_live() {
+            # live.json for the GitHub API (always fresh, 60 requests/hour per visitor) plus one copy per
+            # minute, m-HHMM.json, for plain file links (cached 5 minutes, but each minute has a new name).
             python -m trader.live > /tmp/live.json || return 0
-            blob=$(git hash-object -w /tmp/live.json)
-            tree=$(printf "100644 blob %s\tlive.json\n" "$blob" | git mktree)
+            mkdir -p /tmp/livem && cp /tmp/live.json "/tmp/livem/m-$(date -u +%H%M).json"
+            ls -1 /tmp/livem | sort | head -n -10 | while read -r old; do rm -f "/tmp/livem/$old"; done
+            tree=$( { printf "100644 blob %s\tlive.json\n" "$(git hash-object -w /tmp/live.json)"
+                      for f in /tmp/livem/*.json; do printf "100644 blob %s\t%s\n" "$(git hash-object -w "$f")" "$(basename "$f")"; done
+                    } | git mktree)
             commit=$(git commit-tree "$tree" -m "live $(date -u +%H:%M)")
             git push -q -f origin "$commit:refs/heads/live" || echo "live push failed"
           }

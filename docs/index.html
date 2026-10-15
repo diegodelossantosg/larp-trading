@@ -532,16 +532,35 @@ function decisionsView(decisions) {
   } catch {}
 }
 
-// Live refresh: the watcher publishes live.json every minute on the "live" branch; the GitHub API
-// serves it fresh (the normal file links are cached for 5 minutes). The API allows 60 requests an
-// hour per visitor, so poll about once a minute and only while the tab is visible.
+// Live refresh: the watcher publishes live.json every minute on the "live" branch. The GitHub API
+// serves it fresh but allows only 60 requests an hour per visitor; when that runs out (or fails),
+// read the per-minute copy m-HHMM.json from a plain file link instead (new name every minute, so
+// the 5-minute file cache never serves an old one).
 const LIVE = "https://api.github.com/repos/diegodelossantosg/larp-trading/contents/live.json?ref=live";
+const LIVE_RAW = "https://raw.githubusercontent.com/diegodelossantosg/larp-trading/live/";
+let lastLive = 0, apiBlockedUntil = 0;
+async function fetchLive() {
+  if (Date.now() > apiBlockedUntil) {
+    try {
+      const r = await fetch(LIVE, { headers: { Accept: "application/vnd.github.raw" }, cache: "no-store" });
+      if (r.ok) return await r.json();
+      const reset = Number(r.headers.get("x-ratelimit-reset"));
+      apiBlockedUntil = reset ? reset * 1000 : Date.now() + 10 * 60000;
+    } catch {}
+  }
+  for (let back = 1; back <= 4; back++) {  // the newest minute that has surely been published
+    const t = new Date(Date.now() - back * 60000);
+    const name = `m-${String(t.getUTCHours()).padStart(2, "0")}${String(t.getUTCMinutes()).padStart(2, "0")}.json`;
+    try { const r = await fetch(LIVE_RAW + name); if (r.ok) return await r.json(); } catch {}
+  }
+  return null;
+}
 async function refreshLive() {
-  if (document.visibilityState !== "visible") return;
+  if (document.visibilityState !== "visible" || Date.now() - lastLive < 50000) return;
+  lastLive = Date.now();
   try {
-    const r = await fetch(LIVE, { headers: { Accept: "application/vnd.github.raw" }, cache: "no-store" });
-    if (!r.ok) return;
-    const live = await r.json();
+    const live = await fetchLive();
+    if (!live) return;
     const st = live.status || {};
     if (st.updated && (!DATA.status.updated || new Date(st.updated) >= new Date(DATA.status.updated))) DATA.status = st;
     const pts = (DATA.intraday.points || []).slice();
