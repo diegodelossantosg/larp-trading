@@ -140,10 +140,10 @@ def build(intraday: dict[str, pd.DataFrame], daily: dict[str, pd.DataFrame]):
                     o[0] >= prev * 1.003 and price > o[0],
                     f["vol_trend"] > 1.2,
                 ))
-                meta.append((sym, day, k, ts))
+                meta.append((sym, day, k, ts, f["rsi"], f["vol_trend"], f["atr_pct"]))
         log.info("signals: %s done (%d rows so far)", sym, len(rows))
     sig = np.array(rows, dtype=bool)
-    meta = pd.DataFrame(meta, columns=["sym", "day", "k", "ts"])
+    meta = pd.DataFrame(meta, columns=["sym", "day", "k", "ts", "rsi", "vol_trend", "atr_pct"])
     return sig, meta
 
 
