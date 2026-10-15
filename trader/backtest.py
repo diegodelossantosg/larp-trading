@@ -23,7 +23,7 @@ from datetime import datetime, timedelta, timezone
 import pandas as pd
 
 from .indicators import atr_pct, candlestick_patterns
-from .universe import CORE_ETFS, LEVERAGED
+from .universe import BIG_STOCKS, CORE_ETFS, LEVERAGED
 from .watch import Quote, score
 
 log = logging.getLogger("backtest")
@@ -74,14 +74,18 @@ def simulate_exit(path: pd.Series, entry_pos: int, trail: float, max_days: int) 
 
 
 def run(intraday: dict[str, pd.DataFrame], daily: dict[str, pd.DataFrame], *, min_scores=(4, 5, 6),
-        horizons=(3, 5, 10), trail=0.06, max_buys_per_day=4) -> dict:
+        horizons=(3, 5, 10), trail=0.06, max_buys_per_day=4, universe=None, stock_trail=0.10) -> dict:
+    """`universe` limits which symbols may be bought (default: the core ETFs). Stocks in it use
+    `stock_trail` as their trailing stop."""
     import numpy as np
+
+    universe = set(CORE_ETFS) if universe is None else set(universe)
 
     spy = intraday["SPY"]
     days = sorted({ts.date() for ts in spy.index})
     signals: dict[int, list[tuple]] = {m: [] for m in min_scores}
     by_day = {sym: {d: g for d, g in df.groupby(df.index.date)} for sym, df in intraday.items()
-              if sym not in LEVERAGED and sym in CORE_ETFS and sym in daily}
+              if sym not in LEVERAGED and (sym in universe or sym == "SPY") and sym in daily}
     daily_dates = {sym: np.array([ts.date() for ts in daily[sym].index]) for sym in by_day}
     for day in days:
         feats, todays = {}, {}
@@ -119,27 +123,37 @@ def run(intraday: dict[str, pd.DataFrame], daily: dict[str, pd.DataFrame], *, mi
                 path = intraday[sym]["close"]
                 pos = path.index.get_loc(entry_ts)
                 entry = float(intraday[sym]["open"].iloc[pos])
-                exit_pos, why = simulate_exit(path, pos, trail, h)
+                exit_pos, why = simulate_exit(path, pos, stock_trail if sym in BIG_STOCKS else trail, h)
                 exit_ts, exit_px = path.index[exit_pos], float(path.iloc[exit_pos])
                 spy_in = float(spy_close.asof(entry_ts))
                 spy_out = float(spy_close.asof(exit_ts))
                 ret = exit_px / entry - 1
-                trades.append({"symbol": sym, "entry": str(entry_ts), "exit": str(exit_ts), "why": why,
+                trades.append({"symbol": sym, "stock": sym in BIG_STOCKS, "entry": str(entry_ts), "exit": str(exit_ts), "why": why,
                                "ret": ret, "excess": ret - (spy_out / spy_in - 1)})
-            ex = [t["excess"] for t in trades]
-            results[f"score>={m}, hold<={h}d"] = {
-                "trades": len(trades),
-                "avg_return_pct": round(statistics.mean([t["ret"] for t in trades]) * 100, 3) if trades else None,
-                "avg_vs_spy_pct": round(statistics.mean(ex) * 100, 3) if ex else None,
-                "median_vs_spy_pct": round(statistics.median(ex) * 100, 3) if ex else None,
-                "beat_spy_rate": round(sum(e > 0 for e in ex) / len(ex), 3) if ex else None,
-                "t_stat": round(statistics.mean(ex) / (statistics.stdev(ex) / len(ex) ** 0.5), 2) if len(ex) > 2 and statistics.stdev(ex) > 0 else None,
-                "stopped_out_rate": round(sum(t["why"] == "stop" for t in trades) / len(trades), 3) if trades else None,
-            }
+            results[f"score>={m}, hold<={h}d"] = _stats(trades)
+            stock_trades = [t for t in trades if t["stock"]]
+            if stock_trades:
+                results[f"score>={m}, hold<={h}d"]["stocks_only"] = _stats(stock_trades)
     return results
 
 
-def fetch(months: int) -> tuple[dict, dict]:
+def _stats(trades: list[dict]) -> dict:
+    ex = [t["excess"] for t in trades]
+    if not trades:
+        return {"trades": 0}
+    sd = statistics.stdev(ex) if len(ex) > 2 else 0
+    return {
+        "trades": len(trades),
+        "avg_return_pct": round(statistics.mean([t["ret"] for t in trades]) * 100, 3),
+        "avg_vs_spy_pct": round(statistics.mean(ex) * 100, 3),
+        "median_vs_spy_pct": round(statistics.median(ex) * 100, 3),
+        "beat_spy_rate": round(sum(e > 0 for e in ex) / len(ex), 3),
+        "t_stat": round(statistics.mean(ex) / (sd / len(ex) ** 0.5), 2) if sd > 0 else None,
+        "stopped_out_rate": round(sum(t["why"] == "stop" for t in trades) / len(trades), 3),
+    }
+
+
+def fetch(months: int, symbols: list[str] | None = None) -> tuple[dict, dict]:
     from alpaca.data.enums import Adjustment, DataFeed
     from alpaca.data.historical import StockHistoricalDataClient
     from alpaca.data.requests import StockBarsRequest
@@ -151,7 +165,7 @@ def fetch(months: int) -> tuple[dict, dict]:
     client = StockHistoricalDataClient(cfg.alpaca_api_key, cfg.alpaca_secret_key)
     end = datetime.now(timezone.utc) - timedelta(minutes=20)
     start = end - timedelta(days=int(months * 30.5))
-    symbols = sorted(set(CORE_ETFS) - LEVERAGED)
+    symbols = symbols or sorted(set(CORE_ETFS) - LEVERAGED)
 
     def get(tf, since, chunk):
         out = {}
