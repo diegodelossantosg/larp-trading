@@ -52,13 +52,20 @@ def update_highs(highs: dict[str, float], positions: dict[str, dict], quotes: di
 
 def stop_orders(positions: dict[str, dict], highs: dict[str, float], quotes: dict[str, Quote],
                 idle_asset: str, trail_pct: float, stocks: set[str] | frozenset = frozenset(),
-                stock_trail_pct: float | None = None) -> list[Order]:
+                stock_trail_pct: float | None = None, stock_atr_mult: float | None = None,
+                stock_min: float = 0.08, stock_max: float = 0.20) -> list[Order]:
+    """Trailing stops. Stocks use stock_atr_mult x their normal daily swing (clamped to
+    stock_min..stock_max) when given; 8 years of tests showed fixed tight stops sell stocks at the bottom."""
     orders = []
     for sym, p in positions.items():
         if sym == idle_asset or sym not in quotes:
             continue
         price, high = quotes[sym].price, highs.get(sym, p["avg_entry_price"])
-        trail = stock_trail_pct if sym in stocks and stock_trail_pct else trail_pct
+        trail = trail_pct
+        if sym in stocks:
+            trail = stock_trail_pct or trail_pct
+            if stock_atr_mult and quotes[sym].atr_pct > 0:
+                trail = min(stock_max, max(stock_min, stock_atr_mult * quotes[sym].atr_pct / 100))
         if price <= high * (1 - trail):
             drop = 1 - price / high
             orders.append(Order(sym, "sell", round(p["market_value"], 2),

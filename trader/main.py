@@ -88,13 +88,16 @@ def _repair_history(hist: list[tuple[int, float]], equity_now: float) -> list[tu
     return hist[:start] + [(t, e + gap) for t, e in hist[start:]]
 
 
-def _recent_watch_buys(days: int) -> set[str]:
-    """ETFs the watcher bought within the last `days` trading days."""
+def _recent_watch_buys(days: int, news_days: int | None = None) -> set[str]:
+    """What the watcher bought within `days` trading days, and the News Hunter within `news_days`."""
     import pandas as pd
 
-    cutoff = (pd.Timestamp(_today()) - pd.offsets.BDay(days)).strftime("%Y-%m-%d")
+    def cutoff(n):
+        return (pd.Timestamp(_today()) - pd.offsets.BDay(n)).strftime("%Y-%m-%d")
+
+    limits = {"watch": cutoff(days), "news": cutoff(news_days if news_days is not None else days)}
     return {o["symbol"] for d in journal.read("decisions.json", [])
-            if d.get("source") in ("watch", "news") and not d.get("dry_run") and d["date"] > cutoff
+            if d.get("source") in limits and not d.get("dry_run") and d["date"] > limits[d["source"]]
             for o in d.get("orders", []) if o["side"] == "buy" and o.get("status") not in ("error", "skipped")}
 
 
@@ -230,7 +233,7 @@ def trade(cfg, broker: Broker, market: Market, dry_run: bool, force: bool) -> in
         "performance_vs_spy": _performance(history),
         "previous_decisions": previous,
         "watcher_actions_recent": watcher,
-        "protected_recent_watcher_buys": sorted(_recent_watch_buys(cfg.min_hold_days) & set(positions)),
+        "protected_recent_watcher_buys": sorted(_recent_watch_buys(cfg.min_hold_days, cfg.news_min_hold_days) & set(positions)),
         "headlines": market.news(hours=36, limit=50),
         "holding_headlines": market.news(hours=72, symbols=list(positions), limit=20) if positions else [],
         "technicals": technicals,
@@ -307,7 +310,7 @@ def trade(cfg, broker: Broker, market: Market, dry_run: bool, force: bool) -> in
     orders, notes = plan_orders(
         targets, current, equity, rebalance_band=cfg.rebalance_band,
         min_order_usd=cfg.min_order_usd, max_daily_turnover=cfg.max_daily_turnover,
-        protected=_recent_watch_buys(cfg.min_hold_days) & set(positions),
+        protected=_recent_watch_buys(cfg.min_hold_days, cfg.news_min_hold_days) & set(positions),
     )
     record["notes"] += notes
     prices = {s: t["price"] for s, t in technicals.items()}
@@ -352,7 +355,9 @@ def watch(cfg, broker: Broker, market: Market, dry_run: bool, force: bool = Fals
                                 if broker.vet(s)[2] in ("big", "small")}
 
     orders = rules.stop_orders(positions, highs, quotes, cfg.idle_asset, cfg.stop_trail_pct,
-                               stocks=stocks, stock_trail_pct=cfg.stop_trail_pct_stock)
+                               stocks=stocks, stock_trail_pct=cfg.stop_trail_pct_stock,
+                               stock_atr_mult=cfg.stop_atr_mult_stock, stock_min=cfg.stop_stock_min,
+                               stock_max=cfg.stop_stock_max)
     stopped = {o.symbol for o in orders}
     candidates: list = []
     used = state.get("buys", state.get("breakouts", {})).get(today, 0)

@@ -16,7 +16,7 @@ A fully automated agent that, once per US trading day:
    The dashboard reads those files.
 
 Every minute while the market is open, a rules-only **watcher** (`trader/watch.py`, GitHub Actions,
-no Claude call) sells any position that falls too far below its high (6% for ETFs, 10% for stocks)
+no Claude call) sells any position that falls too far below its high (6% for ETFs; for stocks 4x their normal daily swing, between 8% and 20%)
 and updates the dashboard. It used to also buy ETFs on intraday signals; 8 years of tests showed
 those buys lose to the S&P 500, so that is off (`WATCH_MAX_BUYS_PER_DAY=0`).
 
@@ -49,7 +49,8 @@ After the close, a second job records portfolio value against SPY so the dashboa
 | Max weight in one smaller company / all smaller companies | 5% / 10% | `MAX_SMALL_STOCK_WEIGHT` / `MAX_SMALL_STOCKS_TOTAL` |
 | Max total in single-company stocks | 40% | `MAX_STOCKS_TOTAL` |
 | No buying a stock this close to its earnings report (trading days; unknown date = no buy) | 3 | `EARNINGS_BLACKOUT_DAYS` |
-| Watcher: trailing stop for single stocks | 10% | `STOP_TRAIL_PCT_STOCK` |
+| Watcher: trailing stop for single stocks | 4x daily swing, 8%-20% | `STOP_ATR_MULT_STOCK` / `STOP_STOCK_MIN` / `STOP_STOCK_MAX` |
+| News Hunter buys kept at least (trading days) | 10 | `NEWS_MIN_HOLD_DAYS` |
 | Max total in leveraged/inverse ETFs | 10% | `MAX_LEVERAGED_WEIGHT` |
 | Max traded per day (one-way) | 50% of equity | `MAX_DAILY_TURNOVER` |
 | Ignore weight changes smaller than | 2% of equity | `REBALANCE_BAND` |

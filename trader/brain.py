@@ -51,7 +51,8 @@ How the portfolio works:
   40%. Earnings rule: a company can fall 10-20% overnight on a bad report and a stop can't catch
   that gap, so for every stock give its next earnings date in `next_earnings` (YYYY-MM-DD, checked
   with web search). Code will not add to a stock that reports within 3 trading days, or whose date
-  you leave unknown. Single stocks get a 10% trailing stop (ETFs 6%).
+  you leave unknown. Single stocks get a wide trailing stop sized to their normal daily
+  swing (4x, between 8% and 20%); ETFs 6%. News Hunter buys are kept at least 10 trading days.
 - Positions you omit are sold. To keep a position, include it again with its weight.
 - Small weight changes are ignored by a rebalance band, so do not fiddle with weights.
 - Leveraged and inverse ETFs reset daily and decay in choppy markets; use them only for short,
@@ -346,7 +347,7 @@ You approve or reject intraday buy ideas (ETFs) for a small automated portfolio 
 stocks whose goal is to beat the S&P 500. A rules-based watcher flagged these because several technical signals agree right
 now (trend, today's rise, VWAP, 15-minute candles, volume, 20-day high). Each buy would be about
 8% of the portfolio, funded by selling the idle asset (SSO), and protected by a trailing stop (6% for
-ETFs, 10% for stocks). Always reject a company stock that reports earnings within the next 3 trading
+ETFs, a wide 8-20% one sized to their normal swing for stocks). Always reject a company stock that reports earnings within the next 3 trading
 days (check the date with web search): a bad report can drop it 10-20% overnight.
 
 Approve only if the move looks like it has real support (news, sector rotation, macro) and is not a
@@ -465,7 +466,8 @@ policy news (Federal Reserve, White House). big_company_moves_today lists the bi
 most against the S&P 500 today, even if no headline above mentions them: look up why.
 
 Rules (code enforces them too): at most 2 ideas; each buy is about 5% of the portfolio, protected by
-a trailing stop (10% for stocks, 6% for ETFs). Big well-known companies up to 10% each; smaller
+a trailing stop (8-20% for stocks, sized to their normal swing; 6% for ETFs) and kept at
+least 10 trading days, since the bounce after an overreaction took one to four weeks in our tests. Big well-known companies up to 10% each; smaller
 companies up to 5% each and 10% together, no penny stocks; all stocks together up to 40%. Never a
 stock that reports earnings within the next 3 trading days: give its next earnings date (YYYY-MM-DD,
 verified) or 'unknown', and 'n/a' for ETFs. No leveraged or inverse ETFs.

@@ -70,3 +70,26 @@ def test_watcher_leaves_stocks_to_claude_and_news_hunter():
     quotes = {"SPY": Quote(500.5, 500, 510, 1, bars_today=6), "NVDA": Quote(**strong), "XLE": Quote(**strong)}
     found = buy_candidates(quotes, {}, "SSO", 5, 0.30, 0.08)
     assert [s for s, _, _ in found] == ["XLE"]  # stocks scored badly in the 12-month test
+
+
+def test_stock_stop_scales_with_its_normal_swing():
+    pos = lambda p: {"market_value": p, "avg_entry_price": 100, "current_price": p}
+    # A calm stock (1.5% daily swing): 4x = 6% -> raised to the 8% floor; 9% down is sold.
+    calm = {"KO": pos(91)}
+    q = {"KO": Quote(91.0, 92, 0, 1.5)}
+    assert stop_orders(calm, update_highs({}, calm, q), q, "SSO", 0.06, stocks={"KO"}, stock_atr_mult=4) != []
+    # A jumpy stock (4% daily swing): 4x = 16%; 12% down is kept.
+    jumpy = {"TSLA": pos(88)}
+    q = {"TSLA": Quote(88.0, 90, 0, 4.0)}
+    assert stop_orders(jumpy, update_highs({}, jumpy, q), q, "SSO", 0.06, stocks={"TSLA"}, stock_atr_mult=4) == []
+
+
+def test_news_buys_are_protected_longer(tmp_path, monkeypatch):
+    monkeypatch.setattr(journal, "DATA_DIR", tmp_path)
+    monkeypatch.setattr(main, "_today", lambda: "2026-10-20")
+    buy = lambda sym: [{"symbol": sym, "side": "buy", "status": "filled"}]
+    journal.write("decisions.json", [
+        {"date": "2026-10-13", "source": "watch", "orders": buy("XRT")},
+        {"date": "2026-10-13", "source": "news", "orders": buy("NKE")},
+    ])
+    assert main._recent_watch_buys(3, 10) == {"NKE"}

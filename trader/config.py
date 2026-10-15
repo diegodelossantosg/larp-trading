@@ -62,7 +62,11 @@ class Config:
     max_small_stocks_total: float = 0.10  # all smaller companies together
     max_stocks_total: float = 0.40  # all single-company stocks together
     earnings_blackout_days: int = 3  # no buying a stock this many trading days or fewer before its earnings
-    stop_trail_pct_stock: float = 0.10  # trailing stop for single stocks (they swing more than ETFs)
+    stop_trail_pct_stock: float = 0.10  # fallback stop for a stock whose normal daily swing is unknown
+    stop_atr_mult_stock: float = 4.0  # stock stop = this many of its normal daily swings (ATR)...
+    stop_stock_min: float = 0.08  # ...but at least this
+    stop_stock_max: float = 0.20  # ...and at most this
+    news_min_hold_days: int = 10  # the daily rebalance won't trim a News Hunter buy younger than this
 
 
 def load_config() -> Config:
@@ -113,4 +117,8 @@ def load_config() -> Config:
         max_stocks_total=_float("MAX_STOCKS_TOTAL", 0.40),
         earnings_blackout_days=int(_float("EARNINGS_BLACKOUT_DAYS", 3)),
         stop_trail_pct_stock=_float("STOP_TRAIL_PCT_STOCK", 0.10),
+        stop_atr_mult_stock=_float("STOP_ATR_MULT_STOCK", 4.0),
+        stop_stock_min=_float("STOP_STOCK_MIN", 0.08),
+        stop_stock_max=_float("STOP_STOCK_MAX", 0.20),
+        news_min_hold_days=int(_float("NEWS_MIN_HOLD_DAYS", 10)),
     )
