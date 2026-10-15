@@ -50,6 +50,10 @@ def _write_intraday(cfg, broker: Broker, market: Market) -> None:
     state = journal.read("capital.json", None)
     if not hist or (cfg.capital_usd and state is None):
         return
+    try:
+        hist = _repair_history(hist, broker.account()["equity"])
+    except Exception as e:
+        log.warning("account check for the chart failed: %s", e)
     offset = cfg.capital_usd - state["baseline_equity"] if cfg.capital_usd else 0.0
     spy = market.minute_closes("SPY")
     ts = pd.to_datetime([t for t, _ in hist], unit="s", utc=True)
@@ -63,6 +67,25 @@ def _write_intraday(cfg, broker: Broker, market: Market) -> None:
         first = next((p for p in points if p[0][:10] >= state.get("started", "") and p[2] is not None), None)
         if first:
             journal.write("capital.json", {**state, "spy_start": first[2]})
+
+
+def _repair_history(hist: list[tuple[int, float]], equity_now: float) -> list[tuple[int, float]]:
+    """Line Alpaca's minute history up with the account's live equity.
+
+    Alpaca's paper-account history has been seen reporting equity $100,000 too high from one day
+    on (a step that never happened). When the latest history point is more than 1% off the live
+    value, shift every point since the last such step (a >20% jump between two minutes) by the gap.
+    """
+    if not hist or not equity_now:
+        return hist
+    gap = equity_now - hist[-1][1]
+    if abs(gap) <= 0.01 * equity_now:
+        return hist
+    start = 0
+    for i in range(1, len(hist)):
+        if abs(hist[i][1] - hist[i - 1][1]) > 0.2 * hist[i - 1][1]:
+            start = i
+    return hist[:start] + [(t, e + gap) for t, e in hist[start:]]
 
 
 def _recent_watch_buys(days: int) -> set[str]:
