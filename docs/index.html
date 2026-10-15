@@ -49,11 +49,15 @@ main { margin: 0 auto; padding: 16px 24px 48px; }
 .col { display: flex; flex-direction: column; gap: 16px; }
 .col > .card { margin-top: 0; }
 @media (max-width: 1100px) { .top-grid, .bottom-grid { grid-template-columns: minmax(0, 1fr); } }
-.hero { display: flex; justify-content: space-between; align-items: center; gap: 24px; flex-wrap: wrap; margin-top: 0; }
+.hero { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 24px; margin-top: 0; }
 .hero .label { font-size: 13px; font-weight: 600; opacity: .85; text-transform: uppercase; letter-spacing: .04em; }
-.hero .today { text-align: right; }
-.hero .today .big { font-size: 38px; }
-.hero .today .pill { display: inline-block; font-size: 18px; font-weight: 700; padding: 2px 12px; border-radius: 99px; }
+.hero .side:last-child { text-align: right; }
+.hero .today-line { margin-top: 10px; font-size: 15px; font-weight: 600; }
+.hero .pill { display: inline-block; font-size: 17px; font-weight: 700; padding: 2px 12px; border-radius: 99px; margin-left: 6px; }
+.hero .versus { text-align: center; font-size: 15px; font-weight: 600; padding: 12px 20px; border-radius: 14px; background: rgba(255,255,255,.14); }
+.hero .versus b { display: block; font-size: 26px; margin: 2px 0; }
+.hero .versus.up b { color: #b8f5b8; } .hero .versus.down b { color: #ffc4c4; }
+@media (max-width: 700px) { .hero { grid-template-columns: 1fr; } .hero .side:last-child { text-align: left; } }
 .hero .up-bg { background: rgba(12,163,12,.85); } .hero .down-bg { background: rgba(208,59,59,.9); } .hero .flat-bg { background: rgba(255,255,255,.18); }
 h1 { font-size: 24px; margin: 0; }
 h2 { font-size: 18px; margin: 0 0 4px; }
@@ -233,24 +237,32 @@ function hero(status, equity) {
     return;
   }
   const start = capital ?? equity[0]?.equity;
-  const profit = now - start;
   const todayStr = new Date().toLocaleDateString("en-CA", { timeZone: "America/New_York" });
-  const prevVal = equity.filter((r) => r.date < todayStr).at(-1)?.equity ?? start;
-  const today = now - prevVal;
+  const prevRow = equity.filter((r) => r.date < todayStr).at(-1);
+  // The same starting money put in the S&P 500 (SPY) on day one, valued at SPY's latest price.
+  const pts = (DATA.intraday.points || []).filter((p) => p[2] != null);
+  const spyNow = pts.at(-1)?.[2] ?? equity.at(-1)?.spy_close;
+  const spyStart = status.spy_start ?? equity[0]?.spy_close;
+  const spyPrev = prevRow?.spy_close ?? spyStart;
+  const bench = spyNow && spyStart ? start * spyNow / spyStart : null;
+  const benchPrev = bench != null ? start * spyPrev / spyStart : null;
   const bg = (v) => (v > 0.005 ? "up-bg" : v < -0.005 ? "down-bg" : "flat-bg");
+  const col = (label, value, prev) => {
+    const total = value - start, today = value - prev;
+    return `<div class="side">
+      <div class="label">${label}</div>
+      <span class="big">${usd(value)}</span>
+      <span class="delta ${cls(total)}">${signedUsd(total)} (${pct(total / start * 100)})</span>
+      <div class="today-line">Today <span class="pill ${bg(today)}">${today >= 0 ? "▲" : "▼"} ${signedUsd(today)} (${pct(today / prev * 100)})</span></div>
+    </div>`;
+  };
+  const gap = bench != null ? now - bench : null;
+  const verdict = gap == null ? "" : Math.abs(gap) < 0.005 ? "Tied" : `AI is ${gap > 0 ? "ahead" : "behind"} by<b>${usd(Math.abs(gap))}</b>`;
   const updated = status.updated ? new Date(status.updated).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false }) : "";
   $("hero").innerHTML = `
-    <div>
-      <div class="label">Portfolio</div>
-      <span class="big">${usd(now)}</span>
-      <span class="delta ${cls(profit)}">${signedUsd(profit)} (${pct(profit / start * 100)})</span>
-      ${updated ? `<div class="small" style="margin-top:6px">Updated ${updated}</div>` : ""}
-    </div>
-    <div class="today">
-      <div class="label">Today</div>
-      <span class="big">${signedUsd(today)}</span>
-      <div><span class="pill ${bg(today)}">${today >= 0 ? "▲" : "▼"} ${pct(today / prevVal * 100)}</span></div>
-    </div>`;
+    ${col("AI portfolio", now, prevRow?.equity ?? start)}
+    <div class="versus ${gap == null ? "" : cls(gap)}">${verdict}${updated ? `<div class="small">Updated ${updated}</div>` : ""}</div>
+    ${bench != null ? col("All in the S&amp;P 500", bench, benchPrev) : `<div class="side"></div>`}`;
 }
 
 const DATA = { status: {}, equity: [], intraday: {} };
