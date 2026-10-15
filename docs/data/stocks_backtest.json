@@ -1,0 +1,146 @@
+{
+ "generated": "2026-10-15T14:50+00:00",
+ "picker": {
+  "start": "2018-01-31",
+  "end": "2026-10-15",
+  "results": {
+   "old: ETFs only": {
+    "end_value": 2716.44,
+    "yearly_pct": 12.2,
+    "worst_drop_pct": -36.4
+   },
+   "new: ETFs + big stocks": {
+    "end_value": 4743.4,
+    "yearly_pct": 19.6,
+    "worst_drop_pct": -36.9
+   },
+   "new, without the 6 biggest winners": {
+    "end_value": 3469.32,
+    "yearly_pct": 15.4,
+    "worst_drop_pct": -37.3
+   },
+   "just hold the S&P 500": {
+    "end_value": 3100.54,
+    "yearly_pct": 13.9,
+    "worst_drop_pct": -33.8
+   }
+  },
+  "by_year_pct": {
+   "old: ETFs only": {
+    "2018": -14.9,
+    "2019": 31.6,
+    "2020": 29.4,
+    "2021": 31.5,
+    "2022": -26.3,
+    "2023": 22.9,
+    "2024": 24.7,
+    "2025": 20.0,
+    "2026": 4.3
+   },
+   "new: ETFs + big stocks": {
+    "2018": -8.7,
+    "2019": 40.2,
+    "2020": 54.0,
+    "2021": 32.5,
+    "2022": -19.7,
+    "2023": 37.8,
+    "2024": 37.7,
+    "2025": 21.9,
+    "2026": -3.1
+   },
+   "new, without the 6 biggest winners": {
+    "2018": -11.7,
+    "2019": 35.9,
+    "2020": 28.7,
+    "2021": 32.2,
+    "2022": -20.8,
+    "2023": 29.9,
+    "2024": 39.3,
+    "2025": 23.2,
+    "2026": -3.4
+   },
+   "just hold the S&P 500": {
+    "2018": -10.0,
+    "2019": 31.1,
+    "2020": 17.4,
+    "2021": 30.4,
+    "2022": -18.6,
+    "2023": 26.7,
+    "2024": 25.6,
+    "2025": 18.0,
+    "2026": 13.4
+   }
+  },
+  "biggest_winners_removed": [
+   "AMD",
+   "NVDA",
+   "MU",
+   "LLY",
+   "AVGO",
+   "TSLA"
+  ],
+  "stocks_with_data": 65,
+  "etfs_with_data": 70
+ },
+ "watcher": {
+  "months": 12,
+  "old: ETFs only": {
+   "score>=5, hold<=3d": {
+    "trades": 641,
+    "avg_return_pct": 0.27,
+    "avg_vs_spy_pct": 0.153,
+    "median_vs_spy_pct": 0.054,
+    "beat_spy_rate": 0.516,
+    "t_stat": 1.41,
+    "stopped_out_rate": 0.081
+   },
+   "score>=5, hold<=5d": {
+    "trades": 641,
+    "avg_return_pct": 0.267,
+    "avg_vs_spy_pct": 0.09,
+    "median_vs_spy_pct": -0.179,
+    "beat_spy_rate": 0.466,
+    "t_stat": 0.62,
+    "stopped_out_rate": 0.153
+   }
+  },
+  "new: ETFs + big stocks": {
+   "score>=5, hold<=3d": {
+    "trades": 799,
+    "avg_return_pct": 0.058,
+    "avg_vs_spy_pct": -0.081,
+    "median_vs_spy_pct": 0.022,
+    "beat_spy_rate": 0.504,
+    "t_stat": -0.67,
+    "stopped_out_rate": 0.063,
+    "stocks_only": {
+     "trades": 388,
+     "avg_return_pct": -0.242,
+     "avg_vs_spy_pct": -0.317,
+     "median_vs_spy_pct": -0.128,
+     "beat_spy_rate": 0.487,
+     "t_stat": -1.55,
+     "stopped_out_rate": 0.036
+    }
+   },
+   "score>=5, hold<=5d": {
+    "trades": 799,
+    "avg_return_pct": 0.22,
+    "avg_vs_spy_pct": -0.04,
+    "median_vs_spy_pct": -0.244,
+    "beat_spy_rate": 0.457,
+    "t_stat": -0.24,
+    "stopped_out_rate": 0.121,
+    "stocks_only": {
+     "trades": 388,
+     "avg_return_pct": 0.167,
+     "avg_vs_spy_pct": -0.109,
+     "median_vs_spy_pct": -0.337,
+     "beat_spy_rate": 0.459,
+     "t_stat": -0.38,
+     "stopped_out_rate": 0.075
+    }
+   }
+  }
+ }
+}
