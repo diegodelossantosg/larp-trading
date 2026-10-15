@@ -1,0 +1,37 @@
+name: "Backtest Guard signal combinations"
+
+# Audits the watcher (Guard) buy signals: 587 rules x hold/stop, chosen on year 1, checked on year 2.
+on:
+  workflow_dispatch:
+    inputs:
+      months:
+        description: "How many months of 15-minute prices"
+        default: "24"
+
+permissions:
+  contents: write
+
+jobs:
+  signals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      ALPACA_API_KEY: ${{ secrets.ALPACA_API_KEY }}
+      ALPACA_SECRET_KEY: ${{ secrets.ALPACA_SECRET_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: ./setup.sh
+      - run: python -m trader.signal_backtest --months ${{ inputs.months }}
+      - name: Save results
+        run: |
+          git config user.name "trading-agent"
+          git config user.email "trading-agent@users.noreply.github.com"
+          git add docs/data/signal_backtest.json
+          git commit -q -m "Backtest: Guard signal audit"
+          for i in 1 2 3; do git pull -q --rebase origin main && git push -q origin HEAD:main && exit 0; sleep 5; done
+          exit 1
