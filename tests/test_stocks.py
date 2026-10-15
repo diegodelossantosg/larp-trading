@@ -64,12 +64,9 @@ def test_stocks_get_a_wider_stop_than_etfs():
     assert [o.symbol for o in orders] == ["XLE"]  # 8% down: ETF stopped, stock not yet
 
 
-def test_watcher_respects_stock_caps():
+def test_watcher_leaves_stocks_to_claude_and_news_hunter():
     strong = dict(price=103.0, prev_close=100.0, high_20d=102.0, atr_pct=1.5, sma20=98.0, sma50=95.0,
                   vwap=101.5, candles=["bullish_engulfing"], volume_ratio=2.0, bars_today=6)
-    quotes = {"SPY": Quote(500.5, 500, 510, 1, bars_today=6), "NVDA": Quote(**strong), "AAPL": Quote(**strong),
-              "MSFT": Quote(**strong)}
-    found = buy_candidates(quotes, {"NVDA": 0.05}, "SSO", 5, 0.30, 0.08)
-    assert [s for s, _, _ in found] == ["AAPL", "MSFT"]  # NVDA would pass 10%
-    found = buy_candidates(quotes, {"GOOGL": 0.10, "AMZN": 0.10, "META": 0.10}, "SSO", 5, 0.30, 0.08)
-    assert len(found) == 1  # only one more 8% stock buy fits under the 40% total
+    quotes = {"SPY": Quote(500.5, 500, 510, 1, bars_today=6), "NVDA": Quote(**strong), "XLE": Quote(**strong)}
+    found = buy_candidates(quotes, {}, "SSO", 5, 0.30, 0.08)
+    assert [s for s, _, _ in found] == ["XLE"]  # stocks scored badly in the 12-month test

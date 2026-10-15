@@ -346,7 +346,7 @@ def watch(cfg, broker: Broker, market: Market, dry_run: bool, force: bool = Fals
 
     today = _today()
     state = journal.read("watch.json", {"highs": {}, "breakouts": {}})
-    quotes = market.quotes(sorted(set(CORE_ETFS) | set(BIG_STOCKS) | set(positions)))
+    quotes = market.quotes(sorted(set(CORE_ETFS) | set(positions)))
     highs = rules.update_highs(state.get("highs", {}), positions, quotes)
     stocks = set(BIG_STOCKS) | {s for s in set(positions) - set(CORE_ETFS) - set(BIG_STOCKS)
                                 if broker.vet(s)[2] in ("big", "small")}

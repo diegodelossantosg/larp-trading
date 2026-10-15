@@ -2,7 +2,8 @@
 
 1. Trailing stop: sell any position (other than the idle asset) that has fallen
    STOP_TRAIL_PCT (STOP_TRAIL_PCT_STOCK for single stocks) below its highest price since it was bought.
-2. Intraday buys: score every ETF and big company stock on six signals from its daily trend and today's
+2. Intraday buys: score every ETF on six signals (company stocks are left to Claude and the News
+   Hunter: in a 12-month test the same signals on big stocks lost to the S&P 500) from its daily trend and today's
    15-minute candles. Buy when at least WATCH_MIN_SCORE agree, the market (SPY) is not
    falling and the first half hour of the session is over. Each buy is WATCH_BUY_SIZE of
    capital, funded from the idle asset or cash, at most WATCH_MAX_BUYS_PER_DAY per day,
@@ -93,7 +94,7 @@ def buy_candidates(quotes: dict[str, Quote], weights: dict[str, float], idle_ass
         return []  # don't chase rallies on a falling market
     found = []
     for sym, q in quotes.items():
-        if sym == idle_asset or sym in LEVERAGED or (sym not in CORE_ETFS and sym not in BIG_STOCKS):
+        if sym == idle_asset or sym in LEVERAGED or sym not in CORE_ETFS or sym in stocks:
             continue
         cap = max_stock_weight if sym in stocks else max_weight
         if q.bars_today < 2 or weights.get(sym, 0.0) + size > cap + 1e-9:

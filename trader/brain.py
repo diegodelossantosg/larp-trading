@@ -43,6 +43,7 @@ How the portfolio works:
   protected_recent_watcher_buys), so plan around them instead of fighting them. Recent "watch" entries in previous_decisions show what it did.
 - Company stocks (owner's wishes and hard limits in risk_limits): mostly big, well-known companies
   (the technical table includes about 60 of them; others you name are vetted), at most 10% each.
+  Stocks come into the portfolio only through you and the hourly News Hunter; the watcher buys ETFs.
   The owner also wants some risk in smaller companies you believe can grow explosively: at most 5%
   each and 10% together, and only with a concrete catalyst (product launch, contract, approval,
   accelerating sales) you found in your research, never hype. All single stocks together: at most
@@ -332,7 +333,7 @@ def _sources(content) -> list[dict]:
 
 
 REVIEW_PROMPT = """\
-You approve or reject intraday buy ideas for a small automated portfolio of ETFs and big company
+You approve or reject intraday buy ideas (ETFs) for a small automated portfolio of ETFs and company
 stocks whose goal is to beat the S&P 500. A rules-based watcher flagged these because several technical signals agree right
 now (trend, today's rise, VWAP, 15-minute candles, volume, 20-day high). Each buy would be about
 8% of the portfolio, funded by selling the idle asset (SSO), and protected by a trailing stop (6% for
