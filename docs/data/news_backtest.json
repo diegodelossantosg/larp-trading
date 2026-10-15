@@ -1,0 +1,276 @@
+{
+ "generated": "2026-10-15T16:03+00:00",
+ "months": 24,
+ "headlines": 101098,
+ "events": 17546,
+ "delay_minutes": 60,
+ "groups": {
+  "fell more than 2% (bad news)": {
+   "events": 168,
+   "same day close": {
+    "avg_vs_spy_pct": 0.151,
+    "beat_spy_rate": 0.506,
+    "t_stat": 0.98
+   },
+   "1 day": {
+    "avg_vs_spy_pct": 0.358,
+    "beat_spy_rate": 0.571,
+    "t_stat": 1.1
+   },
+   "3 days": {
+    "avg_vs_spy_pct": 1.677,
+    "beat_spy_rate": 0.554,
+    "t_stat": 3.1
+   },
+   "5 days": {
+    "avg_vs_spy_pct": 2.14,
+    "beat_spy_rate": 0.554,
+    "t_stat": 3.19
+   }
+  },
+  "barely moved (-2% to +1%)": {
+   "events": 16535,
+   "same day close": {
+    "avg_vs_spy_pct": -0.092,
+    "beat_spy_rate": 0.428,
+    "t_stat": -14.46
+   },
+   "1 day": {
+    "avg_vs_spy_pct": -0.059,
+    "beat_spy_rate": 0.472,
+    "t_stat": -3.11
+   },
+   "3 days": {
+    "avg_vs_spy_pct": -0.028,
+    "beat_spy_rate": 0.485,
+    "t_stat": -0.9
+   },
+   "5 days": {
+    "avg_vs_spy_pct": 0.042,
+    "beat_spy_rate": 0.491,
+    "t_stat": 1.04
+   }
+  },
+  "rose 1% to 3%": {
+   "events": 785,
+   "same day close": {
+    "avg_vs_spy_pct": -0.159,
+    "beat_spy_rate": 0.442,
+    "t_stat": -2.86
+   },
+   "1 day": {
+    "avg_vs_spy_pct": 0.001,
+    "beat_spy_rate": 0.484,
+    "t_stat": 0.01
+   },
+   "3 days": {
+    "avg_vs_spy_pct": 0.011,
+    "beat_spy_rate": 0.475,
+    "t_stat": 0.06
+   },
+   "5 days": {
+    "avg_vs_spy_pct": 0.023,
+    "beat_spy_rate": 0.483,
+    "t_stat": 0.1
+   }
+  },
+  "rose 3% to 6%": {
+   "events": 54,
+   "same day close": {
+    "avg_vs_spy_pct": 0.072,
+    "beat_spy_rate": 0.519,
+    "t_stat": 0.25
+   },
+   "1 day": {
+    "avg_vs_spy_pct": 0.548,
+    "beat_spy_rate": 0.556,
+    "t_stat": 0.88
+   },
+   "3 days": {
+    "avg_vs_spy_pct": -0.044,
+    "beat_spy_rate": 0.519,
+    "t_stat": -0.05
+   },
+   "5 days": {
+    "avg_vs_spy_pct": -0.674,
+    "beat_spy_rate": 0.444,
+    "t_stat": -0.55
+   }
+  },
+  "rose more than 6% (already exploded)": {
+   "events": 4,
+   "same day close": {
+    "avg_vs_spy_pct": -2.324,
+    "beat_spy_rate": 0.0,
+    "t_stat": -6.21
+   },
+   "1 day": {
+    "avg_vs_spy_pct": -4.75,
+    "beat_spy_rate": 0.25,
+    "t_stat": -2.05
+   },
+   "3 days": {
+    "avg_vs_spy_pct": -7.736,
+    "beat_spy_rate": 0.0,
+    "t_stat": -3.06
+   },
+   "5 days": {
+    "avg_vs_spy_pct": -10.809,
+    "beat_spy_rate": 0.0,
+    "t_stat": -3.35
+   }
+  }
+ },
+ "examples": [
+  {
+   "symbol": "INTC",
+   "time": "2026-09-24 11:40:02-04:00",
+   "headline": "'Senators Move To Force AI Companies To Disclose More' - Semafor Exclusive",
+   "reaction": 0.014371700745071436,
+   "same day close": 0.019122172816702476,
+   "1 day": -0.021379100027210995,
+   "3 days": -0.06812934506112078,
+   "5 days": -0.03592580730764372
+  },
+  {
+   "symbol": "TSLA",
+   "time": "2026-09-24 11:58:02-04:00",
+   "headline": "'US Seeks to Join Musk in Court Fight With EU Over X Fine' - Bloomberg",
+   "reaction": 0.010281732183823777,
+   "same day close": -0.011375282842786216,
+   "1 day": -0.03189354898524843,
+   "3 days": -0.07285046245868443,
+   "5 days": -0.06939959048560917
+  },
+  {
+   "symbol": "CAT",
+   "time": "2026-09-25 11:09:44-04:00",
+   "headline": "9 Of 11 Sectors Fall In Friday Trading As Cyclicals Lead",
+   "reaction": 0.010279986692289356,
+   "same day close": -0.002958922032626931,
+   "1 day": 0.00314415829799486,
+   "3 days": -0.0039345588204510165,
+   "5 days": 0.029079313651300454
+  },
+  {
+   "symbol": "GE",
+   "time": "2026-09-25 11:09:44-04:00",
+   "headline": "9 Of 11 Sectors Fall In Friday Trading As Cyclicals Lead",
+   "reaction": 0.011711608083436298,
+   "same day close": -0.0012304057759234812,
+   "1 day": -0.02090422607135789,
+   "3 days": -0.03503340034891689,
+   "5 days": -0.05237077969959536
+  },
+  {
+   "symbol": "TSM",
+   "time": "2026-09-28 11:39:54-04:00",
+   "headline": "Nvidia\u2019s AI Boom Has a Hidden Dependency: One Dutch Company",
+   "reaction": 0.01050807417716948,
+   "same day close": 0.0005793601014806313,
+   "1 day": 0.011001582724396441,
+   "3 days": 0.016488995676171125,
+   "5 days": 0.061166523554339824
+  },
+  {
+   "symbol": "AMD",
+   "time": "2026-09-29 09:39:02-04:00",
+   "headline": "StoneX Reiterates Buy on Advanced Micro Devices, Maintains $685 Price Target",
+   "reaction": 0.010506209776214859,
+   "same day close": -0.014256565357476214,
+   "1 day": -0.005491762098903784,
+   "3 days": 0.020778915725726654,
+   "5 days": 0.03399336661359598
+  },
+  {
+   "symbol": "MSFT",
+   "time": "2026-09-29 09:49:42-04:00",
+   "headline": "'Elon Musk, CEOs Of Palantir, Amazon, Service Now, Altimeter To Attend White House Meeting On AI; Microsoft CEO Satya Na",
+   "reaction": 0.015559022372011122,
+   "same day close": -0.0039003927188131495,
+   "1 day": 0.005972816819552086,
+   "3 days": 0.006280097616384262,
+   "5 days": 0.016639076421410715
+  },
+  {
+   "symbol": "AMZN",
+   "time": "2026-09-30 09:39:44-04:00",
+   "headline": "'FTC opens sweeping probe of Anthropic, OpenAI and other super intelligence models' - New York Post",
+   "reaction": 0.014794752785145526,
+   "same day close": 0.0005259573409305282,
+   "1 day": -0.004315171189507082,
+   "3 days": -0.005692058464413229,
+   "5 days": 0.02474434530243863
+  },
+  {
+   "symbol": "COST",
+   "time": "2026-10-01 10:30:42-04:00",
+   "headline": "If You Invested $100 In Costco Wholesale Stock 20 Years Ago, You Would Have This Much Today",
+   "reaction": 0.010100394285995073,
+   "same day close": -0.012881735501112601,
+   "1 day": -0.013685956275257705,
+   "3 days": -0.010122037997923328,
+   "5 days": 0.009969164545675535
+  },
+  {
+   "symbol": "CAT",
+   "time": "2026-10-01 11:11:52-04:00",
+   "headline": "8 Of 11 Sectors Fall In Thursday Trading As Cyclicals Lead",
+   "reaction": 0.017148374205171235,
+   "same day close": -0.0021102313485020776,
+   "1 day": 0.013815748727277977,
+   "3 days": 0.023038378153620864,
+   "5 days": -0.05169844668464785
+  },
+  {
+   "symbol": "NKE",
+   "time": "2026-10-05 11:27:54-04:00",
+   "headline": "Barclays Maintains Overweight on Nike, Lowers Price Target to $37",
+   "reaction": 0.014771367522309786,
+   "same day close": 0.005059429936544181,
+   "1 day": 0.018715329577908002,
+   "3 days": 0.029358601589689948,
+   "5 days": 0.041905291146295265
+  },
+  {
+   "symbol": "AMD",
+   "time": "2026-10-06 09:39:41-04:00",
+   "headline": "Lisa Su Says AI Demand Will Stay \u2018Very, Very High\u2019 for Years as AMD Races to Add Supply",
+   "reaction": 0.018138488681563647,
+   "same day close": 0.0009331879433756027,
+   "1 day": -0.0022741586150797346,
+   "3 days": -0.06214377279216754,
+   "5 days": -0.06548444166576906
+  },
+  {
+   "symbol": "MU",
+   "time": "2026-10-07 09:30:58-04:00",
+   "headline": "Micron Stock Falls Amid Chip-Sector Slump as Taiwan Union Votes 99% for Strike Authorization",
+   "reaction": 0.041925875019829695,
+   "same day close": 0.02617817259556754,
+   "1 day": -0.019239941923248183,
+   "3 days": -0.06869006406672684,
+   "5 days": -0.12871068288153487
+  },
+  {
+   "symbol": "INTC",
+   "time": "2026-10-07 09:44:13-04:00",
+   "headline": "Nvidia Inside: Microsoft's New Laptop Runs AI Agents Without the Cloud",
+   "reaction": 0.014875150986136565,
+   "same day close": -0.015437496752774726,
+   "1 day": -0.0629391551761872,
+   "3 days": -0.11929250788273082,
+   "5 days": -0.13656361936934247
+  },
+  {
+   "symbol": "LLY",
+   "time": "2026-10-07 10:31:53-04:00",
+   "headline": "Morgan Stanley Maintains Overweight on Eli Lilly, Raises Price Target to $1430",
+   "reaction": 0.013682345548029717,
+   "same day close": -0.016690486967743223,
+   "1 day": -0.027726637493978967,
+   "3 days": -0.022985417856762114,
+   "5 days": 0.012439387430114413
+  }
+ ]
+}
