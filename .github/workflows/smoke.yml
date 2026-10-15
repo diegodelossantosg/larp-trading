@@ -1,0 +1,30 @@
+name: Smoke test (no orders)
+
+# Runs the watcher once against live Alpaca data with --dry-run: nothing is sent, nothing is committed.
+on:
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      ALPACA_API_KEY: ${{ secrets.ALPACA_API_KEY }}
+      ALPACA_SECRET_KEY: ${{ secrets.ALPACA_SECRET_KEY }}
+      WATCH_REQUIRE_CLAUDE: "false"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: ./setup.sh
+      - run: python -m trader.main watch --dry-run --force
+      - name: Show what it would have done
+        run: |
+          python - <<'PY'
+          import json
+          d = json.load(open("docs/data/decisions.json"))[-1]
+          print(json.dumps(d, indent=1)[:3000])
+          s = json.load(open("docs/data/status.json"))
+          print([(p["symbol"], p["name"], p["weight"]) for p in s["positions"]])
+          PY
