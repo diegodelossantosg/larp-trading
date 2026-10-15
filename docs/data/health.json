@@ -11,25 +11,25 @@
   },
   "rates": {
    "title": "Bonds (rates)",
-   "display": "-1.4%",
-   "ief_return_20d_pct": -1.42,
+   "display": "-0.4%",
+   "ief_return_20d_pct": -0.39,
    "label": "stable",
    "source": "IEF 7-10y Treasury ETF, 20-day change"
   },
   "credit": {
    "title": "Credit stress",
-   "display": "-0.2%",
-   "hyg_vs_ief_20d_pct": -0.2,
+   "display": "-1.4%",
+   "hyg_vs_ief_20d_pct": -1.39,
    "label": "normal",
    "source": "high-yield (HYG) vs Treasuries (IEF), 20 days"
   },
   "breadth": {
    "title": "ETFs in uptrend",
-   "display": "50%",
-   "above_200d_pct": 50,
+   "display": "49%",
+   "above_200d_pct": 49,
    "above_50d_pct": 30,
    "label": "mixed"
   }
  },
- "checked": "2026-10-14T14:07"
+ "checked": "2026-10-15T14:06"
 }
