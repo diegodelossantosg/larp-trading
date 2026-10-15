@@ -1,0 +1,331 @@
+{
+ "first_year": "2024-10-14 to 2025-10-17",
+ "second_year": "2025-10-17 to 2026-10-15",
+ "rules_tried": 545,
+ "signals": {
+  "uptrend": "price above its 20-day average, which is above the 50-day",
+  "healthy_rise": "up 1% (or 0.75x its usual daily swing) to 6% today",
+  "above_vwap": "above today's average traded price",
+  "bullish_candle": "hammer or bullish engulfing on the last 15-minute bar",
+  "volume_surge": "last 15 minutes traded 1.5x today's average",
+  "high_20d": "at a new 20-day high",
+  "rel_strength": "beat the S&P 500 over the last 3 months",
+  "opening_breakout": "above the high of the first 30 minutes",
+  "pullback": "uptrend, dipped to its 20-day average yesterday, rising today",
+  "not_overheated": "daily RSI below 70",
+  "oversold_uptrend": "daily RSI below 45 while above its 50-day average",
+  "calm_market": "S&P 500 above its 50-day average and its 20-day swings below 20% a year",
+  "sector_rotation": "beat the S&P 500 over the last 5 days",
+  "gap_holds": "opened at least 0.3% higher and is still above the open",
+  "volume_trend": "5-day average volume 20% above the 20-day average"
+ },
+ "current_rule": [
+  {
+   "rule": "current 5-of-6",
+   "hold_days": 3,
+   "stop_pct": 6,
+   "train": {
+    "trades": 650,
+    "avg_vs_spy_pct": -0.057,
+    "beat_spy_rate": 0.463,
+    "t_stat": -0.54,
+    "total_vs_spy_pct": -36.8
+   },
+   "test": {
+    "trades": 585,
+    "avg_vs_spy_pct": -0.062,
+    "beat_spy_rate": 0.463,
+    "t_stat": -0.51,
+    "total_vs_spy_pct": -36.4
+   }
+  }
+ ],
+ "best_by_first_year": [
+  {
+   "rule": "uptrend + rel_strength + calm_market",
+   "hold_days": 5,
+   "stop_pct": 6,
+   "train": {
+    "trades": 704,
+    "avg_vs_spy_pct": 0.428,
+    "beat_spy_rate": 0.486,
+    "t_stat": 2.95,
+    "total_vs_spy_pct": 301.6
+   },
+   "test": {
+    "trades": 726,
+    "avg_vs_spy_pct": -0.104,
+    "beat_spy_rate": 0.446,
+    "t_stat": -0.78,
+    "total_vs_spy_pct": -75.3
+   }
+  },
+  {
+   "rule": "rel_strength + oversold_uptrend",
+   "hold_days": 3,
+   "stop_pct": 8,
+   "train": {
+    "trades": 136,
+    "avg_vs_spy_pct": 0.663,
+    "beat_spy_rate": 0.566,
+    "t_stat": 2.91,
+    "total_vs_spy_pct": 90.2
+   },
+   "test": {
+    "trades": 151,
+    "avg_vs_spy_pct": -0.173,
+    "beat_spy_rate": 0.47,
+    "t_stat": -0.74,
+    "total_vs_spy_pct": -26.2
+   }
+  },
+  {
+   "rule": "rel_strength + not_overheated + oversold_uptrend",
+   "hold_days": 3,
+   "stop_pct": 8,
+   "train": {
+    "trades": 136,
+    "avg_vs_spy_pct": 0.663,
+    "beat_spy_rate": 0.566,
+    "t_stat": 2.91,
+    "total_vs_spy_pct": 90.2
+   },
+   "test": {
+    "trades": 151,
+    "avg_vs_spy_pct": -0.173,
+    "beat_spy_rate": 0.47,
+    "t_stat": -0.74,
+    "total_vs_spy_pct": -26.2
+   }
+  },
+  {
+   "rule": "above_vwap + rel_strength + oversold_uptrend",
+   "hold_days": 3,
+   "stop_pct": 8,
+   "train": {
+    "trades": 134,
+    "avg_vs_spy_pct": 0.664,
+    "beat_spy_rate": 0.59,
+    "t_stat": 2.88,
+    "total_vs_spy_pct": 89.0
+   },
+   "test": {
+    "trades": 146,
+    "avg_vs_spy_pct": -0.273,
+    "beat_spy_rate": 0.432,
+    "t_stat": -1.14,
+    "total_vs_spy_pct": -39.9
+   }
+  },
+  {
+   "rule": "uptrend + above_vwap + not_overheated",
+   "hold_days": 5,
+   "stop_pct": 8,
+   "train": {
+    "trades": 933,
+    "avg_vs_spy_pct": 0.352,
+    "beat_spy_rate": 0.469,
+    "t_stat": 2.86,
+    "total_vs_spy_pct": 328.0
+   },
+   "test": {
+    "trades": 913,
+    "avg_vs_spy_pct": -0.034,
+    "beat_spy_rate": 0.49,
+    "t_stat": -0.3,
+    "total_vs_spy_pct": -31.4
+   }
+  },
+  {
+   "rule": "pullback + not_overheated + sector_rotation",
+   "hold_days": 5,
+   "stop_pct": 6,
+   "train": {
+    "trades": 684,
+    "avg_vs_spy_pct": 0.359,
+    "beat_spy_rate": 0.507,
+    "t_stat": 2.86,
+    "total_vs_spy_pct": 245.8
+   },
+   "test": {
+    "trades": 681,
+    "avg_vs_spy_pct": -0.135,
+    "beat_spy_rate": 0.454,
+    "t_stat": -1.13,
+    "total_vs_spy_pct": -92.1
+   }
+  },
+  {
+   "rule": "uptrend + rel_strength",
+   "hold_days": 5,
+   "stop_pct": 6,
+   "train": {
+    "trades": 934,
+    "avg_vs_spy_pct": 0.355,
+    "beat_spy_rate": 0.489,
+    "t_stat": 2.85,
+    "total_vs_spy_pct": 331.8
+   },
+   "test": {
+    "trades": 925,
+    "avg_vs_spy_pct": -0.191,
+    "beat_spy_rate": 0.443,
+    "t_stat": -1.6,
+    "total_vs_spy_pct": -176.4
+   }
+  },
+  {
+   "rule": "uptrend + not_overheated + volume_trend",
+   "hold_days": 5,
+   "stop_pct": 8,
+   "train": {
+    "trades": 696,
+    "avg_vs_spy_pct": 0.416,
+    "beat_spy_rate": 0.474,
+    "t_stat": 2.78,
+    "total_vs_spy_pct": 289.7
+   },
+   "test": {
+    "trades": 522,
+    "avg_vs_spy_pct": 0.274,
+    "beat_spy_rate": 0.525,
+    "t_stat": 1.79,
+    "total_vs_spy_pct": 143.2
+   }
+  },
+  {
+   "rule": "rel_strength + pullback + volume_trend",
+   "hold_days": 3,
+   "stop_pct": 6,
+   "train": {
+    "trades": 244,
+    "avg_vs_spy_pct": 0.369,
+    "beat_spy_rate": 0.59,
+    "t_stat": 2.74,
+    "total_vs_spy_pct": 89.9
+   },
+   "test": {
+    "trades": 270,
+    "avg_vs_spy_pct": -0.026,
+    "beat_spy_rate": 0.519,
+    "t_stat": -0.15,
+    "total_vs_spy_pct": -7.0
+   }
+  },
+  {
+   "rule": "bullish_candle + rel_strength + oversold_uptrend",
+   "hold_days": 3,
+   "stop_pct": 8,
+   "train": {
+    "trades": 112,
+    "avg_vs_spy_pct": 0.685,
+    "beat_spy_rate": 0.571,
+    "t_stat": 2.68,
+    "total_vs_spy_pct": 76.7
+   },
+   "test": {
+    "trades": 130,
+    "avg_vs_spy_pct": -0.264,
+    "beat_spy_rate": 0.415,
+    "t_stat": -1.1,
+    "total_vs_spy_pct": -34.3
+   }
+  },
+  {
+   "rule": "uptrend + not_overheated",
+   "hold_days": 5,
+   "stop_pct": 8,
+   "train": {
+    "trades": 935,
+    "avg_vs_spy_pct": 0.305,
+    "beat_spy_rate": 0.482,
+    "t_stat": 2.62,
+    "total_vs_spy_pct": 285.0
+   },
+   "test": {
+    "trades": 917,
+    "avg_vs_spy_pct": -0.302,
+    "beat_spy_rate": 0.461,
+    "t_stat": -2.72,
+    "total_vs_spy_pct": -277.3
+   }
+  },
+  {
+   "rule": "above_vwap + not_overheated",
+   "hold_days": 5,
+   "stop_pct": 8,
+   "train": {
+    "trades": 936,
+    "avg_vs_spy_pct": 0.278,
+    "beat_spy_rate": 0.49,
+    "t_stat": 2.59,
+    "total_vs_spy_pct": 260.5
+   },
+   "test": {
+    "trades": 925,
+    "avg_vs_spy_pct": -0.15,
+    "beat_spy_rate": 0.466,
+    "t_stat": -1.24,
+    "total_vs_spy_pct": -138.3
+   }
+  },
+  {
+   "rule": "rel_strength + pullback + oversold_uptrend",
+   "hold_days": 5,
+   "stop_pct": 4,
+   "train": {
+    "trades": 129,
+    "avg_vs_spy_pct": 0.74,
+    "beat_spy_rate": 0.527,
+    "t_stat": 2.58,
+    "total_vs_spy_pct": 95.5
+   },
+   "test": {
+    "trades": 143,
+    "avg_vs_spy_pct": -0.235,
+    "beat_spy_rate": 0.364,
+    "t_stat": -0.88,
+    "total_vs_spy_pct": -33.7
+   }
+  },
+  {
+   "rule": "uptrend + rel_strength + not_overheated",
+   "hold_days": 5,
+   "stop_pct": 6,
+   "train": {
+    "trades": 932,
+    "avg_vs_spy_pct": 0.328,
+    "beat_spy_rate": 0.494,
+    "t_stat": 2.54,
+    "total_vs_spy_pct": 306.0
+   },
+   "test": {
+    "trades": 915,
+    "avg_vs_spy_pct": -0.209,
+    "beat_spy_rate": 0.446,
+    "t_stat": -1.77,
+    "total_vs_spy_pct": -191.6
+   }
+  },
+  {
+   "rule": "rel_strength + not_overheated + calm_market",
+   "hold_days": 5,
+   "stop_pct": 6,
+   "train": {
+    "trades": 704,
+    "avg_vs_spy_pct": 0.366,
+    "beat_spy_rate": 0.487,
+    "t_stat": 2.54,
+    "total_vs_spy_pct": 257.9
+   },
+   "test": {
+    "trades": 729,
+    "avg_vs_spy_pct": -0.124,
+    "beat_spy_rate": 0.45,
+    "t_stat": -0.92,
+    "total_vs_spy_pct": -90.2
+   }
+  }
+ ],
+ "generated": "2026-10-15T20:07+00:00"
+}
