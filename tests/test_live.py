@@ -7,7 +7,7 @@ def test_live_has_status_and_latest_points(tmp_path, monkeypatch):
     journal.write("intraday.json", {"points": [[f"t{i}", 1000 + i, 700] for i in range(40)]})
     out = live.build()
     assert out["status"]["equity"] == 1001.0
-    assert len(out["intraday_tail"]) == 15 and out["intraday_tail"][-1][0] == "t39"
+    assert len(out["intraday_tail"]) == 30 and out["intraday_tail"][-1][0] == "t39"
 
 
 def test_repair_history_removes_a_phantom_step():

@@ -430,6 +430,12 @@ beat the S&P 500. Once an hour during market hours you read the latest headlines
 any of them is a real, still-tradeable opportunity to BUY: news that should push an ETF or a company
 stock up over the next days, which the market has NOT fully priced in yet.
 
+Your headlines come from several places: Alpaca's real-time feed (Benzinga), company press-release
+wires (PR Newswire, GlobeNewswire, Business Wire), fresh SEC 8-K filings (official notices of major
+company events; they name the company, not the ticker), market news (CNBC, MarketWatch, Yahoo
+Finance, Seeking Alpha) and policy news (Federal Reserve, White House). A press release or filing
+that the price hasn't reacted to yet is the best kind of opportunity; for 8-Ks, look up what was filed.
+
 Be realistic: professional traders react to headlines within seconds, so by the time you read one,
 the first jump has usually happened. Only buy when you can say why the move should continue: the
 news changes the business for months (a big contract, an approval, a policy that directly helps

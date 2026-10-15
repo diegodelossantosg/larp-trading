@@ -10,7 +10,7 @@ import json
 from . import journal
 
 
-def build(points: int = 15) -> dict:
+def build(points: int = 30) -> dict:
     return {
         "status": journal.read("status.json", {}),
         "intraday_tail": (journal.read("intraday.json", {}) or {}).get("points", [])[-points:],

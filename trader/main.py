@@ -24,7 +24,7 @@ from .market import Market
 from .risk import Order, apply_limits, drawdown, earnings_blackout, plan_orders
 from .universe import BIG_STOCKS, CORE_ETFS, LEVERAGED, NAMES
 from . import health as market_health
-from . import scorecard
+from . import feeds, scorecard
 from . import watch as rules
 
 log = logging.getLogger("trader")
@@ -484,6 +484,9 @@ def news(cfg, broker: Broker, market: Market, dry_run: bool, force: bool = False
         log.info("News Hunter already made %d buys today", used)
         return 0
     headlines = market.news(hours=2, limit=50)
+    extra, sources = feeds.fetch_all(hours=2)
+    log.info("news sources: Alpaca/Benzinga %d, %s", len(headlines), sources)
+    headlines += extra
     if not headlines:
         log.info("no fresh headlines")
         return 0
@@ -496,6 +499,7 @@ def news(cfg, broker: Broker, market: Market, dry_run: bool, force: bool = False
     context = {
         "now_new_york": datetime.now(ET).strftime("%Y-%m-%d %H:%M"),
         "headlines": headlines,
+        "news_sources_status": {"Alpaca (Benzinga)": f"ok ({len(headlines) - len(extra)})", **sources},
         "prices_of_mentioned": {s: {"price": q.price, "change_today_pct": round((q.price / q.prev_close - 1) * 100, 2)}
                                 for s, q in quotes.items()},
         "holdings": {s: round(w, 3) for s, w in weights.items()},

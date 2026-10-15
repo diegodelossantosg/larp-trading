@@ -53,7 +53,8 @@ jobs:
           git config user.name "trading-agent"
           git config user.email "trading-agent@users.noreply.github.com"
           # Check every minute. Changes are folded into one local commit and published every
-          # 5 minutes, or right away after a trade, so GitHub isn't flooded with commits.
+          # 15 minutes, or right away after a trade, so GitHub Pages can finish publishing the page
+          # between data commits (every commit restarts and cancels the previous publish).
           sync() {
             git pull -q --rebase -X theirs origin main || { git rebase --abort; echo "sync failed"; }
           }
@@ -82,7 +83,7 @@ jobs:
               if [ -n "$(git log origin/main..HEAD --oneline)" ]; then git commit -q --amend --no-edit
               else git commit -q -m "Watch: $(date -u +%Y-%m-%dT%H:%MZ)"; fi
             fi
-            if [ $((i % 5)) -eq 0 ] || [ "$before" != "$(md5sum docs/data/decisions.json 2>/dev/null)" ]; then
+            if [ $((i % 15)) -eq 0 ] || [ "$before" != "$(md5sum docs/data/decisions.json 2>/dev/null)" ]; then
               publish
             else
               sync
