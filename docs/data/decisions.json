@@ -960,5 +960,25 @@
   "notes": [],
   "plain_summary": "Chip and AI-hardware stocks are still sliding for the eighth day because of worries about how AI spending gets paid for and about interest rates, not one company's scary headline, so I'm buying nothing this hour.",
   "ideas": []
+ },
+ {
+  "date": "2026-10-15",
+  "time": "15:19",
+  "source": "news",
+  "dry_run": false,
+  "orders": [],
+  "notes": [
+   "skipped CSCO: its next earnings date isn't confirmed"
+  ],
+  "plain_summary": "Chip and AI-hardware stocks are being sold off broadly, and Cisco fell about 3% because of a security flaw in one small product, so I picked Cisco as the one stock to buy.",
+  "ideas": [
+   {
+    "symbol": "CSCO",
+    "headline": "Why Is Cisco Stock Falling on Thursday? (Benzinga, 2026-10-15 18:12 UTC): attackers are using a critical 9.8-rated flaw in Cisco Secure Email Gateway (CVE-2026-76519)",
+    "why_not_priced_in": "Cisco is down about 3.3% today, 3.7% behind the S&P 500. The cause is a flaw in its Secure Email Gateway, a small product in a company that expects $18-18.2B in revenue this quarter. A fix has been available since September 14, so this is mostly a scary headline, not lasting damage to the business. The flaw only works on gateways with one specific setting turned on, and the US cybersecurity agency (CISA) has simply told users to patch. The rest of the drop is the broad sell-off in AI hardware, not news about Cisco itself. The stock has already bounced from its low of about $108.95 to about $109.93, so it is no longer falling fast. Cisco has not confirmed its next earnings date. Calendars estimate November 10-11, 2026, about four weeks away and well outside the 3-trading-day limit.",
+    "plain_reason": "A fixable bug in one small product shouldn't knock this much off a giant company.",
+    "next_earnings": "unknown"
+   }
+  ]
  }
 ]
