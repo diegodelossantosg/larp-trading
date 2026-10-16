@@ -6,8 +6,8 @@
   "amount": 148.5,
   "entry": 66.0807,
   "spy_entry": 778.1,
-  "last": 67.38,
-  "spy_last": 771.12,
+  "last": 67.32,
+  "spy_last": 770.95,
   "open": true,
   "approx": true
  },
@@ -18,8 +18,8 @@
   "amount": 118.8,
   "entry": 112.034,
   "spy_entry": 778.1,
-  "last": 107.1,
-  "spy_last": 771.12,
+  "last": 107.27,
+  "spy_last": 771.15,
   "open": false,
   "approx": true,
   "closed_date": "2026-10-16"
@@ -31,8 +31,8 @@
   "amount": 99.0,
   "entry": 227.54,
   "spy_entry": 778.1,
-  "last": 227.01,
-  "spy_last": 771.12,
+  "last": 226.76,
+  "spy_last": 770.95,
   "open": true,
   "approx": true
  },
@@ -43,8 +43,8 @@
   "amount": 99.0,
   "entry": 171.7012,
   "spy_entry": 778.1,
-  "last": 177.85,
-  "spy_last": 771.12,
+  "last": 177.52,
+  "spy_last": 770.95,
   "open": true,
   "approx": true
  },
@@ -55,8 +55,8 @@
   "amount": 79.2,
   "entry": 194.316,
   "spy_entry": 778.1,
-  "last": 196.75,
-  "spy_last": 771.12,
+  "last": 196.52,
+  "spy_last": 770.95,
   "open": true,
   "approx": true
  },
@@ -67,8 +67,8 @@
   "amount": 80.0,
   "entry": 66.0807,
   "spy_entry": 778.1,
-  "last": 67.38,
-  "spy_last": 771.12,
+  "last": 67.32,
+  "spy_last": 770.95,
   "open": true,
   "approx": true
  },
@@ -79,8 +79,8 @@
   "amount": 79.94,
   "entry": 171.7012,
   "spy_entry": 778.1,
-  "last": 177.85,
-  "spy_last": 771.12,
+  "last": 177.52,
+  "spy_last": 770.95,
   "open": true,
   "approx": true
  },
@@ -91,41 +91,8 @@
   "amount": 80.01,
   "entry": 87.775,
   "spy_entry": 772.33,
-  "last": 88.52,
-  "spy_last": 771.12,
-  "open": true
- },
- {
-  "date": "2026-10-16",
-  "source": "claude",
-  "symbol": "AAPL",
-  "amount": 78.86,
-  "entry": 343.38,
-  "spy_entry": 771.12,
-  "last": 343.38,
-  "spy_last": 771.12,
-  "open": true
- },
- {
-  "date": "2026-10-16",
-  "source": "claude",
-  "symbol": "LLY",
-  "amount": 69.0,
-  "entry": 1268.22,
-  "spy_entry": 771.12,
-  "last": 1268.22,
-  "spy_last": 771.12,
-  "open": true
- },
- {
-  "date": "2026-10-16",
-  "source": "claude",
-  "symbol": "WMT",
-  "amount": 59.15,
-  "entry": 119.23,
-  "spy_entry": 771.12,
-  "last": 119.23,
-  "spy_last": 771.12,
+  "last": 88.42,
+  "spy_last": 770.95,
   "open": true
  }
 ]
