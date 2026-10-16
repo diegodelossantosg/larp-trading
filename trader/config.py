@@ -50,7 +50,7 @@ class Config:
     trading_enabled: bool
     max_web_searches: int
     capital_usd: float  # money the agent may use; 0 = the whole Alpaca account
-    max_idle_weight: float  # most that may sit in the idle asset (SPY)
+    max_idle_weight: float  # most that may sit in the idle asset (SSO)
     stop_trail_pct: float  # sell a position that falls this far below its high since bought
     watch_min_score: int  # how many of the watcher's 6 buy signals must agree
     watch_buy_size: float  # share of capital per watcher buy
@@ -104,7 +104,7 @@ def load_config() -> Config:
         trading_enabled=_bool("TRADING_ENABLED", True),
         max_web_searches=int(_float("MAX_WEB_SEARCHES", 10)),
         capital_usd=_float("CAPITAL_USD", 1000),
-        max_idle_weight=_float("MAX_IDLE_WEIGHT", 0.50),
+        max_idle_weight=_float("MAX_IDLE_WEIGHT", 0.30),  # 9-year test: same return as 50%, much smaller drops
         stop_trail_pct=_float("STOP_TRAIL_PCT", 0.06),
         watch_min_score=int(_float("WATCH_MIN_SCORE", 5)),
         watch_buy_size=_float("WATCH_BUY_SIZE", 0.08),
