@@ -1,12 +1,12 @@
 {
- "updated": "2026-10-16T09:37-04:00",
+ "updated": "2026-10-16T09:55-04:00",
  "mode": "paper",
  "capital": 1000.0,
  "spy_start": 779.38,
  "idle_asset": "SSO",
  "model": "opus",
- "equity": 1005.05,
- "cash": 9.92,
+ "equity": 1003.1,
+ "cash": 9.96,
  "performance": {
   "since": "2026-10-12",
   "days_tracked": 4,
@@ -17,19 +17,19 @@
  "scorecard": {
   "claude": {
    "buys": 5,
-   "avg_return_pct": 0.75,
-   "avg_vs_spy_pct": 1.48,
+   "avg_return_pct": 0.48,
+   "avg_vs_spy_pct": 1.27,
    "beat_spy": 4,
-   "dollars": 3.9,
-   "dollars_vs_spy": 7.89
+   "dollars": 2.26,
+   "dollars_vs_spy": 6.55
   },
   "watch": {
    "buys": 3,
-   "avg_return_pct": 2.14,
-   "avg_vs_spy_pct": 2.62,
+   "avg_return_pct": 2.15,
+   "avg_vs_spy_pct": 2.69,
    "beat_spy": 3,
-   "dollars": 5.13,
-   "dollars_vs_spy": 6.29
+   "dollars": 5.15,
+   "dollars_vs_spy": 6.45
   }
  },
  "health": {
@@ -71,79 +71,79 @@
   {
    "symbol": "XLE",
    "qty": 3.4576,
-   "market_value": 233.3872,
+   "market_value": 232.3499,
    "avg_entry_price": 66.0807,
-   "current_price": 67.5,
-   "unrealized_pl": 4.9072,
-   "unrealized_plpc": 0.0215,
+   "current_price": 67.2,
+   "unrealized_pl": 3.8699,
+   "unrealized_plpc": 0.0169,
    "name": "Energy",
-   "weight": 0.2322
+   "weight": 0.2316
   },
   {
    "symbol": "SSO",
    "qty": 2.8418,
-   "market_value": 201.4579,
+   "market_value": 201.2874,
    "avg_entry_price": 71.95,
-   "current_price": 70.89,
-   "unrealized_pl": -3.0123,
-   "unrealized_plpc": -0.0147,
+   "current_price": 70.83,
+   "unrealized_pl": -3.1829,
+   "unrealized_plpc": -0.0156,
    "name": "2x S&P 500",
-   "weight": 0.2004
+   "weight": 0.2007
   },
   {
    "symbol": "XLV",
    "qty": 1.042,
-   "market_value": 185.0356,
+   "market_value": 185.2857,
    "avg_entry_price": 171.7012,
-   "current_price": 177.57,
-   "unrealized_pl": 6.1156,
-   "unrealized_plpc": 0.0342,
+   "current_price": 177.81,
+   "unrealized_pl": 6.3657,
+   "unrealized_plpc": 0.0356,
    "name": "Health care",
-   "weight": 0.1841
+   "weight": 0.1847
   },
   {
    "symbol": "IGV",
    "qty": 1.0603,
-   "market_value": 115.4034,
+   "market_value": 114.3908,
    "avg_entry_price": 112.034,
-   "current_price": 108.84,
-   "unrealized_pl": -3.3866,
-   "unrealized_plpc": -0.0285,
+   "current_price": 107.885,
+   "unrealized_pl": -4.3992,
+   "unrealized_plpc": -0.037,
    "name": "Software",
-   "weight": 0.1148
+   "weight": 0.114
   },
   {
    "symbol": "QUAL",
    "qty": 0.435,
-   "market_value": 98.8029,
+   "market_value": 98.8377,
    "avg_entry_price": 227.54,
-   "current_price": 227.11,
-   "unrealized_pl": -0.1871,
-   "unrealized_plpc": -0.0019,
+   "current_price": 227.19,
+   "unrealized_pl": -0.1523,
+   "unrealized_plpc": -0.0015,
    "name": "US quality",
-   "weight": 0.0983
+   "weight": 0.0985
   },
   {
    "symbol": "XRT",
    "qty": 0.9113,
-   "market_value": 80.6853,
+   "market_value": 80.9769,
    "avg_entry_price": 87.788,
-   "current_price": 88.54,
-   "unrealized_pl": 0.6853,
-   "unrealized_plpc": 0.0086,
+   "current_price": 88.86,
+   "unrealized_pl": 0.9769,
+   "unrealized_plpc": 0.0122,
    "name": "Retail",
-   "weight": 0.0803
+   "weight": 0.0807
   },
   {
    "symbol": "XOP",
    "qty": 0.4075,
-   "market_value": 80.3527,
+   "market_value": 80.0108,
    "avg_entry_price": 194.316,
-   "current_price": 197.169,
-   "unrealized_pl": 1.1627,
-   "unrealized_plpc": 0.0147,
+   "current_price": 196.33,
+   "unrealized_pl": 0.8208,
+   "unrealized_plpc": 0.0104,
    "name": "Oil & gas exploration",
-   "weight": 0.0799
+   "weight": 0.0798
   }
  ]
 }
