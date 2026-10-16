@@ -125,6 +125,7 @@ dl.glossary dd { margin: 2px 0 0; color: var(--ink-2); }
 .tag { display: inline-block; padding: 1px 8px; border-radius: 6px; font-size: 13px; font-weight: 600; margin: 2px 4px 2px 0; }
 .tag.buy { background: rgba(12,163,12,.14); color: var(--good); }
 .tag.sell { background: rgba(208,59,59,.14); color: var(--bad); }
+.tag.trim { background: rgba(237,161,0,.18); color: #9a6700; }
 .tag.hold { background: var(--chip); color: var(--ink-2); }
 .mood-badge { display: inline-block; font-weight: 700; font-size: 16px; padding: 4px 12px; border-radius: 99px; margin: 4px 0 10px; }
 .mood-healthy { background: rgba(12,163,12,.15); color: var(--good); }
@@ -525,6 +526,20 @@ function plainReason(d, o, idle) {
   return e ? e.plain_reason : "Claude sees better places for this money.";
 }
 
+// A sell that leaves part of the position in Claude's plan is a "trim", not a full sale.
+function moveKind(d, o, idle) {
+  if (o.side === "buy") return { cls: "buy", label: "Buy" };
+  const keep = (d.final_targets || {})[o.symbol];
+  if (keep && o.symbol !== idle && !(o.reason || "").startsWith("trailing stop")) {
+    const buys = (d.orders || []).filter((x) => x.side === "buy" && x.symbol !== idle).map((x) => x.symbol);
+    const p = (d.positions || []).find((x) => x.symbol === o.symbol);
+    const why = buys.length ? `to make room for ${buys.join(", ")}` : "to rebalance";
+    return { cls: "trim", label: "Trim",
+             reason: `Still holding it, just less: cut to ${Math.round(keep * 100)}% of the portfolio ${why}.` + (p && p.plain_reason ? ` ${p.plain_reason}` : "") };
+  }
+  return { cls: "sell", label: "Sell" };
+}
+
 function decisionsView(decisions) {
   const real = decisions.filter((d) => !d.dry_run && (d.market_view || d.error || (d.orders || []).length));
   if (!real.length) { $("decisions").innerHTML = `<div class="empty">Nothing yet.</div>`; return; }
@@ -537,7 +552,10 @@ function decisionsView(decisions) {
     if (d.error) rows = `<div class="move"><span class="tag sell">Error</span><span>Something went wrong, so nothing was traded.</span></div>`;
     else if (d.trade_today === false || !orders.length)
       rows = `<div class="move"><span class="tag hold">No changes</span><span>${esc(d.plain_summary || "Nothing worth changing today.")}</span></div>`;
-    else rows = orders.map((o) => `<div class="move"><span class="tag ${o.side}">${o.side === "buy" ? "Buy" : "Sell"} ${esc(o.symbol)} ${usd(o.notional, 0)}</span><span>${esc(plainReason(d, o, idle))}</span></div>`).join("");
+    else rows = orders.map((o) => {
+      const kind = moveKind(d, o, idle);
+      return `<div class="move"><span class="tag ${kind.cls}">${kind.label} ${esc(o.symbol)} ${usd(o.notional, 0)}</span><span>${esc(kind.reason || plainReason(d, o, idle))}</span></div>`;
+    }).join("");
     return `<div class="entry">
       <div><span class="when">${esc(d.date)}</span> <span class="small">${esc(d.time || "")}</span>${who}</div>
       <div class="moves">${rows}</div>
