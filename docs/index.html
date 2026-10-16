@@ -154,6 +154,7 @@ details.log[open] > summary { margin-bottom: 8px; }
 .chip.auto { background: rgba(237,161,0,.18); color: var(--ink); }
 .chip.news { background: rgba(214,65,140,.16); color: var(--ink); }
 h2 { display: flex; align-items: center; gap: 8px; }
+h3.sub { font-size: 15px; margin: 18px 0 6px; }
 h2::before { content: ""; width: 4px; height: 18px; border-radius: 2px; background: var(--h, var(--series-1)); }
 </style>
 </head>
@@ -201,6 +202,8 @@ h2::before { content: ""; width: 4px; height: 18px; border-radius: 2px; backgrou
     <section class="card">
       <h2 style="--h: var(--c4)">Who's earning</h2>
       <div class="table-scroll" id="scorecard"></div>
+      <h3 class="sub">🧠 Claude's report card <span class="small">· its picks by kind of trade, vs the S&amp;P 500</span></h3>
+      <div class="table-scroll" id="report-card"></div>
     </section>
 
     <details class="card log" id="log-card" open>
@@ -474,6 +477,21 @@ function scorecardView(status) {
   </tbody></table>`;
 }
 
+const TRADE_TYPES = { news_catalyst: "📰 News", earnings: "📊 Earnings", trend_momentum: "📈 Strong trend",
+  macro_theme: "🌍 Economy / politics", defensive_hedge: "🛡️ Protection", rebound: "↩️ Bounce back", other: "Other",
+  untagged: "Before tagging" };
+
+function reportCardView(card) {
+  const rows = Object.entries((card && card.by_trade_type) || {});
+  if (!rows.length) { $("report-card").innerHTML = `<div class="empty">Fills in as Claude's picks age (first results after 5 trading days).</div>`; return; }
+  const cell = (v) => v == null ? `<td class="num small">–</td>` : `<td class="num ${cls(v)}">${pct(v)}</td>`;
+  $("report-card").innerHTML = `<table><thead><tr><th>Kind of trade</th><th class="num">Picks</th><th class="num">After 5 days</th><th class="num">After 20 days</th><th class="num">So far</th><th class="num">Beat S&amp;P</th></tr></thead><tbody>
+  ${rows.sort((a, b) => b[1].picks - a[1].picks).map(([k, g]) => `<tr><td><b>${TRADE_TYPES[k] || esc(k)}</b></td><td class="num">${g.picks}</td>
+    ${cell(g.vs_spy_5d_avg_pct)}${cell(g.vs_spy_20d_avg_pct)}${cell(g.vs_spy_so_far_avg_pct)}
+    <td class="num">${g.vs_spy_so_far_beat_rate != null ? Math.round(g.vs_spy_so_far_beat_rate * 100) + "%" : "–"}</td></tr>`).join("")}
+  </tbody></table>`;
+}
+
 function describeOrders(orders) {
   const ok = (orders || []).filter((o) => !["error", "skipped"].includes(o.status));
   if (!ok.length) return `<span class="tag hold">No changes</span>`;
@@ -576,7 +594,7 @@ setInterval(refreshLive, 61000);
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") refreshLive(); });
 setTimeout(() => location.reload(), 15 * 60000);  // full reload now and then for everything else
 (async () => {
-  const [status, equity, decisions, trades, intraday] = await Promise.all([load("status.json", {}), load("equity.json", []), load("decisions.json", []), load("scorecard.json", []), load("intraday.json", {})]);
+  const [status, equity, decisions, trades, intraday, card] = await Promise.all([load("status.json", {}), load("equity.json", []), load("decisions.json", []), load("scorecard.json", []), load("intraday.json", {}), load("report_card.json", null)]);
   Object.assign(DATA, { status, equity, intraday });
   document.querySelectorAll("#intervals button").forEach((b) => b.addEventListener("click", () => {
     interval = b.dataset.iv;
@@ -591,6 +609,7 @@ setTimeout(() => location.reload(), 15 * 60000);  // full reload now and then fo
   holdings(status);
   refreshLive();
   scorecardView(status);
+  reportCardView(card);
   closedView(trades, decisions);
   moodView(status, decisions);
   decisionsView(decisions);

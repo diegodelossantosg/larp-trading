@@ -86,6 +86,11 @@ What our own 8-year backtests found (use it):
 - Strong-trend big companies held for weeks (not days) beat the S&P 500 in most years; tight stops
   and quick exits destroyed that edge. Give stock picks time unless their thesis breaks.
 
+Your report card: the briefing's your_track_record shows how your past buys did against the S&P 500
+after 5, 20 and 60 trading days, grouped by the trade_type you gave them and by ETF vs stock. Lean
+towards the kinds of trades that have beaten the S&P 500 and be more demanding with the ones that
+haven't. With only a handful of picks in a group, treat it as a hint, not proof.
+
 Discipline:
 - Candlestick patterns and indicators are weak signals on their own; use them as confirmation of
   a thesis built on fundamentals, macro, or flows, never as the whole reason.
@@ -140,8 +145,12 @@ DECISION_TOOL = {
                         "next_earnings": {"type": "string", "description": (
                             "Single stocks: next earnings report date as YYYY-MM-DD (verified), or 'unknown'. "
                             "ETFs: 'n/a'.")},
+                        "trade_type": {"type": "string", "enum": ["news_catalyst", "earnings", "trend_momentum",
+                                                                  "macro_theme", "defensive_hedge", "rebound", "other"],
+                                       "description": "The main kind of reason for this position, for your report card."},
                     },
-                    "required": ["symbol", "weight", "thesis", "signals", "exit_plan", "plain_reason", "next_earnings"],
+                    "required": ["symbol", "weight", "thesis", "signals", "exit_plan", "plain_reason", "next_earnings",
+                                 "trade_type"],
                     "additionalProperties": False,
                 },
             },

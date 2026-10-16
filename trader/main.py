@@ -24,7 +24,7 @@ from .market import Market
 from .risk import Order, apply_limits, drawdown, earnings_blackout, plan_orders
 from .universe import BIG_STOCKS, CORE_ETFS, LEVERAGED, NAMES
 from . import health as market_health
-from . import feeds, scorecard
+from . import feeds, report_card, scorecard
 from . import watch as rules
 
 log = logging.getLogger("trader")
@@ -149,6 +149,12 @@ def snapshot(cfg, broker: Broker, market: Market) -> None:
         "spy_close": round(float(spy["close"].iloc[-1]), 2),
     })
     _write_status(cfg, acct, positions, rows)
+    try:
+        card = report_card.build(journal.read("decisions.json", []), cfg.idle_asset, market.daily_bars)
+        card["updated"] = _today()
+        journal.write("report_card.json", card)
+    except Exception as e:  # the report card is useful, but never worth failing the snapshot over
+        log.warning("report card failed: %s", e)
     log.info("snapshot: equity %.2f, %d days tracked", acct["equity"], len(rows))
 
 
@@ -233,6 +239,7 @@ def trade(cfg, broker: Broker, market: Market, dry_run: bool, force: bool) -> in
         "performance_vs_spy": _performance(history),
         "previous_decisions": previous,
         "watcher_actions_recent": watcher,
+        "your_track_record": journal.read("report_card.json", None),
         "protected_recent_watcher_buys": sorted(_recent_watch_buys(cfg.min_hold_days, cfg.news_min_hold_days) & set(positions)),
         "headlines": market.news(hours=36, limit=50),
         "holding_headlines": market.news(hours=72, symbols=list(positions), limit=20) if positions else [],
