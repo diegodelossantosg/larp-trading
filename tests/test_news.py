@@ -58,3 +58,13 @@ def test_news_respects_earnings_and_daily_limit(tmp_path, monkeypatch):
     bought = [o.symbol for o in broker.sent if o.side == "buy"]
     assert bought == ["NVDA"]                                    # AAPL reports tomorrow; only 2 ideas looked at
     assert any("AAPL" in n and "earnings" in n for n in rec["notes"])
+
+
+def test_earnings_beats_are_kept_longer(tmp_path, monkeypatch):
+    beat = dict(idea("NVDA"), idea_type="earnings_beat")
+    drop = dict(idea("TINY"), idea_type="overreaction")
+    broker, rec = run(tmp_path, monkeypatch, [beat, drop])
+    held = {o["symbol"]: o["hold_days"] for o in rec["orders"] if o["side"] == "buy"}
+    assert held == {"NVDA": 20, "TINY": 10}
+    monkeypatch.setattr(main, "_today", lambda: "2026-11-02")    # 12 trading days later
+    assert main._recent_watch_buys(3, 10) == {"NVDA"}

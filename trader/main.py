@@ -95,10 +95,18 @@ def _recent_watch_buys(days: int, news_days: int | None = None) -> set[str]:
     def cutoff(n):
         return (pd.Timestamp(_today()) - pd.offsets.BDay(n)).strftime("%Y-%m-%d")
 
-    limits = {"watch": cutoff(days), "news": cutoff(news_days if news_days is not None else days)}
-    return {o["symbol"] for d in journal.read("decisions.json", [])
-            if d.get("source") in limits and not d.get("dry_run") and d["date"] > limits[d["source"]]
-            for o in d.get("orders", []) if o["side"] == "buy" and o.get("status") not in ("error", "skipped")}
+    news_days = news_days if news_days is not None else days
+    out = set()
+    for d in journal.read("decisions.json", []):
+        if d.get("source") not in ("watch", "news") or d.get("dry_run"):
+            continue
+        for o in d.get("orders", []):
+            if o["side"] != "buy" or o.get("status") in ("error", "skipped"):
+                continue
+            n = days if d["source"] == "watch" else o.get("hold_days", news_days)  # earnings beats: longer
+            if d["date"] > cutoff(n):
+                out.add(o["symbol"])
+    return out
 
 
 def _performance(rows: list[dict]) -> dict:
@@ -536,6 +544,7 @@ def news(cfg, broker: Broker, market: Market, dry_run: bool, force: bool = False
     size = NEWS_BUY_SIZE * equity
     stocks_total = sum(w for s, w in weights.items() if s in BIG_STOCKS or (s not in CORE_ETFS and broker.vet(s)[2] in ("big", "small")))
     small_total = sum(w for s, w in weights.items() if s not in CORE_ETFS and s not in BIG_STOCKS and broker.vet(s)[2] == "small")
+    hold_days: dict[str, int] = {}
     buys: list[Order] = []
     for idea in data.get("ideas", [])[: NEWS_MAX_BUYS_PER_DAY - used]:
         sym = idea["symbol"].upper().strip()
@@ -569,6 +578,8 @@ def news(cfg, broker: Broker, market: Market, dry_run: bool, force: bool = False
             record["notes"].append(f"skipped {sym}: {why}")
             continue
         buys.append(Order(sym, "buy", round(amount, 2), idea["plain_reason"]))
+        hold_days[sym] = (cfg.news_earnings_hold_days if idea.get("idea_type") == "earnings_beat"
+                          else cfg.news_min_hold_days)
         if kind in ("big", "small"):
             stocks_total += amount / equity
         if kind == "small":
@@ -589,6 +600,9 @@ def news(cfg, broker: Broker, market: Market, dry_run: bool, force: bool = False
         else:
             record["orders"] = broker.execute(orders, prices, positions)
             scorecard.record(record["orders"], "news", prices, prices.get("SPY"), today, cfg.idle_asset)
+        for o in record["orders"]:
+            if o["side"] == "buy" and o["symbol"] in hold_days:
+                o["hold_days"] = hold_days[o["symbol"]]
         n = sum(1 for o in record["orders"] if o["side"] == "buy" and o["status"] not in ("error", "skipped", "not sent"))
         journal.write("news.json", {"buys": {today: used + n}})
         positions = broker.positions()
