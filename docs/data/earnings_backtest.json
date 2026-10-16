@@ -1,0 +1,1183 @@
+{
+ "events": 1004,
+ "fell more than 5%": {
+  "events": 189,
+  "best": [
+   {
+    "keep_days": 40,
+    "stop": "smart 4x daily swing",
+    "trades": 188,
+    "avg_vs_spy_pct": 0.367,
+    "median_year_pct": 1.168,
+    "years_beating_spy": "4/5",
+    "by_year": {
+     "2022": 2.601,
+     "2023": 0.373,
+     "2024": -1.933,
+     "2025": 1.168,
+     "2026": 1.641
+    }
+   },
+   {
+    "keep_days": 40,
+    "stop": "no stop",
+    "trades": 188,
+    "avg_vs_spy_pct": 0.333,
+    "median_year_pct": 1.176,
+    "years_beating_spy": "3/5",
+    "by_year": {
+     "2022": 2.47,
+     "2023": -0.141,
+     "2024": -2.09,
+     "2025": 1.854,
+     "2026": 1.176
+    }
+   },
+   {
+    "keep_days": 40,
+    "stop": "smart 3x daily swing",
+    "trades": 188,
+    "avg_vs_spy_pct": 0.274,
+    "median_year_pct": 0.729,
+    "years_beating_spy": "3/5",
+    "by_year": {
+     "2022": 2.593,
+     "2023": 0.729,
+     "2024": -1.968,
+     "2025": -0.176,
+     "2026": 2.875
+    }
+   },
+   {
+    "keep_days": 40,
+    "stop": "smart 2x daily swing",
+    "trades": 188,
+    "avg_vs_spy_pct": 0.188,
+    "median_year_pct": 0.027,
+    "years_beating_spy": "3/5",
+    "by_year": {
+     "2022": 4.386,
+     "2023": 0.957,
+     "2024": -0.637,
+     "2025": -0.374,
+     "2026": 0.027
+    }
+   },
+   {
+    "keep_days": 40,
+    "stop": "15%",
+    "trades": 188,
+    "avg_vs_spy_pct": 0.093,
+    "median_year_pct": 1.164,
+    "years_beating_spy": "3/5",
+    "by_year": {
+     "2022": 5.304,
+     "2023": -0.609,
+     "2024": -2.923,
+     "2025": 1.164,
+     "2026": 1.546
+    }
+   }
+  ],
+  "worst": [
+   {
+    "keep_days": 20,
+    "stop": "6%",
+    "trades": 188,
+    "avg_vs_spy_pct": -1.156,
+    "median_year_pct": -1.148,
+    "years_beating_spy": "1/5",
+    "by_year": {
+     "2022": 0.993,
+     "2023": -2.111,
+     "2024": -1.148,
+     "2025": -0.913,
+     "2026": -1.45
+    }
+   },
+   {
+    "keep_days": 40,
+    "stop": "6%",
+    "trades": 188,
+    "avg_vs_spy_pct": -1.22,
+    "median_year_pct": -1.386,
+    "years_beating_spy": "1/5",
+    "by_year": {
+     "2022": 1.579,
+     "2023": -1.982,
+     "2024": -1.386,
+     "2025": -0.683,
+     "2026": -2.096
+    }
+   }
+  ],
+  "keep_20_days": [
+   {
+    "keep_days": 20,
+    "stop": "no stop",
+    "trades": 188,
+    "avg_vs_spy_pct": -0.695,
+    "median_year_pct": -0.548,
+    "years_beating_spy": "1/5",
+    "by_year": {
+     "2022": 1.044,
+     "2023": -0.971,
+     "2024": -0.54,
+     "2025": -0.548,
+     "2026": -1.502
+    }
+   },
+   {
+    "keep_days": 20,
+    "stop": "smart 4x daily swing",
+    "trades": 188,
+    "avg_vs_spy_pct": -0.664,
+    "median_year_pct": -0.66,
+    "years_beating_spy": "1/5",
+    "by_year": {
+     "2022": 1.044,
+     "2023": -0.674,
+     "2024": -0.66,
+     "2025": -0.479,
+     "2026": -1.532
+    }
+   },
+   {
+    "keep_days": 20,
+    "stop": "10%",
+    "trades": 188,
+    "avg_vs_spy_pct": -0.979,
+    "median_year_pct": -0.993,
+    "years_beating_spy": "1/5",
+    "by_year": {
+     "2022": 2.068,
+     "2023": -1.458,
+     "2024": -0.874,
+     "2025": -0.993,
+     "2026": -1.763
+    }
+   }
+  ]
+ },
+ "fell 2% to 5%": {
+  "events": 147,
+  "best": [
+   {
+    "keep_days": 40,
+    "stop": "no stop",
+    "trades": 141,
+    "avg_vs_spy_pct": 1.465,
+    "median_year_pct": 1.498,
+    "years_beating_spy": "3/4",
+    "by_year": {
+     "2023": 2.016,
+     "2024": -1.934,
+     "2025": 0.981,
+     "2026": 3.808
+    }
+   },
+   {
+    "keep_days": 40,
+    "stop": "20%",
+    "trades": 141,
+    "avg_vs_spy_pct": 0.879,
+    "median_year_pct": 1.202,
+    "years_beating_spy": "3/4",
+    "by_year": {
+     "2023": 2.016,
+     "2024": -1.934,
+     "2025": 0.429,
+     "2026": 1.975
+    }
+   },
+   {
+    "keep_days": 40,
+    "stop": "smart 4x daily swing",
+    "trades": 141,
+    "avg_vs_spy_pct": 0.875,
+    "median_year_pct": 1.218,
+    "years_beating_spy": "3/4",
+    "by_year": {
+     "2023": 1.983,
+     "2024": -1.912,
+     "2025": 0.641,
+     "2026": 1.794
+    }
+   },
+   {
+    "keep_days": 40,
+    "stop": "15%",
+    "trades": 141,
+    "avg_vs_spy_pct": 0.845,
+    "median_year_pct": 1.208,
+    "years_beating_spy": "3/4",
+    "by_year": {
+     "2023": 1.686,
+     "2024": -2.521,
+     "2025": 0.73,
+     "2026": 2.484
+    }
+   },
+   {
+    "keep_days": 40,
+    "stop": "smart 3x daily swing",
+    "trades": 141,
+    "avg_vs_spy_pct": 0.681,
+    "median_year_pct": 1.265,
+    "years_beating_spy": "3/4",
+    "by_year": {
+     "2023": 1.531,
+     "2024": -2.056,
+     "2025": 1.287,
+     "2026": 1.244
+    }
+   }
+  ],
+  "worst": [
+   {
+    "keep_days": 40,
+    "stop": "4%",
+    "trades": 141,
+    "avg_vs_spy_pct": -0.518,
+    "median_year_pct": -0.702,
+    "years_beating_spy": "1/4",
+    "by_year": {
+     "2023": -0.313,
+     "2024": -1.489,
+     "2025": 0.556,
+     "2026": -1.091
+    }
+   },
+   {
+    "keep_days": 20,
+    "stop": "4%",
+    "trades": 143,
+    "avg_vs_spy_pct": -0.522,
+    "median_year_pct": -0.716,
+    "years_beating_spy": "1/4",
+    "by_year": {
+     "2023": -0.268,
+     "2024": -1.195,
+     "2025": 0.277,
+     "2026": -1.164
+    }
+   }
+  ],
+  "keep_20_days": [
+   {
+    "keep_days": 20,
+    "stop": "no stop",
+    "trades": 143,
+    "avg_vs_spy_pct": -0.122,
+    "median_year_pct": -0.354,
+    "years_beating_spy": "2/4",
+    "by_year": {
+     "2023": 1.224,
+     "2024": -1.596,
+     "2025": 0.723,
+     "2026": -1.431
+    }
+   },
+   {
+    "keep_days": 20,
+    "stop": "10%",
+    "trades": 143,
+    "avg_vs_spy_pct": -0.345,
+    "median_year_pct": -0.559,
+    "years_beating_spy": "2/4",
+    "by_year": {
+     "2023": 1.155,
+     "2024": -1.593,
+     "2025": 0.474,
+     "2026": -2.01
+    }
+   },
+   {
+    "keep_days": 20,
+    "stop": "smart 4x daily swing",
+    "trades": 143,
+    "avg_vs_spy_pct": -0.408,
+    "median_year_pct": -0.758,
+    "years_beating_spy": "2/4",
+    "by_year": {
+     "2023": 1.117,
+     "2024": -1.899,
+     "2025": 0.219,
+     "2026": -1.735
+    }
+   }
+  ]
+ },
+ "moved less than 2%": {
+  "events": 320,
+  "best": [
+   {
+    "keep_days": 5,
+    "stop": "smart 3x daily swing",
+    "trades": 316,
+    "avg_vs_spy_pct": -0.093,
+    "median_year_pct": -0.096,
+    "years_beating_spy": "1/5",
+    "by_year": {
+     "2022": 1.527,
+     "2023": -0.091,
+     "2024": -0.096,
+     "2025": -0.287,
+     "2026": -0.28
+    }
+   },
+   {
+    "keep_days": 10,
+    "stop": "smart 3x daily swing",
+    "trades": 316,
+    "avg_vs_spy_pct": -0.121,
+    "median_year_pct": -0.438,
+    "years_beating_spy": "2/5",
+    "by_year": {
+     "2022": 3.501,
+     "2023": -0.706,
+     "2024": -0.438,
+     "2025": 0.172,
+     "2026": -0.493
+    }
+   },
+   {
+    "keep_days": 5,
+    "stop": "12%",
+    "trades": 316,
+    "avg_vs_spy_pct": -0.131,
+    "median_year_pct": -0.173,
+    "years_beating_spy": "1/5",
+    "by_year": {
+     "2022": 1.549,
+     "2023": -0.173,
+     "2024": -0.149,
+     "2025": -0.354,
+     "2026": -0.186
+    }
+   },
+   {
+    "keep_days": 5,
+    "stop": "15%",
+    "trades": 316,
+    "avg_vs_spy_pct": -0.134,
+    "median_year_pct": -0.198,
+    "years_beating_spy": "1/5",
+    "by_year": {
+     "2022": 1.549,
+     "2023": -0.198,
+     "2024": -0.15,
+     "2025": -0.311,
+     "2026": -0.246
+    }
+   },
+   {
+    "keep_days": 20,
+    "stop": "smart 3x daily swing",
+    "trades": 315,
+    "avg_vs_spy_pct": -0.141,
+    "median_year_pct": -0.34,
+    "years_beating_spy": "1/5",
+    "by_year": {
+     "2022": 5.767,
+     "2023": -0.371,
+     "2024": -0.987,
+     "2025": -0.34,
+     "2026": -0.137
+    }
+   }
+  ],
+  "worst": [
+   {
+    "keep_days": 40,
+    "stop": "4%",
+    "trades": 313,
+    "avg_vs_spy_pct": -0.737,
+    "median_year_pct": -0.765,
+    "years_beating_spy": "1/5",
+    "by_year": {
+     "2022": 0.212,
+     "2023": -0.765,
+     "2024": -0.854,
+     "2025": -0.864,
+     "2026": -0.594
+    }
+   },
+   {
+    "keep_days": 40,
+    "stop": "10%",
+    "trades": 313,
+    "avg_vs_spy_pct": -0.856,
+    "median_year_pct": -0.867,
+    "years_beating_spy": "1/5",
+    "by_year": {
+     "2022": 5.309,
+     "2023": -1.657,
+     "2024": -2.158,
+     "2025": -0.245,
+     "2026": -0.867
+    }
+   }
+  ],
+  "keep_20_days": [
+   {
+    "keep_days": 20,
+    "stop": "smart 4x daily swing",
+    "trades": 315,
+    "avg_vs_spy_pct": -0.332,
+    "median_year_pct": -0.273,
+    "years_beating_spy": "1/5",
+    "by_year": {
+     "2022": 5.923,
+     "2023": -0.764,
+     "2024": -1.462,
+     "2025": -0.226,
+     "2026": -0.273
+    }
+   },
+   {
+    "keep_days": 20,
+    "stop": "no stop",
+    "trades": 315,
+    "avg_vs_spy_pct": -0.25,
+    "median_year_pct": -0.355,
+    "years_beating_spy": "2/5",
+    "by_year": {
+     "2022": 5.923,
+     "2023": -1.004,
+     "2024": -1.093,
+     "2025": 0.003,
+     "2026": -0.355
+    }
+   },
+   {
+    "keep_days": 20,
+    "stop": "10%",
+    "trades": 315,
+    "avg_vs_spy_pct": -0.526,
+    "median_year_pct": -0.816,
+    "years_beating_spy": "1/5",
+    "by_year": {
+     "2022": 5.146,
+     "2023": -0.816,
+     "2024": -1.526,
+     "2025": -0.27,
+     "2026": -0.984
+    }
+   }
+  ]
+ },
+ "rose 2% to 5%": {
+  "events": 160,
+  "best": [
+   {
+    "keep_days": 20,
+    "stop": "20%",
+    "trades": 157,
+    "avg_vs_spy_pct": 0.779,
+    "median_year_pct": 1.253,
+    "years_beating_spy": "4/5",
+    "by_year": {
+     "2022": 1.42,
+     "2023": -0.738,
+     "2024": 1.564,
+     "2025": 1.253,
+     "2026": 1.23
+    }
+   },
+   {
+    "keep_days": 20,
+    "stop": "smart 3x daily swing",
+    "trades": 157,
+    "avg_vs_spy_pct": 0.722,
+    "median_year_pct": 0.821,
+    "years_beating_spy": "4/5",
+    "by_year": {
+     "2022": 0.821,
+     "2023": -0.737,
+     "2024": 1.667,
+     "2025": 1.418,
+     "2026": 0.666
+    }
+   },
+   {
+    "keep_days": 20,
+    "stop": "no stop",
+    "trades": 157,
+    "avg_vs_spy_pct": 0.719,
+    "median_year_pct": 1.23,
+    "years_beating_spy": "4/5",
+    "by_year": {
+     "2022": 1.42,
+     "2023": -0.738,
+     "2024": 1.631,
+     "2025": 1.001,
+     "2026": 1.23
+    }
+   },
+   {
+    "keep_days": 20,
+    "stop": "smart 4x daily swing",
+    "trades": 157,
+    "avg_vs_spy_pct": 0.687,
+    "median_year_pct": 1.42,
+    "years_beating_spy": "4/5",
+    "by_year": {
+     "2022": 1.42,
+     "2023": -1.227,
+     "2024": 1.777,
+     "2025": 1.491,
+     "2026": 0.793
+    }
+   },
+   {
+    "keep_days": 20,
+    "stop": "15%",
+    "trades": 157,
+    "avg_vs_spy_pct": 0.621,
+    "median_year_pct": 1.155,
+    "years_beating_spy": "4/5",
+    "by_year": {
+     "2022": 1.42,
+     "2023": -0.861,
+     "2024": 1.155,
+     "2025": 1.399,
+     "2026": 0.741
+    }
+   }
+  ],
+  "worst": [
+   {
+    "keep_days": 40,
+    "stop": "6%",
+    "trades": 157,
+    "avg_vs_spy_pct": -0.227,
+    "median_year_pct": 0.039,
+    "years_beating_spy": "3/5",
+    "by_year": {
+     "2022": -0.216,
+     "2023": -1.371,
+     "2024": 0.039,
+     "2025": 0.33,
+     "2026": 0.337
+    }
+   },
+   {
+    "keep_days": 40,
+    "stop": "8%",
+    "trades": 157,
+    "avg_vs_spy_pct": -0.231,
+    "median_year_pct": 0.219,
+    "years_beating_spy": "3/5",
+    "by_year": {
+     "2022": 0.801,
+     "2023": -1.821,
+     "2024": -0.275,
+     "2025": 0.219,
+     "2026": 1.302
+    }
+   }
+  ],
+  "keep_20_days": [
+   {
+    "keep_days": 20,
+    "stop": "smart 4x daily swing",
+    "trades": 157,
+    "avg_vs_spy_pct": 0.687,
+    "median_year_pct": 1.42,
+    "years_beating_spy": "4/5",
+    "by_year": {
+     "2022": 1.42,
+     "2023": -1.227,
+     "2024": 1.777,
+     "2025": 1.491,
+     "2026": 0.793
+    }
+   },
+   {
+    "keep_days": 20,
+    "stop": "no stop",
+    "trades": 157,
+    "avg_vs_spy_pct": 0.719,
+    "median_year_pct": 1.23,
+    "years_beating_spy": "4/5",
+    "by_year": {
+     "2022": 1.42,
+     "2023": -0.738,
+     "2024": 1.631,
+     "2025": 1.001,
+     "2026": 1.23
+    }
+   },
+   {
+    "keep_days": 20,
+    "stop": "10%",
+    "trades": 157,
+    "avg_vs_spy_pct": 0.511,
+    "median_year_pct": 0.93,
+    "years_beating_spy": "4/5",
+    "by_year": {
+     "2022": 1.42,
+     "2023": -1.05,
+     "2024": 0.93,
+     "2025": 1.458,
+     "2026": 0.571
+    }
+   }
+  ]
+ },
+ "rose more than 5%": {
+  "events": 188,
+  "best": [
+   {
+    "keep_days": 40,
+    "stop": "no stop",
+    "trades": 187,
+    "avg_vs_spy_pct": 2.081,
+    "median_year_pct": 1.849,
+    "years_beating_spy": "5/5",
+    "by_year": {
+     "2022": 1.607,
+     "2023": 1.849,
+     "2024": 2.225,
+     "2025": 3.134,
+     "2026": 1.406
+    }
+   },
+   {
+    "keep_days": 20,
+    "stop": "no stop",
+    "trades": 188,
+    "avg_vs_spy_pct": 1.564,
+    "median_year_pct": 2.068,
+    "years_beating_spy": "4/5",
+    "by_year": {
+     "2022": 2.17,
+     "2023": 2.604,
+     "2024": 2.068,
+     "2025": 0.983,
+     "2026": -0.173
+    }
+   },
+   {
+    "keep_days": 40,
+    "stop": "smart 4x daily swing",
+    "trades": 187,
+    "avg_vs_spy_pct": 1.436,
+    "median_year_pct": 1.912,
+    "years_beating_spy": "4/5",
+    "by_year": {
+     "2022": 2.064,
+     "2023": 1.492,
+     "2024": 1.912,
+     "2025": 2.243,
+     "2026": -0.34
+    }
+   },
+   {
+    "keep_days": 40,
+    "stop": "15%",
+    "trades": 187,
+    "avg_vs_spy_pct": 1.319,
+    "median_year_pct": 1.932,
+    "years_beating_spy": "4/5",
+    "by_year": {
+     "2022": 1.2,
+     "2023": 1.932,
+     "2024": 2.113,
+     "2025": 2.562,
+     "2026": -1.701
+    }
+   },
+   {
+    "keep_days": 40,
+    "stop": "20%",
+    "trades": 187,
+    "avg_vs_spy_pct": 1.313,
+    "median_year_pct": 1.503,
+    "years_beating_spy": "4/5",
+    "by_year": {
+     "2022": 1.241,
+     "2023": 1.503,
+     "2024": 1.947,
+     "2025": 1.658,
+     "2026": -0.194
+    }
+   }
+  ],
+  "worst": [
+   {
+    "keep_days": 1,
+    "stop": "smart 4x daily swing",
+    "trades": 188,
+    "avg_vs_spy_pct": 0.306,
+    "median_year_pct": 0.3,
+    "years_beating_spy": "4/5",
+    "by_year": {
+     "2022": 0.142,
+     "2023": 0.949,
+     "2024": 0.414,
+     "2025": 0.3,
+     "2026": -0.536
+    }
+   },
+   {
+    "keep_days": 1,
+    "stop": "12%",
+    "trades": 188,
+    "avg_vs_spy_pct": 0.304,
+    "median_year_pct": 0.3,
+    "years_beating_spy": "4/5",
+    "by_year": {
+     "2022": 0.142,
+     "2023": 0.949,
+     "2024": 0.414,
+     "2025": 0.3,
+     "2026": -0.546
+    }
+   }
+  ],
+  "keep_20_days": [
+   {
+    "keep_days": 20,
+    "stop": "no stop",
+    "trades": 188,
+    "avg_vs_spy_pct": 1.564,
+    "median_year_pct": 2.068,
+    "years_beating_spy": "4/5",
+    "by_year": {
+     "2022": 2.17,
+     "2023": 2.604,
+     "2024": 2.068,
+     "2025": 0.983,
+     "2026": -0.173
+    }
+   },
+   {
+    "keep_days": 20,
+    "stop": "smart 4x daily swing",
+    "trades": 188,
+    "avg_vs_spy_pct": 1.271,
+    "median_year_pct": 1.956,
+    "years_beating_spy": "4/5",
+    "by_year": {
+     "2022": 2.096,
+     "2023": 2.071,
+     "2024": 1.956,
+     "2025": 1.506,
+     "2026": -1.241
+    }
+   },
+   {
+    "keep_days": 20,
+    "stop": "10%",
+    "trades": 188,
+    "avg_vs_spy_pct": 0.956,
+    "median_year_pct": 0.88,
+    "years_beating_spy": "4/5",
+    "by_year": {
+     "2022": 0.88,
+     "2023": 0.434,
+     "2024": 1.257,
+     "2025": 2.515,
+     "2026": -0.19
+    }
+   }
+  ]
+ },
+ "headline_says_beat_and_rose_2pct_plus": {
+  "events": 316,
+  "best": [
+   {
+    "keep_days": 40,
+    "stop": "no stop",
+    "trades": 312,
+    "avg_vs_spy_pct": 1.487,
+    "median_year_pct": 1.814,
+    "years_beating_spy": "5/5",
+    "by_year": {
+     "2022": 2.699,
+     "2023": 0.006,
+     "2024": 2.555,
+     "2025": 1.189,
+     "2026": 1.814
+    }
+   },
+   {
+    "keep_days": 20,
+    "stop": "no stop",
+    "trades": 313,
+    "avg_vs_spy_pct": 1.293,
+    "median_year_pct": 1.072,
+    "years_beating_spy": "5/5",
+    "by_year": {
+     "2022": 2.916,
+     "2023": 0.923,
+     "2024": 1.851,
+     "2025": 1.072,
+     "2026": 0.677
+    }
+   },
+   {
+    "keep_days": 20,
+    "stop": "20%",
+    "trades": 313,
+    "avg_vs_spy_pct": 1.118,
+    "median_year_pct": 1.191,
+    "years_beating_spy": "4/5",
+    "by_year": {
+     "2022": 2.916,
+     "2023": 0.944,
+     "2024": 1.808,
+     "2025": 1.191,
+     "2026": -0.324
+    }
+   },
+   {
+    "keep_days": 40,
+    "stop": "smart 4x daily swing",
+    "trades": 312,
+    "avg_vs_spy_pct": 1.089,
+    "median_year_pct": 1.147,
+    "years_beating_spy": "4/5",
+    "by_year": {
+     "2022": 3.124,
+     "2023": -0.334,
+     "2024": 2.198,
+     "2025": 1.147,
+     "2026": 0.559
+    }
+   },
+   {
+    "keep_days": 40,
+    "stop": "20%",
+    "trades": 312,
+    "avg_vs_spy_pct": 1.075,
+    "median_year_pct": 0.867,
+    "years_beating_spy": "4/5",
+    "by_year": {
+     "2022": 2.699,
+     "2023": -0.206,
+     "2024": 2.374,
+     "2025": 0.626,
+     "2026": 0.867
+    }
+   }
+  ],
+  "worst": [
+   {
+    "keep_days": 1,
+    "stop": "12%",
+    "trades": 316,
+    "avg_vs_spy_pct": 0.194,
+    "median_year_pct": 0.322,
+    "years_beating_spy": "4/5",
+    "by_year": {
+     "2022": 0.44,
+     "2023": 0.559,
+     "2024": 0.109,
+     "2025": 0.322,
+     "2026": -0.36
+    }
+   },
+   {
+    "keep_days": 40,
+    "stop": "6%",
+    "trades": 312,
+    "avg_vs_spy_pct": 0.085,
+    "median_year_pct": 0.363,
+    "years_beating_spy": "3/5",
+    "by_year": {
+     "2022": 2.021,
+     "2023": -0.893,
+     "2024": 0.363,
+     "2025": 0.569,
+     "2026": -0.348
+    }
+   }
+  ],
+  "keep_20_days": [
+   {
+    "keep_days": 20,
+    "stop": "smart 4x daily swing",
+    "trades": 313,
+    "avg_vs_spy_pct": 1.07,
+    "median_year_pct": 1.557,
+    "years_beating_spy": "4/5",
+    "by_year": {
+     "2022": 2.865,
+     "2023": 0.312,
+     "2024": 1.829,
+     "2025": 1.557,
+     "2026": -0.227
+    }
+   },
+   {
+    "keep_days": 20,
+    "stop": "no stop",
+    "trades": 313,
+    "avg_vs_spy_pct": 1.293,
+    "median_year_pct": 1.072,
+    "years_beating_spy": "5/5",
+    "by_year": {
+     "2022": 2.916,
+     "2023": 0.923,
+     "2024": 1.851,
+     "2025": 1.072,
+     "2026": 0.677
+    }
+   },
+   {
+    "keep_days": 20,
+    "stop": "10%",
+    "trades": 313,
+    "avg_vs_spy_pct": 0.772,
+    "median_year_pct": 1.072,
+    "years_beating_spy": "4/5",
+    "by_year": {
+     "2022": 1.818,
+     "2023": -0.336,
+     "2024": 1.072,
+     "2025": 1.682,
+     "2026": 0.297
+    }
+   }
+  ]
+ },
+ "headline_says_miss_and_fell_2pct_plus": {
+  "events": 60,
+  "best": [
+   {
+    "keep_days": 40,
+    "stop": "no stop",
+    "trades": 59,
+    "avg_vs_spy_pct": 0.848,
+    "median_year_pct": 3.26,
+    "years_beating_spy": "3/5",
+    "by_year": {
+     "2022": 3.26,
+     "2023": -3.127,
+     "2024": -4.413,
+     "2025": 4.224,
+     "2026": 6.947
+    }
+   },
+   {
+    "keep_days": 40,
+    "stop": "15%",
+    "trades": 59,
+    "avg_vs_spy_pct": 0.295,
+    "median_year_pct": 3.519,
+    "years_beating_spy": "3/5",
+    "by_year": {
+     "2022": 3.519,
+     "2023": -4.165,
+     "2024": -6.506,
+     "2025": 4.987,
+     "2026": 6.175
+    }
+   },
+   {
+    "keep_days": 40,
+    "stop": "smart 4x daily swing",
+    "trades": 59,
+    "avg_vs_spy_pct": 0.253,
+    "median_year_pct": 2.283,
+    "years_beating_spy": "3/5",
+    "by_year": {
+     "2022": 2.283,
+     "2023": -2.508,
+     "2024": -4.882,
+     "2025": 3.428,
+     "2026": 4.766
+    }
+   },
+   {
+    "keep_days": 1,
+    "stop": "3%",
+    "trades": 60,
+    "avg_vs_spy_pct": 0.161,
+    "median_year_pct": 0.366,
+    "years_beating_spy": "3/5",
+    "by_year": {
+     "2022": 0.366,
+     "2023": -0.491,
+     "2024": 0.773,
+     "2025": 0.617,
+     "2026": -0.758
+    }
+   },
+   {
+    "keep_days": 1,
+    "stop": "5%",
+    "trades": 60,
+    "avg_vs_spy_pct": 0.112,
+    "median_year_pct": 0.332,
+    "years_beating_spy": "3/5",
+    "by_year": {
+     "2022": 0.389,
+     "2023": -0.525,
+     "2024": 0.773,
+     "2025": 0.332,
+     "2026": -0.478
+    }
+   }
+  ],
+  "worst": [
+   {
+    "keep_days": 20,
+    "stop": "10%",
+    "trades": 59,
+    "avg_vs_spy_pct": -1.596,
+    "median_year_pct": -2.169,
+    "years_beating_spy": "1/5",
+    "by_year": {
+     "2022": 3.364,
+     "2023": -2.169,
+     "2024": -3.39,
+     "2025": -0.661,
+     "2026": -3.499
+    }
+   },
+   {
+    "keep_days": 40,
+    "stop": "8%",
+    "trades": 59,
+    "avg_vs_spy_pct": -1.741,
+    "median_year_pct": -1.984,
+    "years_beating_spy": "1/5",
+    "by_year": {
+     "2022": 2.154,
+     "2023": -1.984,
+     "2024": -4.412,
+     "2025": -0.71,
+     "2026": -2.215
+    }
+   }
+  ],
+  "keep_20_days": [
+   {
+    "keep_days": 20,
+    "stop": "no stop",
+    "trades": 59,
+    "avg_vs_spy_pct": -0.864,
+    "median_year_pct": -0.735,
+    "years_beating_spy": "1/5",
+    "by_year": {
+     "2022": 5.017,
+     "2023": -1.73,
+     "2024": -3.12,
+     "2025": -0.579,
+     "2026": -0.735
+    }
+   },
+   {
+    "keep_days": 20,
+    "stop": "smart 4x daily swing",
+    "trades": 59,
+    "avg_vs_spy_pct": -0.731,
+    "median_year_pct": -1.042,
+    "years_beating_spy": "1/5",
+    "by_year": {
+     "2022": 5.017,
+     "2023": -1.583,
+     "2024": -3.206,
+     "2025": -0.059,
+     "2026": -1.042
+    }
+   },
+   {
+    "keep_days": 20,
+    "stop": "10%",
+    "trades": 59,
+    "avg_vs_spy_pct": -1.596,
+    "median_year_pct": -2.169,
+    "years_beating_spy": "1/5",
+    "by_year": {
+     "2022": 3.364,
+     "2023": -2.169,
+     "2024": -3.39,
+     "2025": -0.661,
+     "2026": -3.499
+    }
+   }
+  ]
+ },
+ "examples": [
+  {
+   "symbol": "ORCL",
+   "day": "2025-09-10",
+   "i": 1007,
+   "reaction": 0.35664060346416426,
+   "beat": false,
+   "miss": true,
+   "headline": "Oracle Q1 Adj. EPS $1.47 Misses $1.48 Estimate, Sales $14.926B Miss $15.035B Estimate"
+  },
+  {
+   "symbol": "PLTR",
+   "day": "2024-02-06",
+   "i": 608,
+   "reaction": 0.30509981913450224,
+   "beat": false,
+   "miss": false,
+   "headline": "Palantir Technologies Q4 2023 Adj EPS $0.08, Inline, Sales $608.00M Beat $602.41M Estimate"
+  },
+  {
+   "symbol": "PLTR",
+   "day": "2026-08-04",
+   "i": 1232,
+   "reaction": 0.276514238583244,
+   "beat": true,
+   "miss": false,
+   "headline": "CORRECTION: Palantir Technologies Q2 Adj. EPS $0.41 Beats $0.35 Estimate, Sales $1.935B Beat $1.802B Estimate"
+  },
+  {
+   "symbol": "AVGO",
+   "day": "2024-12-13",
+   "i": 824,
+   "reaction": 0.2445437380184038,
+   "beat": true,
+   "miss": false,
+   "headline": "Broadcom Q4 2024 Adj. EPS $1.42 Beats $1.38 Estimate, Sales $14.054B Miss $14.091B Estimate"
+  },
+  {
+   "symbol": "PLTR",
+   "day": "2023-05-09",
+   "i": 421,
+   "reaction": 0.2382281026780636,
+   "beat": true,
+   "miss": false,
+   "headline": "Palantir Technologies Q1 EPS $0.05 Beats $0.04 Estimate, Sales $525.19M Beat $505.60M Estimate"
+  },
+  {
+   "symbol": "NVDA",
+   "day": "2023-05-25",
+   "i": 433,
+   "reaction": 0.23509415474475692,
+   "beat": true,
+   "miss": false,
+   "headline": "NVIDIA Q1 Adj. EPS $1.09 Beats $0.92 Estimate, Sales $7.19B Beat $6.52B Estimate"
+  },
+  {
+   "symbol": "PLTR",
+   "day": "2025-02-04",
+   "i": 857,
+   "reaction": 0.2332053894583097,
+   "beat": true,
+   "miss": false,
+   "headline": "Palantir Technologies Q4 2024 Adj. EPS $0.14 Beats $0.11 Estimate, Sales $827.519M Beat $775.907M Estimate"
+  },
+  {
+   "symbol": "INTC",
+   "day": "2026-04-24",
+   "i": 1163,
+   "reaction": 0.22825280271750503,
+   "beat": true,
+   "miss": false,
+   "headline": "Intel Q1 Adj. EPS $0.29 Beats $0.01 Estimate, Sales $13.577B Beat $12.424B Estimate"
+  }
+ ],
+ "generated": "2026-10-16T13:47+00:00",
+ "months": 48,
+ "headlines_scanned": 198140
+}
