@@ -6,10 +6,11 @@ import logging
 import math
 import time
 
+from alpaca.common.enums import Sort
 from alpaca.common.exceptions import APIError
 from alpaca.trading.client import TradingClient
-from alpaca.trading.enums import AssetClass, AssetStatus, OrderSide, TimeInForce
-from alpaca.trading.requests import GetCalendarRequest, GetPortfolioHistoryRequest, MarketOrderRequest
+from alpaca.trading.enums import AssetClass, AssetStatus, OrderSide, QueryOrderStatus, TimeInForce
+from alpaca.trading.requests import GetCalendarRequest, GetOrdersRequest, GetPortfolioHistoryRequest, MarketOrderRequest
 
 from .config import Config
 from .risk import Order
@@ -34,6 +35,26 @@ class Broker:
         h = self.client.get_portfolio_history(GetPortfolioHistoryRequest(
             period="1W", timeframe="1Min", intraday_reporting="market_hours"))
         return [(t, float(e)) for t, e in zip(h.timestamp or [], h.equity or []) if e]
+
+    def filled_orders(self, since: str) -> list[dict]:
+        """Every filled (or partly filled) order since `since` (YYYY-MM-DD), oldest first."""
+        import pandas as pd
+
+        out, after = [], pd.Timestamp(since, tz="UTC").to_pydatetime()
+        while True:
+            batch = self.client.get_orders(GetOrdersRequest(status=QueryOrderStatus.CLOSED, after=after, limit=500,
+                                                            direction=Sort.ASC))
+            for o in batch:
+                qty = float(o.filled_qty or 0)
+                if qty > 0 and o.filled_avg_price:
+                    out.append({"id": str(o.id), "symbol": o.symbol, "side": str(getattr(o.side, "value", o.side)),
+                                "qty": qty, "price": float(o.filled_avg_price),
+                                "time": o.filled_at.isoformat() if o.filled_at else o.submitted_at.isoformat()})
+            if len(batch) < 500:
+                break
+            after = batch[-1].submitted_at
+        out.sort(key=lambda x: x["time"])
+        return out
 
     def account(self) -> dict:
         a = self.client.get_account()

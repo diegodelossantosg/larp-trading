@@ -24,7 +24,7 @@ from .market import Market
 from .risk import Order, apply_limits, drawdown, earnings_blackout, plan_orders
 from .universe import BIG_STOCKS, CORE_ETFS, LEVERAGED, NAMES
 from . import health as market_health
-from . import feeds, report_card, scorecard
+from . import feeds, ledger, report_card, scorecard
 from . import watch as rules
 
 log = logging.getLogger("trader")
@@ -86,6 +86,31 @@ def _repair_history(hist: list[tuple[int, float]], equity_now: float) -> list[tu
         if abs(hist[i][1] - hist[i - 1][1]) > 0.2 * hist[i - 1][1]:
             start = i
     return hist[:start] + [(t, e + gap) for t, e in hist[start:]]
+
+
+def _write_sales(cfg, broker: Broker, market: Market) -> None:
+    """Refresh docs/data/sales.json (the dashboard's Sold page) when Alpaca has new fills."""
+    try:
+        since = (journal.read("capital.json", None) or {}).get("started") or _today()
+        fills = broker.filled_orders(since)
+        old = journal.read("sales.json", {}) or {}
+        if old.get("fills_seen") == len(fills) and old.get("rows") is not None:
+            return
+        spy = None
+        if any(f["side"] == "sell" for f in fills):
+            import pandas as pd
+
+            days = (pd.Timestamp.now() - pd.Timestamp(since)).days + 10
+            bars = market.daily_bars(["SPY"], days=days).get("SPY")
+            if bars is not None:
+                idx = pd.DatetimeIndex(bars.index)
+                idx = idx.tz_convert("America/New_York").tz_localize(None).normalize() if idx.tz else idx.normalize()
+                spy = pd.Series(bars["close"].to_numpy(), index=idx)
+        rows = ledger.sales(fills, journal.read("decisions.json", []), spy)
+        journal.write("sales.json", {"updated": datetime.now(ET).isoformat(timespec="minutes"), "fills_seen": len(fills),
+                                     "summary": ledger.summary(rows), "rows": rows})
+    except Exception as e:  # the Sold page is nice to have; never break trading for it
+        log.warning("sales ledger failed: %s", e)
 
 
 def _recent_watch_buys(days: int, news_days: int | None = None) -> set[str]:
@@ -157,6 +182,7 @@ def snapshot(cfg, broker: Broker, market: Market) -> None:
         "spy_close": round(float(spy["close"].iloc[-1]), 2),
     })
     _write_status(cfg, acct, positions, rows)
+    _write_sales(cfg, broker, market)
     try:
         card = report_card.build(journal.read("decisions.json", []), cfg.idle_asset, market.daily_bars)
         card["updated"] = _today()
@@ -407,6 +433,7 @@ def watch(cfg, broker: Broker, market: Market, dry_run: bool, force: bool = Fals
         scorecard.update({s: q.price for s, q in quotes.items()}, quotes["SPY"].price if "SPY" in quotes else None, set(positions), _today())
         _write_intraday(cfg, broker, market)
         _write_status(cfg, acct, positions, history)  # live value for the dashboard
+        _write_sales(cfg, broker, market)
         log.info("watch: no action (%d quotes checked)", len(quotes))
         return 0
 
@@ -429,6 +456,7 @@ def watch(cfg, broker: Broker, market: Market, dry_run: bool, force: bool = Fals
     scorecard.update(prices, prices.get("SPY"), set(positions), _today())
     _write_intraday(cfg, broker, market)
     _write_status(cfg, _account(cfg, broker, positions), positions, history)
+    _write_sales(cfg, broker, market)
     for r in results:
         log.info("%s %s $%.2f -> %s (%s)", r["side"], r["symbol"], r["notional"], r["status"], r["reason"])
     return 0
