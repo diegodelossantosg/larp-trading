@@ -118,8 +118,39 @@ def summarize(evs: list[dict]) -> dict:
     return report
 
 
-def fetch(months: int) -> tuple[list[dict], dict[str, pd.DataFrame]]:
+def fetch_news(months: float, symbols: list[str]) -> list[dict]:
+    """Every Alpaca/Benzinga headline about these symbols over the last `months` months."""
     import requests
+
+    from .config import load_config
+
+    cfg = load_config()
+    end = datetime.now(timezone.utc) - timedelta(minutes=20)
+    start = end - timedelta(days=int(months * 30.5))
+    headers = {"APCA-API-KEY-ID": cfg.alpaca_api_key, "APCA-API-SECRET-KEY": cfg.alpaca_secret_key}
+    news: list[dict] = []
+    for i in range(0, len(symbols), 10):
+        params = {"symbols": ",".join(symbols[i:i + 10]), "start": start.isoformat(), "end": end.isoformat(),
+                  "limit": 50, "sort": "asc", "include_content": "false"}
+        while True:
+            for attempt in range(5):
+                r = requests.get("https://data.alpaca.markets/v1beta1/news", params=params, headers=headers, timeout=30)
+                if r.status_code != 429:
+                    break
+                import time
+                time.sleep(2 ** attempt)
+            r.raise_for_status()
+            body = r.json()
+            news += [{"time": a["created_at"], "headline": a["headline"], "symbols": a.get("symbols", [])}
+                     for a in body.get("news", [])]
+            if not body.get("next_page_token"):
+                break
+            params["page_token"] = body["next_page_token"]
+        log.info("news: %d headlines after %d/%d symbols", len(news), min(i + 10, len(symbols)), len(symbols))
+    return news
+
+
+def fetch(months: int) -> tuple[list[dict], dict[str, pd.DataFrame]]:
     from alpaca.data.enums import Adjustment, DataFeed
     from alpaca.data.historical import StockHistoricalDataClient
     from alpaca.data.requests import StockBarsRequest
@@ -130,22 +161,8 @@ def fetch(months: int) -> tuple[list[dict], dict[str, pd.DataFrame]]:
     cfg = load_config()
     end = datetime.now(timezone.utc) - timedelta(minutes=20)
     start = end - timedelta(days=int(months * 30.5))
-    headers = {"APCA-API-KEY-ID": cfg.alpaca_api_key, "APCA-API-SECRET-KEY": cfg.alpaca_secret_key}
     symbols = sorted(BIG_STOCKS)
-    news: list[dict] = []
-    for i in range(0, len(symbols), 10):
-        params = {"symbols": ",".join(symbols[i:i + 10]), "start": start.isoformat(), "end": end.isoformat(),
-                  "limit": 50, "sort": "asc", "include_content": "false"}
-        while True:
-            r = requests.get("https://data.alpaca.markets/v1beta1/news", params=params, headers=headers, timeout=30)
-            r.raise_for_status()
-            body = r.json()
-            news += [{"time": a["created_at"], "headline": a["headline"], "symbols": a.get("symbols", [])}
-                     for a in body.get("news", [])]
-            if not body.get("next_page_token"):
-                break
-            params["page_token"] = body["next_page_token"]
-        log.info("news: %d headlines after %d/%d symbols", len(news), min(i + 10, len(symbols)), len(symbols))
+    news = fetch_news(months, symbols)
 
     client = StockHistoricalDataClient(cfg.alpaca_api_key, cfg.alpaca_secret_key)
     bars = {}
