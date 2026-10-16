@@ -1282,5 +1282,26 @@
    "WMT": 0.06,
    "SSO": 0.24
   }
+ },
+ {
+  "date": "2026-10-16",
+  "time": "10:21",
+  "source": "news",
+  "dry_run": false,
+  "orders": [],
+  "notes": [
+   "skipped AA: its next earnings date isn't confirmed"
+  ],
+  "plain_summary": "I checked today's big drops and earnings reports and found one solid buy: Alcoa beat profit estimates, kept its outlook and jumped. Micron, UnitedHealth, JPMorgan and Travelers were skipped.",
+  "ideas": [
+   {
+    "symbol": "AA",
+    "headline": "Alcoa reports Q3 2026 results (Oct 15, after close): adjusted EPS $1.82 vs about $1.47-1.54 expected; stock +7.8% on Oct 16 (~+7.9% vs SPY)",
+    "why_not_priced_in": "Profit per share beat estimates by about 20%. Full-year production and shipment targets were kept, aluminum output grew for a sixth quarter in a row, and the company is selling part of its Massena East site for up to $315M in cash. The CEO says global aluminum stocks are the lowest in years (42 days of use), which supports prices. Revenue missed slightly, but that came from lower metal prices, not lost business. Some of the jump is a sector-wide aluminum move (Century Aluminum is up about 6%), but the report alone produced a clear gain of at least 2%. Our tests show beats with jumps over 5% kept drifting higher for about 20 days. AA is a mid-size cyclical stock (about $11B), so it should be sized as a smaller company (up to 5%) with a wide trailing stop of about 15%. Its next report should be around late January 2027. That date is not confirmed, but it is far outside the 3-day window.",
+    "plain_reason": "Profits beat forecasts by a lot, the outlook held, and aluminum supply is tight.",
+    "next_earnings": "unknown",
+    "idea_type": "earnings_beat"
+   }
+  ]
  }
 ]
