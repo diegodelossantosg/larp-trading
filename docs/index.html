@@ -210,7 +210,6 @@ h2::before { content: ""; width: 4px; height: 18px; border-radius: 2px; backgrou
 
     <section class="card" id="sold-card">
       <h2 style="--h: var(--c5)">Sold</h2>
-      <div class="small">Partial sales (trims): we sold part and still hold the rest. Full sales are in "Closed trades".</div>
       <div id="sold-summary"></div>
       <div class="table-scroll" id="sold"></div>
     </section>
@@ -499,7 +498,7 @@ function soldView(data, decisions) {
   const nice = (d) => new Date(d + "T12:00:00Z").toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" });
   $("sold").innerHTML = days.map((day, i) => {
     const dr = rows.filter((r) => r.date === day), tot = dr.reduce((t, r) => t + r.pnl, 0);
-    return `<details class="sold-day"${i === 0 ? " open" : ""}><summary>${nice(day)} <span class="small">${dr.length} trim${dr.length > 1 ? "s" : ""}</span><b class="${cls(tot)}">${signedUsd(tot)}</b></summary>
+    return `<details class="sold-day"${i === 0 ? " open" : ""}><summary>${nice(day)}<b class="${cls(tot)}">${signedUsd(tot)}</b></summary>
     <table class="sold"><thead><tr><th>What</th><th>Comment</th><th class="num">Made</th><th class="num">%</th><th class="num">vs S&amp;P</th></tr></thead><tbody>
     ${dr.map((r) => `<tr>
       <td>${WHO_ICON[r.bought_by] || "🧠"} <b>${esc(r.symbol)}</b><div class="small">${esc(r.name || "")}</div></td>
