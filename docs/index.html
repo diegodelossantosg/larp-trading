@@ -197,7 +197,7 @@ h2::before { content: ""; width: 4px; height: 18px; border-radius: 2px; backgrou
 
     <section class="card">
       <h2 style="--h: var(--c6)">Closed trades</h2>
-      <div id="closed-summary" class="small"></div>
+      <div id="closed-summary"></div>
       <div class="table-scroll" id="closed"></div>
     </section>
   </div>
@@ -478,6 +478,17 @@ function salesSummary(rows) {
            win_rate: rows.length ? won.length / rows.length : 0, avg_win_pct: avg(won), avg_loss_pct: avg(lost) };
 }
 
+function statTiles(s, countLabel) {
+  const tile = (label, value, c = "") => `<div class="stat"><div class="small">${label}</div><b class="${c}">${value}</b></div>`;
+  return `<div class="stats">
+    ${tile("Total made", signedUsd(s.total_pnl), cls(s.total_pnl))}
+    ${tile(countLabel, `${s.sales} <span class="small">(<span class="up">${s.won} won</span> · <span class="down">${s.lost} lost</span>)</span>`)}
+    ${tile("Win rate", Math.round(s.win_rate * 100) + "%")}
+    ${tile("Avg win", s.avg_win_pct != null ? pct(s.avg_win_pct) : "–", "up")}
+    ${tile("Avg loss", s.avg_loss_pct != null ? pct(s.avg_loss_pct) : "–", "down")}
+  </div>`;
+}
+
 function soldView(data, decisions) {
   const rows = ((data && data.rows) || []).filter((r) => !r.full);
   if (!rows.length) {
@@ -485,15 +496,7 @@ function soldView(data, decisions) {
     $("sold").innerHTML = `<div class="empty">No trims yet. When part of a holding is sold, it shows here with what it earned.</div>`;
     return;
   }
-  const s = salesSummary(rows);
-  const tile = (label, value, c = "") => `<div class="stat"><div class="small">${label}</div><b class="${c}">${value}</b></div>`;
-  $("sold-summary").innerHTML = `<div class="stats">
-    ${tile("Total made", signedUsd(s.total_pnl), cls(s.total_pnl))}
-    ${tile("Trims", `${s.sales} <span class="small">(<span class="up">${s.won} won</span> · <span class="down">${s.lost} lost</span>)</span>`)}
-    ${tile("Win rate", Math.round(s.win_rate * 100) + "%")}
-    ${tile("Avg win", s.avg_win_pct != null ? pct(s.avg_win_pct) : "–", "up")}
-    ${tile("Avg loss", s.avg_loss_pct != null ? pct(s.avg_loss_pct) : "–", "down")}
-  </div>`;
+  $("sold-summary").innerHTML = statTiles(salesSummary(rows), "Trims");
   const days = [...new Set(rows.map((r) => r.date))].sort().reverse();
   const nice = (d) => new Date(d + "T12:00:00Z").toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" });
   $("sold").innerHTML = days.map((day, i) => {
@@ -525,8 +528,7 @@ function closedFromSales(data) {
     $("closed").innerHTML = `<div class="empty">No closed trades yet. A trade appears here once something is fully sold.</div>`;
     return;
   }
-  const s = salesSummary(rows);
-  $("closed-summary").innerHTML = `${s.sales} closed · <b class="up">${s.won} won</b> · <b class="down">${s.lost} lost</b> · total <b class="${cls(s.total_pnl)}">${signedUsd(s.total_pnl)}</b>`;
+  $("closed-summary").innerHTML = statTiles(salesSummary(rows), "Trades");
   $("closed").innerHTML = `<table><thead><tr><th>What</th><th>Sold</th><th class="num">Made</th><th class="num">%</th><th class="num">vs S&amp;P</th></tr></thead><tbody>
   ${rows.slice(0, 12).map((r) => `<tr><td>${WHO_ICON[r.bought_by] || "🧠"} <b>${esc(r.symbol)}</b></td>
     <td>${esc(r.date)}</td><td class="num ${cls(r.pnl)}">${signedUsd(r.pnl)}</td><td class="num ${cls(r.pnl_pct)}">${pct(r.pnl_pct)}</td>
