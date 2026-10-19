@@ -1,35 +1,41 @@
 {
  "all": {
   "picks": 9,
-  "vs_spy_so_far_avg_pct": 1.26,
+  "vs_spy_5d_avg_pct": 1.52,
+  "vs_spy_5d_beat_rate": 0.67,
+  "vs_spy_so_far_avg_pct": 0.7,
   "vs_spy_so_far_beat_rate": 0.44
  },
  "by_trade_type": {
   "news_catalyst": {
    "picks": 1,
-   "vs_spy_so_far_avg_pct": 0.0,
+   "vs_spy_so_far_avg_pct": -0.57,
    "vs_spy_so_far_beat_rate": 0.0
   },
   "trend_momentum": {
    "picks": 2,
-   "vs_spy_so_far_avg_pct": 0.0,
+   "vs_spy_so_far_avg_pct": -1.14,
    "vs_spy_so_far_beat_rate": 0.0
   },
   "untagged": {
    "picks": 6,
-   "vs_spy_so_far_avg_pct": 1.89,
+   "vs_spy_5d_avg_pct": 1.52,
+   "vs_spy_5d_beat_rate": 0.67,
+   "vs_spy_so_far_avg_pct": 1.52,
    "vs_spy_so_far_beat_rate": 0.67
   }
  },
  "by_kind": {
   "ETF": {
    "picks": 6,
-   "vs_spy_so_far_avg_pct": 1.89,
+   "vs_spy_5d_avg_pct": 1.52,
+   "vs_spy_5d_beat_rate": 0.67,
+   "vs_spy_so_far_avg_pct": 1.52,
    "vs_spy_so_far_beat_rate": 0.67
   },
   "stock": {
    "picks": 3,
-   "vs_spy_so_far_avg_pct": 0.0,
+   "vs_spy_so_far_avg_pct": -0.95,
    "vs_spy_so_far_beat_rate": 0.0
   }
  },
@@ -43,8 +49,8 @@
    "vs_spy_5d_pct": null,
    "vs_spy_20d_pct": null,
    "vs_spy_60d_pct": null,
-   "vs_spy_so_far_pct": 0.0,
-   "days_held_so_far": 0
+   "vs_spy_so_far_pct": -0.57,
+   "days_held_so_far": 1
   },
   {
    "date": "2026-10-16",
@@ -55,8 +61,8 @@
    "vs_spy_5d_pct": null,
    "vs_spy_20d_pct": null,
    "vs_spy_60d_pct": null,
-   "vs_spy_so_far_pct": 0.0,
-   "days_held_so_far": 0
+   "vs_spy_so_far_pct": -1.75,
+   "days_held_so_far": 1
   },
   {
    "date": "2026-10-16",
@@ -67,8 +73,8 @@
    "vs_spy_5d_pct": null,
    "vs_spy_20d_pct": null,
    "vs_spy_60d_pct": null,
-   "vs_spy_so_far_pct": 0.0,
-   "days_held_so_far": 0
+   "vs_spy_so_far_pct": -0.52,
+   "days_held_so_far": 1
   },
   {
    "date": "2026-10-12",
@@ -76,11 +82,11 @@
    "trade_type": "untagged",
    "kind": "ETF",
    "reason": "",
-   "vs_spy_5d_pct": null,
+   "vs_spy_5d_pct": 0.0,
    "vs_spy_20d_pct": null,
    "vs_spy_60d_pct": null,
    "vs_spy_so_far_pct": 0.0,
-   "days_held_so_far": 4
+   "days_held_so_far": 5
   },
   {
    "date": "2026-10-12",
@@ -88,11 +94,11 @@
    "trade_type": "untagged",
    "kind": "ETF",
    "reason": "Geopolitical oil risk is rising (Hormuz, Russia energy) and energy has the strongest trend: above bo",
-   "vs_spy_5d_pct": null,
+   "vs_spy_5d_pct": 4.21,
    "vs_spy_20d_pct": null,
    "vs_spy_60d_pct": null,
-   "vs_spy_so_far_pct": 5.29,
-   "days_held_so_far": 4
+   "vs_spy_so_far_pct": 4.21,
+   "days_held_so_far": 5
   },
   {
    "date": "2026-10-12",
@@ -100,11 +106,11 @@
    "trade_type": "untagged",
    "kind": "ETF",
    "reason": "Software is in a strong uptrend, with RBC raising price targets across the group, and is less expose",
-   "vs_spy_5d_pct": null,
+   "vs_spy_5d_pct": -3.26,
    "vs_spy_20d_pct": null,
    "vs_spy_60d_pct": null,
-   "vs_spy_so_far_pct": -4.33,
-   "days_held_so_far": 4
+   "vs_spy_so_far_pct": -3.26,
+   "days_held_so_far": 5
   },
   {
    "date": "2026-10-12",
@@ -112,11 +118,11 @@
    "trade_type": "untagged",
    "kind": "ETF",
    "reason": "Quality factor in a steady uptrend with low volatility, offering a modest risk-adjusted edge over SP",
-   "vs_spy_5d_pct": null,
+   "vs_spy_5d_pct": 0.4,
    "vs_spy_20d_pct": null,
    "vs_spy_60d_pct": null,
-   "vs_spy_so_far_pct": 0.68,
-   "days_held_so_far": 4
+   "vs_spy_so_far_pct": 0.4,
+   "days_held_so_far": 5
   },
   {
    "date": "2026-10-12",
@@ -124,11 +130,11 @@
    "trade_type": "untagged",
    "kind": "ETF",
    "reason": "Defensive growth with steady momentum, which balances the tech and energy tilt.",
-   "vs_spy_5d_pct": null,
+   "vs_spy_5d_pct": 3.62,
    "vs_spy_20d_pct": null,
    "vs_spy_60d_pct": null,
-   "vs_spy_so_far_pct": 4.65,
-   "days_held_so_far": 4
+   "vs_spy_so_far_pct": 3.62,
+   "days_held_so_far": 5
   },
   {
    "date": "2026-10-12",
@@ -136,12 +142,12 @@
    "trade_type": "untagged",
    "kind": "ETF",
    "reason": "Higher-beta oil exposure to the same oil-price drivers.",
-   "vs_spy_5d_pct": null,
+   "vs_spy_5d_pct": 4.16,
    "vs_spy_20d_pct": null,
    "vs_spy_60d_pct": null,
-   "vs_spy_so_far_pct": 5.04,
-   "days_held_so_far": 4
+   "vs_spy_so_far_pct": 4.16,
+   "days_held_so_far": 5
   }
  ],
- "updated": "2026-10-16"
+ "updated": "2026-10-19"
 }
