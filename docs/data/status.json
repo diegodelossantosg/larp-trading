@@ -1,11 +1,11 @@
 {
- "updated": "2026-10-20T12:31-04:00",
+ "updated": "2026-10-20T12:48-04:00",
  "mode": "paper",
  "capital": 1000.0,
  "spy_start": 779.38,
  "idle_asset": "SSO",
  "model": "opus",
- "equity": 1002.54,
+ "equity": 1002.99,
  "cash": 10.11,
  "performance": {
   "since": "2026-10-12",
@@ -17,19 +17,19 @@
  "scorecard": {
   "claude": {
    "buys": 5,
-   "avg_return_pct": 0.83,
-   "avg_vs_spy_pct": 1.91,
+   "avg_return_pct": 0.91,
+   "avg_vs_spy_pct": 1.98,
    "beat_spy": 4,
-   "dollars": 3.96,
-   "dollars_vs_spy": 9.82
+   "dollars": 4.35,
+   "dollars_vs_spy": 10.12
   },
   "watch": {
    "buys": 3,
-   "avg_return_pct": 2.21,
-   "avg_vs_spy_pct": 3.09,
+   "avg_return_pct": 2.32,
+   "avg_vs_spy_pct": 3.18,
    "beat_spy": 3,
-   "dollars": 5.3,
-   "dollars_vs_spy": 7.41
+   "dollars": 5.57,
+   "dollars_vs_spy": 7.63
   }
  },
  "health": {
@@ -71,99 +71,99 @@
   {
    "symbol": "SSO",
    "qty": 3.3649,
-   "market_value": 236.6204,
+   "market_value": 236.6877,
    "avg_entry_price": 71.7554,
-   "current_price": 70.32,
-   "unrealized_pl": -4.8299,
-   "unrealized_plpc": -0.02,
+   "current_price": 70.34,
+   "unrealized_pl": -4.7626,
+   "unrealized_plpc": -0.0197,
    "name": "2x S&P 500",
    "weight": 0.236
   },
   {
    "symbol": "XLV",
    "qty": 0.837,
-   "market_value": 150.3587,
+   "market_value": 150.3043,
    "avg_entry_price": 171.7475,
-   "current_price": 179.65,
-   "unrealized_pl": 6.614,
-   "unrealized_plpc": 0.046,
+   "current_price": 179.585,
+   "unrealized_pl": 6.5596,
+   "unrealized_plpc": 0.0456,
    "name": "Health care",
-   "weight": 0.15
+   "weight": 0.1499
   },
   {
    "symbol": "XLE",
    "qty": 2.0618,
-   "market_value": 139.4262,
+   "market_value": 139.55,
    "avg_entry_price": 66.0542,
-   "current_price": 67.625,
-   "unrealized_pl": 3.2387,
-   "unrealized_plpc": 0.0238,
+   "current_price": 67.685,
+   "unrealized_pl": 3.3624,
+   "unrealized_plpc": 0.0247,
    "name": "Energy",
    "weight": 0.1391
   },
   {
    "symbol": "QUAL",
    "qty": 0.435,
-   "market_value": 98.1112,
+   "market_value": 98.1249,
    "avg_entry_price": 227.54,
-   "current_price": 225.5199,
-   "unrealized_pl": -0.8788,
-   "unrealized_plpc": -0.0089,
+   "current_price": 225.5515,
+   "unrealized_pl": -0.8651,
+   "unrealized_plpc": -0.0087,
    "name": "US quality",
-   "weight": 0.0979
+   "weight": 0.0978
   },
   {
    "symbol": "XOP",
    "qty": 0.4075,
-   "market_value": 81.1274,
+   "market_value": 81.3026,
    "avg_entry_price": 194.316,
-   "current_price": 199.07,
-   "unrealized_pl": 1.9374,
-   "unrealized_plpc": 0.0245,
+   "current_price": 199.5,
+   "unrealized_pl": 2.1126,
+   "unrealized_plpc": 0.0267,
    "name": "Oil & gas exploration",
-   "weight": 0.0809
+   "weight": 0.0811
   },
   {
    "symbol": "XRT",
    "qty": 0.9113,
-   "market_value": 79.7284,
+   "market_value": 79.938,
    "avg_entry_price": 87.788,
-   "current_price": 87.49,
-   "unrealized_pl": -0.2716,
-   "unrealized_plpc": -0.0034,
+   "current_price": 87.72,
+   "unrealized_pl": -0.062,
+   "unrealized_plpc": -0.0008,
    "name": "Retail",
-   "weight": 0.0795
+   "weight": 0.0797
   },
   {
    "symbol": "AAPL",
    "qty": 0.2289,
-   "market_value": 77.9987,
+   "market_value": 78.0067,
    "avg_entry_price": 344.454,
-   "current_price": 340.735,
-   "unrealized_pl": -0.8513,
-   "unrealized_plpc": -0.0108,
+   "current_price": 340.77,
+   "unrealized_pl": -0.8433,
+   "unrealized_plpc": -0.0107,
    "name": "Apple",
    "weight": 0.0778
   },
   {
    "symbol": "LLY",
    "qty": 0.0544,
-   "market_value": 70.5202,
+   "market_value": 70.3975,
    "avg_entry_price": 1267.296,
-   "current_price": 1295.4054,
-   "unrealized_pl": 1.5302,
-   "unrealized_plpc": 0.0222,
+   "current_price": 1293.15,
+   "unrealized_pl": 1.4075,
+   "unrealized_plpc": 0.0204,
    "name": "Eli Lilly",
-   "weight": 0.0703
+   "weight": 0.0702
   },
   {
    "symbol": "WMT",
    "qty": 0.4957,
-   "market_value": 58.5372,
+   "market_value": 58.5719,
    "avg_entry_price": 119.296,
-   "current_price": 118.08,
-   "unrealized_pl": -0.6028,
-   "unrealized_plpc": -0.0102,
+   "current_price": 118.15,
+   "unrealized_pl": -0.5681,
+   "unrealized_plpc": -0.0096,
    "name": "Walmart",
    "weight": 0.0584
   }
