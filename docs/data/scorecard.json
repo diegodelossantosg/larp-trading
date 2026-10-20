@@ -94,5 +94,16 @@
   "last": 87.47,
   "spy_last": 768.62,
   "open": true
+ },
+ {
+  "date": "2026-10-20",
+  "source": "news",
+  "symbol": "NOC",
+  "amount": 50.11,
+  "entry": 535.93,
+  "spy_entry": 768.73,
+  "last": 535.93,
+  "spy_last": 768.73,
+  "open": true
  }
 ]

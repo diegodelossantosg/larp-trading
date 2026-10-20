@@ -1882,5 +1882,44 @@
     "idea_type": "earnings_beat"
    }
   ]
+ },
+ {
+  "date": "2026-10-20",
+  "time": "13:19",
+  "source": "news",
+  "dry_run": false,
+  "orders": [
+   {
+    "symbol": "SSO",
+    "side": "sell",
+    "notional": 50.02,
+    "reason": "funding the buys",
+    "status": "pending_new",
+    "order_id": "4e3d7c21-fad8-40bd-9e97-5ebd0f7396fe"
+   },
+   {
+    "symbol": "NOC",
+    "side": "buy",
+    "notional": 50.11,
+    "reason": "Profits beat forecasts, the company raised its outlook, and its order backlog hit a record.",
+    "status": "pending_new",
+    "order_id": "8cf502e2-8745-4698-b714-44a8b970b5b8",
+    "hold_days": 20
+   }
+  ],
+  "notes": [
+   "earnings dates checked on Nasdaq's calendar"
+  ],
+  "plain_summary": "Most of today's big moves came from earnings reports, and only Northrop Grumman was a clean beat with a strong jump, so it is the only buy idea.",
+  "ideas": [
+   {
+    "symbol": "NOC",
+    "headline": "Northrop Grumman Q3 2026 results, Oct 20 2026 pre-market: adjusted EPS $7.89 vs $7.18 expected, full-year EPS guidance raised to $29.35-$29.75 (from $28.60-$29.10), record ~$110B backlog; stock up ~5-6% midday (CNBC midday movers 16:45 UTC).",
+    "why_not_priced_in": "In our tests, a big company that clearly beats and jumps more than 5% vs the S&P 500 keeps drifting up for about 20 trading days. NOC's profit beat was about 10%. It raised both its EPS and segment operating income outlook, kept its sales outlook, reported $1.8B of adjusted free cash flow in the quarter and grew backlog 20% to a record. I found no sign the beat came from one-off items. Sales were about in line (some sources say a slight miss) and segment margin slipped a little, but the jump is holding into midday rather than fading. Next earnings should be late January 2027, about three months away (last year's Q4 report was Jan 27, 2026). The date is not confirmed yet, so I entered 'unknown'. We hold no defense stocks, so this adds variety.",
+    "plain_reason": "Profits beat forecasts, the company raised its outlook, and its order backlog hit a record.",
+    "next_earnings": "unknown",
+    "idea_type": "earnings_beat"
+   }
+  ]
  }
 ]
