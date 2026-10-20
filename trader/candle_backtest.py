@@ -166,8 +166,8 @@ def intraday_trades(o, h, l, c, day_last: np.ndarray, idx: np.ndarray, stop: np.
     return out
 
 
-def resample(df: pd.DataFrame, minutes: int) -> pd.DataFrame:
-    if minutes == 5:
+def resample(df: pd.DataFrame, minutes: int, base: int = 5) -> pd.DataFrame:
+    if minutes == base:
         return df
     ny = df.index.tz_convert("America/New_York")
     mins = ny.hour * 60 + ny.minute - 570
@@ -177,15 +177,16 @@ def resample(df: pd.DataFrame, minutes: int) -> pd.DataFrame:
                          "close": g["close"].last(), "volume": g["volume"].sum()})
 
 
-def run_intraday(bars: dict[str, pd.DataFrame], seed: int = 7) -> dict:
+def run_intraday(bars: dict[str, pd.DataFrame], seed: int = 7, timeframes: dict[str, int] = TIMEFRAMES,
+                 base: int = 5) -> dict:
     rng = np.random.default_rng(seed)
     all_days = sorted({d for df in bars.values() for d in df.index.tz_convert("America/New_York").date})
     split = all_days[len(all_days) // 2]
     report = {"period": f"{all_days[0]} to {all_days[-1]}", "second_half_starts": str(split), "symbols": len(bars)}
-    for tf, minutes in TIMEFRAMES.items():
+    for tf, minutes in timeframes.items():
         res = defaultdict(lambda: defaultdict(list))   # (pattern, context, exit) -> half -> returns
         for sym, raw in bars.items():
-            df = resample(raw, minutes)
+            df = resample(raw, minutes, base)
             if len(df) < 200:
                 continue
             ny = df.index.tz_convert("America/New_York") if df.index.tz else df.index
@@ -342,7 +343,7 @@ def summarize_daily(res) -> dict:
 
 # ---------- data ----------
 
-def fetch_intraday(symbols: list[str], years: float) -> dict[str, pd.DataFrame]:
+def fetch_intraday(symbols: list[str], years: float, minutes: int = 5) -> dict[str, pd.DataFrame]:
     from alpaca.data.enums import Adjustment, DataFeed
     from alpaca.data.historical import StockHistoricalDataClient
     from alpaca.data.requests import StockBarsRequest
@@ -357,7 +358,7 @@ def fetch_intraday(symbols: list[str], years: float) -> dict[str, pd.DataFrame]:
     out = {}
     for sym in symbols:
         try:
-            df = client.get_stock_bars(StockBarsRequest(symbol_or_symbols=sym, timeframe=TimeFrame(5, TimeFrameUnit.Minute),
+            df = client.get_stock_bars(StockBarsRequest(symbol_or_symbols=sym, timeframe=TimeFrame(minutes, TimeFrameUnit.Minute),
                                                         start=start, end=end, adjustment=Adjustment.ALL,
                                                         feed=DataFeed.SIP)).df
         except Exception as e:
@@ -368,7 +369,7 @@ def fetch_intraday(symbols: list[str], years: float) -> dict[str, pd.DataFrame]:
         df = df.xs(sym, level="symbol").sort_index()
         ny = df.index.tz_convert("America/New_York")
         out[sym] = df[[(t.hour, t.minute) >= (9, 30) and t.hour < 16 for t in ny]]
-        log.info("5-min bars %s: %d", sym, len(out[sym]))
+        log.info("%d-min bars %s: %d", minutes, sym, len(out[sym]))
     return out
 
 

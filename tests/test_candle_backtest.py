@@ -58,3 +58,19 @@ def test_bearish_sell_signal_scored_as_worse_than_random():
     res[("bearish_engulfing", "any", 5, "no stop")] = {2020: [-0.01] * 60, 2021: [-0.01] * 60}
     out = summarize_daily(res)
     assert out["passing"] and out["passing"][0]["edge_vs_random_pct"] > 0
+
+
+def test_dragonfly_luck_check_runs_on_random_walks():
+    from trader.candle_luck import run
+    rng = np.random.default_rng(3)
+    idx = pd.bdate_range("2019-01-01", periods=900)
+    daily = {}
+    for sym in ["SPY"] + [f"S{i}" for i in range(8)] + ["XLE"]:
+        c = 100 * np.exp(np.cumsum(rng.normal(0.0003, 0.015, len(idx))))
+        o = c * (1 + rng.normal(0, 0.003, len(idx)))
+        lo = np.minimum(o, c) * (1 - np.abs(rng.normal(0, 0.012, len(idx))))
+        hi = np.maximum(o, c) * (1 + np.abs(rng.normal(0, 0.004, len(idx))))
+        daily[sym] = pd.DataFrame({"open": o, "high": hi, "low": lo, "close": c, "volume": 1e6}, index=idx)
+    rep = run(daily, ["S0", "S1", "S2", "S3"], ["S4", "S5", "S6", "S7"])
+    assert rep["nudged_definitions"]["variants"] == 162
+    assert "first test's stocks" in rep["sets"]
