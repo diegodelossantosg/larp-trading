@@ -1,18 +1,37 @@
 {
- "updated": "2026-10-16T11:59-04:00",
- "fills_seen": 21,
+ "updated": "2026-10-20T13:19-04:00",
+ "fills_seen": 23,
  "summary": {
-  "sales": 7,
+  "sales": 8,
   "won": 4,
-  "lost": 3,
-  "total_pnl": -3.25,
-  "win_rate": 0.57,
+  "lost": 4,
+  "total_pnl": -4.34,
+  "win_rate": 0.5,
   "avg_win_pct": 1.41,
-  "avg_loss_pct": -1.93,
+  "avg_loss_pct": -1.98,
   "best": "XLE",
   "worst": "IGV"
  },
  "rows": [
+  {
+   "order_id": "4e3d7c21-fad8-40bd-9e97-5ebd0f7396fe",
+   "date": "2026-10-20",
+   "symbol": "SSO",
+   "name": "2x S&P 500",
+   "bought": "2026-10-13",
+   "bought_by": "claude",
+   "sold_by": "claude",
+   "days": 7,
+   "shares": 0.7123,
+   "avg_buy_price": 71.76,
+   "sell_price": 70.22,
+   "cost": 51.11,
+   "proceeds": 50.02,
+   "pnl": -1.09,
+   "pnl_pct": -2.14,
+   "full": false,
+   "vs_spy_pct": -0.96
+  },
   {
    "order_id": "6abd0e2f-3cfd-48c3-baf9-112207d7a5bc",
    "date": "2026-10-16",
@@ -30,7 +49,7 @@
    "pnl": 1.8,
    "pnl_pct": 1.95,
    "full": false,
-   "vs_spy_pct": 3.28
+   "vs_spy_pct": 3.86
   },
   {
    "order_id": "3009665e-ac76-4ff8-8092-d7af7c72b45a",
@@ -49,7 +68,7 @@
    "pnl": 1.25,
    "pnl_pct": 3.54,
    "full": false,
-   "vs_spy_pct": 4.87
+   "vs_spy_pct": 5.45
   },
   {
    "order_id": "26519c21-a64c-43e1-99a4-0e8700fc60fb",
@@ -68,7 +87,7 @@
    "pnl": -5.16,
    "pnl_pct": -4.34,
    "full": true,
-   "vs_spy_pct": -3.01
+   "vs_spy_pct": -2.43
   },
   {
    "order_id": "bcbb1d8a-f64d-49e6-83f3-9bc01aa5a7e7",
