@@ -69,6 +69,7 @@ class Broker:
                 "current_price": float(p.current_price),
                 "unrealized_pl": float(p.unrealized_pl),
                 "unrealized_plpc": float(p.unrealized_plpc),
+                "change_today_usd": float(p.unrealized_intraday_pl or 0),   # since yesterday's close (or today's buy)
             }
             for p in self.client.get_all_positions()
         }
