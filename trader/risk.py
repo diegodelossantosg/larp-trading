@@ -135,14 +135,17 @@ def plan_orders(
     rebalance_band: float,
     min_order_usd: float,
     max_daily_turnover: float,
-    cash_buffer: float = 0.01,
+    cash_buffer: float = 0.002,
     protected: set[str] | frozenset = frozenset(),
+    sweep_to: str | None = None,
+    sweep_cap: float = 1.0,
 ) -> tuple[list[Order], list[str]]:
     """Dollar orders to move current holdings toward targets. Sells come first.
 
     Positions in `protected` (recent watcher buys) are never trimmed here, so a buy isn't undone
     the next morning; their trailing stop still applies. Buys never spend more than the agent's
-    cash plus what it sells.
+    cash plus what it sells. Cash left over (orders below the minimum size, rounding) goes into
+    `sweep_to` (the idle asset) up to `sweep_cap` of equity, so money doesn't sit idle.
     """
     notes: list[str] = []
     investable = equity * (1 - cash_buffer)
@@ -174,6 +177,14 @@ def plan_orders(
         scale = budget / spend
         deltas = {s: (d * scale if d > 0 else d) for s, d in deltas.items()}
         notes.append(f"buys scaled by {scale:.2f} to stay within the agent's own money")
+
+    if sweep_to and sweep_to in targets:
+        leftover = budget - sum(d for d in deltas.values() if d > 0)
+        room = sweep_cap * equity - current_values.get(sweep_to, 0.0) - deltas.get(sweep_to, 0.0)
+        extra = min(leftover, room)
+        if extra >= 1:                                    # Alpaca's smallest order is $1
+            deltas[sweep_to] = deltas.get(sweep_to, 0.0) + extra
+            notes.append(f"leftover cash ${extra:,.2f} put into {sweep_to}")
 
     sells = [Order(s, "sell", round(-d, 2)) for s, d in deltas.items() if d < 0]
     buys = [Order(s, "buy", round(d, 2)) for s, d in deltas.items() if d > 0]

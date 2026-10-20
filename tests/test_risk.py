@@ -97,3 +97,15 @@ def test_leveraged_idle_asset_is_not_squeezed_by_leverage_cap():
                         idle_asset="SSO", max_position_weight=0.30, max_positions=8,
                         max_leveraged_weight=0.10, max_idle_weight=0.5)
     assert t["SSO"] == 0.5 and t["XLE"] == 0.3 and t["XLV"] == 0.2
+
+
+def test_leftover_cash_swept_into_idle_asset():
+    cur = {"SSO": 240.0, "XLE": 140.0, "AAPL": 610.0}
+    t = {s: v / 1000 for s, v in cur.items()}
+    orders, notes = plan_orders(t, cur, 1000, rebalance_band=0.02, min_order_usd=25, max_daily_turnover=0.5,
+                                sweep_to="SSO", sweep_cap=0.30)
+    assert [(o.symbol, o.side, o.notional) for o in orders] == [("SSO", "buy", 8.0)]
+    # no room under the SSO cap: cash stays
+    orders, _ = plan_orders(t, cur, 1000, rebalance_band=0.02, min_order_usd=25, max_daily_turnover=0.5,
+                            sweep_to="SSO", sweep_cap=0.24)
+    assert orders == []

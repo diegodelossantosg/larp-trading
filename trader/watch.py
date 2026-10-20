@@ -141,7 +141,7 @@ def fund_buys(buys: list[Order], *, equity: float, cash: float, idle_value: floa
     """The buys plus the idle-asset sale that pays for them (buys shrink if there isn't enough)."""
     if not buys:
         return []
-    need = sum(o.notional for o in buys) - max(0.0, cash - 0.01 * equity)
+    need = sum(o.notional for o in buys) - max(0.0, cash - 0.002 * equity)
     if need <= 0:
         return buys
     sell = min(need, idle_value)

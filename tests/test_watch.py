@@ -54,4 +54,4 @@ def test_buy_candidates_respect_position_cap():
 def test_buys_funded_from_spy():
     orders = buy_orders([("SMH", 6, ["x"])], equity=1000, cash=10, idle_value=500, idle_asset="SPY",
                         held={"SPY", "XLE"}, max_positions=8, size=0.08, slots=4)
-    assert [(o.symbol, o.side, o.notional) for o in orders] == [("SPY", "sell", 80.0), ("SMH", "buy", 80.0)]
+    assert [(o.symbol, o.side, o.notional) for o in orders] == [("SPY", "sell", 72.0), ("SMH", "buy", 80.0)]

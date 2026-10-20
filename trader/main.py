@@ -355,6 +355,7 @@ def trade(cfg, broker: Broker, market: Market, dry_run: bool, force: bool) -> in
         targets, current, equity, rebalance_band=cfg.rebalance_band,
         min_order_usd=cfg.min_order_usd, max_daily_turnover=cfg.max_daily_turnover,
         protected=_recent_watch_buys(cfg.min_hold_days, cfg.news_min_hold_days) & set(positions),
+        sweep_to=cfg.idle_asset, sweep_cap=cfg.max_idle_weight,
     )
     record["notes"] += notes
     prices = {s: t["price"] for s, t in technicals.items()}
