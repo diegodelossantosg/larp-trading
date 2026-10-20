@@ -1,0 +1,40 @@
+name: "Backtest candlestick patterns"
+
+# 16 candlestick patterns on 5m, 15m, 1h and daily candles, vs random entries, after costs.
+on:
+  workflow_dispatch:
+    inputs:
+      intraday_years:
+        description: "Years of 5-minute history"
+        default: "2"
+      daily_years:
+        description: "Years of daily history"
+        default: "8"
+
+permissions:
+  contents: write
+
+jobs:
+  candles:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    env:
+      ALPACA_API_KEY: ${{ secrets.ALPACA_API_KEY }}
+      ALPACA_SECRET_KEY: ${{ secrets.ALPACA_SECRET_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: ./setup.sh
+      - run: python -m trader.candle_backtest --intraday-years ${{ inputs.intraday_years }} --daily-years ${{ inputs.daily_years }}
+      - name: Save results
+        run: |
+          git config user.name "trading-agent"
+          git config user.email "trading-agent@users.noreply.github.com"
+          git add docs/data/candle_backtest.json
+          git commit -q -m "Backtest: candlestick patterns"
+          for i in 1 2 3; do git pull -q --rebase origin main && git push -q origin HEAD:main && exit 0; sleep 5; done
+          exit 1
