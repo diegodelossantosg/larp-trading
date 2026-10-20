@@ -588,9 +588,12 @@ def news(cfg, broker: Broker, market: Market, dry_run: bool, force: bool = False
                 ok, why = False, f"price ${t['price']} is too low (penny stock)"
             elif t["avg_dollar_vol_m"] < (MIN_SMALL_STOCK_DOLLAR_VOLUME_M if kind == "small" else MIN_DOLLAR_VOLUME_M):
                 ok, why = False, f"too illiquid (${t['avg_dollar_vol_m']}M/day)"
-        if ok and kind in ("big", "small"):
+        next_er = idea.get("next_earnings", "")
+        # An earnings beat just reported, so its next report is ~3 months away even if the date is unknown.
+        just_reported = idea.get("idea_type") == "earnings_beat" and next_er.strip().lower() == "unknown"
+        if ok and kind in ("big", "small") and not just_reported:
             _, notes = earnings_blackout({sym: weights.get(sym, 0) + NEWS_BUY_SIZE}, weights, {sym},
-                                         {sym: idea.get("next_earnings", "")}, today, cfg.earnings_blackout_days)
+                                         {sym: next_er}, today, cfg.earnings_blackout_days)
             if notes:
                 ok, why = False, notes[0].replace(f"didn't add to {sym}: ", "")
         cap = {"big": cfg.max_stock_weight, "small": cfg.max_small_stock_weight}.get(kind, cfg.max_position_weight)
