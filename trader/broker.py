@@ -78,7 +78,7 @@ class Broker:
         if symbol not in self._assets:
             try:
                 self._assets[symbol] = self.client.get_asset(symbol)
-            except APIError:
+            except (APIError, ValueError):   # ValueError: e.g. an exchange alpaca-py doesn't know yet (TXSE)
                 self._assets[symbol] = None
         return self._assets[symbol]
 

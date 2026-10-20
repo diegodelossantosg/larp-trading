@@ -44,13 +44,14 @@ def universe_2018(top: int = N_COMPANIES) -> list[str]:
     from .config import load_config
 
     cfg = load_config()
-    trading = TradingClient(cfg.alpaca_api_key, cfg.alpaca_secret_key, paper=True)
+    # raw dicts: new exchanges (e.g. TXSE) aren't in alpaca-py's list yet and would fail validation
+    trading = TradingClient(cfg.alpaca_api_key, cfg.alpaca_secret_key, paper=True, raw_data=True)
     assets = []
     for status in (AssetStatus.ACTIVE, AssetStatus.INACTIVE):
         assets += trading.get_all_assets(GetAssetsRequest(status=status, asset_class=AssetClass.US_EQUITY))
-    names = {a.symbol: a.name or "" for a in assets
-             if str(getattr(a.exchange, "value", a.exchange)).upper() in ("NYSE", "NASDAQ", "AMEX", "ARCA", "BATS")
-             and a.symbol.isalpha() and len(a.symbol) <= 5 and not looks_like_fund(a.name or "")}
+    names = {a["symbol"]: a.get("name") or "" for a in assets
+             if str(a.get("exchange", "")).upper() in ("NYSE", "NASDAQ", "AMEX", "ARCA", "BATS")
+             and a["symbol"].isalpha() and len(a["symbol"]) <= 5 and not looks_like_fund(a.get("name") or "")}
     log.info("candidate companies: %d", len(names))
     client = StockHistoricalDataClient(cfg.alpaca_api_key, cfg.alpaca_secret_key)
     dollar = {}
