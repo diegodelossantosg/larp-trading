@@ -20,16 +20,21 @@ HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; larp-trading/1.0; paper-tradi
            "Accept": "application/json", "Accept-Encoding": "identity"}
 
 
-def parse(raw: bytes) -> set[str]:
-    """Tickers in one day's calendar response (a day with no reports has no rows)."""
+def parse(raw: bytes, skip_pre_market: bool = False) -> set[str]:
+    """Tickers in one day's calendar response (a day with no reports has no rows).
+
+    With skip_pre_market, companies that reported before today's open are left out: we trade during
+    market hours, so that report is already out and priced in.
+    """
     rows = ((json.loads(raw).get("data") or {}).get("rows")) or []
-    return {r["symbol"].strip().upper() for r in rows if r.get("symbol")}
+    return {r["symbol"].strip().upper() for r in rows
+            if r.get("symbol") and not (skip_pre_market and r.get("time") == "time-pre-market")}
 
 
-def fetch_day(day: str, timeout: float = 10) -> set[str]:
+def fetch_day(day: str, skip_pre_market: bool = False, timeout: float = 10) -> set[str]:
     req = urllib.request.Request(URL.format(day=day), headers=HEADERS)
     with urllib.request.urlopen(req, timeout=timeout) as resp:
-        return parse(resp.read())
+        return parse(resp.read(), skip_pre_market)
 
 
 def upcoming(today: str, days: int, fetch=fetch_day) -> dict[str, str] | None:
@@ -41,7 +46,7 @@ def upcoming(today: str, days: int, fetch=fetch_day) -> dict[str, str] | None:
     for i in range(days + 1):
         day = str(np.busday_offset(today, i, roll="forward"))
         try:
-            symbols = fetch(day)
+            symbols = fetch(day, day == today)
         except Exception as e:  # a missing calendar must never crash a run
             log.info("earnings calendar unavailable for %s: %s", day, e)
             return None
