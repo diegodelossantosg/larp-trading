@@ -189,11 +189,14 @@ def earnings_blackout(
     earnings: dict[str, str],
     today: str,
     days: int,
+    calendar: dict[str, str] | None = None,
 ) -> tuple[dict[str, float], list[str]]:
     """Don't add to a stock that reports earnings within `days` trading days (or whose date is unknown).
 
     A single company can drop 10-20% overnight on a bad report, and a stop can't catch a gap.
     Holding what we already own is allowed; only the increase is blocked.
+    `calendar` ({symbol: date} of everyone reporting inside the window, from earnings_calendar) wins
+    over the dates in `earnings`: a stock missing from it doesn't report soon.
     """
     import numpy as np
 
@@ -201,6 +204,11 @@ def earnings_blackout(
     for sym, w in proposed.items():
         held = current_weights.get(sym, 0.0)
         if sym not in stocks or w <= held + 0.005:
+            continue
+        if calendar is not None:
+            if sym in calendar:
+                out[sym] = held
+                notes.append(f"didn't add to {sym}: it reports earnings on {calendar[sym]}, too soon to buy")
             continue
         date = (earnings.get(sym) or "").strip()[:10]
         try:
