@@ -135,7 +135,7 @@ def plan_orders(
     rebalance_band: float,
     min_order_usd: float,
     max_daily_turnover: float,
-    cash_buffer: float = 0.002,
+    cash_buffer: float = 0.0,
     protected: set[str] | frozenset = frozenset(),
     sweep_to: str | None = None,
     sweep_cap: float = 1.0,

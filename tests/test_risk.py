@@ -104,7 +104,7 @@ def test_leftover_cash_swept_into_idle_asset():
     t = {s: v / 1000 for s, v in cur.items()}
     orders, notes = plan_orders(t, cur, 1000, rebalance_band=0.02, min_order_usd=25, max_daily_turnover=0.5,
                                 sweep_to="SSO", sweep_cap=0.30)
-    assert [(o.symbol, o.side, o.notional) for o in orders] == [("SSO", "buy", 8.0)]
+    assert [(o.symbol, o.side, o.notional) for o in orders] == [("SSO", "buy", 10.0)]
     # no room under the SSO cap: cash stays
     orders, _ = plan_orders(t, cur, 1000, rebalance_band=0.02, min_order_usd=25, max_daily_turnover=0.5,
                             sweep_to="SSO", sweep_cap=0.24)
