@@ -24,7 +24,7 @@ from .market import Market
 from .risk import Order, apply_limits, drawdown, earnings_blackout, plan_orders
 from .universe import BIG_STOCKS, CORE_ETFS, LEVERAGED, NAMES
 from . import health as market_health
-from . import feeds, ledger, report_card, scorecard
+from . import earnings_calendar, feeds, ledger, report_card, scorecard
 from . import watch as rules
 
 log = logging.getLogger("trader")
@@ -333,8 +333,11 @@ def trade(cfg, broker: Broker, market: Market, dry_run: bool, force: bool) -> in
 
     held_weights = {s: p["market_value"] / (equity or 1) for s, p in positions.items()}
     earnings = {p["symbol"].upper(): p.get("next_earnings", "") for p in decision.data["positions"]}
+    calendar = None
+    if any(s in stocks and w > held_weights.get(s, 0.0) for s, w in proposed.items()):
+        calendar = earnings_calendar.upcoming(_today(), cfg.earnings_blackout_days)
     proposed, notes = earnings_blackout(proposed, held_weights, set(stocks), earnings, _today(),
-                                        cfg.earnings_blackout_days)
+                                        cfg.earnings_blackout_days, calendar)
     record["notes"] += notes
 
     targets, notes = apply_limits(
@@ -574,6 +577,7 @@ def news(cfg, broker: Broker, market: Market, dry_run: bool, force: bool = False
     small_total = sum(w for s, w in weights.items() if s not in CORE_ETFS and s not in BIG_STOCKS and broker.vet(s)[2] == "small")
     hold_days: dict[str, int] = {}
     buys: list[Order] = []
+    calendar, calendar_checked = None, False   # fetched once, on the first stock idea
     for idea in data.get("ideas", [])[: NEWS_MAX_BUYS_PER_DAY - used]:
         sym = idea["symbol"].upper().strip()
         ok, lev, kind, why = broker.vet(sym)
@@ -589,11 +593,16 @@ def news(cfg, broker: Broker, market: Market, dry_run: bool, force: bool = False
             elif t["avg_dollar_vol_m"] < (MIN_SMALL_STOCK_DOLLAR_VOLUME_M if kind == "small" else MIN_DOLLAR_VOLUME_M):
                 ok, why = False, f"too illiquid (${t['avg_dollar_vol_m']}M/day)"
         next_er = idea.get("next_earnings", "")
-        # An earnings beat just reported, so its next report is ~3 months away even if the date is unknown.
+        if ok and kind in ("big", "small") and not calendar_checked:
+            calendar, calendar_checked = earnings_calendar.upcoming(today, cfg.earnings_blackout_days), True
+            record["notes"].append("earnings dates checked on Nasdaq's calendar" if calendar is not None
+                                   else "Nasdaq's earnings calendar was unavailable; used Claude's dates")
+        # Without the calendar, an earnings beat that just reported is still safe: its next report is
+        # ~3 months away even if Claude couldn't find the date.
         just_reported = idea.get("idea_type") == "earnings_beat" and next_er.strip().lower() == "unknown"
-        if ok and kind in ("big", "small") and not just_reported:
+        if ok and kind in ("big", "small") and not (calendar is None and just_reported):
             _, notes = earnings_blackout({sym: weights.get(sym, 0) + NEWS_BUY_SIZE}, weights, {sym},
-                                         {sym: next_er}, today, cfg.earnings_blackout_days)
+                                         {sym: next_er}, today, cfg.earnings_blackout_days, calendar)
             if notes:
                 ok, why = False, notes[0].replace(f"didn't add to {sym}: ", "")
         cap = {"big": cfg.max_stock_weight, "small": cfg.max_small_stock_weight}.get(kind, cfg.max_position_weight)
