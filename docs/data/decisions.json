@@ -1921,5 +1921,44 @@
     "idea_type": "earnings_beat"
    }
   ]
+ },
+ {
+  "date": "2026-10-20",
+  "time": "14:19",
+  "source": "news",
+  "dry_run": false,
+  "orders": [
+   {
+    "symbol": "SSO",
+    "side": "sell",
+    "notional": 40.14,
+    "reason": "funding the buys",
+    "status": "pending_new",
+    "order_id": "93802f4a-2328-4d0a-a023-7797c693a7e0"
+   },
+   {
+    "symbol": "MMM",
+    "side": "buy",
+    "notional": 50.17,
+    "reason": "Profits beat forecasts, outlook raised, and a big Amazon deal; such jumps usually keep rising.",
+    "status": "pending_new",
+    "order_id": "e3e78fcb-109a-46cd-8bd4-07d69abbbc58",
+    "hold_days": 20
+   }
+  ],
+  "notes": [
+   "earnings dates checked on Nasdaq's calendar"
+  ],
+  "plain_summary": "3M beat profit estimates, raised its full-year outlook and is up about 5% more than the market today, so I picked it. I skipped the other big moves: GE fell on its own earnings report, Equifax cut its outlook, and DaVita's drop is tied to a real policy threat to its business.",
+  "ideas": [
+   {
+    "symbol": "MMM",
+    "headline": "2026-10-20 before the open: 3M reports Q3 2026 adjusted EPS of $2.50 vs about $2.39 expected (sixth straight beat), raises 2026 EPS guidance to $9.10-9.15 and expands its data-center optical deal with Amazon (up to $6B, with an Amazon warrant). Stock is up 5.6% vs SPY +0.4% (CNBC/Benzinga 17:48 UTC: 'Why Is 3M Stock Soaring Tuesday?')",
+    "why_not_priced_in": "Our tests show that after big companies beat estimates and jump more than 5% against the market, the stock tends to keep drifting up for about 20 trading days, beating the market by roughly 1.6%. The beat looks clean. Profit was about 5% above estimates, and still beat after removing the roughly $0.04 per share that comes from a change in how 3M reports results. Full-year guidance went up by more than that change explains, and the Amazon deal adds a new growth story for several years. The stock was up about 3% right after the report and has kept climbing to about 5.6% by the afternoon, so the move is not fading. Revenue was only in line with estimates (around $6.6B, organic growth +3.3%), so a trailing stop around 10% makes sense.",
+    "plain_reason": "Profits beat forecasts, outlook raised, and a big Amazon deal; such jumps usually keep rising.",
+    "next_earnings": "unknown",
+    "idea_type": "earnings_beat"
+   }
+  ]
  }
 ]

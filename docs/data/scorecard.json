@@ -105,5 +105,16 @@
   "last": 536.76,
   "spy_last": 769.77,
   "open": true
+ },
+ {
+  "date": "2026-10-20",
+  "source": "news",
+  "symbol": "MMM",
+  "amount": 50.17,
+  "entry": 171.15,
+  "spy_entry": 769.67,
+  "last": 171.15,
+  "spy_last": 769.67,
+  "open": true
  }
 ]
