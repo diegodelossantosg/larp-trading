@@ -1852,5 +1852,35 @@
     "idea_type": "earnings_beat"
    }
   ]
+ },
+ {
+  "date": "2026-10-20",
+  "time": "12:18",
+  "source": "news",
+  "dry_run": false,
+  "orders": [],
+  "notes": [
+   "skipped NOC: its next earnings date isn't confirmed",
+   "skipped HAS: its next earnings date isn't confirmed"
+  ],
+  "plain_summary": "Several big companies beat their earnings today. I picked the two cleanest beats that also raised their yearly forecasts, Northrop Grumman and Hasbro, and skipped the stocks that fell on their own earnings (GM, GE, RTX).",
+  "ideas": [
+   {
+    "symbol": "NOC",
+    "headline": "2026-10-20 premarket: Northrop Grumman Q3 profit of $7.89/share beat the $7.18 estimate. Backlog hit a record ~$110B (1.5x book-to-bill, $16B of new awards) and it raised 2026 EPS guidance to $29.35-29.75 from $28.60-29.10. Shares were up ~6% to ~$542 at midday.",
+    "why_not_priced_in": "This is a clean beat-and-raise driven by operations, not one-off items. Sales were in line, and the record backlog and higher guidance point to stronger profits for several quarters. In our tests, big companies that beat and jumped more than 5% kept beating the S&P 500 by about 1.6% over the next 20 trading days. The jump is holding at midday even though peer RTX fell. Next earnings are around late January 2027 (last year Jan 27), but the date is not confirmed yet.",
+    "plain_reason": "Profit beat forecasts, record orders, and it raised its yearly outlook.",
+    "next_earnings": "unknown",
+    "idea_type": "earnings_beat"
+   },
+   {
+    "symbol": "HAS",
+    "headline": "2026-10-20 premarket: Hasbro Q3 adjusted EPS of $2.90 vs $1.86 expected, and revenue of ~$1.59B vs ~$1.48B. Magic: The Gathering set a record ($616M, +34%). It raised 2026 guidance (revenue growth 7-9% from 5-7%, operating margin 27-28% from 25-26%) and bigger buybacks. Shares up ~6-9% to around $105-107.",
+    "why_not_priced_in": "The beat is very large and holds up even after removing the ~$55M one-time tariff refund. Revenue also beat, and full-year guidance for sales and margins went up, so analysts will need to raise their numbers. That is what drives the multi-week drift we saw after big, clean earnings jumps (about +1.6% vs the S&P over 20 days after jumps above 5%). Q4 results usually come out in mid-to-late February, so they are far off; the 2027 date is not confirmed.",
+    "plain_reason": "Huge profit beat and higher yearly forecast, with Magic cards selling at record levels.",
+    "next_earnings": "unknown",
+    "idea_type": "earnings_beat"
+   }
+  ]
  }
 ]
