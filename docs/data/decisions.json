@@ -1810,5 +1810,26 @@
    "WMT": 0.06,
    "SSO": 0.24
   }
+ },
+ {
+  "date": "2026-10-20",
+  "time": "10:20",
+  "source": "news",
+  "dry_run": false,
+  "orders": [],
+  "notes": [
+   "skipped MMM: its next earnings date isn't confirmed"
+  ],
+  "plain_summary": "Lots of earnings news this hour; 3M beat estimates and raised its yearly forecast, so I picked it and skipped the rest.",
+  "ideas": [
+   {
+    "symbol": "MMM",
+    "headline": "3M Reports Third-Quarter 2026 Results; Raises Full-Year EPS Guidance (Oct 20, 2026, pre-market); stock +4.7% (~+4.2% vs SPY) at 10:19 ET",
+    "why_not_priced_in": "Clean beat: adjusted EPS $2.50 vs about $2.38-2.39 expected (+12% from a year ago, sixth straight beat), and the full-year EPS forecast was raised to $9.10-9.15 from $8.80-8.95. The beat came from operations, not one-off items. Big beat-and-raise reports with a 2%+ jump vs the market kept drifting higher over the next 20 days in our tests. Small catches: sales were flat to slightly light, and an Amazon warrant could add about 0.6% more shares. The stock is in industrials, away from the chip and big-tech selling.",
+    "plain_reason": "3M earned more than expected and raised its yearly forecast; such stocks keep climbing.",
+    "next_earnings": "unknown",
+    "idea_type": "earnings_beat"
+   }
+  ]
  }
 ]
