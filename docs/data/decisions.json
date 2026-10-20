@@ -1831,5 +1831,26 @@
     "idea_type": "earnings_beat"
    }
   ]
+ },
+ {
+  "date": "2026-10-20",
+  "time": "11:19",
+  "source": "news",
+  "dry_run": false,
+  "orders": [],
+  "notes": [
+   "skipped NOC: its next earnings date isn't confirmed"
+  ],
+  "plain_summary": "Most of today's big moves had no clean buy behind them, so I'm suggesting one stock: Northrop Grumman, which beat its profit estimates, raised its forecast and is up about 4% more than the S&P 500.",
+  "ideas": [
+   {
+    "symbol": "NOC",
+    "headline": "Northrop Grumman Q3 2026 results, Oct 20, 2026 before the open (call transcript 14:41 UTC): adjusted EPS $7.89 vs about $7.18 expected; sales up 7% to $11.1B; 2026 EPS guidance raised to $29.35-$29.75; record $110B backlog; book-to-bill 1.5x",
+    "why_not_priced_in": "The beat came from the business itself, not one-off items. Profit beat estimates by about 10%. The full-year EPS forecast went up by $0.70 at the midpoint and new orders were 1.5 times sales. No one-time gains turned up in what I found. The stock is up 4.6% against SPY's +0.42%, so about 4.2% ahead of the market. That is a clean earnings-beat jump, the kind that kept drifting up for about 20 days in our tests. It has given back some of its roughly 6% premarket gain but has not faded hard. Before the report, Goldman and Bernstein had cut price targets, so expectations were low and estimates now need to go up. Defense also fits the defensive tilt and has little overlap with what we hold. Next earnings will probably be around late January 2027 (last year's was Jan 27), but the date isn't announced yet.",
+    "plain_reason": "Big defense maker earned more than expected, raised its forecast, and has record orders.",
+    "next_earnings": "unknown",
+    "idea_type": "earnings_beat"
+   }
+  ]
  }
 ]
