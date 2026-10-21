@@ -2210,5 +2210,27 @@
     "idea_type": "earnings_beat"
    }
   ]
+ },
+ {
+  "date": "2026-10-21",
+  "time": "11:20",
+  "source": "news",
+  "dry_run": false,
+  "orders": [],
+  "notes": [
+   "earnings dates checked on Nasdaq's calendar",
+   "skipped COF: already at its size limit"
+  ],
+  "plain_summary": "Most of today's big drops (AT&T, Netflix, Abbott) came after earnings reports, so we skip them. I picked one stock: Capital One, which beat earnings forecasts clearly and is holding its gain.",
+  "ideas": [
+   {
+    "symbol": "COF",
+    "headline": "Capital One Q3 2026 results (Oct 20 after close): adjusted EPS $6.69 vs ~$5.50 expected, revenue $16.34B vs ~$16.26B, costs down 2% from last quarter, fewer bad loans; analysts raising targets (Benzinga, 2026-10-21)",
+    "why_not_priced_in": "The EPS beat was about 22%. It came from higher card yields, lower costs and fewer bad loans, not one-off items. The stock is up about 4.3% against a market up 0.26%, roughly 4% better than the S&P 500. That gain is holding: $210.2 now vs $209.4 after hours. In our tests, big companies that beat and jumped 2-5% beat the S&P 500 by about 1.3% over the next 20 days, and analysts are only now raising their estimates. Skipped the others: AT&T, Netflix and Abbott fell on their own earnings or guidance. Verizon is falling with AT&T over the Starlink worry. Alphabet is down only about 2.5% with its earnings a week away. SpaceX's jump is mixed with merger talk, and more insider shares can be sold starting around Oct 22.",
+    "plain_reason": "Profits were far above forecasts thanks to lower costs and fewer bad loans; such gains tend to keep going.",
+    "next_earnings": "unknown",
+    "idea_type": "earnings_beat"
+   }
+  ]
  }
 ]
