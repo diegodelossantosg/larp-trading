@@ -3,26 +3,26 @@
   "picks": 9,
   "vs_spy_5d_avg_pct": 1.52,
   "vs_spy_5d_beat_rate": 0.67,
-  "vs_spy_so_far_avg_pct": 1.04,
-  "vs_spy_so_far_beat_rate": 0.56
+  "vs_spy_so_far_avg_pct": 0.73,
+  "vs_spy_so_far_beat_rate": 0.33
  },
  "by_trade_type": {
   "news_catalyst": {
    "picks": 1,
-   "vs_spy_so_far_avg_pct": -1.91,
+   "vs_spy_so_far_avg_pct": -1.13,
    "vs_spy_so_far_beat_rate": 0.0
   },
   "trend_momentum": {
    "picks": 2,
-   "vs_spy_so_far_avg_pct": -0.1,
-   "vs_spy_so_far_beat_rate": 0.5
+   "vs_spy_so_far_avg_pct": -1.17,
+   "vs_spy_so_far_beat_rate": 0.0
   },
   "untagged": {
    "picks": 6,
    "vs_spy_5d_avg_pct": 1.52,
    "vs_spy_5d_beat_rate": 0.67,
-   "vs_spy_so_far_avg_pct": 1.92,
-   "vs_spy_so_far_beat_rate": 0.67
+   "vs_spy_so_far_avg_pct": 1.67,
+   "vs_spy_so_far_beat_rate": 0.5
   }
  },
  "by_kind": {
@@ -30,13 +30,13 @@
    "picks": 6,
    "vs_spy_5d_avg_pct": 1.52,
    "vs_spy_5d_beat_rate": 0.67,
-   "vs_spy_so_far_avg_pct": 1.92,
-   "vs_spy_so_far_beat_rate": 0.67
+   "vs_spy_so_far_avg_pct": 1.67,
+   "vs_spy_so_far_beat_rate": 0.5
   },
   "stock": {
    "picks": 3,
-   "vs_spy_so_far_avg_pct": -0.71,
-   "vs_spy_so_far_beat_rate": 0.33
+   "vs_spy_so_far_avg_pct": -1.16,
+   "vs_spy_so_far_beat_rate": 0.0
   }
  },
  "recent": [
@@ -49,8 +49,8 @@
    "vs_spy_5d_pct": null,
    "vs_spy_20d_pct": null,
    "vs_spy_60d_pct": null,
-   "vs_spy_so_far_pct": -1.91,
-   "days_held_so_far": 2
+   "vs_spy_so_far_pct": -1.13,
+   "days_held_so_far": 3
   },
   {
    "date": "2026-10-16",
@@ -61,8 +61,8 @@
    "vs_spy_5d_pct": null,
    "vs_spy_20d_pct": null,
    "vs_spy_60d_pct": null,
-   "vs_spy_so_far_pct": 1.36,
-   "days_held_so_far": 2
+   "vs_spy_so_far_pct": -0.2,
+   "days_held_so_far": 3
   },
   {
    "date": "2026-10-16",
@@ -73,8 +73,8 @@
    "vs_spy_5d_pct": null,
    "vs_spy_20d_pct": null,
    "vs_spy_60d_pct": null,
-   "vs_spy_so_far_pct": -1.57,
-   "days_held_so_far": 2
+   "vs_spy_so_far_pct": -2.14,
+   "days_held_so_far": 3
   },
   {
    "date": "2026-10-12",
@@ -86,7 +86,7 @@
    "vs_spy_20d_pct": null,
    "vs_spy_60d_pct": null,
    "vs_spy_so_far_pct": 0.0,
-   "days_held_so_far": 6
+   "days_held_so_far": 7
   },
   {
    "date": "2026-10-12",
@@ -97,8 +97,8 @@
    "vs_spy_5d_pct": 4.21,
    "vs_spy_20d_pct": null,
    "vs_spy_60d_pct": null,
-   "vs_spy_so_far_pct": 4.13,
-   "days_held_so_far": 6
+   "vs_spy_so_far_pct": 3.9,
+   "days_held_so_far": 7
   },
   {
    "date": "2026-10-12",
@@ -109,8 +109,8 @@
    "vs_spy_5d_pct": -3.26,
    "vs_spy_20d_pct": null,
    "vs_spy_60d_pct": null,
-   "vs_spy_so_far_pct": -2.75,
-   "days_held_so_far": 6
+   "vs_spy_so_far_pct": -1.57,
+   "days_held_so_far": 7
   },
   {
    "date": "2026-10-12",
@@ -121,8 +121,8 @@
    "vs_spy_5d_pct": 0.4,
    "vs_spy_20d_pct": null,
    "vs_spy_60d_pct": null,
-   "vs_spy_so_far_pct": 0.27,
-   "days_held_so_far": 6
+   "vs_spy_so_far_pct": -0.09,
+   "days_held_so_far": 7
   },
   {
    "date": "2026-10-12",
@@ -133,8 +133,8 @@
    "vs_spy_5d_pct": 3.62,
    "vs_spy_20d_pct": null,
    "vs_spy_60d_pct": null,
-   "vs_spy_so_far_pct": 5.72,
-   "days_held_so_far": 6
+   "vs_spy_so_far_pct": 4.68,
+   "days_held_so_far": 7
   },
   {
    "date": "2026-10-12",
@@ -145,9 +145,9 @@
    "vs_spy_5d_pct": 4.16,
    "vs_spy_20d_pct": null,
    "vs_spy_60d_pct": null,
-   "vs_spy_so_far_pct": 4.13,
-   "days_held_so_far": 6
+   "vs_spy_so_far_pct": 3.08,
+   "days_held_so_far": 7
   }
  ],
- "updated": "2026-10-20"
+ "updated": "2026-10-21"
 }
