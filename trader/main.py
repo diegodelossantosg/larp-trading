@@ -128,7 +128,7 @@ def _recent_watch_buys(days: int, news_days: int | None = None) -> set[str]:
         for o in d.get("orders", []):
             if o["side"] != "buy" or o.get("status") in ("error", "skipped"):
                 continue
-            n = days if d["source"] == "watch" else o.get("hold_days", news_days)  # earnings beats: longer
+            n = days if d["source"] == "watch" else o.get("hold_days", news_days)  # per-order hold days (older earnings-beat buys: 20)
             if d["date"] > cutoff(n):
                 out.add(o["symbol"])
     return out
@@ -593,15 +593,14 @@ def news(cfg, broker: Broker, market: Market, dry_run: bool, force: bool = False
                 ok, why = False, f"price ${t['price']} is too low (penny stock)"
             elif t["avg_dollar_vol_m"] < (MIN_SMALL_STOCK_DOLLAR_VOLUME_M if kind == "small" else MIN_DOLLAR_VOLUME_M):
                 ok, why = False, f"too illiquid (${t['avg_dollar_vol_m']}M/day)"
+        if ok and idea.get("idea_type") == "earnings_beat":   # tested: no edge outside today's big winners
+            ok, why = False, "earnings-beat buys are switched off (no edge in our wider test)"
         next_er = idea.get("next_earnings", "")
         if ok and kind in ("big", "small") and not calendar_checked:
             calendar, calendar_checked = earnings_calendar.upcoming(today, cfg.earnings_blackout_days), True
             record["notes"].append("earnings dates checked on Nasdaq's calendar" if calendar is not None
                                    else "Nasdaq's earnings calendar was unavailable; used Claude's dates")
-        # Without the calendar, an earnings beat that just reported is still safe: its next report is
-        # ~3 months away even if Claude couldn't find the date.
-        just_reported = idea.get("idea_type") == "earnings_beat" and next_er.strip().lower() == "unknown"
-        if ok and kind in ("big", "small") and not (calendar is None and just_reported):
+        if ok and kind in ("big", "small"):
             _, notes = earnings_blackout({sym: weights.get(sym, 0) + NEWS_BUY_SIZE}, weights, {sym},
                                          {sym: next_er}, today, cfg.earnings_blackout_days, calendar)
             if notes:
@@ -619,8 +618,7 @@ def news(cfg, broker: Broker, market: Market, dry_run: bool, force: bool = False
             record["notes"].append(f"skipped {sym}: {why}")
             continue
         buys.append(Order(sym, "buy", round(amount, 2), idea["plain_reason"]))
-        hold_days[sym] = (cfg.news_earnings_hold_days if idea.get("idea_type") == "earnings_beat"
-                          else cfg.news_min_hold_days)
+        hold_days[sym] = cfg.news_min_hold_days
         if kind in ("big", "small"):
             stocks_total += amount / equity
         if kind == "small":

@@ -60,19 +60,10 @@ def test_news_respects_earnings_and_daily_limit(tmp_path, monkeypatch):
     assert any("AAPL" in n and "earnings" in n for n in rec["notes"])
 
 
-def test_earnings_beat_with_unknown_next_date_can_buy(tmp_path, monkeypatch):
-    beat = dict(idea("NVDA", "unknown"), idea_type="earnings_beat")
-    drop = dict(idea("AAPL", "unknown"), idea_type="overreaction")
-    broker, rec = run(tmp_path, monkeypatch, [beat, drop])
-    assert [o.symbol for o in broker.sent if o.side == "buy"] == ["NVDA"]   # just reported: next one is months away
-    assert any("AAPL" in n and "isn't confirmed" in n for n in rec["notes"])  # other ideas still need a date
-
-
-def test_earnings_beats_are_kept_longer(tmp_path, monkeypatch):
+def test_earnings_beat_ideas_are_switched_off(tmp_path, monkeypatch):
     beat = dict(idea("NVDA"), idea_type="earnings_beat")
     drop = dict(idea("TINY"), idea_type="overreaction")
     broker, rec = run(tmp_path, monkeypatch, [beat, drop])
     held = {o["symbol"]: o["hold_days"] for o in rec["orders"] if o["side"] == "buy"}
-    assert held == {"NVDA": 20, "TINY": 10}
-    monkeypatch.setattr(main, "_today", lambda: "2026-11-02")    # 12 trading days later
-    assert main._recent_watch_buys(3, 10) == {"NVDA"}
+    assert held == {"TINY": 10}
+    assert any("NVDA" in n and "earnings-beat" in n for n in rec["notes"])

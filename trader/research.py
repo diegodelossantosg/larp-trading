@@ -11,6 +11,7 @@ from __future__ import annotations
 import pandas as pd
 
 COSTS = {"pre8": 0.004}
+BASE_ENTRY = {"hour_after": "h11"}   # random days have no headline: compare with buying at 11:00
 DEFAULT_COST = 0.001
 
 
@@ -29,7 +30,8 @@ def evaluate(df: pd.DataFrame, mask, entry: str, hold: int, stop: bool = True, s
     out = {}
     for s in sets:
         ev = df[mask & (df["set"] == s)][["year", c]].dropna()
-        ctl = df[(df["kind"] == "control") & (df["set"] == s)][["year", c]].dropna()
+        cc = col(BASE_ENTRY.get(entry, entry), hold, stop)
+        ctl = df[(df["kind"] == "control") & (df["set"] == s)][["year", cc]].dropna().rename(columns={cc: c})
         if len(ev) < 10:
             out[s] = {"trades": len(ev)}
             continue

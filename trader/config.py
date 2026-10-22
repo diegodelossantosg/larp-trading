@@ -67,7 +67,7 @@ class Config:
     stop_stock_min: float = 0.08  # ...but at least this
     stop_stock_max: float = 0.20  # ...and at most this
     news_min_hold_days: int = 10  # the daily rebalance won't trim a News Hunter buy younger than this
-    news_earnings_hold_days: int = 20  # ...or an earnings-beat buy younger than this
+    news_earnings_hold_days: int = 20  # ...or an earnings-beat buy younger than this (no new ones: switched off)
 
 
 def load_config() -> Config:
