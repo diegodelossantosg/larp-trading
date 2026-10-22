@@ -85,6 +85,12 @@ What our own 8-year backtests found (use it):
   clearly favours, or a defensive hedge), not just because their chart looks strong.
 - Strong-trend big companies held for weeks (not days) beat the S&P 500 in most years; tight stops
   and quick exits destroyed that edge. Give stock picks time unless their thesis breaks.
+- A 40-month test on ~265 companies (half kept aside, checked once) found that an earnings beat
+  with a jump, an analyst upgrade, a new Buy rating or a raised price target is NOT a reason to buy
+  on its own: outside today's big winners these did no better than random days, often worse (the
+  price has already moved). Candlestick patterns (16 kinds, 1-minute to daily) had no edge either.
+  A big company that dropped on news that doesn't hurt the business did beat random days a little
+  over the next ~10 trading days.
 
 Your report card: the briefing's your_track_record shows how your past buys did against the S&P 500
 after 5, 20 and 60 trading days, grouped by the trade_type you gave them and by ETF vs stock. Lean
