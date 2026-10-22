@@ -1,0 +1,37 @@
+name: "Backtest analyst upgrades and downgrades"
+
+# Buy after an analyst upgrade? Real headlines, vs random days, on big and fresh companies, by year.
+on:
+  workflow_dispatch:
+    inputs:
+      months:
+        description: "Months of headlines"
+        default: "40"
+
+permissions:
+  contents: write
+
+jobs:
+  analyst:
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    env:
+      ALPACA_API_KEY: ${{ secrets.ALPACA_API_KEY }}
+      ALPACA_SECRET_KEY: ${{ secrets.ALPACA_SECRET_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: ./setup.sh
+      - run: python -m trader.analyst_backtest --months ${{ inputs.months }}
+      - name: Save results
+        run: |
+          git config user.name "trading-agent"
+          git config user.email "trading-agent@users.noreply.github.com"
+          git add docs/data/analyst_backtest.json
+          git commit -q -m "Backtest: analyst upgrades"
+          for i in 1 2 3; do git pull -q --rebase origin main && git push -q origin HEAD:main && exit 0; sleep 5; done
+          exit 1
