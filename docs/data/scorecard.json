@@ -116,5 +116,27 @@
   "last": 175.12,
   "spy_last": 766.12,
   "open": true
+ },
+ {
+  "date": "2026-10-22",
+  "source": "news",
+  "symbol": "LMT",
+  "amount": 50.23,
+  "entry": 590.21,
+  "spy_entry": 765.64,
+  "last": 590.21,
+  "spy_last": 765.64,
+  "open": true
+ },
+ {
+  "date": "2026-10-22",
+  "source": "news",
+  "symbol": "PG",
+  "amount": 40.03,
+  "entry": 165.235,
+  "spy_entry": 765.64,
+  "last": 165.235,
+  "spy_last": 765.64,
+  "open": true
  }
 ]
