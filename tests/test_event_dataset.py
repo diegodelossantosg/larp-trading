@@ -38,6 +38,7 @@ def test_build_earnings_and_news_rows_with_entries():
     assert e["beat"] == 1 and e["sales_beat"] == 1 and "pre8_r5" in e and "close_s20" in e
     n = kinds["news"]
     assert n["move_1h"] >= 0.04 and "hour_after_r10" in n and "pre8_r5" not in n
+    assert any(r["kind"] == "control" and "close_r10" in r for r in rows)
 
 
 def test_split_is_stable():

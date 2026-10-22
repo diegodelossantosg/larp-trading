@@ -254,7 +254,34 @@ def build(news, daily, hourly, sets) -> list[dict]:
                 for k, v in returns(px, spy, e[0], e[1], e[2]).items():
                     row[f"{name}_{k}"] = v
             rows.append(row)
+    rows += controls(daily, hourly, sets)
     return rows
+
+
+def controls(daily, hourly, sets, per_year: int = 25, seed: int = 9) -> list[dict]:
+    """Random days of the same companies, entered the same ways: the "did the rule beat chance" baseline."""
+    rng = np.random.default_rng(seed)
+    spy, spy_hr = daily["SPY"], hourly.get("SPY")
+    out = []
+    for sym, grp in sorted(sets.items()):
+        px = daily.get(sym)
+        if px is None or len(px.c) < 260:
+            continue
+        n = int(per_year * (len(px.c) - 230) / 252)
+        for i in sorted(set(rng.integers(230, len(px.c) - 2, max(1, n)).tolist())):
+            s = spy.pos.get(px.dates[i])
+            if s is None:
+                continue
+            ts = pd.Timestamp(px.dates[i - 1]).tz_localize(NY) + pd.Timedelta(hours=20)
+            row = {"kind": "control", "symbol": sym, "set": grp, "day": str(px.dates[i]), "year": px.dates[i].year,
+                   "day_move": round((px.c[i] / px.c[i - 1] - 1) - (spy.c[s] / spy.c[s - 1] - 1), 4),
+                   **features(px, spy, i, px.vol)}
+            for name, e in entries(px, i, hourly.get(sym), spy_hr, spy, ts).items():
+                row[f"move_{name}"] = move_at(e, px.c[i - 1], spy.c[s - 1]) if e[2] == i else None
+                for k, v in returns(px, spy, e[0], e[1], e[2]).items():
+                    row[f"{name}_{k}"] = v
+            out.append(row)
+    return out
 
 
 class DailyV(eb.Daily):
