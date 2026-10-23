@@ -14,6 +14,12 @@ class NewsMarket(FakeMarket):
     def quotes(self, symbols):
         return {s: Quote(100.0, 98.0, 0, 1) for s in symbols}
 
+    def daily_bars(self, symbols, days=400):
+        out = super().daily_bars(symbols, days)
+        if "DASH" in out:                       # a heavily traded company (~$600M a day)
+            out["DASH"] = out["DASH"].assign(volume=5_000_000)
+        return out
+
 
 class HeldBroker(FakeBroker):
     def positions(self):
@@ -26,7 +32,7 @@ class HeldBroker(FakeBroker):
     def vet(self, s):
         if s == "TINY":
             return True, False, "small", ""
-        return super().vet(s) if s not in ("NVDA", "AAPL") else (True, False, "big", "")
+        return super().vet(s) if s not in ("NVDA", "AAPL", "DASH") else (True, False, "big", "")
 
 
 def run(tmp_path, monkeypatch, ideas):
@@ -45,9 +51,9 @@ def idea(sym, earnings="2026-12-01"):
 
 
 def test_news_buys_are_sized_funded_and_journaled(tmp_path, monkeypatch):
-    broker, rec = run(tmp_path, monkeypatch, [idea("NVDA"), idea("TINY")])
+    broker, rec = run(tmp_path, monkeypatch, [idea("NVDA"), idea("DASH")])
     sent = {(o.symbol, o.side): o.notional for o in broker.sent}
-    assert sent[("NVDA", "buy")] == 500 and sent[("TINY", "buy")] == 500   # 5% each
+    assert sent[("NVDA", "buy")] == 500 and sent[("DASH", "buy")] == 500   # 5% each
     assert sent[("SSO", "sell")] > 0                                        # paid for by selling SSO
     assert rec["source"] == "news" and rec["plain_summary"] == "One real opportunity."
     assert journal.read("news.json", {})["buys"]["2026-10-15"] == 2
@@ -62,8 +68,14 @@ def test_news_respects_earnings_and_daily_limit(tmp_path, monkeypatch):
 
 def test_earnings_beat_ideas_are_switched_off(tmp_path, monkeypatch):
     beat = dict(idea("NVDA"), idea_type="earnings_beat")
-    drop = dict(idea("TINY"), idea_type="overreaction")
+    drop = dict(idea("DASH"), idea_type="overreaction")
     broker, rec = run(tmp_path, monkeypatch, [beat, drop])
     held = {o["symbol"]: o["hold_days"] for o in rec["orders"] if o["side"] == "buy"}
-    assert held == {"TINY": 10}
+    assert held == {"DASH": 10}
     assert any("NVDA" in n and "earnings-beat" in n for n in rec["notes"])
+
+
+def test_thinly_traded_companies_are_skipped(tmp_path, monkeypatch):
+    broker, rec = run(tmp_path, monkeypatch, [idea("TINY")])      # ~$120M a day: below the $300M line
+    assert not [o for o in broker.sent if o.side == "buy"]
+    assert any("TINY" in n and "$300M" in n for n in rec["notes"])

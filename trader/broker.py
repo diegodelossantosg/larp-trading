@@ -14,6 +14,7 @@ from alpaca.trading.requests import GetCalendarRequest, GetOrdersRequest, GetPor
 
 from .config import Config
 from .risk import Order
+from .liquid import LIQUID_STOCKS
 from .universe import BIG_STOCKS, CORE_ETFS, is_leveraged, looks_like_fund
 
 log = logging.getLogger(__name__)
@@ -85,7 +86,7 @@ class Broker:
     def vet(self, symbol: str) -> tuple[bool, bool, str, str]:
         """(ok, leveraged, kind, reason) for any ETF or stock Claude wants to trade.
 
-        kind is "etf", "big" (a big, well-known company) or "small" (any other company).
+        kind is "etf", "big" (a big, well-known or heavily traded company) or "small" (any other company).
         """
         a = self.asset(symbol)
         if a is None:
@@ -96,7 +97,7 @@ class Broker:
             return True, is_leveraged(symbol, a.name or ""), "etf", ""
         if str(getattr(a.exchange, "value", a.exchange)).upper() in ("OTC", ""):
             return False, False, "", "only trades over the counter"
-        return True, False, "big" if symbol in BIG_STOCKS else "small", ""
+        return True, False, "big" if symbol in BIG_STOCKS or symbol in LIQUID_STOCKS else "small", ""
 
     def execute(self, orders: list[Order], prices: dict[str, float], positions: dict[str, dict]) -> list[dict]:
         """Submit sells, wait for them to settle into buying power, then buys."""

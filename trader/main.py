@@ -23,6 +23,7 @@ from .config import load_config
 from .indicators import summarize
 from .market import Market
 from .risk import Order, apply_limits, drawdown, earnings_blackout, plan_orders
+from .liquid import LIQUID_MIN_DOLLAR_VOLUME_M, LIQUID_STOCKS
 from .universe import BIG_STOCKS, CORE_ETFS, LEVERAGED, NAMES
 from . import health as market_health
 from . import earnings_calendar, feeds, ledger, report_card, scorecard
@@ -582,9 +583,10 @@ def news(cfg, broker: Broker, market: Market, dry_run: bool, force: bool = False
     equity = acct["equity"] or 1
     weights = {s: p["market_value"] / equity for s, p in positions.items()}
     mentioned = sorted({s for h in headlines for s in h["symbols"] if s.isalpha() and len(s) <= 5})[:40]
-    quotes = market.quotes(sorted(set(mentioned) | set(BIG_STOCKS) | {"SPY"}))
+    watched = set(BIG_STOCKS) | LIQUID_STOCKS
+    quotes = market.quotes(sorted(set(mentioned) | watched | {"SPY"}))
     spy_move = quotes["SPY"].price / quotes["SPY"].prev_close - 1 if "SPY" in quotes else 0.0
-    vs_spy = {s: q.price / q.prev_close - 1 - spy_move for s, q in quotes.items() if s in BIG_STOCKS}
+    vs_spy = {s: q.price / q.prev_close - 1 - spy_move for s, q in quotes.items() if s in watched}
     big_moves = sorted((s for s, m in vs_spy.items() if abs(m) >= 0.02), key=lambda s: vs_spy[s])[:15]
     last = next((d for d in reversed(journal.read("decisions.json", [])) if d.get("market_view")), {})
     context = {
@@ -594,7 +596,7 @@ def news(cfg, broker: Broker, market: Market, dry_run: bool, force: bool = False
         "prices_of_mentioned": {s: {"price": q.price, "change_today_pct": round((q.price / q.prev_close - 1) * 100, 2)}
                                 for s, q in quotes.items() if s in mentioned},
         "spy_change_today_pct": round(spy_move * 100, 2),
-        "big_company_moves_today": {s: {"name": BIG_STOCKS[s], "vs_spy_today_pct": round(vs_spy[s] * 100, 2)}
+        "big_company_moves_today": {s: {"name": BIG_STOCKS.get(s, ""), "vs_spy_today_pct": round(vs_spy[s] * 100, 2)}
                                     for s in big_moves},
         "holdings": {s: round(w, 3) for s, w in weights.items()},
         "todays_market_view": last.get("market_view"),
@@ -629,6 +631,9 @@ def news(cfg, broker: Broker, market: Market, dry_run: bool, force: bool = False
                 ok, why = False, f"price ${t['price']} is too low (penny stock)"
             elif t["avg_dollar_vol_m"] < (MIN_SMALL_STOCK_DOLLAR_VOLUME_M if kind == "small" else MIN_DOLLAR_VOLUME_M):
                 ok, why = False, f"too illiquid (${t['avg_dollar_vol_m']}M/day)"
+            elif kind != "etf" and sym not in BIG_STOCKS and t["avg_dollar_vol_m"] < LIQUID_MIN_DOLLAR_VOLUME_M:
+                ok, why = False, (f"trades ${t['avg_dollar_vol_m']}M/day; drops on news only beat chance above "
+                                  f"${LIQUID_MIN_DOLLAR_VOLUME_M:.0f}M/day in our test")
         if ok and idea.get("idea_type") == "earnings_beat":   # tested: no edge outside today's big winners
             ok, why = False, "earnings-beat buys are switched off (no edge in our wider test)"
         next_er = idea.get("next_earnings", "")

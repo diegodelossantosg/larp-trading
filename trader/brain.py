@@ -491,8 +491,11 @@ Other good-news buys (idea_type "big_news") are the rare exception: only when th
 Your headlines come from several places: Alpaca's real-time feed (Benzinga), company press-release
 wires (PR Newswire, Business Wire), fresh SEC 8-K filings (official notices of major company
 events; they name the company, not the ticker), market news (CNBC, MarketWatch, Seeking Alpha) and
-policy news (Federal Reserve, White House). big_company_moves_today lists the big companies moving
-most against the S&P 500 today, even if no headline above mentions them: look up why.
+policy news (Federal Reserve, White House). big_company_moves_today lists the companies moving most
+against the S&P 500 today among the ~65 big names and ~290 other heavily traded US companies (all
+trading $300M+ a day), even if no headline above mentions them: look up why. The test found the drop
+rebound only in companies that trade at least $300M a day; code skips thinner ones, so don't
+propose them.
 
 Rules (code enforces them too): at most 2 ideas; each buy is about 5% of the portfolio, protected by
 a trailing stop (8-20% for stocks, sized to their normal swing; 6% for ETFs). Overreaction and
