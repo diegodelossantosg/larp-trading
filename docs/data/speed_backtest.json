@@ -1,0 +1,167 @@
+{
+ "generated": "2026-10-23T14:30+00:00",
+ "months": 40,
+ "rule": "drop -2% vs SPY, buy 3 min after the look, hold 10 days, 0.1% costs",
+ "by_interval_minutes": {
+  "5": {
+   "all": {
+    "buys": 4321,
+    "buys_per_year": 1296.3,
+    "avg_vs_spy_pct": 0.209,
+    "win_rate": 0.487,
+    "median_minutes_after_news": 5,
+    "dollars_per_year_on_50_usd_trades": 135.47
+   },
+   "big": {
+    "buys": 2005,
+    "buys_per_year": 601.5,
+    "avg_vs_spy_pct": 0.508,
+    "win_rate": 0.5,
+    "median_minutes_after_news": 5,
+    "dollars_per_year_on_50_usd_trades": 152.91
+   },
+   "dev": {
+    "buys": 1059,
+    "buys_per_year": 317.7,
+    "avg_vs_spy_pct": -0.087,
+    "win_rate": 0.462,
+    "median_minutes_after_news": 5,
+    "dollars_per_year_on_50_usd_trades": -13.74
+   },
+   "holdout": {
+    "buys": 1257,
+    "buys_per_year": 377.1,
+    "avg_vs_spy_pct": -0.02,
+    "win_rate": 0.487,
+    "median_minutes_after_news": 5,
+    "dollars_per_year_on_50_usd_trades": -3.7
+   },
+   "by_year_avg_pct": {
+    "2023": 0.522,
+    "2024": -0.117,
+    "2025": 0.487,
+    "2026": 0.108
+   }
+  },
+  "15": {
+   "all": {
+    "buys": 4061,
+    "buys_per_year": 1218.3,
+    "avg_vs_spy_pct": 0.18,
+    "win_rate": 0.488,
+    "median_minutes_after_news": 14,
+    "dollars_per_year_on_50_usd_trades": 109.37
+   },
+   "big": {
+    "buys": 1885,
+    "buys_per_year": 565.5,
+    "avg_vs_spy_pct": 0.506,
+    "win_rate": 0.503,
+    "median_minutes_after_news": 14,
+    "dollars_per_year_on_50_usd_trades": 143.11
+   },
+   "dev": {
+    "buys": 992,
+    "buys_per_year": 297.6,
+    "avg_vs_spy_pct": -0.187,
+    "win_rate": 0.461,
+    "median_minutes_after_news": 14,
+    "dollars_per_year_on_50_usd_trades": -27.89
+   },
+   "holdout": {
+    "buys": 1184,
+    "buys_per_year": 355.2,
+    "avg_vs_spy_pct": -0.033,
+    "win_rate": 0.486,
+    "median_minutes_after_news": 14,
+    "dollars_per_year_on_50_usd_trades": -5.85
+   },
+   "by_year_avg_pct": {
+    "2023": 0.467,
+    "2024": -0.163,
+    "2025": 0.459,
+    "2026": 0.111
+   }
+  },
+  "30": {
+   "all": {
+    "buys": 3741,
+    "buys_per_year": 1122.3,
+    "avg_vs_spy_pct": 0.144,
+    "win_rate": 0.484,
+    "median_minutes_after_news": 25,
+    "dollars_per_year_on_50_usd_trades": 80.58
+   },
+   "big": {
+    "buys": 1742,
+    "buys_per_year": 522.6,
+    "avg_vs_spy_pct": 0.364,
+    "win_rate": 0.493,
+    "median_minutes_after_news": 25,
+    "dollars_per_year_on_50_usd_trades": 95.08
+   },
+   "dev": {
+    "buys": 908,
+    "buys_per_year": 272.4,
+    "avg_vs_spy_pct": -0.164,
+    "win_rate": 0.457,
+    "median_minutes_after_news": 24,
+    "dollars_per_year_on_50_usd_trades": -22.35
+   },
+   "holdout": {
+    "buys": 1091,
+    "buys_per_year": 327.3,
+    "avg_vs_spy_pct": 0.048,
+    "win_rate": 0.493,
+    "median_minutes_after_news": 24,
+    "dollars_per_year_on_50_usd_trades": 7.85
+   },
+   "by_year_avg_pct": {
+    "2023": 0.517,
+    "2024": -0.362,
+    "2025": 0.422,
+    "2026": 0.192
+   }
+  },
+  "60": {
+   "all": {
+    "buys": 3474,
+    "buys_per_year": 1042.2,
+    "avg_vs_spy_pct": 0.115,
+    "win_rate": 0.485,
+    "median_minutes_after_news": 32,
+    "dollars_per_year_on_50_usd_trades": 60.18
+   },
+   "big": {
+    "buys": 1615,
+    "buys_per_year": 484.5,
+    "avg_vs_spy_pct": 0.389,
+    "win_rate": 0.495,
+    "median_minutes_after_news": 32,
+    "dollars_per_year_on_50_usd_trades": 94.13
+   },
+   "dev": {
+    "buys": 853,
+    "buys_per_year": 255.9,
+    "avg_vs_spy_pct": -0.096,
+    "win_rate": 0.463,
+    "median_minutes_after_news": 32,
+    "dollars_per_year_on_50_usd_trades": -12.25
+   },
+   "holdout": {
+    "buys": 1006,
+    "buys_per_year": 301.8,
+    "avg_vs_spy_pct": -0.144,
+    "win_rate": 0.488,
+    "median_minutes_after_news": 32,
+    "dollars_per_year_on_50_usd_trades": -21.71
+   },
+   "by_year_avg_pct": {
+    "2023": 0.501,
+    "2024": -0.369,
+    "2025": 0.413,
+    "2026": 0.117
+   }
+  }
+ }
+}
