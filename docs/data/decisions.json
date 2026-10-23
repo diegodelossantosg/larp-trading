@@ -2815,5 +2815,27 @@
    "PG": 0.04,
    "SSO": 0.054
   }
+ },
+ {
+  "date": "2026-10-23",
+  "time": "10:22",
+  "source": "news",
+  "dry_run": false,
+  "orders": [],
+  "notes": [
+   "earnings dates checked on Nasdaq's calendar",
+   "skipped T: already at its size limit"
+  ],
+  "plain_summary": "Most of today's big drops come from earnings or high oil prices, so we skip them; AT&T fell about 5% on an unconfirmed report about a future SpaceX competitor, and that looks like a scare rather than real damage.",
+  "ideas": [
+   {
+    "symbol": "T",
+    "headline": "Oct 22 evening / Oct 23 morning: Bloomberg reports SpaceX is in talks to access up to 80,000 US cell sites (including Crown Castle's) to build a fourth wireless network; AT&T, Verizon and T-Mobile drop about 4-5% (AT&T -5.0% vs SPY at 10:21 ET).",
+    "why_not_priced_in": "This is a scare across the whole sector, triggered by talks that haven't been confirmed. No tower deal has been announced. Analysts estimate a ground network would take years and over $100B to build, and BofA and UBS see no near-term threat. AT&T is a huge, profitable company, and nothing about its customers, sales or debt changed today. Today's drop isn't from earnings: AT&T reported on Oct 21, then rose 3.8% on Oct 22 before this report hit. Moves like this in big, heavily traded stocks have tended to recover over about 10 trading days in our tests. One risk: the SpaceX theme has come back several times since September.",
+    "plain_reason": "A rumor about a future rival that is years away scared investors.",
+    "next_earnings": "unknown",
+    "idea_type": "overreaction"
+   }
+  ]
  }
 ]
