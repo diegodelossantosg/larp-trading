@@ -10,6 +10,7 @@ Flags for trade: --dry-run (decide but place no orders), --force (run while the 
 from __future__ import annotations
 
 import argparse
+import dataclasses
 import logging
 import sys
 from datetime import datetime
@@ -166,6 +167,41 @@ def _account(cfg, broker: Broker, positions: dict) -> dict:
     equity = cfg.capital_usd + (real["equity"] - state["baseline_equity"])
     invested = sum(p["market_value"] for p in positions.values())
     return {"equity": equity, "cash": equity - invested, "buying_power": equity - invested}
+
+
+def idle_for(spy_closes: pd.Series, bull: str, bear: str) -> tuple[str, str]:
+    """The 2x fund while SPY's last close is above its 200-day average, else the plain one.
+
+    Lab test 2016-2026 (S&P 500, Nasdaq 100 and small caps alike): about the same return as always
+    holding the 2x fund, with worst drops 12-15 points smaller (2x funds sink in long bear markets).
+    """
+    c = spy_closes.dropna()
+    if len(c) < 200:
+        return bull, "not enough SPY history: kept the usual idle asset"
+    avg = float(c.iloc[-200:].mean())
+    last = float(c.iloc[-1])
+    if last >= avg:
+        return bull, f"S&P 500 {last:.2f} is above its 200-day average {avg:.2f}: idle money in {bull}"
+    return bear, f"S&P 500 {last:.2f} is below its 200-day average {avg:.2f}: idle money in {bear} (no 2x)"
+
+
+def _with_todays_idle(cfg, market: Market):
+    """Pick today's idle asset once a day (from closes before today) and remember it in idle.json."""
+    today = _today()
+    state = journal.read("idle.json", {})
+    if state.get("date") != today:
+        try:
+            spy = market.daily_bars(["SPY"], days=420).get("SPY")
+            closes = spy["close"]
+            ny = closes.index.tz_convert("America/New_York") if closes.index.tz is not None else closes.index
+            closes = closes[[d.strftime("%Y-%m-%d") < today for d in ny]]   # only finished days
+            asset, why = idle_for(closes, cfg.idle_asset, cfg.idle_asset_bear)
+        except Exception as e:   # no data: keep yesterday's choice (or the usual one)
+            asset, why = state.get("asset", cfg.idle_asset), f"SPY prices unavailable ({e}); kept the previous choice"
+        state = {"date": today, "asset": asset, "why": why}
+        journal.write("idle.json", state)
+        log.info("idle asset: %s", why)
+    return dataclasses.replace(cfg, idle_asset=state["asset"])
 
 
 def snapshot(cfg, broker: Broker, market: Market) -> None:
@@ -664,6 +700,8 @@ def main(argv: list[str] | None = None) -> int:
     cfg = load_config()
     broker, market = Broker(cfg), Market(cfg)
     log.info("mode: %s", "PAPER" if cfg.paper else "LIVE MONEY")
+    if args.command in ("trade", "watch", "news", "snapshot"):
+        cfg = _with_todays_idle(cfg, market)
     if args.command == "snapshot":
         snapshot(cfg, broker, market)
         return 0

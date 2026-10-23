@@ -30,11 +30,13 @@ risk-aware basis over months, not to be busy.
 How the portfolio works:
 - You set TARGET WEIGHTS for ETFs and single-company stocks. Code turns them into orders and enforces hard risk limits
   (stated in each request). Unallocated weight goes to the idle asset named in risk_limits
-  (currently SSO, the 2x leveraged S&P 500, held on purpose by the owner without a trend filter),
-  up to `max_weight_in_idle_asset` (30%): it is only where money waits between trades. This is a
-  trading account, so you MUST put at least 70% of the portfolio into your trade ideas.
-  Spread it over 4-10 ETFs and stocks whose edge you can explain; if you under-allocate, code scales your
-  picks up or leaves cash. (A 9-year test found 30% SSO earned the same as 50% with much smaller drops.) Remember the idle asset already gives the portfolio a large, leveraged
+  (SSO, the 2x S&P 500, while the S&P 500 is above its 200-day average; plain SPY while it is below,
+  because 2x funds sink in long bear markets), up to `max_weight_in_idle_asset` (50%): it is only
+  where money waits between trades. This is a trading account, so you MUST put at least 50% of the
+  portfolio into your trade ideas. Spread it over 4-10 ETFs and stocks whose edge you can explain; if
+  you under-allocate, code scales your picks up or leaves cash. (A 2016-2026 test on three markets
+  found 50% in the 2x fund with this trend switch earned a bit more than 30% always in it, with drops
+  no bigger.) Remember the idle asset already gives the portfolio a large, often leveraged
   bet on the S&P 500, so your other picks add the most when they are not just more S&P 500 beta.
 - Between your daily runs, an automatic watcher checks prices every minute and sells a position
   that falls too far below its high since purchase (trailing stop). It no longer buys: its intraday

@@ -128,3 +128,28 @@ def test_hold_still_moves_spare_money_to_new_idle_asset(tmp_path, monkeypatch):
     sent = {(o.side, o.symbol) for o in broker.sent}
     assert ("sell", "SPY") in sent and ("buy", "SSO") in sent
     assert not any(o.symbol == "XLE" for o in broker.sent)  # XLE is already at target
+
+
+def test_idle_asset_switches_to_plain_spy_below_the_200_day_average(tmp_path, monkeypatch):
+    import pandas as pd
+    from trader import journal, main
+    up = pd.Series(range(100, 400), dtype=float)
+    assert main.idle_for(up, "SSO", "SPY")[0] == "SSO"
+    down = pd.Series(list(range(100, 400)) + [200.0] * 5)
+    assert main.idle_for(down, "SSO", "SPY")[0] == "SPY"
+    assert main.idle_for(up.iloc[:50], "SSO", "SPY")[0] == "SSO"          # too little history: usual one
+
+    monkeypatch.setattr("trader.journal.DATA_DIR", tmp_path)
+    monkeypatch.setattr(main, "_today", lambda: "2026-10-23")
+    idx = pd.date_range("2025-09-01", periods=305, freq="D", tz="UTC") + pd.Timedelta(hours=4)
+    bars = pd.DataFrame({"close": list(range(100, 400)) + [200.0] * 5}, index=idx)
+    calls = []
+
+    class FakeMarket:
+        def daily_bars(self, symbols, days=400):
+            calls.append(symbols)
+            return {"SPY": bars}
+
+    c = main._with_todays_idle(cfg(), FakeMarket())
+    assert c.idle_asset == "SPY" and journal.read("idle.json", {})["asset"] == "SPY"
+    assert main._with_todays_idle(cfg(), FakeMarket()).idle_asset == "SPY" and len(calls) == 1   # once a day

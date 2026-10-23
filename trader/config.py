@@ -62,6 +62,7 @@ class Config:
     max_small_stocks_total: float = 0.10  # all smaller companies together
     max_stocks_total: float = 0.40  # all single-company stocks together
     earnings_blackout_days: int = 3  # no buying a stock this many trading days or fewer before its earnings
+    idle_asset_bear: str = "SPY"  # idle money goes here instead while SPY is below its 200-day average
     stop_trail_pct_stock: float = 0.10  # fallback stop for a stock whose normal daily swing is unknown
     stop_atr_mult_stock: float = 4.0  # stock stop = this many of its normal daily swings (ATR)...
     stop_stock_min: float = 0.08  # ...but at least this
@@ -94,7 +95,8 @@ def load_config() -> Config:
         paper=paper,
         claude_model=os.environ.get("CLAUDE_MODEL") or default_model,
         claude_effort=os.environ.get("CLAUDE_EFFORT", "high"),
-        idle_asset=os.environ.get("IDLE_ASSET", "SSO").upper(),  # 2x S&P 500, held without a trend filter
+        idle_asset=os.environ.get("IDLE_ASSET", "SSO").upper(),  # 2x S&P 500 while SPY is above its 200-day average...
+        idle_asset_bear=os.environ.get("IDLE_ASSET_BEAR", "SPY").upper(),  # ...plain S&P 500 while it is below
         max_position_weight=_float("MAX_POSITION_WEIGHT", 0.30),
         max_positions=int(_float("MAX_POSITIONS", 12)),
         max_leveraged_weight=_float("MAX_LEVERAGED_WEIGHT", 0.10),
@@ -105,7 +107,7 @@ def load_config() -> Config:
         trading_enabled=_bool("TRADING_ENABLED", True),
         max_web_searches=int(_float("MAX_WEB_SEARCHES", 10)),
         capital_usd=_float("CAPITAL_USD", 1000),
-        max_idle_weight=_float("MAX_IDLE_WEIGHT", 0.30),  # 9-year test: same return as 50%, much smaller drops
+        max_idle_weight=_float("MAX_IDLE_WEIGHT", 0.50),  # with the trend switch: drops no bigger than 30% always-SSO
         stop_trail_pct=_float("STOP_TRAIL_PCT", 0.06),
         watch_min_score=int(_float("WATCH_MIN_SCORE", 5)),
         watch_buy_size=_float("WATCH_BUY_SIZE", 0.08),
