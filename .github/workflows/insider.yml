@@ -1,0 +1,33 @@
+name: "Download insider purchases (SEC Form 4, since 2016)"
+
+# Every officer/director open-market purchase from the SEC's quarterly data sets, for the lab.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  insider:
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    env:
+      ALPACA_API_KEY: ${{ secrets.ALPACA_API_KEY }}
+      ALPACA_SECRET_KEY: ${{ secrets.ALPACA_SECRET_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: ./setup.sh
+      - run: python -m trader.insider_data
+      - name: Save results
+        run: |
+          git config user.name "trading-agent"
+          git config user.email "trading-agent@users.noreply.github.com"
+          git add research/insider_buys.csv.gz
+          git commit -q -m "Research: insider purchases"
+          for i in 1 2 3; do git pull -q --rebase origin main && git push -q origin HEAD:main && exit 0; sleep 5; done
+          exit 1
