@@ -23,7 +23,7 @@ import requests
 log = logging.getLogger("insider")
 
 URL = "https://www.sec.gov/files/structureddata/data/insider-transactions-data-sets/{q}_form345.zip"
-UA = "larp-trading research bot (https://github.com/diegodelossantosg/larp-trading)"
+UA = "larp-trading research {contact}"   # the SEC refuses requests without a contact email
 
 
 def quarters(start: int = 2016) -> list[str]:
@@ -73,11 +73,12 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--start", type=int, default=2016)
     ap.add_argument("--out", default="research/insider_buys.csv.gz")
+    ap.add_argument("--contact", required=True, help="contact email the SEC asks for (not stored anywhere)")
     args = ap.parse_args()
     frames = []
     for q in quarters(args.start):
         for attempt in range(4):
-            r = requests.get(URL.format(q=q), headers={"User-Agent": UA}, timeout=120)
+            r = requests.get(URL.format(q=q), headers={"User-Agent": UA.format(contact=args.contact)}, timeout=120)
             if r.status_code == 200:
                 break
             log.warning("%s: HTTP %s, retrying", q, r.status_code)
@@ -93,6 +94,8 @@ def main() -> None:
         frames.append(p)
         log.info("%s: %d purchases", q, len(p))
         time.sleep(1)   # the SEC asks for at most 10 requests a second; be gentler than that
+    if not frames:
+        raise SystemExit("no quarter could be downloaded")
     df = pd.concat(frames, ignore_index=True).drop_duplicates()
     os.makedirs(os.path.dirname(args.out), exist_ok=True)
     df.to_csv(args.out, index=False, compression="gzip")
