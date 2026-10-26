@@ -347,6 +347,7 @@ function books(x, y, w, h, seed) {  // one shelf of books standing on y + h
   }
 }
 function ceilingLight(x, y) { R(x - 8, y, 16, 1.5, "#9aa0ae"); R(x - 7, y + 1.5, 14, 1, "#f4f6ff"); }
+const clipRoom = (x, y, w, h) => { g.save(); g.beginPath(); g.rect(x, y, w, h); g.clip(); };
 function room(x, y, w, h, wall, floorC) {
   ob(x, y, w, h, wall);
   R(x + 1, y + h - 13, w - 2, 12, floorC); hl(x + 1, y + h - 13, w - 2, mix(floorC, 0.25)); R(x + 1, y + h - 12.5, w - 2, 1, mix(floorC, -0.2));
@@ -382,22 +383,25 @@ function tree(x, y) {
 function lamp(x, y, sky) { R(x - 1, y - 44, 2, 44, "#2a2438"); R(x - 2.5, y - 2, 5, 2, "#2a2438"); R(x - 1, y - 46, 8, 1.5, "#2a2438"); ob(x + 4, y - 46, 6, 4, "#3a3448", 0.5); R(x + 5, y - 42.5, 4, 1, sky.k === "day" ? "#c9c6d2" : "#ffe7a0"); LAMPS.push([x + 7, y - 41]); }
 function neighbours(XL, XR, sky) {
   LAMPS.length = 0;
-  const pal = ["#8a8fa8", "#b89a7a", "#7a8a7a", "#a87a7a", "#9a8ab0", "#c0a888"];
-  for (const [from, to, dir, seed] of [[4, XL, -1, 3], [796, XR, 1, 8]]) {
+  const pal = ["#9aa0b8", "#c4ab8e", "#93a393", "#b89494", "#a99cc0", "#ccb89a"], haze = sky.k === "day" ? 0.25 : -0.1;
+  for (const [from, to, dir, seed] of [[-28, XL, -1, 3], [828, XR, 1, 8]]) {
+    lamp(from + 10 * -dir + (dir < 0 ? 0 : -6), 488, sky);
     const r = rng(seed); let x = from;
     while (dir < 0 ? x > to : x < to) {
-      const w = 60 + r() * 60, top = 120 + r() * 140, c = pal[(r() * pal.length) | 0], bx = dir < 0 ? x - w : x;
-      ob(bx, top, w, 488 - top, c); R(bx + 1, top + 1, w - 2, 3, mix(c, 0.25)); R(bx - 2, top - 3, w + 4, 4, mix(c, -0.3));
-      for (let wy = top + 12; wy < 470; wy += 18) for (let wx = bx + 8; wx < bx + w - 12; wx += 16) {
-        const lit = sky.lit && r() < sky.lit + 0.2;
-        ob(wx, wy, 9, 11, lit ? "#f4d27a" : sky.k === "day" ? mix(sky.bands[3], -0.1) : "#2a2c40", 0.5); vl(wx + 4.5, wy + 0.5, 10, mix(c, -0.3));
+      const w = 70 + r() * 40, top = 230 + r() * 80, c = mix(pal[(r() * pal.length) | 0], haze), bx = dir < 0 ? x - w : x;
+      ob(bx, top, w, 488 - top, c, 0.5); R(bx - 1.5, top - 2, w + 3, 2.5, mix(c, -0.2));
+      for (let wy = top + 14; wy < 456; wy += 24) for (let wx = bx + 10; wx < bx + w - 14; wx += 22) {
+        const lit = sky.lit && r() < sky.lit + 0.15;
+        R(wx, wy, 8, 10, lit ? "#f4d27a" : mix(c, -0.18)); hl(wx, wy, 8, mix(c, -0.3));
       }
-      ob(bx + w / 2 - 6, 466, 12, 22, mix(c, -0.4)); R(bx + w / 2 + 2, 477, 1.5, 1.5, "#e0c070");
-      x += dir * (w + 6 + r() * 10);
+      R(bx + w / 2 - 5, 470, 10, 18, mix(c, -0.3));
+      const gap = 34 + r() * 26;
+      tree(dir < 0 ? bx - gap / 2 : bx + w + gap / 2, 488);
+      x += dir * (w + gap);
     }
-    for (let k = 0, lx = from + dir * 40; dir < 0 ? lx > to + 10 : lx < to - 10; lx += dir * 70, k++) (k % 2 ? tree : (xx, yy) => lamp(xx, yy, sky))(lx, 488);
   }
 }
+
 const bg = document.createElement("canvas"); bg.width = W * 2; bg.height = H * 2;
 let bgKey = "";
 function drawBackground(t) {
@@ -413,9 +417,10 @@ function drawBackground(t) {
   if (dayish && (wx === "clear" || wx === "cloudy")) { for (let y = -8; y <= 8; y += 0.5) for (let x = -8; x <= 8; x += 0.5) if (x * x + y * y <= 64) R(120 + x, 22 + y, 0.5, 0.5, x * x + y * y > 50 ? "#ffe590" : "#fff4c0"); for (const [cx, cy] of [[600, 14], [210, 30]]) { R(cx, cy, 34, 7, "#ffffff"); R(cx + 7, cy - 5, 16, 5, "#ffffff"); hl(cx, cy + 6.5, 34, "#d8e8f8"); } }
   drawWeatherSky(wx, sky);
   const r = rng(23);
-  for (let x = XL - 6; x < XR; x += 30 + r() * 20) {
-    const top = 8 + r() * 34, w = 26 + r() * 30; R(x, top, w, H, sky.city); hl(x, top, w, mix(sky.city, 0.15));
-    for (let wy = top + 4; wy < 46; wy += 5) for (let wx = x + 3; wx < x + w - 3; wx += 4) if (r() < (sky.lit || 0.06)) R(wx, wy, 1.5, 2, sky.lit ? "#f4d27a" : mix(sky.city, 0.2));
+  const far = mix(sky.city, sky.k === "day" ? 0.35 : 0.08);
+  for (let x = XL - 6; x < XR; x += 46 + r() * 30) {
+    const top = 22 + r() * 26, w = 28 + r() * 26; R(x, top, w, H, far);
+    if (sky.lit) for (let wy = top + 5; wy < 44; wy += 7) for (let wx = x + 4; wx < x + w - 4; wx += 7) if (r() < sky.lit * 0.6) R(wx, wy, 1.5, 2, "#e8c870");
   }
   // ---------- street
   R(XL, 488, XR - XL, 6, "#a8a2b6"); hl(XL, 488, XR - XL, OUT); for (let x = Math.floor(XL / 10) * 10; x < XR; x += 10) vl(x, 489, 5, "#948ea4");
@@ -456,9 +461,9 @@ function drawBackground(t) {
   { const rc = rng(6); for (let i = 0; i < 700; i++) R(401 + rc() * 320, 470 + rc() * 10, 0.5, 0.5, "#8a7a9a"); }
   // shared walls with doorways
   for (const [x, top, fy] of [[278, 58, 181], [538, 58, 181], [720, 58, 181], [720, 202, 325], [400, 346, 469], [720, 346, 469]]) {
-    R(x - 4, top, 8, fy - 38 - top, "#5a5068"); vl(x - 4, top, fy - 38 - top, "#7a7090"); vl(x + 3.5, top, fy - 38 - top, "#3a3448"); vl(x - 4.5, top, fy - top, OUT); vl(x + 4, top, fy - top, OUT);
-    R(x - 6, fy - 38, 12, 3, "#8a5a36"); hl(x - 6, fy - 38, 12, "#b07a50"); R(x - 6, fy - 35, 2.5, 35, "#8a5a36"); R(x + 3.5, fy - 35, 2.5, 35, "#8a5a36");
-    g.fillStyle = "rgba(20,14,40,.18)"; g.fillRect(x - 3.5, fy - 35, 7, 35);
+    const h = fy - 36 - top;  // solid wall above a doorway 36 tall
+    R(x - 4, top, 8, h, "#5a5068"); vl(x - 3.5, top, h, "#7a7090"); vl(x + 3, top, h, "#3a3448"); vl(x - 4.5, top, h + 0.5, OUT); vl(x + 4, top, h + 0.5, OUT); hl(x - 4.5, top + h, 9, OUT);
+    R(x - 4, fy - 36, 8, 36, "#4a4258"); vl(x - 4, fy - 36, 36, "#3a3448"); vl(x + 3.5, fy - 36, 36, "#5a5268");  // the opening: a plain recess
   }
   // slabs between floors
   for (const y of [194, 338]) { R(9, y, 782, 8, "#6a6278"); hl(9, y, 782, OUT); hl(9, y + 7.5, 782, OUT); hl(9, y + 1, 782, "#8a8298"); for (let x = 12; x < 790; x += 14) R(x, y + 3, 7, 2.5, "#5a5268"); }
@@ -474,6 +479,7 @@ function drawBackground(t) {
   // Things hanging from the ceiling get longer cords instead.
   g.save(); g.translate(0, 16);
   // ================= STUDY (Claude)
+  clipRoom(22, 42, 252, 136);
   sh(28, 62, 52, 108, "#8a5a36"); R(30, 64, 48, 104, "#5a3a22");
   for (let s = 0; s < 5; s++) { books(31, 66 + s * 21, 46, 18, 50 + s); R(29, 84 + s * 21, 50, 2, "#a0704a"); hl(29, 84 + s * 21, 50, "#c09060"); }
   g.save(); g.translate(0, -8); winBox(96, 76, 50, 42, sky, { curtain: "#a84848" }); g.restore();
@@ -491,7 +497,9 @@ function drawBackground(t) {
   R(240, 151, 9, 3, "#f4ecd8"); R(241, 149.5, 8, 1.5, "#e0d8c4");
   R(176, 146, 1.5, 8, "#3a3448"); line(176.5, 146, 182, 139, "#3a3448", 1); ob(179, 135, 10, 5, "#c9a64a", 0.5);
 
+  g.restore();
   // ================= CONTROL ROOM (Watcher)
+  clipRoom(282, 42, 252, 136);
 
   g.save(); g.translate(0, -8); ob(376, 62, 48, 9, "#2a3040"); txt("DAILY", 400 - tw("DAILY") / 2, 63, "#e8f0f6"); g.restore();
   for (const lx of [330, 470]) ceilingLight(lx, 50);
@@ -505,7 +513,9 @@ function drawBackground(t) {
 
   R(410, 45, 10, 4, OUT);
 
+  g.restore();
   // ================= NEWSROOM (News Hunter)
+  clipRoom(542, 42, 174, 136);
   g.save(); g.translate(0, -8); winBox(548, 76, 40, 36, sky, { blinds: 16 }); g.restore();
   g.save(); g.translate(0, -8); ob(598, 74, 58, 40, "#8a5a36"); R(600, 76, 54, 36, "#d8a86a"); { const rc = rng(31); for (let i = 0; i < 80; i++) R(600 + rc() * 53, 76 + rc() * 35, 0.5, 0.5, "#c09050"); } g.restore();
   const rn = rng(9), pins = [];
@@ -516,9 +526,11 @@ function drawBackground(t) {
   sh(668, 142, 46, 28, "#9aa0ae"); R(672, 146, 38, 8, "#3a3f55"); for (let i = 0; i < 8; i++) for (let j = 0; j < 2; j++) R(673 + i * 4.5, 157 + j * 3.5, 3.5, 2.5, "#e8e4f0"); ob(678, 139, 22, 4, "#f4ecd8", 0.5);
 
   g.restore();
+  g.restore();
 
   // ================= TRADING ROOM
   g.save(); g.translate(0, 32);
+  clipRoom(22, 170, 694, 136);
   for (const lx of [120, 320, 520]) ceilingLight(lx, 174);
   sh(28, 178, 684, 24, "#2a2438"); R(30, 180, 680, 20, "#050608"); for (const bx of [31, 708]) for (const by of [181, 198]) R(bx, by, 1, 1, "#9aa0ae");
   sh(28, 206, 184, 84, "#2a2438"); R(30, 208, 180, 80, "#0b141c");
@@ -531,9 +543,11 @@ function drawBackground(t) {
   plant(696, 304, 1);
 
   g.restore();
+  g.restore();
 
   // ================= LOUNGE
   g.save(); g.translate(0, 50);
+  clipRoom(22, 296, 374, 136);
   ceilingLight(110, 300); ceilingLight(300, 300);
 
   g.save(); g.translate(0, -16); winBox(126, 330, 44, 34, sky, { curtain: "#5aa0a8" }); g.restore();
@@ -560,8 +574,10 @@ function drawBackground(t) {
   plant(374, 418, 0.9);
 
   g.restore();
+  g.restore();
 
   // ================= BEDROOM: one bed per agent
+  clipRoom(404, 346, 312, 136);
   R(560, 346, 0.5, 14, OUT); ob(552, 360, 17, 5, "#c9a64a"); hl(553, 361, 15, "#e0c070");
   winBox(578, 368, 40, 32, sky, { curtain: "#7a5aa8" });
   R(420, 476.5, 270, 2.5, "#9a6ab8"); for (let x = 422; x < 688; x += 3) R(x, 477, 1.5, 1, "#e0b04a");
@@ -574,6 +590,7 @@ function drawBackground(t) {
     sh(bx + 6, 457, 61, 8, "#f4f0e8");
     if (i < 2) { sh(bx + 76, 458, 16, 17, "#a0704a"); R(bx + 82, 465, 4, 1, "#e0c070"); R(bx + 83, 450, 2, 8, "#3a3448"); ob(bx + 78, 444, 12, 7, "#f4dcaa", 0.5); }
   });
+  g.restore();
   if (night) { g.fillStyle = "rgba(8,6,30,.5)"; g.fillRect(8, 50, 784, 440); }
   else if (!dayish) { g.fillStyle = "rgba(20,12,40,.2)"; g.fillRect(8, 50, 784, 440); }
   g = main;
@@ -870,16 +887,16 @@ function topAgentFrame(x, y, w, h) {  // "employee of the month": gold frame, re
   ob(x, y, w, h, "#b8892e"); R(x + 1, y + 1, w - 2, 1, "#f2d27a"); R(x + 1, y + h - 2, w - 2, 1, "#7a5a1e"); vl(x + 1, y + 1, h - 2, "#f2d27a");
   ob(x + 3, y + 3, w - 6, h - 6, "#2a1f3a", 0.5); R(x + 3.5, y + 3.5, w - 7, 1, "#3a2c50");
   for (const [dx, dy] of [[5, 5], [w - 7, 5], [5, h - 7], [w - 7, h - 7]]) R(x + dx, y + dy, 2, 2, "#f2d27a");
-  R(x + 8, y + 7, w - 16, 10, "#c73b3b"); R(x + 8, y + 7, w - 16, 1, "#e05a5a"); R(x + 5, y + 9, 3, 6, "#9a2a2a"); R(x + w - 8, y + 9, 3, 6, "#9a2a2a");
-  txt("TOP AGENT", cx - tw("TOP AGENT") / 2, y + 8.5, "#fff4d0");
+  R(x + 14, y + 8, w - 28, 8, "#c73b3b"); R(x + 14, y + 8, w - 28, 0.5, "#e05a5a"); R(x + 11, y + 9.5, 3, 5, "#9a2a2a"); R(x + w - 14, y + 9.5, 3, 5, "#9a2a2a");
+  txt("TOP AGENT", cx - tw("TOP AGENT", 0.5) / 2, y + 10.5, "#fff4d0", 0.5);
   if (!star) { txt("NOBODY YET", cx - tw("NOBODY YET") / 2, y + h / 2, "#8a8494"); return; }
   const sparkle = ((T / 20) | 0) % 2;
-  for (const [sx, sy, on] of [[x + 16, y + 26, sparkle], [x + w - 18, y + 30, !sparkle], [x + 22, y + 40, !sparkle]]) if (on) { R(sx, sy - 1.5, 0.5, 3.5, "#f2d27a"); R(sx - 1.5, sy, 3.5, 0.5, "#f2d27a"); }
-  ob(cx - 10, y + 46, 20, 3, "#c9a64a", 0.5);
-  main.drawImage(SPR[star.id]["front-stand"], cx - 10.5, y + 18, 21, 28.5);
-  txt(NAME[star.id], cx - tw(NAME[star.id]) / 2, y + 51, COLOR[star.id]);
+  for (const [sx, sy, on] of [[cx - 18, y + 26, sparkle], [cx + 17, y + 29, !sparkle], [cx - 14, y + 35, !sparkle]]) if (on) { R(sx, sy - 1.5, 0.5, 3.5, "#f2d27a"); R(sx - 1.5, sy, 3.5, 0.5, "#f2d27a"); }
+  main.drawImage(SPR[star.id]["front-stand"], cx - 7, y + 19, 14, 19);
+  ob(cx - 8, y + 38, 16, 2, "#c9a64a", 0.5);
+  txt(NAME[star.id], cx - tw(NAME[star.id], 0.5) / 2, y + 44, COLOR[star.id], 0.5);
   const v = `${star.v >= 0 ? "+" : ""}${star.v.toFixed(1)}% VS S&P`;
-  txt(v, cx - tw(v) / 2, y + 60, star.v >= 0 ? "#6fd08c" : "#ef6f6c");
+  txt(v, cx - tw(v) / 2, y + 52, star.v >= 0 ? "#6fd08c" : "#ef6f6c");
 }
 function bestAgent() {
   let best = null;
