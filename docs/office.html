@@ -251,8 +251,8 @@ function buildSprites() {
 // ================================================================ the building: three floors and a lift
 // Floor 0 is the top floor (the agents' own rooms), 1 the trading room, 2 the ground floor.
 const FEET = [171, 299, 425];
-const CAR = FEET.map((f) => f - 40);
-const ELEV_X = 740;
+// the lift: one door per floor at the right; agents wait at WAIT_X and stand at INSIDE_X in the cabin
+const DOOR_L = 732, DOOR_R = 772, WAIT_X = 704, INSIDE_X = 742;
 const SP = {
   desk: { f: 0, x: 160, dir: 1, seat: true }, console: { f: 0, x: 358, dir: 1 }, stool: { f: 0, x: 300, dir: 1, seat: true },
   armchair: { f: 0, x: 562, dir: 1, seat: true }, teletype: { f: 0, x: 654, dir: 1 },
@@ -305,10 +305,14 @@ function drawBackground(t) {
   room(18, 186, 704, 120, "#dedcec", "#a8a4bc");  // trading room
   room(18, 314, 384, 118, "#dcebdc", "#c09a6a");  // lounge
   room(400, 314, 322, 118, "#e8e2d4", "#9a948a");  // lobby
-  ob(720, 58, 64, 374, "#3a3448");                  // lift shaft
-  R(728, 60, 2, 370, "#2a2438"); R(774, 60, 2, 370, "#2a2438");
-  for (const [x, fy] of [[278, 164], [538, 164], [400, 418]]) { R(x - 2, fy - 34, 6, 34, mix("#d8cfc0", -0.35)); R(x - 4, fy - 36, 10, 2, OUT); }
-  for (const fy of [164, 292, 418]) R(720, fy - 34, 4, 34, "#2a2438");
+  for (const [top, h] of [[58, 120], [186, 120], [314, 118]]) room(720, top, 66, h, "#cfc8dc", "#8a8498");
+  for (const [x, fy] of [[278, 164], [538, 164], [400, 418], [720, 164], [720, 292], [720, 418]]) { R(x - 2, fy - 34, 6, 34, mix("#d8cfc0", -0.35)); R(x - 4, fy - 36, 10, 2, OUT); }
+  for (const fy of FEET) {  // door frame, cabin opening and the strip above it
+    const top = fy - 50;
+    R(DOOR_L - 4, top - 4, 48, 4, "#6a6476"); R(DOOR_L - 4, top, 4, 51, "#6a6476"); R(DOOR_R, top, 4, 51, "#6a6476");
+    R(DOOR_L - 4, top - 4, 48, 1, OUT); R(DOOR_L - 5, top - 4, 1, 55, OUT); R(DOOR_R + 4, top - 4, 1, 55, OUT);
+    R(DOOR_L - 2, fy + 1, 44, 2, "#6a6476");
+  }
   // slabs between floors
   for (const y of [178, 306]) { R(10, y, 780, 8, "#a89c8a"); R(10, y, 780, 2, OUT); R(10, y + 6, 780, 2, OUT); }
 
@@ -424,44 +428,66 @@ function drawHeatmap(x, y, w, h, open) {
 
 // ================================================================ agents: walking, the lift, poses
 const agents = {};
-const lift = { y: CAR[1], queue: [], rider: null, dest: 1 };
+const lift = { floor: 1, pos: 1, target: 1, state: "idle", door: 0, rider: null, queue: [], wait: 0 };
 function route(a) {
   const s = SP[a.want];
-  if (a.floor === s.f) { a.tx = s.x; a.phase = "walk"; } else { a.tx = ELEV_X; a.phase = "toLift"; }
+  a.phase = a.floor === s.f ? "walk" : "toLift";
 }
 function place(a) { const s = SP[a.want]; a.floor = s.f; a.x = s.x; a.y = FEET[s.f]; a.dir = s.dir; a.phase = "idle"; a.at = a.want; }
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const WALKING = new Set(["walk", "toLift", "enter", "exit"]);
 function stepAgent(a) {
   const speed = V.mode === "live" ? 0.8 : 1.6;
   if (a.phase === "idle" && a.at !== a.want) route(a);
-  if (a.phase === "walk" || a.phase === "toLift") {
-    if (a.phase === "walk" && SP[a.want].f !== a.floor) route(a);
-    if (a.phase === "walk" && a.tx !== SP[a.want].x) a.tx = SP[a.want].x;
-    const d = a.tx - a.x;
-    if (Math.abs(d) <= speed) {
-      a.x = a.tx;
-      if (a.phase === "toLift") { a.phase = "wait"; lift.queue.push(a); }
-      else { a.phase = "idle"; a.at = a.want; a.dir = SP[a.want].dir; }
-    } else { a.x += Math.sign(d) * speed; a.dir = Math.sign(d); a.walkT = (a.walkT || 0) + 1; }
-  }
+  if (a.phase === "walk" && SP[a.want].f !== a.floor) route(a);
+  const target = { walk: SP[a.want].x, toLift: WAIT_X, enter: INSIDE_X, exit: WAIT_X }[a.phase];
+  if (target == null) return;
+  const d = target - a.x;
+  if (Math.abs(d) <= speed) {
+    a.x = target;
+    if (a.phase === "toLift") { a.phase = "wait"; a.dir = 1; if (!lift.queue.includes(a)) lift.queue.push(a); }
+    else if (a.phase === "enter") a.phase = "inside";
+    else if (a.phase === "exit") a.phase = "out";
+    else { a.phase = "idle"; a.at = a.want; a.dir = SP[a.want].dir; }
+  } else { a.x += Math.sign(d) * speed; a.dir = Math.sign(d); a.walkT = (a.walkT || 0) + 1; }
 }
+// idle → (moving to the caller) → opening → open (someone walks in or out) → closing → moving → …
 function stepLift() {
-  const sp = V.mode === "live" ? 1.2 : 2.4;
-  if (lift.rider) {
-    lift.dest = SP[lift.rider.want].f;
-    const ty = CAR[lift.dest], d = ty - lift.y;
+  const L = lift, fast = V.mode === "live" ? 1 : 1.5;
+  if (L.state === "idle") {
+    const next = L.queue[0];
+    if (!next) return;
+    if (next.floor === L.floor) L.state = "opening"; else { L.target = next.floor; L.state = "moving"; }
+  } else if (L.state === "moving") {
+    const d = L.target - L.pos, sp = 0.008 * fast;
     if (Math.abs(d) <= sp) {
-      lift.y = ty; const a = lift.rider; lift.rider = null;
-      a.floor = lift.dest; a.y = FEET[a.floor]; a.phase = "idle"; a.at = null; route(a);
-    } else { lift.y += Math.sign(d) * sp; lift.rider.y = lift.y + 40; }
-    return;
+      L.pos = L.floor = L.target; L.state = "opening";
+      if (L.rider) { L.rider.floor = L.floor; L.rider.y = FEET[L.floor]; }
+    } else L.pos += Math.sign(d) * sp;
+  } else if (L.state === "opening") {
+    L.door = Math.min(1, L.door + 0.03 * fast);
+    if (L.door === 1) { L.state = "open"; L.wait = 0; L.hold = false; if (L.rider && L.rider.phase === "inside") L.rider.phase = "exit"; }
+  } else if (L.state === "open") {
+    L.wait++;
+    const a = L.rider;
+    if (a) {
+      if (a.phase === "inside") { if (!L.hold) { L.hold = true; L.wait = 0; } else if (L.wait > 24) { L.hold = false; L.state = "closing"; } }
+      else if (a.phase === "out") { L.rider = null; a.phase = "idle"; a.at = null; L.wait = 0; }
+    } else {
+      const i = L.queue.findIndex((q) => q.floor === L.floor);
+      if (i >= 0) { L.rider = L.queue.splice(i, 1)[0]; L.rider.phase = "enter"; }
+      else if (L.wait > 40) L.state = "closing";
+    }
+  } else if (L.state === "closing") {
+    L.door = Math.max(0, L.door - 0.03 * fast);
+    if (L.door === 0) {
+      const a = L.rider;
+      if (!a) L.state = "idle";
+      else { const dest = SP[a.want].f; if (dest === L.floor) L.state = "opening"; else { L.target = dest; L.state = "moving"; } }
+    }
   }
-  const next = lift.queue[0];
-  if (!next) return;
-  const ty = CAR[next.floor], d = ty - lift.y;
-  if (Math.abs(d) <= sp) { lift.y = ty; lift.queue.shift(); lift.rider = next; next.phase = "ride"; next.x = ELEV_X; lift.dest = SP[next.want].f; }
-  else lift.y += Math.sign(d) * sp;
 }
+function resetLift() { Object.assign(lift, { state: "idle", door: 0, rider: null, queue: [], pos: lift.floor, target: lift.floor }); }
 function think(instant) {
   const t = now();
   for (const id of AG) {
@@ -469,12 +495,15 @@ function think(instant) {
     a.plan = plan(id, t);
     const first = !a.want;
     a.want = a.plan.spot;
-    if (first || instant || reduceMotion) { if (a.phase !== "ride") { lift.queue = lift.queue.filter((q) => q !== a); place(a); } }
+    if (first || instant || reduceMotion) { if (lift.rider === a) resetLift(); lift.queue = lift.queue.filter((q) => q !== a); place(a); }
+    else if (a.phase === "wait" && SP[a.want].f === a.floor) { lift.queue = lift.queue.filter((q) => q !== a); route(a); }
   }
 }
 function frameOf(a) {
   const dir = a.dir > 0 ? "right" : "left";
-  if (a.phase === "walk" || a.phase === "toLift") { const k = ((a.walkT / 8) | 0) % 2; return { key: `${dir}-${k ? "walkA" : "stand"}`, bob: k ? -2 : 0 }; }
+  if (WALKING.has(a.phase)) { const k = ((a.walkT / 8) | 0) % 2; return { key: `${dir}-${k ? "walkA" : "stand"}`, bob: k ? -2 : 0 }; }
+  if (a.phase === "wait") return { key: "right-stand", bob: 0 };
+  if (a.phase === "out") return { key: "left-stand", bob: 0 };
   if (a.phase !== "idle") return { key: "front-stand", bob: 0 };
   const s = SP[a.at] || {}, act = a.plan.act, body = s.seat ? "sit" : "stand";
   if (act === "sleep") return { key: `front-${body}-z`, bob: 0 };
@@ -587,11 +616,6 @@ function live(t) {
   const fb = ((T / 4) | 0) % 3; R(196 + fb * 3, 326, 20 - fb * 3, 2, "#6b4a32"); R(226, 326, 20 - fb * 3, 2, "#6b4a32");
   clock(692, 330, t);
 
-  // lift car and floor lights
-  const ly = lift.y;
-  R(751, 52, 2, ly - 52, "#8a8494");
-  ob(726, ly, 48, 42, "#9a8fb0"); R(728, ly + 2, 44, 3, "#ffe7a0");
-  for (const [fy, f] of [[60, 0], [188, 1], [316, 2]]) { R(744, fy, 16, 6, OUT); R(747 + f * 0, fy + 2, 3, 2, Math.abs(ly - CAR[f]) < 2 ? "#6fd08c" : "#7a2a2a"); txt(String(3 - f), 753, fy + 1, "#c9c6d2"); }
 }
 function clock(x, y, t) {
   for (let yy = -11; yy <= 11; yy++) for (let xx = -11; xx <= 11; xx++) { const d = xx * xx + yy * yy; if (d <= 121) R(x + xx, y + yy, 1, 1, d > 90 ? OUT : "#ffffff"); }
@@ -625,13 +649,13 @@ let selected = null;
 function overlays() {
   AG.forEach((id, i) => {
     const a = agents[id];
-    if (a.phase === "ride" || a.phase === "wait") return;
+    if (lift.rider === a) return;
     if (a.plan.act === "sleep" && a.phase === "idle") { const z = ((T / 30) | 0) % 3; txt("Z", a.x + 16 + z * 2, a.y - 40 - z * 4, "#e8e4ff"); if (z) txt("Z", a.x + 20, a.y - 48 - z * 2, "#a49cc0"); return; }
     if (!a.plan.say || a.phase !== "idle") return;
     const cycle = (T / 60 + i * 6) % 18;
     if (a.plan.loud || selected === id || cycle < 5) bubble(a, a.plan.say);
   });
-  if (selected) { const a = agents[selected]; if (a.phase !== "ride" && a.phase !== "wait") { const b = ((T / 15) | 0) % 2; R(a.x + 4, a.y + 1 + b, 12, 2, "#f2c14e"); } }
+  if (selected) { const a = agents[selected]; if (lift.rider !== a) { const b = ((T / 15) | 0) % 2; R(a.x + 4, a.y + 1 + b, 12, 2, "#f2c14e"); } }
 }
 
 // ================================================================ main loop
@@ -647,17 +671,40 @@ function frame(ts) {
   stepLift();
   main.drawImage(bg, 0, 0);
   live(t);
-  for (const id of AG) {
-    const a = agents[id];
-    if (a.phase === "wait") continue;
-    const f = frameOf(a);
-    main.drawImage(SPR[id][f.key], Math.round(a.x - 4), Math.round(a.y - 38 + f.bob), 28, 38);
-  }
-  R(726, lift.y, 48, 2, OUT); R(726, lift.y, 2, 42, OUT); R(772, lift.y, 2, 42, OUT); R(726, lift.y + 40, 48, 2, OUT);
+  for (const id of AG) if (lift.rider !== agents[id]) drawAgent(agents[id]);
+  drawLift();
   overlays();
   const tick = Math.floor(t.min * 4);
   if (tick !== lastHud) { lastHud = tick; hud(t); }
   requestAnimationFrame(frame);
+}
+
+function drawAgent(a) { const f = frameOf(a); main.drawImage(SPR[a.id][f.key], Math.round(a.x - 4), Math.round(a.y - 38 + f.bob), 28, 38); }
+function drawLift() {
+  const L = lift;
+  FEET.forEach((fy, f) => {
+    const top = fy - 50, here = L.floor === f && L.state !== "moving", open = here ? L.door : 0;
+    if (open > 0) {  // the lit cabin behind the doors
+      R(DOOR_L, top, 40, 51, "#efe2c4"); for (let x = DOOR_L + 4; x < DOOR_R; x += 8) R(x, top + 4, 1, 40, "#e0d0ae");
+      R(DOOR_L, top, 40, 3, "#fff1b0"); R(DOOR_L + 2, fy - 24, 36, 2, "#c9a64a"); R(DOOR_L, fy - 3, 40, 4, "#9a8a76");
+    } else R(DOOR_L, top, 40, 51, "#2a2438");
+    const a = L.rider;
+    if (a && a.floor === f && here && (open > 0 || a.phase === "out")) drawAgent(a);
+    const pw = Math.round(20 * (1 - open));  // two panels sliding apart from the middle
+    if (pw > 0) {
+      R(DOOR_L, top, pw, 51, "#a8b0c0"); R(DOOR_R - pw, top, pw, 51, "#a8b0c0");
+      R(DOOR_L + pw - 1, top, 1, 51, "#6a7286"); R(DOOR_R - pw, top, 1, 51, "#6a7286");
+      R(DOOR_L, top, pw, 2, "#c8d0de"); R(DOOR_R - pw, top, pw, 2, "#c8d0de");
+    }
+    // floor display: where the cabin is, and which way it is going
+    ob(740, top - 18, 24, 12, "#16131f");
+    const shown = 3 - Math.round(L.pos), col = L.state === "moving" ? "#f2c14e" : "#6fd08c";
+    txt(String(shown), 753, top - 15, col);
+    if (L.state === "moving") { const up = L.target < L.pos; R(745, top - 13 + (up ? 0 : 1), 3, 1, col); R(746, top - 14 + (up ? 0 : 3), 1, 1, col); R(746, top - 12 + (up ? 0 : -1), 1, 1, col); }
+    // call button: lights up while someone waits on this floor
+    const calling = L.queue.some((q) => q.floor === f);
+    ob(722, fy - 32, 8, 10, "#6a6476"); R(724, fy - 30, 4, 4, calling ? "#f2c14e" : "#3a3448");
+  });
 }
 
 // ================================================================ HUD, agent card, big heatmap
@@ -691,7 +738,7 @@ function heatPanel() {
   }).join("") || `<p class="dim" style="padding:20px">No holdings yet.</p>`;
 }
 function toggleHeat(show) { $("heat").hidden = !show; $("heatbtn").setAttribute("aria-pressed", show); if (show) heatPanel(); }
-const hitAgent = (x, y) => AG.find((id) => { const a = agents[id]; return a && a.phase !== "wait" && x >= a.x - 2 && x <= a.x + 22 && y >= a.y - 40 && y <= a.y + 2; });
+const hitAgent = (x, y) => AG.find((id) => { const a = agents[id]; return a && lift.rider !== a && x >= a.x - 2 && x <= a.x + 22 && y >= a.y - 40 && y <= a.y + 2; });
 const toWorld = (e) => { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) / r.width * W, (e.clientY - r.top) / r.height * H]; };
 const onHeatScreen = (x, y) => x >= 220 && x <= 510 && y >= 224 && y <= 290;
 cv.addEventListener("click", (e) => {
