@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Trading Floor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
+<style>
+:root{--bg:#0b0a14;--ink:#f4ecd8;--dim:#a49cc0;--up:#6fd08c;--down:#ef6f6c;--gold:#f2c14e;--panel:rgba(14,12,28,.85);--line:#3a3556;
+  --pixel:"Press Start 2P",ui-monospace,monospace;color-scheme:dark}
+html,body{margin:0;height:100%;background:var(--bg);overflow:hidden}
+canvas{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);image-rendering:pixelated;image-rendering:crisp-edges}
+.hud{position:fixed;font-family:var(--pixel);font-size:10px;line-height:1.7;color:var(--ink);background:var(--panel);border:2px solid var(--line);padding:6px 10px;box-shadow:3px 3px 0 #000}
+#tl{top:max(10px,env(safe-area-inset-top));left:max(10px,env(safe-area-inset-left))}
+#tr{top:max(10px,env(safe-area-inset-top));right:max(10px,env(safe-area-inset-right));text-align:right}
+#bl{bottom:max(10px,env(safe-area-inset-bottom));left:max(10px,env(safe-area-inset-left));display:flex;gap:6px;align-items:center;padding:5px}
+#card{bottom:max(10px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);width:min(440px,calc(100vw - 24px));font-size:9px;padding:10px 12px}
+#card h3{margin:0 0 6px;font-size:10px;font-weight:normal}
+#card p{margin:0}
+.dim{color:var(--dim)} .up{color:var(--up)} .down{color:var(--down)}
+button,select{font-family:var(--pixel);font-size:8px;color:var(--ink);background:#221d38;border:2px solid var(--line);padding:6px 8px;cursor:pointer}
+button[aria-pressed="true"]{border-color:var(--gold);color:var(--gold)}
+button:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+@media (max-width:640px){.hud{font-size:8px;padding:4px 6px}}
+</style>
+</head>
+<body>
+<canvas id="cv" width="640" height="360" aria-label="Pixel building where the three trading agents work"></canvas>
+<div class="hud" id="tl">…</div>
+<div class="hud" id="tr">…</div>
+<div class="hud" id="bl">
+  <button id="live" aria-pressed="true">LIVE</button>
+  <button id="replay" aria-pressed="false">REPLAY</button>
+  <select id="day" aria-label="Day to replay" hidden></select>
+  <button id="speed" hidden>30×</button>
+</div>
+<div class="hud" id="card" hidden></div>
+
+<script>
+"use strict";
+// ================================================================ data (same sources as the dashboard)
+const RAW = "https://raw.githubusercontent.com/diegodelossantosg/larp-trading/main/docs/data/";
+const LIVE = "https://api.github.com/repos/diegodelossantosg/larp-trading/contents/live.json?ref=live";
+const LIVE_RAW = "https://raw.githubusercontent.com/diegodelossantosg/larp-trading/live/";
+async function load(name, fallback) {
+  for (const url of [`${RAW}${name}?t=${Date.now()}`, `data/${name}?t=${Date.now()}`]) {
+    try { const r = await fetch(url, { cache: "no-store" }); if (r.ok) return await r.json(); } catch {}
+  }
+  return fallback;
+}
+let apiBlockedUntil = 0;
+async function fetchLive() {
+  if (Date.now() > apiBlockedUntil) {
+    try {
+      const r = await fetch(LIVE, { headers: { Accept: "application/vnd.github.raw" }, cache: "no-store" });
+      if (r.ok) return await r.json();
+      const reset = Number(r.headers.get("x-ratelimit-reset"));
+      apiBlockedUntil = reset ? reset * 1000 : Date.now() + 10 * 60000;
+    } catch {}
+  }
+  for (let back = 1; back <= 4; back++) {
+    const t = new Date(Date.now() - back * 60000);
+    const name = `m-${String(t.getUTCHours()).padStart(2, "0")}${String(t.getUTCMinutes()).padStart(2, "0")}.json`;
+    try { const r = await fetch(LIVE_RAW + name); if (r.ok) return await r.json(); } catch {}
+  }
+  return null;
+}
+
+const D = { status: {}, decisions: [], intraday: { points: [] }, watch: {}, events: [] };
+const AG = ["claude", "watch", "news"];
+const NAME = { claude: "CLAUDE", watch: "WATCHER", news: "NEWS HUNTER" };
+const ROLE = { claude: "Researches every morning at 9:36 and sets the plan.", watch: "Checks every holding each minute and sells on a stop.", news: "Every hour, buys stocks that fell too hard on news." };
+
+const NYF = new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23", weekday: "short" });
+function ny(ms) {
+  const p = Object.fromEntries(NYF.formatToParts(new Date(ms)).map((x) => [x.type, x.value]));
+  return { date: `${p.year}-${p.month}-${p.day}`, min: +p.hour * 60 + +p.minute + +p.second / 60, wd: p.weekday };
+}
+const hhmm = (m) => `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(Math.floor(m % 60)).padStart(2, "0")}`;
+const money = (v) => "$" + Number(v).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const pct = (v) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(2) + "%";
+const cls = (v) => (v > 0.005 ? "up" : v < -0.005 ? "down" : "");
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+function buildEvents() {
+  D.events = D.decisions.filter((d) => d.date && d.time).map((d) => {
+    const agent = d.source === "watch" ? "watch" : d.source === "news" ? "news" : "claude";
+    const [h, m] = d.time.split(":").map(Number);
+    const orders = (d.orders || []).filter((o) => o.symbol && o.side);
+    const buys = orders.filter((o) => o.side === "buy").map((o) => o.symbol);
+    const sells = orders.filter((o) => o.side === "sell").map((o) => o.symbol);
+    const stopSells = orders.filter((o) => o.side === "sell" && /stop/i.test(o.reason || "")).map((o) => o.symbol);
+    const full = orders.map((o) => `${o.side === "buy" ? "Bought" : "Sold"} ${o.symbol} ${money(o.notional)}`).join(", ");
+    return { agent, date: d.date, min: h * 60 + m, orders, buys, sells, stopSells, full, summary: d.plain_summary || "" };
+  }).sort((a, b) => a.date.localeCompare(b.date) || a.min - b.min);
+}
+
+// ================================================================ clock: live, or replaying a past day
+const V = { mode: "live", day: null, min: 560, speed: 0.5, playing: false };
+function now() {
+  if (V.mode === "live") return ny(Date.now());
+  const wd = new Date(V.day + "T12:00:00Z").toLocaleDateString("en-US", { weekday: "short", timeZone: "UTC" });
+  return { date: V.day, min: V.min, wd };
+}
+const isWeekend = (t) => t.wd === "Sat" || t.wd === "Sun";
+const isOpen = (t) => !isWeekend(t) && t.min >= 570 && t.min < 960;
+const tradeWindow = () => (V.mode === "live" ? 8 : Math.max(5, 12 * V.speed));
+
+// ================================================================ what each agent is doing right now
+const hash = (s) => { let h = 7; for (const c of s) h = (h * 31 + c.charCodeAt(0)) | 0; return Math.abs(h); };
+const coffeeBreak = (id, t) => hash(id + t.date + Math.floor(t.min / 41)) % 5 === 0 && t.min % 41 < 3;
+function lastEvent(id, t, today) {
+  for (let i = D.events.length - 1; i >= 0; i--) {
+    const e = D.events[i];
+    if (e.agent !== id || e.date > t.date || (e.date === t.date && e.min > t.min)) continue;
+    if (today && e.date !== t.date) return null;
+    return e;
+  }
+  return null;
+}
+const short = (list) => list.slice(0, 3).join(", ") + (list.length > 3 ? "…" : "");
+function watchLine() {
+  const pos = (D.status.positions || []).filter((p) => p.current_price), highs = D.watch.highs || {};
+  let worst = null;
+  for (const p of pos) { const off = (p.current_price / Math.max(highs[p.symbol] || 0, p.current_price) - 1) * 100; if (!worst || off < worst.off) worst = { s: p.symbol, off }; }
+  return worst && worst.off < -1 ? `${worst.s} ${worst.off.toFixed(1)}% from top` : "All holdings safe";
+}
+function plan(id, t) {
+  const open = isOpen(t), today = lastEvent(id, t, true);
+  const recent = today && t.min - today.min < tradeWindow() ? today : null;
+  if (recent && recent.orders.length) {
+    const stop = id === "watch" && recent.stopSells.length;
+    const say = stop ? `Stop! Selling ${short(recent.stopSells)}` : recent.buys.length ? `Buying ${short(recent.buys)}!` : `Selling ${short(recent.sells)}`;
+    return { spot: "term_" + id, act: "trade", say, loud: true, side: recent.buys.length ? "BUY" : "SELL", stop };
+  }
+  if (id === "claude") {
+    if (!open) {
+      if (!isWeekend(t) && t.min >= 540 && t.min < 570) return { spot: "coffee_claude", act: "stand", say: "Coffee first" };
+      return { spot: "desk", act: "sleep" };
+    }
+    if (t.min < 576) return { spot: "coffee_claude", act: "stand", say: "Deciding at 9:36" };
+    if (!today && t.min < 690) return { spot: "desk", act: "type", say: "Researching…", loud: true };
+    if (coffeeBreak(id, t)) return { spot: "coffee_claude", act: "stand", say: "Coffee break" };
+    return { spot: "desk", act: "read", say: today && today.buys.length ? `New picks: ${short(today.buys)}` : "Holding my picks" };
+  }
+  if (id === "watch") {
+    if (!open) return t.min >= 960 && t.min < 1320 && !isWeekend(t) ? { spot: "arcade", act: "type", say: "Off duty!" } : { spot: "stool", act: "sleep" };
+    if (coffeeBreak(id, t)) return { spot: "coffee_watch", act: "stand", say: "Quick coffee" };
+    return { spot: "console", act: "type", say: watchLine() };
+  }
+  if (!open) return { spot: "armchair", act: "sleep" };
+  const next = D.events.find((e) => e.agent === "news" && e.date === t.date && e.min >= t.min);
+  const scanning = next ? next.min - t.min <= 5 : V.mode === "live" && t.min % 60 >= 15 && t.min % 60 < 21 && !(today && t.min - today.min < 40);
+  if (scanning) return { spot: "teletype", act: "type", say: "Any big drops?", loud: true };
+  if (coffeeBreak(id, t)) return { spot: "coffee_news", act: "stand", say: "Coffee break" };
+  const nothing = today && !today.orders.length && t.min - today.min < 30;
+  return { spot: "armchair", act: "read", say: nothing ? "Nothing worth buying" : "Reading the news" };
+}
+
+// ================================================================ drawing helpers
+const W = 640, H = 360;
+const cv = document.getElementById("cv");
+const main = cv.getContext("2d");
+let g = main;
+const R = (x, y, w, h, c) => { g.fillStyle = c; g.fillRect(Math.round(x), Math.round(y), w, h); };
+const box = (x, y, w, h, fill, edge) => { R(x, y, w, h, edge); R(x + 1, y + 1, w - 2, h - 2, fill); };
+function rng(seed) { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+const F = {A:"010101111101101",B:"110101110101110",C:"011100100100011",D:"110101101101110",E:"111100110100111",F:"111100110100100",G:"011100101101011",H:"101101111101101",I:"111010010010111",J:"001001001101010",K:"101101110101101",L:"100100100100111",M:"101111111101101",N:"110101101101101",O:"010101101101010",P:"110101110100100",Q:"010101101110011",R:"110101110101101",S:"011100010001110",T:"111010010010010",U:"101101101101111",V:"101101101101010",W:"101101111111101",X:"101101010101101",Y:"101101010010010",Z:"111001010100111","&":"010101010101011","+":"000010111010000","-":"000000111000000","−":"000000111000000",".":"000000000000010",",":"000000000010100",":":"000010000010000","%":"101001010100101","!":"010010010000010","?":"110001010000010","$":"011110010011110","/":"001001010100100","(":"010100100100010",")":"010001001001010","'":"010010000000000","…":"000000000000101","0":"111101101101111","1":"010110010010111","2":"110001010100111","3":"110001010001110","4":"101101111001001","5":"111100110001110","6":"011100111101111","7":"111001010010010","8":"111101111101111","9":"111101111001110"," ":"000000000000000"};
+function txt(s, x, y, c, k = 1) { for (const ch of String(s).toUpperCase()) { const f = F[ch] || F[" "]; for (let i = 0; i < 15; i++) if (f[i] === "1") R(x + (i % 3) * k, y + ((i / 3) | 0) * k, k, k, c); x += 4 * k; } }
+const tw = (s, k = 1) => String(s).length * 4 * k - k;
+function line(x0, y0, x1, y1, c) { const n = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0), 1); for (let i = 0; i <= n; i++) R(x0 + (x1 - x0) * i / n, y0 + (y1 - y0) * i / n, 1, 1, c); }
+const OUT = "#1a1426";
+
+// ================================================================ characters (16×26 sprites, facing right)
+const ROWS = {
+  head: ["................", ".....oooooo.....", "....ohhhhhhoo...", "...ohhhhhhhhho..", "...ohhhhhhhhhho.", "...ohhhssssssso.", "...ohhsssssesso.", "...ohSsssssssso.", "....oSsssssSo...", ".....oSSSSSo....", "......oSSo......"],
+  hang: ["....occcccccco..", "...occcccccccco.", "...occcCCccccco.", "...occcCCccccco.", "...occcCCccccco.", "...occcCCccccco.", "...occcssccccco.", "...oCCCssCCCCCo."],
+  reachA: ["....occcccccco..", "...occcccccccco.", "...occcccccccco.", "...occcCCCCCCsso", "...occcccccccoo.", "...occcccccccco.", "...occcccccccco.", "...oCCCCCCCCCCo."],
+  reachB: ["....occcccccco..", "...occcccccccco.", "...occcccccccco.", "...occcccccccco.", "...occcCCCCCCsso", "...occcccccccoo.", "...occcccccccco.", "...oCCCCCCCCCCo."],
+  stand: ["....oppppppppo..", "....opppoppppo..", "....opppoppppo..", "....oPPPoPPPPo..", "....oPPPoPPPPo..", "....okkkookkkkoo", "....oooo.ooooo.."],
+  walk: ["....oppppppppo..", "...opppo.oppppo.", "..opppo...oppppo", "..oPPPo...oPPPPo", ".oPPPo.....oPPPo", ".okkko.....okkko", ".oooo......oooo."],
+  sit: ["....oppppppppppo", "....oPPPPPPPPPPo", ".....oooooooopPo", "............opPo", "............opPo", "...........okkko", "...........ooooo"],
+};
+const FRAMES = { stand: ["head", "hang", "stand"], walk: ["head", "hang", "walk"], sit: ["head", "hang", "sit"], sitA: ["head", "reachA", "sit"], sitB: ["head", "reachB", "sit"], standA: ["head", "reachA", "stand"], standB: ["head", "reachB", "stand"] };
+const PAL = {
+  claude: { o: OUT, h: "#4a2e22", H: "#33201a", s: "#f2c9a0", S: "#d49a73", e: OUT, c: "#d9845a", C: "#a8603c", p: "#3b3a5a", P: "#2b2a44", k: "#2a1e1a", g: OUT, w: "#f4ecd8" },
+  watch: { o: OUT, h: "#26262f", H: "#18181f", s: "#e8b48c", S: "#c08660", e: OUT, c: "#4f8fd6", C: "#3567a3", p: "#2d3244", P: "#1f2333", k: "#15151c", g: "#3a3a46", r: "#ef4f4f" },
+  news: { o: OUT, h: "#e6c574", H: "#b8964c", s: "#f5d0b0", S: "#d8a888", e: OUT, c: "#9b6bd1", C: "#744aa8", p: "#4a3d5c", P: "#352a44", k: "#2a2233", r: "#f2c14e" },
+};
+const ACC = {
+  claude: [[10, 5, "g"], [11, 5, "g"], [12, 5, "g"], [10, 6, "g"], [12, 6, "g"], [8, 11, "w"], [9, 11, "w"], [10, 11, "w"]],
+  watch: [[7, 1, "g"], [7, 2, "g"], [7, 3, "g"], [7, 4, "g"], [7, 5, "g"], [6, 6, "g"], [7, 6, "g"], [6, 7, "g"], [7, 7, "g"], [8, 8, "g"], [9, 8, "g"], [10, 8, "g"], [11, 8, "r"]],
+  news: [[5, 7, "h"], [3, 8, "o"], [4, 8, "h"], [5, 8, "h"], [3, 9, "o"], [4, 9, "h"], [5, 9, "H"], [3, 10, "o"], [4, 10, "H"], [5, 10, "o"], [6, 10, "r"], [7, 10, "r"], [8, 10, "r"], [9, 10, "r"], [5, 11, "r"], [6, 11, "r"], [7, 11, "r"], [8, 11, "r"], [9, 11, "r"], [10, 11, "r"]],
+};
+const SPR = {};
+function buildSprites() {
+  for (const id of AG) {
+    SPR[id] = {};
+    for (const [fr, parts] of Object.entries(FRAMES)) for (const closed of [false, true]) {
+      const rows = parts.flatMap((k) => ROWS[k]).map((r) => r.split(""));
+      for (const [x, y, k] of ACC[id]) rows[y][x] = k;
+      if (closed) { rows[6][11] = "s"; rows[7][10] = "e"; rows[7][11] = "e"; }
+      const c = document.createElement("canvas"); c.width = 16; c.height = 26;
+      const x = c.getContext("2d");
+      rows.forEach((r, y) => r.forEach((k, xx) => { if (k !== ".") { x.fillStyle = PAL[id][k] || "#f0f"; x.fillRect(xx, y, 1, 1); } }));
+      const f = document.createElement("canvas"); f.width = 16; f.height = 26;
+      const fx = f.getContext("2d"); fx.translate(16, 0); fx.scale(-1, 1); fx.drawImage(c, 0, 0);
+      SPR[id][fr + (closed ? "z" : "")] = [c, f];
+    }
+  }
+}
+
+// ================================================================ the building
+const FEET = [212, 306];          // where feet touch the floor, top floor and ground floor
+const ELEV_X = 580, CAR = [172, 266];
+const SP = {
+  desk: { f: 0, x: 112, dir: 1, seat: true }, console: { f: 0, x: 284, dir: 1 }, stool: { f: 0, x: 246, dir: 1, seat: true },
+  armchair: { f: 0, x: 446, dir: 1, seat: true }, teletype: { f: 0, x: 504, dir: 1 },
+  term_claude: { f: 1, x: 180, dir: 1 }, term_news: { f: 1, x: 234, dir: 1 }, term_watch: { f: 1, x: 288, dir: 1 },
+  coffee_claude: { f: 1, x: 396, dir: 1 }, coffee_watch: { f: 1, x: 406, dir: 1 }, coffee_news: { f: 1, x: 416, dir: 1 },
+  arcade: { f: 1, x: 472, dir: 1 },
+};
+
+function skyOf(t) {
+  const m = t.min;
+  if (m < 360 || m >= 1230) return { k: "night", bands: ["#070a1c", "#0b1026", "#101633", "#151c40", "#1b2350", "#22295c"], city: "#0e0c1e", lit: 0.35 };
+  if (m < 450) return { k: "dawn", bands: ["#2a2f6e", "#4b3f86", "#7a4f8f", "#b5658a", "#e48a7c", "#f6b383"], city: "#2a2140", lit: 0.12 };
+  if (m >= 1110) return { k: "dusk", bands: ["#24306e", "#433f8a", "#7b4e92", "#c0628a", "#ec8a6e", "#f7b768"], city: "#251d3a", lit: 0.2 };
+  return { k: "day", bands: ["#4a8fd8", "#5b9de0", "#6fabe6", "#86bbec", "#a0cbf0", "#bcdcf4"], city: "#5d6a92", lit: 0 };
+}
+const bg = document.createElement("canvas"); bg.width = W; bg.height = H;
+let bgKey = "";
+function drawBackground(t) {
+  const sky = skyOf(t), night = sky.k === "night";
+  g = bg.getContext("2d");
+  // sky in bands, far city, near city
+  sky.bands.forEach((c, i) => R(0, i * 22, W, 22, c)); R(0, 132, W, 200, sky.bands.at(-1));
+  if (night || sky.k === "dawn" || sky.k === "dusk") { const r = rng(4); for (let i = 0; i < 60; i++) R(r() * W, r() * 100, 1, 1, night ? "#e8e4ff" : "#ffe8d0"); }
+  if (night) for (let y = -7; y <= 7; y++) for (let x = -7; x <= 7; x++) if (x * x + y * y <= 49 && (x - 4) * (x - 4) + (y + 2) * (y + 2) > 36) R(76 + x, 32 + y, 1, 1, "#efe9c8"); else if (sky.k === "day") { R(80, 30, 14, 14, "#fff1b0"); R(78, 32, 18, 10, "#fff1b0"); }
+  const r = rng(11);
+  for (let x = -10; x < W; x += 18 + r() * 14) { const h = 40 + r() * 70, w = 16 + r() * 22; R(x, 330 - h - 60, w, h + 60, sky.k === "day" ? "#8fa6cf" : "#1d1938"); }
+  const r2 = rng(23);
+  for (let x = -6; x < W; x += 22 + r2() * 18) {
+    const h = 60 + r2() * 90, w = 20 + r2() * 26, top = 330 - h;
+    R(x, top, w, h, sky.city);
+    for (let wy = top + 5; wy < 326; wy += 7) for (let wx = x + 3; wx < x + w - 3; wx += 5) if (r2() < (sky.lit || 0.04)) R(wx, wy, 2, 3, "#f4d27a");
+  }
+  // street
+  R(0, 316, W, 8, "#77708a"); R(0, 316, W, 1, "#9a93b0"); R(0, 324, W, 36, "#2e2b3a");
+  for (let x = 0; x < W; x += 28) R(x, 341, 14, 2, "#c9c09a");
+  for (const lx of [8, 628]) { R(lx, 270, 3, 46, "#3a3448"); R(lx - 3, 266, 9, 5, "#3a3448"); if (sky.k !== "day") { R(lx - 2, 271, 7, 2, "#ffe7a0"); g.fillStyle = "rgba(255,231,160,.10)"; g.fillRect(lx - 14, 273, 31, 43); } }
+
+  // building shell
+  box(22, 124, 596, 194, "#4b3f63", OUT);
+  R(18, 116, 604, 9, "#3a3050"); R(18, 116, 604, 1, "#5b4f75");
+  for (let x = 28; x < 612; x += 24) R(x, 118, 12, 4, "#2e2640");
+  R(590, 92, 2, 24, "#3a3448"); R(586, 104, 10, 2, "#3a3448");
+  // floors and walls
+  const rooms = [
+    [26, 128, 194, 86, "#5a4636", "#644e3d"], [222, 128, 192, 86, "#1d3742", "#22414e"], [416, 128, 148, 86, "#4f3449", "#5a3d53"],
+    [26, 222, 318, 86, "#2b2740", "#312c48"], [346, 222, 218, 86, "#3d4c38", "#44553f"],
+  ];
+  for (const [x, y, w, h, c1, c2] of rooms) { R(x, y, w, h, c1); for (let sx = x + 4; sx < x + w; sx += 10) R(sx, y, 4, h, c2); R(x, y, w, 3, "#00000033"); }
+  for (const [y, fl] of [[206, "#7a5236"], [300, "#5b5568"]]) { R(26, y, 538, 8, fl); for (let x = 26; x < 564; x += 16) R(x, y, 1, 8, "#00000030"); R(26, y, 538, 1, "#ffffff22"); }
+  R(22, 214, 596, 8, "#3a3050"); R(22, 214, 596, 1, OUT); R(22, 221, 596, 1, OUT);
+  // partitions with door frames
+  for (const [x, top, bot] of [[220, 128, 214], [414, 128, 214], [344, 222, 308]]) { R(x, top, 2, bot - top - 34, "#2a2238"); R(x - 2, bot - 36, 6, 2, "#2a2238"); }
+  // elevator shaft
+  R(564, 128, 52, 180, "#2a2438"); R(566, 128, 2, 180, "#1f1a2c"); R(612, 128, 2, 180, "#1f1a2c");
+  for (let y = 132; y < 306; y += 12) R(569, y, 42, 1, "#332c44");
+  R(589, 128, 2, 180, "#463c5c");
+
+  // ---------- Claude's study
+  // bookshelf
+  box(32, 140, 44, 68, "#5c3a22", OUT);
+  const rb = rng(5);
+  for (let s = 0; s < 4; s++) {
+    const sy = 143 + s * 16; R(33, sy + 13, 42, 2, "#3f2716");
+    for (let bx = 35; bx < 72;) { const bw = 2 + ((rb() * 3) | 0), bh = 8 + ((rb() * 5) | 0); R(bx, sy + 13 - bh, bw, bh, ["#c75b4a", "#e0b04a", "#4d8fbf", "#5fa66a", "#9b6bd1", "#e8e0c8"][(rb() * 6) | 0]); bx += bw + (rb() < 0.15 ? 2 : 0); }
+  }
+  // window
+  box(84, 138, 40, 40, "#20263a", OUT); R(86, 140, 36, 36, sky.bands[3]); R(86, 160, 36, 16, sky.city); if (sky.lit) for (let i = 0; i < 9; i++) R(88 + i * 4, 164 + (i % 3) * 4, 1, 2, "#f4d27a");
+  R(103, 140, 2, 36, "#20263a"); R(86, 157, 36, 2, "#20263a"); R(82, 176, 44, 3, "#5c3a22");
+  // whiteboard with a rising line
+  box(160, 138, 54, 32, "#e9e6dc", "#6b6f80");
+  line(164, 162, 176, 156, "#5fa66a"); line(176, 156, 186, 159, "#5fa66a"); line(186, 159, 208, 146, "#5fa66a");
+  line(164, 158, 180, 160, "#c75b4a"); line(180, 160, 208, 163, "#c75b4a"); R(165, 143, 14, 1, "#4d8fbf"); R(165, 146, 10, 1, "#4d8fbf");
+  // rug, chair, desk
+  R(92, 211, 110, 2, "#8a3b3b");
+  R(108, 176, 3, 24, "#3d2a20"); R(108, 196, 16, 3, "#3d2a20"); R(112, 199, 2, 13, "#3d2a20"); R(120, 199, 2, 13, "#3d2a20"); R(106, 174, 7, 14, "#8a3b3b");
+  box(134, 196, 66, 5, "#9a6b45", OUT); R(138, 201, 4, 11, "#5c3a22"); R(192, 201, 4, 11, "#5c3a22"); box(170, 201, 22, 11, "#7a5236", OUT); R(178, 205, 6, 1, "#e0b04a");
+  box(158, 174, 30, 21, "#2c2a3a", OUT); R(171, 195, 4, 1, "#6b6f80"); R(166, 195, 14, 1, "#6b6f80");
+  R(138, 186, 2, 10, "#6b6f80"); R(135, 182, 8, 4, "#e0b04a"); R(192, 191, 5, 5, "#e8e0c8"); R(197, 192, 1, 2, "#e8e0c8");
+  R(145, 193, 10, 3, "#e8e0c8"); R(146, 191, 9, 2, "#d8d0bc");
+
+  // ---------- Watcher's control room
+  for (let i = 0; i < 6; i++) { const mx = 236 + (i % 3) * 58, my = 136 + Math.floor(i / 3) * 28; box(mx, my, 54, 25, "#0b141c", "#3a4a5a"); }
+  box(300, 196, 74, 16, "#3a4652", OUT); R(301, 196, 72, 3, "#55657a");
+  R(240, 200, 18, 3, "#55657a"); R(242, 203, 2, 9, "#3a4652"); R(254, 203, 2, 9, "#3a4652");
+  R(382, 182, 18, 30, "#2f3a46"); R(384, 184, 14, 6, "#1b232c"); R(384, 194, 14, 2, "#55657a");
+  R(330, 128, 8, 4, "#3a4652");
+
+  // ---------- Newsroom
+  box(424, 138, 50, 34, "#b58d5a", "#5c3a22");
+  const rn = rng(9);
+  for (let i = 0; i < 7; i++) { const px = 428 + ((rn() * 38) | 0), py = 141 + ((rn() * 22) | 0); R(px, py, 9, 7, "#ece6d6"); R(px + 1, py + 2, 6, 1, "#8a8496"); R(px + 1, py + 4, 5, 1, "#8a8496"); R(px + 4, py, 1, 1, "#c75b4a"); }
+  line(432, 146, 462, 160, "#c75b4a");
+  box(486, 138, 56, 34, "#101018", "#2c2a3a"); R(511, 172, 6, 4, "#2c2a3a");
+  // armchair (side view)
+  R(436, 180, 6, 28, "#7a3f5c"); R(436, 196, 30, 8, "#7a3f5c"); R(438, 198, 26, 4, "#91506f"); R(438, 204, 2, 8, "#3d2a20"); R(460, 204, 2, 8, "#3d2a20"); R(462, 190, 6, 8, "#7a3f5c");
+  // teletype and paper stacks
+  box(522, 186, 34, 26, "#6b6f80", OUT); R(526, 190, 26, 6, "#3a3f55"); R(470, 202, 14, 10, "#ece6d6"); R(470, 198, 14, 4, "#d8d0bc"); R(472, 205, 10, 1, "#8a8496");
+
+  // ---------- Trading pit
+  box(34, 228, 304, 18, "#050608", "#4a4458");
+  box(36, 252, 112, 50, "#0b141c", "#4a4458");
+  for (const kx of [198, 252, 306]) { box(kx, 262, 22, 44, "#3a3f55", OUT); box(kx + 3, 266, 16, 12, "#0b141c", "#22262f"); for (let i = 0; i < 3; i++) R(kx + 5 + i * 4, 284, 3, 2, "#6b6f80"); }
+  R(170, 252, 8, 54, "#2b2740");
+  // ---------- Lounge
+  box(422, 276, 52, 30, "#5b6170", OUT); R(423, 276, 50, 3, "#7a8090");
+  box(430, 256, 16, 20, "#2c2f3a", OUT); R(434, 268, 6, 6, "#ece6d6"); R(452, 268, 6, 8, "#ece6d6"); R(460, 270, 5, 6, "#ece6d6");
+  box(488, 248, 24, 58, "#5a2d6e", OUT); R(489, 249, 22, 6, "#f2c14e"); txt("ZAP", 494, 250, "#5a2d6e"); box(492, 258, 16, 13, "#0b0b16", OUT); R(491, 276, 18, 6, "#43204f");
+  box(352, 282, 60, 18, "#3f6f78", OUT); R(352, 274, 60, 10, "#4c8590"); R(352, 274, 60, 1, OUT); R(350, 278, 6, 22, "#4c8590"); R(408, 278, 6, 22, "#4c8590"); R(358, 300, 3, 6, "#2a2238"); R(404, 300, 3, 6, "#2a2238");
+  box(522, 234, 34, 34, "#20263a", OUT); R(524, 236, 30, 30, sky.bands[3]); R(524, 254, 30, 12, sky.city); R(538, 236, 2, 30, "#20263a");
+  R(530, 286, 12, 14, "#a35a3c"); R(532, 300, 8, 6, "#a35a3c"); for (const [x, y] of [[526, 274], [532, 268], [538, 276], [530, 280], [540, 270]]) R(x, y, 7, 8, "#4f9a5a");
+  box(372, 236, 18, 18, "#ece6d6", OUT);
+
+  // night: darken the rooms a little; lamps and screens are drawn on top every frame
+  if (night) { g.fillStyle = "rgba(6,6,24,.45)"; g.fillRect(26, 128, 538, 180); }
+  else if (sky.k !== "day") { g.fillStyle = "rgba(10,8,30,.18)"; g.fillRect(26, 128, 538, 180); }
+  g = main;
+}
+
+// ================================================================ agents: walking, the lift, poses
+const agents = {};
+const lift = { y: CAR[1], queue: [], rider: null, dest: 1 };
+function route(a) {
+  const s = SP[a.want];
+  if (a.floor === s.f) { a.tx = s.x; a.phase = "walk"; } else { a.tx = ELEV_X; a.phase = "toLift"; }
+}
+function place(a) { const s = SP[a.want]; a.floor = s.f; a.x = s.x; a.y = FEET[s.f]; a.dir = s.dir; a.phase = "idle"; a.at = a.want; }
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+function stepAgent(a) {
+  const speed = V.mode === "live" ? 0.75 : 1.5;
+  if (a.phase === "idle" && a.at !== a.want) route(a);
+  if (a.phase === "walk" || a.phase === "toLift") {
+    if (a.phase === "walk" && SP[a.want].f !== a.floor) route(a);
+    if (a.phase === "walk" && a.tx !== SP[a.want].x) a.tx = SP[a.want].x;
+    const d = a.tx - a.x;
+    if (Math.abs(d) <= speed) {
+      a.x = a.tx;
+      if (a.phase === "toLift") { a.phase = "wait"; lift.queue.push(a); }
+      else { a.phase = "idle"; a.at = a.want; a.dir = SP[a.want].dir; }
+    } else { a.x += Math.sign(d) * speed; a.dir = Math.sign(d); a.walkT = (a.walkT || 0) + 1; }
+  }
+}
+function stepLift() {
+  const sp = V.mode === "live" ? 1 : 2;
+  if (lift.rider) {
+    const ty = CAR[lift.dest], d = ty - lift.y;
+    if (Math.abs(d) <= sp) {
+      lift.y = ty; const a = lift.rider; lift.rider = null;
+      a.floor = lift.dest; a.y = FEET[a.floor]; a.phase = "idle"; a.at = null; route(a);
+    } else { lift.y += Math.sign(d) * sp; lift.rider.y = lift.y + 40; }
+    return;
+  }
+  const next = lift.queue[0];
+  if (!next) return;
+  const ty = CAR[next.floor], d = ty - lift.y;
+  if (Math.abs(d) <= sp) { lift.y = ty; lift.queue.shift(); lift.rider = next; next.phase = "ride"; lift.dest = 1 - next.floor; next.x = ELEV_X; }
+  else lift.y += Math.sign(d) * sp;
+}
+function think(instant) {
+  const t = now();
+  for (const id of AG) {
+    const a = agents[id] || (agents[id] = { id, phase: "idle", x: 0, y: 0, dir: 1, floor: 0, want: null, at: null });
+    a.plan = plan(id, t);
+    const first = !a.want;
+    a.want = a.plan.spot;
+    if (first || instant || reduceMotion) { if (a.phase !== "ride") { lift.queue = lift.queue.filter((q) => q !== a); place(a); } }
+  }
+}
+function frameOf(a) {
+  if (a.phase === "walk" || a.phase === "toLift") return ((a.walkT / 8) | 0) % 2 ? "walk" : "stand";
+  if (a.phase !== "idle") return "stand";
+  const s = SP[a.at] || {}, act = a.plan.act, k = ((T / 7) | 0) % 2;
+  if (act === "sleep") return (s.seat ? "sit" : "stand") + "z";
+  if (s.seat) return act === "type" ? (k ? "sitA" : "sitB") : act === "read" ? (a.id === "news" ? "sitA" : "sit") : "sit";
+  if (act === "type" || act === "trade") return k ? "standA" : "standB";
+  return "stand";
+}
+
+// ================================================================ things that move every frame
+let T = 0;
+function holdings() {
+  return (D.status.positions || []).map((p) => {
+    const base = p.market_value - (p.change_today_usd || 0);
+    return { s: p.symbol, today: base ? (p.change_today_usd || 0) / base * 100 : 0, total: (p.unrealized_plpc || 0) * 100 };
+  });
+}
+function dayPoints(date) {
+  const out = [];
+  for (const p of D.intraday.points || []) { if (p[1] == null || p[2] == null) continue; const n = ny(Date.parse(p[0])); if (n.date === date) out.push([n.min, p[1], p[2]]); }
+  return out;
+}
+let ptsCache = { key: "", pts: [] };
+function live(t) {
+  const night = skyOf(t).k === "night", open = isOpen(t);
+  const A = agents;
+  // roof sign
+  const flick = night && hash(String((T / 9) | 0)) % 23 === 0;
+  if (!flick) txt("LARP CAPITAL", 320 - tw("LARP CAPITAL", 2) / 2, 100, night || skyOf(t).k !== "day" ? "#f2c14e" : "#c99a2e", 2);
+  if (((T / 40) | 0) % 2) R(589, 90, 4, 3, "#ef4f4f");
+
+  // Claude's desk: monitor and lamp
+  const c = A.claude, atDesk = c.phase === "idle" && c.at === "desk";
+  if (atDesk && c.plan.act !== "sleep") {
+    for (let i = 0; i < 6; i++) { const w = c.plan.act === "type" ? ((T / 6 + i * 5) | 0) % 22 + 3 : 8 + (i * 7) % 15; R(161, 177 + i * 3, w, 1, i % 2 ? "#6fd08c" : "#7fb8ff"); }
+  } else R(161, 177, 2, 2, "#3a3a46");
+  if (night || (atDesk && c.plan.act === "sleep")) { g.fillStyle = "rgba(255,220,140,.16)"; g.beginPath(); g.moveTo(135, 186); g.lineTo(143, 186); g.lineTo(166, 206); g.lineTo(112, 206); g.fill(); R(135, 182, 8, 4, "#ffe08a"); }
+
+  // Watcher's wall of screens: each shows one holding, today's move
+  const hs = holdings(), page = Math.floor(T / 300);
+  for (let i = 0; i < 6; i++) {
+    const mx = 237 + (i % 3) * 58, my = 137 + Math.floor(i / 3) * 28;
+    const h = hs.length ? hs[(page * 6 + i) % hs.length] : null;
+    if (!h || (!open && i % 2)) { R(mx + 2, my + 2, 2, 2, "#223"); continue; }
+    const col = h.today >= 0 ? "#6fd08c" : "#ef6f6c";
+    txt(h.s, mx + 2, my + 2, "#c9d6e6");
+    const r = rng(hash(h.s + t.date));
+    let y = 0, px = mx + 3, py = my + 17;
+    const tilt = Math.max(-1, Math.min(1, h.today / 2));
+    for (let k = 0; k < 46; k++) { y += (r() - 0.5) * 1.6 - tilt * 0.12; y = Math.max(-6, Math.min(5, y)); const ny_ = my + 16 + y; line(px, py, mx + 3 + k, ny_, col); px = mx + 3 + k; py = ny_; }
+    txt((h.today >= 0 ? "+" : "") + h.today.toFixed(1) + "%", mx + 52 - tw((h.today >= 0 ? "+" : "") + h.today.toFixed(1) + "%"), my + 2, col);
+  }
+  for (let i = 0; i < 8; i++) R(304 + i * 8, 199, 3, 2, open && ((T / 20 + i * 3) | 0) % 4 ? ["#6fd08c", "#f2c14e", "#ef6f6c", "#7fb8ff"][i % 4] : "#2a323c");
+  const siren = A.watch.plan.stop;
+  R(331, 132, 6, 3, siren && ((T / 8) | 0) % 2 ? "#ff3b3b" : "#7a2a2a");
+  if (siren && ((T / 8) | 0) % 2) { g.fillStyle = "rgba(255,40,40,.12)"; g.fillRect(222, 128, 192, 86); }
+
+  // Newsroom TV: the latest news line scrolls by
+  const lastNews = lastEvent("news", t, false);
+  const head = (lastNews && (lastNews.summary || lastNews.full)) || "MARKETS TODAY";
+  R(488, 140, 52, 30, open ? "#16203a" : "#0b0b12");
+  if (open || !night) {
+    txt("NEWS", 490, 142, "#ef6f6c"); R(488, 160, 52, 8, "#f2c14e");
+    g.save(); g.beginPath(); g.rect(488, 160, 52, 8); g.clip();
+    const s = head.toUpperCase().replace(/[^A-Z0-9 .,%$&!?'()/+-]/g, ""); const len = tw(s) + 60;
+    txt(s, 540 - ((T / 2) % len), 162, "#1a1426"); g.restore();
+    R(492, 149, 10, 8, "#e8b48c"); R(491, 148, 12, 3, "#26262f"); R(504, 150, 14, 2, "#7fb8ff"); R(504, 154, 10, 2, "#7fb8ff");
+  }
+  const n = A.news;
+  if (n.phase === "idle" && n.at === "teletype") { const p = (T / 3) % 14; R(530, 186 - p, 18, p + 2, "#ece6d6"); for (let i = 0; i < p; i += 3) R(532, 186 - i, 10, 1, "#8a8496"); }
+  if (n.phase === "idle" && n.at === "armchair") {
+    if (n.plan.act === "sleep") { R(449, 196, 14, 6, "#ece6d6"); R(450, 198, 10, 1, "#8a8496"); }
+    else { const up = ((T % 400) > 320) ? 3 : 0; box(456, 180 + up, 14, 16, "#ece6d6", "#8a8496"); R(458, 183 + up, 10, 1, OUT); for (let i = 0; i < 4; i++) R(458, 186 + up + i * 2, 10, 1, "#8a8496"); }
+  }
+
+  // Trading pit: the ticker board, today's chart, the terminals
+  const trades = AG.filter((id) => A[id].phase === "idle" && A[id].at === "term_" + id);
+  let tick = hs.map((h) => `${h.s} ${h.today >= 0 ? "+" : ""}${h.today.toFixed(1)}%`).join("   ");
+  if (trades.length) tick = trades.map((id) => `${NAME[id]}: ${A[id].plan.say}`).join("   ") + "   " + tick;
+  g.save(); g.beginPath(); g.rect(36, 230, 300, 14); g.clip();
+  if (tick) { const len = tw(tick) + 80, off = (T * 0.6) % len; for (let rep = 0; rep < 2; rep++) drawTicker(tick, 336 - off + rep * len, 234, hs); }
+  g.restore();
+  const key = t.date + "|" + (D.intraday.points || []).length;
+  if (ptsCache.key !== key) ptsCache = { key, pts: dayPoints(t.date) };
+  const pts = ptsCache.pts.filter((p) => p[0] <= t.min);
+  if (pts.length > 1) {
+    const a0 = pts[0][1], s0 = pts[0][2], ai = pts.map((p) => (p[1] / a0 - 1) * 100), sp = pts.map((p) => (p[2] / s0 - 1) * 100);
+    let lo = Math.min(...ai, ...sp, -0.3), hi = Math.max(...ai, ...sp, 0.3);
+    const m0 = pts[0][0], span = Math.max(pts.at(-1)[0] - m0 + 20, 60);
+    const px = (m) => 40 + 104 * (m - m0) / span, py = (v) => 296 - (v - lo) / (hi - lo) * 34;
+    R(38, py(0), 108, 1, "#1d2f3d");
+    for (const [arr, col] of [[sp, "#ef6f6c"], [ai, "#6fd08c"]]) for (let i = 1; i < pts.length; i++) line(px(pts[i - 1][0]), py(arr[i - 1]), px(pts[i][0]), py(arr[i]), col);
+    const fa = ai.at(-1), fs = sp.at(-1), f = (v) => (v >= 0 ? "+" : "") + v.toFixed(1) + "%";
+    txt("AI " + f(fa), 40, 255, fa >= fs ? "#6fd08c" : "#ef6f6c"); txt("S&P " + f(fs), 88, 255, "#c9c0d8");
+  } else txt(open ? "LOADING" : "CLOSED", 72, 274, "#4a5568");
+  [198, 252, 306].forEach((kx, i) => {
+    const id = ["claude", "news", "watch"][i], busy = trades.includes(id);
+    if (busy) { const p = A[id].plan; if (((T / 10) | 0) % 2) txt(p.side, kx + 11 - tw(p.side) / 2, 270, p.side === "BUY" ? "#6fd08c" : "#ef6f6c"); }
+    else R(kx + 5, 268, 3, 1, "#2f6b45");
+  });
+  for (const id of trades) { const kx = { claude: 198, news: 252, watch: 306 }[id]; for (let k = 0; k < 5; k++) { const ph = (T * 0.8 + k * 13) % 40; R(kx + 4 + ((k * 5) % 14), 262 - ph, 2, 2, ph < 30 ? "#f2c14e" : "#b8923a"); } }
+
+  // Lounge: steam, arcade, clock
+  if (AG.some((id) => A[id].phase === "idle" && A[id].at === "coffee_" + id)) for (let k = 0; k < 3; k++) R(436 + k * 2, 262 - ((T / 9 + k * 3) % 8), 1, 2, "#d8d0bc");
+  const playing = A.watch.phase === "idle" && A.watch.at === "arcade";
+  if (playing) { R(494 + ((T / 4) | 0) % 12, 264, 2, 2, "#6fd08c"); R(500, 260 + ((T / 9) | 0) % 8, 2, 2, "#ef6f6c"); R(494, 269, 12, 1, "#7fb8ff"); } else R(499, 263, 2, 2, "#2a1a33");
+  const ca = ((t.min / 60) % 12) / 12 * Math.PI * 2 - Math.PI / 2, ma = (t.min % 60) / 60 * Math.PI * 2 - Math.PI / 2;
+  line(381, 245, 381 + Math.cos(ca) * 4, 245 + Math.sin(ca) * 4, OUT); line(381, 245, 381 + Math.cos(ma) * 6, 245 + Math.sin(ma) * 6, "#c75b4a");
+
+  // lift car
+  const ly = lift.y;
+  R(589, 128, 2, ly - 128, "#6b6f80");
+  box(570, ly, 40, 40, "#6a5f80", OUT); R(572, ly + 2, 36, 36, "#8a7fa0"); R(572, ly + 2, 36, 3, "#ffe7a0");
+  // passing car on the street
+  const cx = ((T * 1.4) % 1400) - 200;
+  if (cx > -40 && cx < W + 40) { R(cx, 330, 34, 8, "#c75b4a"); R(cx + 6, 324, 20, 7, "#c75b4a"); R(cx + 9, 325, 6, 5, "#9fd0f0"); R(cx + 17, 325, 6, 5, "#9fd0f0"); R(cx + 4, 337, 6, 4, OUT); R(cx + 24, 337, 6, 4, OUT); R(cx + 32, 332, 2, 2, "#ffe7a0"); }
+}
+function drawTicker(s, x, y, hs) {
+  // colour each holding by its move, agent messages in gold
+  let cx = x;
+  for (const part of s.split("   ")) {
+    const h = hs.find((q) => part.startsWith(q.s + " "));
+    const col = h ? (h.today >= 0 ? "#6fd08c" : "#ef6f6c") : "#f2c14e";
+    if (cx < 340 && cx + tw(part) > 30) txt(part, cx, y, col);
+    cx += tw(part) + 4 * 3 + 1;
+  }
+}
+
+// ================================================================ speech bubbles and sleep Zs
+function bubble(a, text) {
+  const words = text.toUpperCase().split(" "), lines = [""];
+  for (const w of words) { if ((lines.at(-1) + " " + w).trim().length > 18) lines.push(w); else lines[lines.length - 1] = (lines.at(-1) + " " + w).trim(); }
+  const bw = Math.max(...lines.map((l) => tw(l))) + 8, bh = lines.length * 7 + 5;
+  const cx = a.x + 8;
+  let bx = Math.round(Math.min(Math.max(cx - bw / 2, 24), 616 - bw)), by = Math.round(a.y - 30 - bh);
+  R(bx - 1, by, bw + 2, bh, OUT); R(bx, by - 1, bw, bh + 2, OUT); R(bx, by, bw, bh, "#f4ecd8");
+  R(cx - 1, by + bh, 3, 1, "#f4ecd8"); R(cx - 2, by + bh, 1, 2, OUT); R(cx + 2, by + bh, 1, 2, OUT); R(cx - 1, by + bh + 1, 3, 1, OUT); R(cx, by + bh + 1, 1, 1, "#f4ecd8"); R(cx, by + bh + 2, 1, 1, OUT);
+  const col = { claude: "#a8603c", watch: "#3567a3", news: "#744aa8" }[a.id];
+  lines.forEach((l, i) => txt(l, bx + 4, by + 3 + i * 7, i === 0 ? col : OUT));
+}
+let selected = null;
+function overlays() {
+  AG.forEach((id, i) => {
+    const a = agents[id];
+    if (a.phase === "ride" || a.phase === "wait") return;
+    if (a.plan.act === "sleep" && a.phase === "idle") { const z = ((T / 30) | 0) % 3; txt("Z", a.x + 12 + z * 2, a.y - 30 - z * 4, "#e8e4ff"); if (z) txt("Z", a.x + 16, a.y - 38 - z * 2, "#a49cc0"); return; }
+    if (!a.plan.say || a.phase !== "idle") return;
+    const cycle = (T / 60 + i * 6) % 18;
+    if (a.plan.loud || selected === id || cycle < 5) bubble(a, a.plan.say);
+  });
+  if (selected) { const a = agents[selected]; if (a.phase !== "ride") { const b = ((T / 15) | 0) % 2; R(a.x + 6, a.y + 2 + b, 5, 1, "#f2c14e"); } }
+}
+
+// ================================================================ main loop
+let lastThink = 0, lastTs = 0, lastSecond = -1;
+function frame(ts) {
+  const dt = Math.min(0.25, (ts - lastTs) / 1000 || 0); lastTs = ts; T++;
+  if (V.mode === "replay" && V.playing) { V.min += dt * V.speed; if (V.min >= 975) { V.min = 975; V.playing = false; } }
+  if (ts - lastThink > 400) { think(false); lastThink = ts; }
+  const t = now();
+  const sk = skyOf(t).k + "|" + (V.mode);
+  if (sk !== bgKey) { drawBackground(t); bgKey = sk; }
+  for (const id of AG) stepAgent(agents[id]);
+  stepLift();
+  main.drawImage(bg, 0, 0);
+  live(t);
+  for (const id of AG) {
+    const a = agents[id];
+    if (a.phase === "wait") continue;  // waiting inside the lift doors
+    const fr = frameOf(a), spr = SPR[id][fr] || SPR[id].stand;
+    main.drawImage(spr[a.dir > 0 ? 0 : 1], Math.round(a.x), Math.round(a.y - 26));
+  }
+  // lift front frame drawn over riders so they look inside
+  R(570, lift.y, 40, 2, OUT); R(570, lift.y, 2, 40, OUT); R(608, lift.y, 2, 40, OUT); R(570, lift.y + 38, 40, 2, "#4a4060");
+  overlays();
+  const sec = Math.floor(t.min * 60 / 15);
+  if (sec !== lastSecond) { lastSecond = sec; hud(t); }
+  requestAnimationFrame(frame);
+}
+
+// ================================================================ the little HUD and the agent card
+const $ = (id) => document.getElementById(id);
+function hud(t) {
+  const s = D.status, p = s.performance || {};
+  $("tl").innerHTML = s.equity == null ? "WAITING FOR DATA" :
+    `${money(s.equity)}<br><span class="${cls(p.agent_return_pct)}">AI ${pct(p.agent_return_pct || 0)}</span> <span class="dim">VS</span> <span class="${cls(p.spy_return_pct)}">S&amp;P ${pct(p.spy_return_pct || 0)}</span>`;
+  $("tr").innerHTML = `${V.mode === "replay" ? `<span class="dim">${esc(t.date.slice(5))}</span> ` : ""}NY ${hhmm(t.min)}<br><span class="${isOpen(t) ? "up" : "down"}">${isOpen(t) ? "● OPEN" : "● CLOSED"}</span>`;
+  if (selected) card();
+}
+function card() {
+  const id = selected, a = agents[id], s = (D.status.scorecard || {})[id] || {};
+  const last = [...D.events].reverse().find((e) => e.agent === id && e.orders.length);
+  $("card").hidden = false;
+  $("card").innerHTML = `<h3 style="color:${{ claude: "#d9845a", watch: "#5aa9e6", news: "#b98be0" }[id]}">${NAME[id]}</h3>
+    <p class="dim">${ROLE[id]}</p>
+    <p style="margin-top:6px">${s.buys ? `Beat S&amp;P on ${s.beat_spy}/${s.buys} buys · avg <span class="${cls(s.avg_vs_spy_pct)}">${pct(s.avg_vs_spy_pct)}</span>` : "No buys yet"}</p>
+    ${last ? `<p class="dim" style="margin-top:6px">${esc(last.date.slice(5))}: ${esc(last.full)}</p>` : ""}`;
+}
+cv.addEventListener("click", (e) => {
+  const r = cv.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * W, y = (e.clientY - r.top) / r.height * H;
+  const hit = AG.find((id) => { const a = agents[id]; return a.phase !== "wait" && x >= a.x - 2 && x <= a.x + 18 && y >= a.y - 30 && y <= a.y + 2; });
+  selected = hit && hit !== selected ? hit : null;
+  if (selected) card(); else $("card").hidden = true;
+});
+cv.addEventListener("mousemove", (e) => {
+  const r = cv.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * W, y = (e.clientY - r.top) / r.height * H;
+  cv.style.cursor = AG.some((id) => { const a = agents[id]; return a && x >= a.x - 2 && x <= a.x + 18 && y >= a.y - 30 && y <= a.y + 2; }) ? "pointer" : "default";
+});
+function fit() {
+  const s = Math.min(innerWidth / W, innerHeight / H);
+  cv.style.width = Math.floor(W * s) + "px"; cv.style.height = Math.floor(H * s) + "px";
+}
+addEventListener("resize", fit);
+
+function tradingDays() { return [...new Set(D.events.map((e) => e.date))].slice(-15).reverse(); }
+function setMode(mode) {
+  V.mode = mode;
+  $("live").setAttribute("aria-pressed", mode === "live"); $("replay").setAttribute("aria-pressed", mode === "replay");
+  $("day").hidden = $("speed").hidden = mode === "live";
+  think(true); bgKey = ""; lastSecond = -1;
+}
+function startReplay(day) {
+  const days = tradingDays();
+  $("day").innerHTML = days.map((d) => `<option value="${d}">${d.slice(5)}</option>`).join("");
+  V.day = day || days.find((d) => D.events.some((e) => e.date === d && e.orders.length)) || days[0];
+  $("day").value = V.day; V.min = 560; V.playing = true;
+  setMode("replay");
+}
+$("live").onclick = () => setMode("live");
+$("replay").onclick = () => startReplay();
+$("day").onchange = () => startReplay($("day").value);
+$("speed").onclick = () => { V.speed = V.speed === 0.5 ? 2 : V.speed === 2 ? 0.1 : 0.5; $("speed").textContent = { 0.5: "30×", 2: "120×", 0.1: "6×" }[V.speed]; };
+
+async function refreshAll() {
+  const [status, decisions, intraday, watch] = await Promise.all([load("status.json", D.status), load("decisions.json", D.decisions), load("intraday.json", D.intraday), load("watch.json", D.watch)]);
+  Object.assign(D, { status: status || {}, decisions: decisions || [], intraday: intraday && intraday.points ? intraday : { points: [] }, watch: watch || {} });
+  buildEvents(); lastSecond = -1;
+}
+async function refreshLive() {
+  if (document.visibilityState !== "visible") return;
+  const lv = await fetchLive();
+  if (!lv) return;
+  const st = lv.status || {};
+  if (st.updated && (!D.status.updated || new Date(st.updated) >= new Date(D.status.updated))) D.status = st;
+  const pts = (D.intraday.points || []).slice(), seen = new Set(pts.map((p) => p[0]));
+  for (const p of lv.intraday_tail || []) if (!seen.has(p[0])) pts.push(p);
+  D.intraday = { points: pts.sort((a, b) => a[0].localeCompare(b[0])) };
+  lastSecond = -1;
+}
+(async () => {
+  fit(); buildSprites();
+  await refreshAll();
+  think(true);
+  requestAnimationFrame((ts) => { lastTs = ts; frame(ts); });
+  refreshLive();
+  setInterval(refreshLive, 61000);
+  setInterval(refreshAll, 3 * 60000);
+})();
+</script>
+</body>
+</html>
