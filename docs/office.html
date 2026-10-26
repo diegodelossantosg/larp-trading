@@ -22,11 +22,18 @@ canvas{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);image-rend
 button,select{font-family:var(--pixel);font-size:8px;color:var(--ink);background:#221d38;border:2px solid var(--line);padding:6px 8px;cursor:pointer}
 button[aria-pressed="true"]{border-color:var(--gold);color:var(--gold)}
 button:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+#heat{background:#0e0c1a;left:50%;top:50%;transform:translate(-50%,-50%);width:min(960px,calc(100vw - 24px));height:min(620px,calc(100vh - 24px));display:flex;flex-direction:column;gap:8px;padding:10px;box-sizing:border-box}
+#heat[hidden]{display:none}
+.heathead{display:flex;justify-content:space-between;align-items:center;font-size:10px}
+#heatmap{position:relative;flex:1;min-height:0}
+.cell{position:absolute;box-sizing:border-box;border:1px solid #0b0e14;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;overflow:hidden;text-align:center;color:#fff;font-family:var(--pixel)}
+.cell span{font-size:9px}.cell small{font-size:7px;opacity:.85;padding:0 4px}
+.heatnote{margin:0;font-size:8px}
 @media (max-width:640px){.hud{font-size:8px;padding:4px 6px}}
 </style>
 </head>
 <body>
-<canvas id="cv" width="640" height="360" aria-label="Pixel building where the three trading agents work"></canvas>
+<canvas id="cv" width="800" height="450" aria-label="Pixel building where the three trading agents work"></canvas>
 <div class="hud" id="tl">…</div>
 <div class="hud" id="tr">…</div>
 <div class="hud" id="bl">
@@ -34,8 +41,14 @@ button:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-
   <button id="replay" aria-pressed="false">REPLAY</button>
   <select id="day" aria-label="Day to replay" hidden></select>
   <button id="speed" hidden>30×</button>
+  <button id="heatbtn" aria-pressed="false">HEATMAP</button>
 </div>
 <div class="hud" id="card" hidden></div>
+<div class="hud" id="heat" hidden>
+  <div class="heathead"><span>YOUR HOLDINGS TODAY</span><button id="heatclose" aria-label="Close">✕</button></div>
+  <div id="heatmap"></div>
+  <p class="dim heatnote">Size: money in each holding. Colour: today's move.</p>
+</div>
 
 <script>
 "use strict";
@@ -160,7 +173,7 @@ function plan(id, t) {
 }
 
 // ================================================================ drawing helpers
-const W = 640, H = 360;
+const W = 800, H = 450;
 const cv = document.getElementById("cv");
 const main = cv.getContext("2d");
 main.imageSmoothingEnabled = false;
@@ -235,119 +248,178 @@ function buildSprites() {
   }
 }
 
-// ================================================================ the building
-const FEET = [211, 305];
-const ELEV_X = 580, CAR = [171, 265];
+// ================================================================ the building: three floors and a lift
+// Floor 0 is the top floor (the agents' own rooms), 1 the trading room, 2 the ground floor.
+const FEET = [171, 299, 425];
+const CAR = FEET.map((f) => f - 40);
+const ELEV_X = 740;
 const SP = {
-  desk: { f: 0, x: 116, dir: 1, seat: true }, console: { f: 0, x: 282, dir: 1 }, stool: { f: 0, x: 244, dir: 1, seat: true },
-  armchair: { f: 0, x: 440, dir: 1, seat: true }, teletype: { f: 0, x: 510, dir: 1 },
-  term_claude: { f: 1, x: 176, dir: 1 }, term_news: { f: 1, x: 232, dir: 1 }, term_watch: { f: 1, x: 288, dir: 1 },
-  coffee_claude: { f: 1, x: 392, dir: 1 }, coffee_watch: { f: 1, x: 402, dir: 1 }, coffee_news: { f: 1, x: 412, dir: 1 },
-  arcade: { f: 1, x: 474, dir: 1 },
+  desk: { f: 0, x: 160, dir: 1, seat: true }, console: { f: 0, x: 358, dir: 1 }, stool: { f: 0, x: 300, dir: 1, seat: true },
+  armchair: { f: 0, x: 562, dir: 1, seat: true }, teletype: { f: 0, x: 654, dir: 1 },
+  term_claude: { f: 1, x: 540, dir: 1 }, term_news: { f: 1, x: 590, dir: 1 }, term_watch: { f: 1, x: 640, dir: 1 },
+  coffee_claude: { f: 2, x: 190, dir: 1 }, coffee_watch: { f: 2, x: 202, dir: 1 }, coffee_news: { f: 2, x: 214, dir: 1 },
+  arcade: { f: 2, x: 318, dir: 1 },
 };
 
 function skyOf(t) {
   const m = t.min;
-  if (m < 360 || m >= 1230) return { k: "night", bands: ["#070a1c", "#0b1026", "#101633", "#151c40", "#1b2350", "#22295c"], city: "#0e0c1e", far: "#151330", lit: 0.35 };
-  if (m < 450) return { k: "dawn", bands: ["#2a2f6e", "#4b3f86", "#7a4f8f", "#b5658a", "#e48a7c", "#f6b383"], city: "#2a2140", far: "#4a3a60", lit: 0.12 };
-  if (m >= 1110) return { k: "dusk", bands: ["#24306e", "#433f8a", "#7b4e92", "#c0628a", "#ec8a6e", "#f7b768"], city: "#251d3a", far: "#4a3660", lit: 0.2 };
-  return { k: "day", bands: ["#4a8fd8", "#5b9de0", "#6fabe6", "#86bbec", "#a0cbf0", "#bcdcf4"], city: "#5d6a92", far: "#8fa6cf", lit: 0 };
+  if (m < 360 || m >= 1230) return { k: "night", bands: ["#070a1c", "#0b1026", "#101633", "#151c40", "#1b2350", "#22295c"], city: "#0e0c1e", lit: 0.35 };
+  if (m < 450) return { k: "dawn", bands: ["#2a2f6e", "#4b3f86", "#7a4f8f", "#b5658a", "#e48a7c", "#f6b383"], city: "#2a2140", lit: 0.12 };
+  if (m >= 1110) return { k: "dusk", bands: ["#24306e", "#433f8a", "#7b4e92", "#c0628a", "#ec8a6e", "#f7b768"], city: "#251d3a", lit: 0.2 };
+  return { k: "day", bands: ["#4a8fd8", "#5b9de0", "#6fabe6", "#86bbec", "#a0cbf0", "#bcdcf4"], city: "#5d6a92", lit: 0 };
 }
 
 // --- minimal furniture: flat colours, thick outlines
 const ob = (x, y, w, h, fill) => { R(x, y, w, h, OUT); R(x + 2, y + 2, w - 4, h - 4, fill); };
-const shelf = (x, y, w, h, fill) => { ob(x, y, w, h, fill); R(x + 2, y + 2, w - 4, 2, mix(fill, 0.3)); };
 function winBox(x, y, w, h, sky) {
   ob(x, y, w, h, sky.bands[3]); R(x + 2, y + h - 2 - ((h - 4) >> 2), w - 4, (h - 4) >> 2, sky.city);
   R(x + (w >> 1) - 1, y, 2, h, OUT); R(x, y + (h >> 1) - 1, w, 2, OUT);
 }
-function plantMin(x, y) { ob(x, y - 10, 12, 10, "#c9744a"); for (const [lx, ly] of [[2, -20], [-2, -16], [6, -18], [4, -24]]) ob(x + lx, y + ly, 8, 8, "#5fae6a"); }
+function plantMin(x, y) { ob(x, y - 12, 14, 12, "#c9744a"); for (const [lx, ly] of [[2, -24], [-3, -19], [8, -21], [4, -29]]) ob(x + lx, y + ly, 9, 9, "#5fae6a"); }
+function room(x, y, w, h, wall, floorC) { ob(x, y, w, h, wall); R(x + 2, y + h - 14, w - 4, 12, floorC); R(x + 2, y + h - 14, w - 4, 2, mix(floorC, -0.25)); R(x + 2, y + 2, w - 4, 3, mix(wall, -0.12)); }
 
 const bg = document.createElement("canvas"); bg.width = W; bg.height = H;
 let bgKey = "";
 function drawBackground(t) {
   const sky = skyOf(t), night = sky.k === "night", dayish = sky.k === "day";
   g = bg.getContext("2d");
-  // sky and one flat skyline
-  sky.bands.forEach((c, i) => R(0, i * 22, W, 22, c)); R(0, 132, W, 200, sky.bands.at(-1));
-  if (!dayish) { const r = rng(4); for (let i = 0; i < 40; i++) R(r() * W, r() * 100, 2, 2, "#e8e4ff"); }
-  if (night) for (let y = -8; y <= 8; y++) for (let x = -8; x <= 8; x++) if (x * x + y * y <= 64 && (x - 5) * (x - 5) + (y + 2) * (y + 2) > 49) R(150 + x, 32 + y, 1, 1, "#f4efd8");
-  if (dayish) { for (let y = -9; y <= 9; y++) for (let x = -9; x <= 9; x++) if (x * x + y * y <= 81) R(150 + x, 34 + y, 1, 1, "#fff1b0"); for (const [cx, cy] of [[300, 40], [470, 24], [40, 60]]) { R(cx, cy, 34, 8, "#ffffff"); R(cx + 8, cy - 6, 16, 6, "#ffffff"); } }
+  sky.bands.forEach((c, i) => R(0, i * 9, W, 9, c)); R(0, 54, W, H, sky.bands.at(-1));
+  if (!dayish) { const r = rng(4); for (let i = 0; i < 30; i++) R(r() * W, r() * 40, 2, 2, "#e8e4ff"); }
+  if (night) for (let y = -7; y <= 7; y++) for (let x = -7; x <= 7; x++) if (x * x + y * y <= 49 && (x - 4) * (x - 4) + (y + 2) * (y + 2) > 36) R(120 + x, 22 + y, 1, 1, "#f4efd8");
+  if (dayish) { for (let y = -8; y <= 8; y++) for (let x = -8; x <= 8; x++) if (x * x + y * y <= 64) R(120 + x, 22 + y, 1, 1, "#fff1b0"); R(600, 14, 34, 8, "#ffffff"); R(608, 8, 16, 6, "#ffffff"); }
   const r = rng(23);
-  for (let x = -6; x < W; x += 24 + r() * 16) { const h = 90 + r() * 100, w = 26 + r() * 24; R(x, 318 - h, w, h, sky.city); if (sky.lit) for (let wy = 324 - h; wy < 314; wy += 10) for (let wx = x + 4; wx < x + w - 4; wx += 8) if (r() < sky.lit) R(wx, wy, 3, 4, "#f4d27a"); }
+  for (let x = -6; x < W; x += 30 + r() * 20) { const top = 8 + r() * 34, w = 26 + r() * 30; R(x, top, w, H, sky.city); if (sky.lit) for (let wy = top + 5; wy < 46; wy += 9) for (let wx = x + 4; wx < x + w - 4; wx += 8) if (r() < sky.lit) R(wx, wy, 3, 4, "#f4d27a"); }
   // street
-  R(0, 318, W, 10, "#a8a2b6"); R(0, 318, W, 2, OUT); R(0, 328, W, 32, "#3a3646"); for (let x = 6; x < W; x += 34) R(x, 343, 16, 2, "#d8d0a8");
-  for (const lx of [8, 626]) { R(lx, 266, 4, 52, OUT); ob(lx - 5, 258, 14, 8, sky.k === "day" ? "#c9c6d2" : "#ffe7a0"); }
+  R(0, 436, W, 6, "#a8a2b6"); R(0, 436, W, 2, OUT); R(0, 442, W, 8, "#3a3646");
 
-  // building: plain facade, bold outline, roof line, sign
-  ob(16, 112, 608, 208, "#d8cfc0");
-  R(12, 106, 616, 8, OUT); R(14, 108, 612, 4, "#a89c8a");
-  R(250, 90, 4, 18, OUT); R(386, 90, 4, 18, OUT); ob(240, 76, 160, 18, "#241f30");
-  R(596, 62, 4, 46, OUT); R(588, 76, 20, 3, OUT);
-  // rooms: each is its own box with a thick outline, a flat wall and a flat floor
-  const room = (x, y, w, h, wall, floorC) => { ob(x, y, w, h, wall); R(x + 2, y + h - 12, w - 4, 10, floorC); R(x + 2, y + h - 12, w - 4, 2, mix(floorC, -0.25)); R(x + 2, y + 2, w - 4, 3, mix(wall, -0.12)); };
-  room(24, 124, 196, 92, "#efe3cc", "#b98a5e");   // study
-  room(218, 124, 194, 92, "#d6e0e8", "#8f9aa8");  // control room
-  room(410, 124, 154, 92, "#f0dcdc", "#9a7aa0");  // newsroom
-  room(24, 222, 322, 90, "#dedcec", "#a8a4bc");   // trading room
-  room(344, 222, 220, 90, "#dcebdc", "#c09a6a");  // lounge
-  ob(562, 124, 56, 188, "#3a3448");               // lift shaft
-  R(574, 126, 2, 184, "#2a2438"); R(604, 126, 2, 184, "#2a2438");
-  // doorways between rooms (gaps in the shared wall)
-  for (const [x, fy] of [[218, 204], [410, 204], [344, 300]]) { R(x - 2, fy - 30, 6, 30, mix("#d8cfc0", -0.35)); R(x - 4, fy - 32, 10, 2, OUT); }
-  for (const fy of [204, 300]) { R(562, fy - 30, 4, 30, "#2a2438"); }
+  // building shell, roof, sign posts, antenna
+  ob(8, 50, 784, 388, "#d8cfc0");
+  R(4, 44, 792, 8, OUT); R(6, 46, 788, 4, "#a89c8a");
+  R(330, 30, 4, 16, OUT); R(466, 30, 4, 16, OUT); ob(300, 8, 200, 24, "#241f30");
+  R(762, 10, 4, 36, OUT); R(754, 20, 20, 3, OUT);
 
-  // ===== STUDY
-  shelf(30, 140, 40, 64, "#a0704a");
-  for (let s = 0; s < 3; s++) { R(32, 160 + s * 20, 36, 2, OUT); const cols = ["#e07a4a", "#3f8fe0", "#5fae6a", "#f2c14e", "#8a5cc8"]; for (let i = 0; i < 5; i++) R(34 + i * 7, 146 + s * 20, 5, 14 - (i % 2) * 3 + (i % 2) * 3, cols[(i + s) % 5]); }
-  winBox(84, 140, 36, 30, sky);
-  ob(150, 142, 26, 18, "#f2c14e"); R(154, 146, 18, 10, sky.bands[3]); R(154, 152, 18, 4, "#5fae6a");
-  R(176, 126, 2, 8, OUT); ob(170, 132, 14, 6, "#e07a4a");
-  ob(108, 172, 8, 26, "#4a4458"); ob(108, 196, 18, 6, "#4a4458"); R(116, 202, 2, 8, OUT);
-  ob(134, 196, 76, 6, "#c08a5a"); R(138, 202, 4, 10, OUT); R(202, 202, 4, 10, OUT); ob(176, 202, 26, 10, "#c08a5a");
-  ob(162, 172, 34, 22, "#2a2438"); R(177, 194, 6, 3, OUT);
-  ob(140, 180, 10, 6, "#f2c14e"); R(144, 186, 2, 10, OUT);
-  ob(198, 188, 8, 8, "#ffffff");
-  plantMin(84, 204);
+  // rooms
+  room(18, 58, 262, 120, "#efe3cc", "#b98a5e");   // study
+  room(278, 58, 262, 120, "#d6e0e8", "#8f9aa8");  // control room
+  room(538, 58, 184, 120, "#f0dcdc", "#9a7aa0");  // newsroom
+  room(18, 186, 704, 120, "#dedcec", "#a8a4bc");  // trading room
+  room(18, 314, 384, 118, "#dcebdc", "#c09a6a");  // lounge
+  room(400, 314, 322, 118, "#e8e2d4", "#9a948a");  // lobby
+  ob(720, 58, 64, 374, "#3a3448");                  // lift shaft
+  R(728, 60, 2, 370, "#2a2438"); R(774, 60, 2, 370, "#2a2438");
+  for (const [x, fy] of [[278, 164], [538, 164], [400, 418]]) { R(x - 2, fy - 34, 6, 34, mix("#d8cfc0", -0.35)); R(x - 4, fy - 36, 10, 2, OUT); }
+  for (const fy of [164, 292, 418]) R(720, fy - 34, 4, 34, "#2a2438");
+  // slabs between floors
+  for (const y of [178, 306]) { R(10, y, 780, 8, "#a89c8a"); R(10, y, 780, 2, OUT); R(10, y + 6, 780, 2, OUT); }
 
-  // ===== CONTROL ROOM
-  for (let i = 0; i < 6; i++) { const mx = 236 + (i % 3) * 54, my = 139 + Math.floor(i / 3) * 27; ob(mx, my, 50, 25, "#0e1620"); }
-  ob(388, 146, 20, 58, "#3a4252"); for (let y = 152; y < 200; y += 8) R(390, y, 16, 2, OUT);
-  ob(300, 196, 82, 16, "#8f9aa8"); R(302, 198, 78, 2, "#b8c2cc");
-  ob(244, 198, 18, 4, "#3f8fe0"); R(252, 202, 2, 8, OUT); R(246, 208, 14, 2, OUT);
-  ob(226, 186, 8, 18, "#e05a4a");
-  R(330, 126, 8, 4, OUT);
+  // ===== STUDY (Claude)
+  ob(30, 82, 54, 82, "#a0704a");
+  const cols = ["#e07a4a", "#3f8fe0", "#5fae6a", "#f2c14e", "#8a5cc8"];
+  for (let s = 0; s < 3; s++) { R(32, 110 + s * 26, 50, 2, OUT); for (let i = 0; i < 6; i++) R(35 + i * 8, 92 + s * 26 - (i % 3), 6, 18 + (i % 3), cols[(i + s) % 5]); }
+  winBox(98, 78, 50, 40, sky);
+  plantMin(110, 164);
+  ob(196, 80, 36, 26, "#f2c14e"); R(200, 84, 28, 18, sky.bands[3]); R(200, 94, 28, 8, "#5fae6a");
+  R(240, 60, 2, 10, OUT); ob(232, 70, 18, 8, "#e07a4a");
+  ob(150, 120, 10, 42, "#4a4458"); ob(150, 150, 26, 6, "#4a4458"); R(162, 156, 2, 8, OUT); R(154, 162, 18, 2, OUT);
+  ob(178, 148, 96, 7, "#c08a5a"); R(182, 155, 4, 10, OUT); R(266, 155, 4, 10, OUT); ob(228, 155, 34, 11, "#c08a5a"); R(242, 159, 6, 2, OUT);
+  ob(206, 112, 44, 32, "#2a2438"); R(225, 144, 6, 4, OUT); R(218, 146, 20, 2, OUT);
+  ob(184, 124, 14, 7, "#f2c14e"); R(190, 131, 2, 17, OUT);
+  ob(256, 136, 10, 12, "#ffffff");
 
-  // ===== NEWSROOM
-  winBox(422, 140, 32, 28, sky); for (let y = 144; y < 156; y += 4) R(424, y, 28, 2, "#f4ecd8");
-  ob(462, 138, 44, 32, "#d8a86a");
-  const rn = rng(9); for (let i = 0; i < 5; i++) { const px = 466 + ((rn() * 28) | 0), py = 142 + ((rn() * 16) | 0); ob(px, py, 10, 8, "#ffffff"); R(px + 4, py, 2, 2, "#e05a4a"); }
-  ob(512, 136, 46, 30, "#16131f"); R(533, 166, 4, 4, OUT);
-  ob(430, 176, 12, 32, "#8a5cc8"); ob(436, 196, 32, 12, "#8a5cc8"); ob(460, 190, 8, 12, "#6e46a6");
-  ob(486, 192, 18, 4, "#c08a5a"); R(489, 196, 2, 14, OUT); R(499, 196, 2, 14, OUT); ob(488, 184, 14, 8, "#e05a4a");
-  ob(528, 186, 32, 26, "#9aa0ae"); R(532, 192, 24, 4, OUT);
-  for (let i = 0; i < 3; i++) ob(416, 196 - i * 6, 14, 8, "#f4ecd8");
+  // ===== CONTROL ROOM (Watcher)
+  for (let i = 0; i < 6; i++) { const mx = 300 + (i % 3) * 70, my = 70 + Math.floor(i / 3) * 34; ob(mx, my, 66, 32, "#0e1620"); }
+  ob(512, 88, 22, 76, "#3a4252"); for (let y = 94; y < 160; y += 8) R(514, y, 18, 2, OUT);
+  ob(378, 146, 112, 18, "#8f9aa8"); R(380, 148, 108, 2, "#b8c2cc");
+  ob(298, 148, 24, 5, "#3f8fe0"); R(309, 153, 2, 10, OUT); R(302, 162, 16, 2, OUT);
+  ob(284, 138, 9, 24, "#e05a4a");
+  R(408, 60, 10, 5, OUT);
+
+  // ===== NEWSROOM (News Hunter)
+  winBox(548, 76, 42, 36, sky); for (let y = 80; y < 94; y += 4) R(550, y, 38, 2, "#f4ecd8");
+  ob(600, 74, 56, 40, "#d8a86a");
+  const rn = rng(9); for (let i = 0; i < 6; i++) { const px = 604 + ((rn() * 38) | 0), py = 78 + ((rn() * 24) | 0); ob(px, py, 12, 10, "#ffffff"); R(px + 5, py, 2, 2, "#e05a4a"); }
+  ob(664, 72, 52, 40, "#16131f"); R(688, 112, 4, 6, OUT);
+  ob(550, 122, 14, 42, "#8a5cc8"); ob(556, 146, 42, 18, "#8a5cc8"); ob(590, 138, 10, 16, "#6e46a6");
+  ob(608, 140, 20, 4, "#c08a5a"); R(611, 144, 2, 20, OUT); R(623, 144, 2, 20, OUT); ob(610, 130, 16, 10, "#e05a4a");
+  ob(676, 134, 38, 30, "#9aa0ae"); R(680, 140, 30, 4, OUT);
 
   // ===== TRADING ROOM
-  ob(34, 229, 302, 20, "#050608");
-  ob(34, 253, 114, 44, "#0e1620");
-  R(160, 276, 6, 22, OUT); ob(154, 294, 18, 6, "#c9a64a");
-  for (const kx of [196, 252, 308]) { ob(kx + 6, 278, 10, 22, "#4a5068"); ob(kx, 256, 22, 24, "#4a5068"); R(kx + 2, 258, 18, 13, "#0b141c"); }
-  plantMin(330, 300);
+  ob(30, 196, 680, 22, "#050608");
+  ob(30, 226, 180, 62, "#0e1620");
+  ob(220, 224, 290, 66, "#0e1620");
+  R(524, 266, 6, 26, OUT); ob(518, 288, 18, 6, "#c9a64a");
+  for (const kx of [560, 610, 660]) { ob(kx + 7, 262, 10, 30, "#4a5068"); ob(kx, 234, 24, 30, "#4a5068"); R(kx + 2, 236, 20, 16, "#0b141c"); }
+  plantMin(696, 292);
 
   // ===== LOUNGE
-  ob(372, 230, 42, 26, "#241f30"); txt("BEAT THE", 377, 236, "#f2c14e"); txt("S&P 500", 379, 244, "#ef6f6c");
-  ob(354, 270, 66, 14, "#3fa3a8"); ob(352, 280, 70, 20, "#3fa3a8"); R(354, 282, 66, 3, "#6ac2c6");
-  ob(430, 274, 48, 26, "#c08a5a"); R(432, 276, 44, 2, "#e0b88a");
-  ob(434, 256, 18, 20, "#3a3646"); R(440, 268, 6, 6, "#ffffff");
-  ob(458, 266, 8, 10, "#ffffff"); ob(466, 266, 8, 10, "#e07a4a");
-  ob(494, 240, 26, 60, "#8a5cc8"); R(496, 242, 22, 6, "#f2c14e"); txt("ZAP", 501, 243, "#5e3a96"); ob(496, 249, 22, 18, "#0b0b16"); ob(494, 268, 26, 8, "#5e3a96");
-  ob(528, 262, 28, 38, "#f4f6fa"); R(530, 278, 24, 2, OUT); R(550, 266, 2, 8, OUT); R(550, 284, 2, 10, OUT);
-  winBox(528, 232, 28, 22, sky);
+  ob(50, 328, 70, 36, "#241f30"); txt("BEAT THE", 70, 336, "#f2c14e"); txt("S&P 500", 72, 346, "#ef6f6c");
+  winBox(140, 330, 40, 34, sky);
+  ob(34, 376, 110, 18, "#3fa3a8"); ob(30, 390, 118, 30, "#3fa3a8"); R(32, 392, 114, 3, "#6ac2c6");
+  R(232, 346, 70, 3, OUT); for (let i = 0; i < 4; i++) ob(236 + i * 16, 336, 10, 10, cols[i]);
+  ob(230, 386, 74, 34, "#c08a5a"); R(232, 388, 70, 2, "#e0b88a");
+  ob(236, 356, 26, 30, "#3a3646"); R(244, 372, 8, 8, "#ffffff");
+  ob(268, 374, 10, 12, "#ffffff"); ob(282, 374, 10, 12, "#e07a4a");
+  ob(340, 340, 36, 80, "#8a5cc8"); R(342, 342, 32, 8, "#f2c14e"); txt("ZAP", 353, 344, "#5e3a96"); ob(344, 352, 28, 24, "#0b0b16"); ob(340, 378, 36, 10, "#5e3a96");
+  plantMin(380, 418);
 
-  if (night) { g.fillStyle = "rgba(8,6,30,.5)"; g.fillRect(16, 112, 608, 208); }
-  else if (!dayish) { g.fillStyle = "rgba(20,12,40,.2)"; g.fillRect(16, 112, 608, 208); }
+  // ===== LOBBY
+  ob(414, 346, 58, 72, "#9ad0e8"); R(441, 346, 4, 72, OUT); R(434, 380, 4, 8, OUT); R(448, 380, 4, 8, OUT); R(420, 352, 2, 20, "#ffffff88"); R(452, 352, 2, 20, "#ffffff88");
+  ob(408, 340, 70, 8, "#6a6476"); R(410, 416, 66, 2, "#8a3b3b");
+  ob(500, 326, 150, 22, "#241f30"); txt("LARP CAPITAL", 575 - tw("LARP CAPITAL", 2) / 2, 332, "#f2c14e", 2);
+  ob(520, 382, 112, 36, "#c08a5a"); R(522, 384, 108, 3, "#e0b88a"); ob(560, 368, 24, 14, "#2a2438");
+  plantMin(494, 418); plantMin(650, 418);
+  R(670, 356, 44, 2, OUT); ob(670, 400, 44, 8, "#4a4458"); R(674, 408, 2, 10, OUT); R(708, 408, 2, 10, OUT);
+
+  if (night) { g.fillStyle = "rgba(8,6,30,.5)"; g.fillRect(8, 50, 784, 388); }
+  else if (!dayish) { g.fillStyle = "rgba(20,12,40,.2)"; g.fillRect(8, 50, 784, 388); }
   g = main;
+}
+
+// ================================================================ heatmap of the holdings (squarified treemap)
+function heatColor(p) {
+  const stops = [[-3, "#f04a4f"], [-2, "#c23b42"], [-1, "#8b2f36"], [0, "#41444f"], [1, "#1e7a46"], [2, "#22a35a"], [3, "#3fd06e"]];
+  const v = Math.max(-3, Math.min(3, p));
+  for (let i = 1; i < stops.length; i++) if (v <= stops[i][0]) {
+    const [a, ca] = stops[i - 1], [b, cb] = stops[i], f = (v - a) / (b - a);
+    const A = [1, 3, 5].map((k) => parseInt(ca.slice(k, k + 2), 16)), B = [1, 3, 5].map((k) => parseInt(cb.slice(k, k + 2), 16));
+    return "#" + A.map((x, k) => Math.round(x + (B[k] - x) * f).toString(16).padStart(2, "0")).join("");
+  }
+  return stops.at(-1)[1];
+}
+function squarify(items, x, y, w, h) {
+  const total = items.reduce((s, i) => s + i.v, 0);
+  if (!total) return [];
+  const scale = (w * h) / total, out = [];
+  let rest = items.slice().sort((a, b) => b.v - a.v);
+  const worst = (row, side) => { const s = row.reduce((a, i) => a + i.v * scale, 0); let mx = 0, mn = Infinity; for (const i of row) { const a = i.v * scale; mx = Math.max(mx, a); mn = Math.min(mn, a); } return Math.max((side * side * mx) / (s * s), (s * s) / (side * side * mn)); };
+  while (rest.length) {
+    const side = Math.min(w, h);
+    let row = [rest[0]], best = worst(row, side);
+    for (let k = 1; k < rest.length; k++) { const c = row.concat(rest[k]), wv = worst(c, side); if (wv <= best) { row = c; best = wv; } else break; }
+    const sum = row.reduce((a, i) => a + i.v * scale, 0), thick = sum / side;
+    let off = 0;
+    for (const it of row) { const len = (it.v * scale) / thick; out.push(w >= h ? { ...it, x, y: y + off, w: thick, h: len } : { ...it, x: x + off, y, w: len, h: thick }); off += len; }
+    if (w >= h) { x += thick; w -= thick; } else { y += thick; h -= thick; }
+    rest = rest.slice(row.length);
+  }
+  return out;
+}
+function heatItems() {
+  return (D.status.positions || []).filter((p) => p.market_value > 0).map((p) => {
+    const base = p.market_value - (p.change_today_usd || 0);
+    return { s: p.symbol, name: p.name || "", v: p.market_value, today: base ? ((p.change_today_usd || 0) / base) * 100 : 0, total: (p.unrealized_plpc || 0) * 100, w8: p.weight };
+  });
+}
+function drawHeatmap(x, y, w, h, open) {
+  const items = heatItems();
+  if (!items.length) { txt("NO HOLDINGS", x + w / 2 - 20, y + h / 2 - 2, "#4a5568"); return; }
+  for (const c of squarify(items, x, y, w, h)) {
+    const rx = Math.round(c.x), ry = Math.round(c.y), rw = Math.round(c.x + c.w) - rx, rh = Math.round(c.y + c.h) - ry;
+    R(rx, ry, rw, rh, "#0b0e14"); R(rx + 1, ry + 1, rw - 2, rh - 2, open ? heatColor(c.today) : mix(heatColor(c.today), -0.35));
+    const p = (c.today >= 0 ? "+" : "") + c.today.toFixed(1) + "%";
+    if (rw >= tw(c.s) + 4 && rh >= 16) { txt(c.s, rx + (rw - tw(c.s)) / 2, ry + rh / 2 - 6, "#ffffff"); if (rw >= tw(p) + 4) txt(p, rx + (rw - tw(p)) / 2, ry + rh / 2 + 1, "#e8e4f0"); }
+    else if (rw >= tw(c.s) + 2 && rh >= 8) txt(c.s, rx + (rw - tw(c.s)) / 2, ry + (rh - 5) / 2, "#ffffff");
+  }
 }
 
 // ================================================================ agents: walking, the lift, poses
@@ -360,7 +432,7 @@ function route(a) {
 function place(a) { const s = SP[a.want]; a.floor = s.f; a.x = s.x; a.y = FEET[s.f]; a.dir = s.dir; a.phase = "idle"; a.at = a.want; }
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 function stepAgent(a) {
-  const speed = V.mode === "live" ? 0.75 : 1.5;
+  const speed = V.mode === "live" ? 0.8 : 1.6;
   if (a.phase === "idle" && a.at !== a.want) route(a);
   if (a.phase === "walk" || a.phase === "toLift") {
     if (a.phase === "walk" && SP[a.want].f !== a.floor) route(a);
@@ -374,8 +446,9 @@ function stepAgent(a) {
   }
 }
 function stepLift() {
-  const sp = V.mode === "live" ? 1 : 2;
+  const sp = V.mode === "live" ? 1.2 : 2.4;
   if (lift.rider) {
+    lift.dest = SP[lift.rider.want].f;
     const ty = CAR[lift.dest], d = ty - lift.y;
     if (Math.abs(d) <= sp) {
       lift.y = ty; const a = lift.rider; lift.rider = null;
@@ -386,7 +459,7 @@ function stepLift() {
   const next = lift.queue[0];
   if (!next) return;
   const ty = CAR[next.floor], d = ty - lift.y;
-  if (Math.abs(d) <= sp) { lift.y = ty; lift.queue.shift(); lift.rider = next; next.phase = "ride"; lift.dest = 1 - next.floor; next.x = ELEV_X; }
+  if (Math.abs(d) <= sp) { lift.y = ty; lift.queue.shift(); lift.rider = next; next.phase = "ride"; next.x = ELEV_X; lift.dest = SP[next.want].f; }
   else lift.y += Math.sign(d) * sp;
 }
 function think(instant) {
@@ -411,12 +484,6 @@ function frameOf(a) {
 
 // ================================================================ things that move every frame
 let T = 0;
-function holdings() {
-  return (D.status.positions || []).map((p) => {
-    const base = p.market_value - (p.change_today_usd || 0);
-    return { s: p.symbol, today: base ? (p.change_today_usd || 0) / base * 100 : 0, total: (p.unrealized_plpc || 0) * 100 };
-  });
-}
 function dayPoints(date) {
   const out = [];
   for (const p of D.intraday.points || []) { if (p[1] == null || p[2] == null) continue; const n = ny(Date.parse(p[0])); if (n.date === date) out.push([n.min, p[1], p[2]]); }
@@ -426,72 +493,65 @@ let ptsCache = { key: "", pts: [] };
 function live(t) {
   const sky = skyOf(t), night = sky.k === "night", open = isOpen(t);
   const A = agents;
-  // roof sign
+  // roof sign and antenna light
   const flick = night && hash(String((T / 9) | 0)) % 23 === 0;
-  if (!flick) { const s = "LARP CAPITAL", c = sky.k === "day" ? "#c99a2e" : "#f2c14e"; txt(s, 320 - tw(s, 2) / 2, 82, c, 2); if (!dayish(sky)) glow(320, 87, 90, "242,193,78", 0.12); }
-  if (((T / 40) | 0) % 2) { R(597, 62, 4, 3, "#ef4f4f"); if (night) glow(599, 63, 8, "239,79,79", 0.5); }
-
-  // lamps at night
-  if (night) {
-    glow(176, 136, 40, "255,226,150", 0.22); glow(148, 178, 26, "255,226,150", 0.3);
-    for (const lx of [10, 628]) glow(lx + 1, 264, 30, "255,231,160", 0.25);
-  }
+  if (!flick) { const s = "LARP CAPITAL"; txt(s, 400 - tw(s, 2) / 2, 15, sky.k === "day" ? "#e0b040" : "#f2c14e", 2); if (sky.k !== "day") glow(400, 20, 110, "242,193,78", 0.12); }
+  if (((T / 40) | 0) % 2) { R(762, 8, 4, 3, "#ef4f4f"); if (night) glow(764, 9, 8, "239,79,79", 0.5); }
+  if (night) { glow(241, 76, 44, "255,226,150", 0.22); glow(191, 128, 28, "255,226,150", 0.3); glow(575, 360, 70, "255,226,150", 0.12); }
 
   // Claude's monitor
   const c = A.claude, atDesk = c.phase === "idle" && c.at === "desk";
+  R(208, 114, 40, 28, "#0e1620");
   if (atDesk && c.plan.act !== "sleep") {
-    R(164, 174, 30, 18, "#0f1c2a"); R(164, 174, 30, 3, "#2a3a5a");
-    for (let i = 0; i < 5; i++) { const w = c.plan.act === "type" ? ((T / 6 + i * 5) | 0) % 24 + 3 : 8 + (i * 7) % 16; R(166, 179 + i * 3, w, 1, i % 2 ? "#6fd08c" : "#7fb8ff"); }
-    if (night) glow(178, 183, 20, "127,184,255", 0.18);
-  } else if (((T / 50) | 0) % 2) R(191, 190, 1, 1, "#6fd08c");
+    R(208, 114, 40, 4, "#2a3a5a");
+    for (let i = 0; i < 6; i++) { const w = c.plan.act === "type" ? ((T / 6 + i * 5) | 0) % 32 + 4 : 10 + (i * 7) % 22; R(211, 120 + i * 3, w, 2, i % 2 ? "#6fd08c" : "#7fb8ff"); }
+    if (night) glow(228, 128, 24, "127,184,255", 0.18);
+  } else if (((T / 50) | 0) % 2) R(244, 138, 2, 2, "#6fd08c");
 
-  // Watcher's wall of screens: each shows one holding and how it moves today
-  const hs = holdings(), page = Math.floor(T / 300);
+  // Watcher's wall: six holdings and how they move today
+  const hs = heatItems(), page = Math.floor(T / 300);
   for (let i = 0; i < 6; i++) {
-    const mx = 238 + (i % 3) * 54, my = 141 + Math.floor(i / 3) * 27;
+    const mx = 302 + (i % 3) * 70, my = 72 + Math.floor(i / 3) * 34;
     const h = hs.length ? hs[(page * 6 + i) % hs.length] : null;
     if (!h || (!open && i % 2)) { R(mx + 2, my + 2, 2, 2, "#1d2633"); continue; }
-    const col = h.today >= 0 ? "#6fd08c" : "#ef6f6c";
-    R(mx, my, 46, 21, "#0c1824");
-    txt(h.s, mx + 2, my + 2, "#c9d6e6");
-    const lbl = (h.today >= 0 ? "+" : "") + h.today.toFixed(1) + "%";
-    txt(lbl, mx + 45 - tw(lbl), my + 2, col);
+    const col = h.today >= 0 ? "#6fd08c" : "#ef6f6c", lbl = (h.today >= 0 ? "+" : "") + h.today.toFixed(1) + "%";
+    txt(h.s, mx + 3, my + 3, "#c9d6e6"); txt(lbl, mx + 59 - tw(lbl), my + 3, col);
     const r = rng(hash(h.s + t.date)), tilt = Math.max(-1, Math.min(1, h.today / 2));
-    let y = 0, px = mx + 2, py = my + 15;
-    for (let k = 0; k < 42; k++) { y += (r() - 0.5) * 1.6 - tilt * 0.12; y = Math.max(-5, Math.min(4, y)); const yy = my + 15 + y; line(px, py, mx + 2 + k, yy, col); px = mx + 2 + k; py = yy; }
-    if (night) glow(mx + 23, my + 11, 22, h.today >= 0 ? "111,208,140" : "239,111,108", 0.08);
+    let y = 0, px = mx + 3, py = my + 18;
+    for (let k = 0; k < 56; k++) { y += (r() - 0.5) * 1.8 - tilt * 0.1; y = Math.max(-7, Math.min(7, y)); const yy = my + 18 + y; line(px, py, mx + 3 + k, yy, col); px = mx + 3 + k; py = yy; }
+    if (night) glow(mx + 31, my + 14, 26, h.today >= 0 ? "111,208,140" : "239,111,108", 0.08);
   }
-  for (let y = 150, i = 0; y < 200; y += 6, i++) { R(400, y + 2, 2, 1, ((T / 10 + i * 7) | 0) % 5 ? "#6fd08c" : "#1b2029"); R(403, y + 2, 2, 1, ((T / 13 + i * 3) | 0) % 3 ? "#f2c14e" : "#1b2029"); }
-  for (let i = 0; i < 6; i++) R(350 + i * 5, 198, 2, 1, open && ((T / 20 + i * 3) | 0) % 4 ? ["#6fd08c", "#f2c14e", "#ef6f6c", "#7fb8ff"][i % 4] : "#2a323c");
-  const siren = A.watch.plan.stop, on = siren && ((T / 8) | 0) % 2;
-  R(331, 129, 6, 3, on ? "#ff3b3b" : "#7a2a2a");
-  if (on) { g.fillStyle = "rgba(255,40,40,.12)"; g.fillRect(222, 126, 188, 88); }
+  for (let y = 94, i = 0; y < 160; y += 8, i++) { R(526, y + 3, 3, 1, ((T / 10 + i * 7) | 0) % 5 ? "#6fd08c" : "#1b2029"); R(521, y + 3, 3, 1, ((T / 13 + i * 3) | 0) % 3 ? "#f2c14e" : "#1b2029"); }
+  for (let i = 0; i < 8; i++) R(440 + i * 6, 152, 3, 2, open && ((T / 20 + i * 3) | 0) % 4 ? ["#6fd08c", "#f2c14e", "#ef6f6c", "#7fb8ff"][i % 4] : "#5a6470");
+  const on = A.watch.plan.stop && ((T / 8) | 0) % 2;
+  R(410, 62, 6, 3, on ? "#ff3b3b" : "#7a2a2a");
+  if (on) { g.fillStyle = "rgba(255,40,40,.12)"; g.fillRect(280, 60, 258, 116); }
 
-  // Newsroom TV: the latest news line scrolls by
-  const lastNews = lastEvent("news", t, false);
-  const head = (lastNews && (lastNews.summary || lastNews.full)) || "MARKETS TODAY";
+  // Newsroom TV with the latest News Hunter line
+  const lastNews = lastEvent("news", t, false), head = (lastNews && (lastNews.summary || lastNews.full)) || "MARKETS TODAY";
+  R(666, 74, 48, 36, "#0b0b12");
   if (open || !night) {
-    R(514, 138, 42, 26, "#16203a"); R(514, 138, 42, 6, "#c73b3b"); txt("NEWS", 516, 139, "#f4ecd8");
-    R(517, 147, 9, 9, "#e8b48c"); R(516, 146, 11, 3, "#26262f"); R(518, 156, 7, 2, "#3567a3"); R(529, 148, 22, 2, "#7fb8ff"); R(529, 152, 16, 2, "#7fb8ff");
-    R(514, 158, 42, 6, "#f2c14e");
-    g.save(); g.beginPath(); g.rect(514, 158, 42, 6); g.clip();
+    R(666, 74, 48, 36, "#16203a"); R(666, 74, 48, 8, "#c73b3b"); txt("NEWS", 669, 76, "#f4ecd8");
+    R(670, 86, 10, 10, "#ffffff"); R(670, 86, 10, 2, OUT); R(672, 89, 1, 2, OUT); R(677, 89, 1, 2, OUT); R(684, 87, 24, 2, "#7fb8ff"); R(684, 92, 18, 2, "#7fb8ff");
+    R(666, 101, 48, 8, "#f2c14e");
+    g.save(); g.beginPath(); g.rect(666, 101, 48, 8); g.clip();
     const s = head.toUpperCase().replace(/[^A-Z0-9 .,%$&!?'()/+-]/g, ""), len = tw(s) + 50;
-    txt(s, 556 - ((T / 2) % len), 159, OUT); g.restore();
-    if (night) glow(535, 151, 26, "127,160,255", 0.12);
+    txt(s, 714 - ((T / 2) % len), 103, OUT); g.restore();
+    if (night) glow(690, 92, 30, "127,160,255", 0.12);
   }
   const n = A.news;
-  if (n.phase === "idle" && n.at === "teletype") { const p = (T / 3) % 16; R(539, 184 - p, 10, p + 1, "#f4ecd8"); for (let i = 1; i < p; i += 3) R(540, 184 - i, 7, 1, "#8a8496"); }
+  if (n.phase === "idle" && n.at === "teletype") { const p = (T / 3) % 18; R(686, 132 - p, 14, p + 2, "#ffffff"); for (let i = 1; i < p; i += 3) R(688, 132 - i, 10, 1, "#8a8496"); }
   if (n.phase === "idle" && n.at === "armchair") {
-    if (n.plan.act === "sleep") { R(447, 196, 14, 4, "#f4ecd8"); R(448, 197, 10, 1, "#8a8496"); }
-    else { const up = (T % 400) > 320 ? 4 : 0; box(456, 177 + up, 16, 18, "#f4ecd8", "#8a8496"); R(458, 179 + up, 12, 2, OUT); for (let i = 0; i < 5; i++) R(458, 183 + up + i * 2, i % 2 ? 6 : 12, 1, "#8a8496"); R(464, 177 + up, 1, 18, "#d8d0bc"); }
+    if (n.plan.act === "sleep") ob(570, 152, 20, 6, "#ffffff");
+    else { const up = (T % 400) > 320 ? 4 : 0; ob(580, 124 + up, 22, 24, "#ffffff"); R(584, 128 + up, 14, 2, OUT); for (let i = 0; i < 5; i++) R(584, 133 + up + i * 3, i % 2 ? 8 : 14, 1, "#8a8496"); }
   }
 
-  // Trading room: ticker, chart, terminals, bell, coins
+  // Trading room: ticker, chart, heatmap, terminals, bell, coins
   const trades = AG.filter((id) => A[id].phase === "idle" && A[id].at === "term_" + id);
   let tick = hs.map((h) => `${h.s} ${h.today >= 0 ? "+" : ""}${h.today.toFixed(1)}%`).join("   ");
   if (trades.length) tick = trades.map((id) => `${NAME[id]}: ${A[id].plan.say}`).join("   ") + "   " + tick;
-  g.save(); g.beginPath(); g.rect(36, 231, 298, 16); g.clip();
-  if (tick) { const len = tw(tick) + 80, off = (T * 0.6) % len; for (let rep = 0; rep < 2; rep++) drawTicker(tick, 334 - off + rep * len, 236, hs); }
+  g.save(); g.beginPath(); g.rect(32, 198, 676, 18); g.clip();
+  if (tick) { const len = tw(tick, 2) + 120, off = (T * 0.7) % len; for (let rep = 0; rep < 2; rep++) drawTicker(tick, 708 - off + rep * len, 202, hs); }
   g.restore();
   const key = t.date + "|" + (D.intraday.points || []).length;
   if (ptsCache.key !== key) ptsCache = { key, pts: dayPoints(t.date) };
@@ -500,47 +560,52 @@ function live(t) {
     const a0 = pts[0][1], s0 = pts[0][2], ai = pts.map((p) => (p[1] / a0 - 1) * 100), sp = pts.map((p) => (p[2] / s0 - 1) * 100);
     const lo = Math.min(...ai, ...sp, -0.3), hi = Math.max(...ai, ...sp, 0.3);
     const m0 = pts[0][0], span = Math.max(pts.at(-1)[0] - m0 + 20, 60);
-    const px = (m) => 40 + 102 * (m - m0) / span, py = (v) => 292 - (v - lo) / (hi - lo) * 28;
-    for (let gx = 40; gx < 144; gx += 10) R(gx, 266, 1, 27, "#122230");
-    R(38, py(0), 106, 1, "#1d3a4d");
-    for (const [arr, col] of [[sp, "#ef6f6c"], [ai, "#6fd08c"]]) for (let i = 1; i < pts.length; i++) line(px(pts[i - 1][0]), py(arr[i - 1]), px(pts[i][0]), py(arr[i]), col);
+    const px = (m) => 36 + 168 * (m - m0) / span, py = (v) => 282 - (v - lo) / (hi - lo) * 42;
+    for (let gx = 36; gx < 206; gx += 14) R(gx, 240, 1, 44, "#122230");
+    R(34, py(0), 174, 1, "#1d3a4d");
+    for (const [arr, col] of [[sp, "#ef6f6c"], [ai, "#6fd08c"]]) for (let i = 1; i < pts.length; i++) { line(px(pts[i - 1][0]), py(arr[i - 1]), px(pts[i][0]), py(arr[i]), col); line(px(pts[i - 1][0]), py(arr[i - 1]) + 1, px(pts[i][0]), py(arr[i]) + 1, col); }
     const fa = ai.at(-1), fs = sp.at(-1), f = (v) => (v >= 0 ? "+" : "") + v.toFixed(1) + "%";
-    txt("AI " + f(fa), 40, 258, fa >= fs ? "#6fd08c" : "#ef6f6c"); txt("S&P " + f(fs), 90, 258, "#c9c0d8");
-  } else txt(open ? "LOADING" : "CLOSED", open ? 76 : 78, 272, "#4a5568");
+    txt("AI " + f(fa), 36, 230, fa >= fs ? "#6fd08c" : "#ef6f6c"); txt("S&P " + f(fs), 96, 230, "#c9c0d8");
+  } else txt(open ? "LOADING" : "CLOSED", 106, 254, "#4a5568");
+  drawHeatmap(222, 226, 286, 62, open || V.mode === "replay");
   const ring = trades.length && ((T / 6) | 0) % 2;
-  R(158 + (ring ? 1 : 0), 268, 10, 6, "#e0b04a"); R(160 + (ring ? 1 : 0), 266, 6, 2, "#c9a64a"); R(162 + (ring ? 1 : 0), 264, 2, 2, "#8a6a2a"); R(156, 274, 14, 2, "#c9a64a");
-  [196, 252, 308].forEach((kx, i) => {
+  ob(516 + (ring ? 2 : 0), 252, 20, 14, "#e0b04a"); R(523 + (ring ? 2 : 0), 248, 6, 4, OUT);
+  [560, 610, 660].forEach((kx, i) => {
     const id = ["claude", "news", "watch"][i], busy = trades.includes(id);
-    R(kx + 2, 258, 18, 13, busy ? "#0f2418" : "#0b141c");
-    if (busy) { const p = A[id].plan; if (((T / 10) | 0) % 2) txt(p.side, kx + 11 - tw(p.side) / 2, 262, p.side === "BUY" ? "#6fd08c" : "#ef6f6c"); }
-    else { R(kx + 4, 261, 8, 1, "#2f6b45"); R(kx + 4, 264, 5, 1, "#2f6b45"); }
+    R(kx + 2, 236, 20, 16, busy ? "#0f2418" : "#0b141c");
+    if (busy) { const p = A[id].plan; if (((T / 10) | 0) % 2) txt(p.side, kx + 12 - tw(p.side) / 2, 241, p.side === "BUY" ? "#6fd08c" : "#ef6f6c"); }
+    else { R(kx + 5, 240, 10, 1, "#2f6b45"); R(kx + 5, 244, 6, 1, "#2f6b45"); }
   });
-  for (const id of trades) { const kx = { claude: 196, news: 252, watch: 308 }[id]; for (let k = 0; k < 6; k++) { const ph = (T * 0.8 + k * 11) % 40; R(kx + 3 + ((k * 5) % 16), 256 - ph, 2, 2, ph < 30 ? "#f2c14e" : "#b8923a"); } }
+  for (const id of trades) { const kx = { claude: 560, news: 610, watch: 660 }[id]; for (let k = 0; k < 6; k++) { const ph = (T * 0.8 + k * 11) % 44; R(kx + 3 + ((k * 5) % 18), 232 - ph, 3, 3, ph < 32 ? "#f2c14e" : "#b8923a"); } }
 
-  // Lounge: steam, arcade, ceiling fan
-  if (AG.some((id) => A[id].phase === "idle" && A[id].at === "coffee_" + id)) for (let k = 0; k < 3; k++) R(441 + k * 2, 266 - ((T / 9 + k * 3) % 8), 1, 2, "#d8d0bc");
+  // Lounge and lobby: steam, arcade, ceiling fan, clock
+  if (AG.some((id) => A[id].phase === "idle" && A[id].at === "coffee_" + id)) for (let k = 0; k < 3; k++) R(246 + k * 3, 366 - ((T / 9 + k * 3) % 10), 2, 3, "#ffffff");
   const playing = A.watch.phase === "idle" && A.watch.at === "arcade";
-  R(498, 251, 18, 14, playing ? "#101028" : "#0b0b16");
-  if (playing) { R(500 + ((T / 4) | 0) % 14, 258, 2, 2, "#6fd08c"); R(506, 253 + ((T / 9) | 0) % 9, 2, 2, "#ef6f6c"); R(500, 263, 14, 1, "#7fb8ff"); if (night) glow(507, 258, 18, "127,184,255", 0.2); }
-  else if (((T / 60) | 0) % 2) txt("ZAP", 502, 255, "#3a2a5a");
-  R(455, 224, 1, 5, OUT); R(452, 229, 7, 2, "#3a3448");
-  const fb = ((T / 4) | 0) % 3; R(440 + fb * 2, 230, 14 - fb * 2, 1, "#6b4a32"); R(456, 230, 14 - fb * 2, 1, "#6b4a32");
+  R(346, 354, 24, 20, playing ? "#101028" : "#0b0b16");
+  if (playing) { R(348 + ((T / 4) | 0) % 20, 362, 3, 3, "#6fd08c"); R(356, 356 + ((T / 9) | 0) % 14, 3, 3, "#ef6f6c"); R(348, 371, 20, 1, "#7fb8ff"); if (night) glow(358, 364, 22, "127,184,255", 0.2); }
+  R(220, 316, 2, 8, OUT); R(214, 324, 14, 4, OUT);
+  const fb = ((T / 4) | 0) % 3; R(196 + fb * 3, 326, 20 - fb * 3, 2, "#6b4a32"); R(226, 326, 20 - fb * 3, 2, "#6b4a32");
+  clock(692, 330, t);
 
-  // lift car with its light
+  // lift car and floor lights
   const ly = lift.y;
-  R(590, 126, 2, ly - 126, "#8a8494");
-  block(572, ly, 38, 40, "#6a5f80"); R(574, ly + 2, 34, 36, "#9a8fb0"); R(574, ly + 2, 34, 2, "#ffe7a0"); R(574, ly + 26, 34, 1, "#c9a64a");
-  for (let i = 0; i < 3; i++) R(576 + i * 11, ly + 28, 8, 9, "#8a7fa0");
-  for (const [fy, f] of [[128, 0], [226, 1]]) { R(586, fy, 10, 4, "#1a1426"); R(588 + (lift.dest === f && lift.rider ? 0 : 4), fy + 1, 2, 2, Math.abs(ly - CAR[f]) < 2 ? "#6fd08c" : "#7a2a2a"); }
+  R(751, 52, 2, ly - 52, "#8a8494");
+  ob(726, ly, 48, 42, "#9a8fb0"); R(728, ly + 2, 44, 3, "#ffe7a0");
+  for (const [fy, f] of [[60, 0], [188, 1], [316, 2]]) { R(744, fy, 16, 6, OUT); R(747 + f * 0, fy + 2, 3, 2, Math.abs(ly - CAR[f]) < 2 ? "#6fd08c" : "#7a2a2a"); txt(String(3 - f), 753, fy + 1, "#c9c6d2"); }
 }
-const dayish = (sky) => sky.k === "day";
+function clock(x, y, t) {
+  for (let yy = -11; yy <= 11; yy++) for (let xx = -11; xx <= 11; xx++) { const d = xx * xx + yy * yy; if (d <= 121) R(x + xx, y + yy, 1, 1, d > 90 ? OUT : "#ffffff"); }
+  const ha = ((t.min / 60) % 12) / 12 * Math.PI * 2 - Math.PI / 2, ma = (t.min % 60) / 60 * Math.PI * 2 - Math.PI / 2;
+  line(x, y, x + Math.cos(ha) * 5, y + Math.sin(ha) * 5, OUT); line(x, y, x + Math.cos(ma) * 8, y + Math.sin(ma) * 8, "#e05a4a");
+  txt("NY", x - 3, y + 14, OUT);
+}
 function drawTicker(s, x, y, hs) {
   let cx = x;
   for (const part of s.split("   ")) {
     const h = hs.find((q) => part.startsWith(q.s + " "));
     const col = h ? (h.today >= 0 ? "#6fd08c" : "#ef6f6c") : "#f2c14e";
-    if (cx < 338 && cx + tw(part) > 30) txt(part, cx, y, col);
-    cx += tw(part) + 13;
+    if (cx < 712 && cx + tw(part, 2) > 28) txt(part, cx, y, col, 2);
+    cx += tw(part, 2) + 26;
   }
 }
 
@@ -550,10 +615,10 @@ function bubble(a, text) {
   for (const w of words) { if ((lines.at(-1) + " " + w).trim().length > 18) lines.push(w); else lines[lines.length - 1] = (lines.at(-1) + " " + w).trim(); }
   const bw = Math.max(...lines.map((l) => tw(l))) + 8, bh = lines.length * 7 + 5;
   const cx = Math.round(a.x + 10);
-  const bx = Math.round(Math.min(Math.max(cx - bw / 2, 24), 616 - bw)), by = Math.round(a.y - 36 - bh);
-  R(bx - 1, by, bw + 2, bh, OUT); R(bx, by - 1, bw, bh + 2, OUT); R(bx, by, bw, bh, "#f4ecd8");
-  R(cx - 1, by + bh, 3, 1, "#f4ecd8"); R(cx - 2, by + bh, 1, 2, OUT); R(cx + 2, by + bh, 1, 2, OUT); R(cx - 1, by + bh + 1, 3, 1, OUT); R(cx, by + bh + 1, 1, 1, "#f4ecd8"); R(cx, by + bh + 2, 1, 1, OUT);
-  const col = { claude: "#a8603c", watch: "#3567a3", news: "#744aa8" }[a.id];
+  const bx = Math.round(Math.min(Math.max(cx - bw / 2, 14), W - 14 - bw)), by = Math.round(a.y - 46 - bh);
+  R(bx - 1, by, bw + 2, bh, OUT); R(bx, by - 1, bw, bh + 2, OUT); R(bx, by, bw, bh, "#ffffff");
+  R(cx - 1, by + bh, 3, 1, "#ffffff"); R(cx - 2, by + bh, 1, 2, OUT); R(cx + 2, by + bh, 1, 2, OUT); R(cx - 1, by + bh + 1, 3, 1, OUT); R(cx, by + bh + 1, 1, 1, "#ffffff"); R(cx, by + bh + 2, 1, 1, OUT);
+  const col = { claude: "#b8582e", watch: "#2a6bb0", news: "#5e3a96" }[a.id];
   lines.forEach((l, i) => txt(l, bx + 4, by + 3 + i * 7, i === 0 ? col : OUT));
 }
 let selected = null;
@@ -561,12 +626,12 @@ function overlays() {
   AG.forEach((id, i) => {
     const a = agents[id];
     if (a.phase === "ride" || a.phase === "wait") return;
-    if (a.plan.act === "sleep" && a.phase === "idle") { const z = ((T / 30) | 0) % 3; txt("Z", a.x + 14 + z * 2, a.y - 36 - z * 4, "#e8e4ff"); if (z) txt("Z", a.x + 18, a.y - 44 - z * 2, "#a49cc0"); return; }
+    if (a.plan.act === "sleep" && a.phase === "idle") { const z = ((T / 30) | 0) % 3; txt("Z", a.x + 16 + z * 2, a.y - 40 - z * 4, "#e8e4ff"); if (z) txt("Z", a.x + 20, a.y - 48 - z * 2, "#a49cc0"); return; }
     if (!a.plan.say || a.phase !== "idle") return;
     const cycle = (T / 60 + i * 6) % 18;
     if (a.plan.loud || selected === id || cycle < 5) bubble(a, a.plan.say);
   });
-  if (selected) { const a = agents[selected]; if (a.phase !== "ride" && a.phase !== "wait") { const b = ((T / 15) | 0) % 2; R(a.x + 6, a.y + 1 + b, 9, 1, "#f2c14e"); } }
+  if (selected) { const a = agents[selected]; if (a.phase !== "ride" && a.phase !== "wait") { const b = ((T / 15) | 0) % 2; R(a.x + 4, a.y + 1 + b, 12, 2, "#f2c14e"); } }
 }
 
 // ================================================================ main loop
@@ -588,14 +653,14 @@ function frame(ts) {
     const f = frameOf(a);
     main.drawImage(SPR[id][f.key], Math.round(a.x - 4), Math.round(a.y - 38 + f.bob), 28, 38);
   }
-  R(572, lift.y, 38, 2, OUT); R(572, lift.y, 2, 40, OUT); R(608, lift.y, 2, 40, OUT); R(572, lift.y + 38, 38, 2, "#4a4060");
+  R(726, lift.y, 48, 2, OUT); R(726, lift.y, 2, 42, OUT); R(772, lift.y, 2, 42, OUT); R(726, lift.y + 40, 48, 2, OUT);
   overlays();
   const tick = Math.floor(t.min * 4);
   if (tick !== lastHud) { lastHud = tick; hud(t); }
   requestAnimationFrame(frame);
 }
 
-// ================================================================ the little HUD and the agent card
+// ================================================================ HUD, agent card, big heatmap
 const $ = (id) => document.getElementById(id);
 function hud(t) {
   const s = D.status, p = s.performance || {};
@@ -603,6 +668,7 @@ function hud(t) {
     `${money(s.equity)}<br><span class="${cls(p.agent_return_pct)}">AI ${pct(p.agent_return_pct || 0)}</span> <span class="dim">VS</span> <span class="${cls(p.spy_return_pct)}">S&amp;P ${pct(p.spy_return_pct || 0)}</span>`;
   $("tr").innerHTML = `${V.mode === "replay" ? `<span class="dim">${esc(t.date.slice(5))}</span> ` : ""}NY ${hhmm(t.min)}<br><span class="${isOpen(t) ? "up" : "down"}">${isOpen(t) ? "● OPEN" : "● CLOSED"}</span>`;
   if (selected) card();
+  if (!$("heat").hidden) heatPanel();
 }
 function card() {
   const id = selected, s = (D.status.scorecard || {})[id] || {};
@@ -613,15 +679,33 @@ function card() {
     <p style="margin-top:6px">${s.buys ? `Beat S&amp;P on ${s.beat_spy}/${s.buys} buys · avg <span class="${cls(s.avg_vs_spy_pct)}">${pct(s.avg_vs_spy_pct)}</span>` : "No buys yet"}</p>
     ${last ? `<p class="dim" style="margin-top:6px">${esc(last.date.slice(5))}: ${esc(last.full)}</p>` : ""}`;
 }
-const hitAgent = (x, y) => AG.find((id) => { const a = agents[id]; return a && a.phase !== "wait" && x >= a.x && x <= a.x + 20 && y >= a.y - 34 && y <= a.y + 2; });
+function heatPanel() {
+  const box = $("heatmap"), W2 = box.clientWidth, H2 = box.clientHeight;
+  const cells = squarify(heatItems(), 0, 0, W2, H2);
+  box.innerHTML = cells.map((c) => {
+    const big = c.w > 110 && c.h > 70, mid = c.w > 60 && c.h > 40;
+    return `<div class="cell" style="left:${c.x}px;top:${c.y}px;width:${c.w}px;height:${c.h}px;background:${heatColor(c.today)}" title="${esc(c.name)}">
+      <b style="font-size:${big ? 18 : mid ? 12 : 8}px">${esc(c.s)}</b>
+      ${mid ? `<span>${c.today >= 0 ? "+" : ""}${c.today.toFixed(2)}%</span>` : ""}
+      ${big ? `<small>${esc(c.name)} · ${money(c.v)} · total ${c.total >= 0 ? "+" : ""}${c.total.toFixed(1)}%</small>` : ""}</div>`;
+  }).join("") || `<p class="dim" style="padding:20px">No holdings yet.</p>`;
+}
+function toggleHeat(show) { $("heat").hidden = !show; $("heatbtn").setAttribute("aria-pressed", show); if (show) heatPanel(); }
+const hitAgent = (x, y) => AG.find((id) => { const a = agents[id]; return a && a.phase !== "wait" && x >= a.x - 2 && x <= a.x + 22 && y >= a.y - 40 && y <= a.y + 2; });
 const toWorld = (e) => { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) / r.width * W, (e.clientY - r.top) / r.height * H]; };
+const onHeatScreen = (x, y) => x >= 220 && x <= 510 && y >= 224 && y <= 290;
 cv.addEventListener("click", (e) => {
-  const hit = hitAgent(...toWorld(e));
+  const [x, y] = toWorld(e);
+  if (onHeatScreen(x, y)) { toggleHeat(true); return; }
+  const hit = hitAgent(x, y);
   selected = hit && hit !== selected ? hit : null;
   if (selected) card(); else $("card").hidden = true;
 });
-cv.addEventListener("mousemove", (e) => { cv.style.cursor = hitAgent(...toWorld(e)) ? "pointer" : "default"; });
-function fit() { const s = Math.min(innerWidth / W, innerHeight / H); cv.style.width = Math.floor(W * s) + "px"; cv.style.height = Math.floor(H * s) + "px"; }
+cv.addEventListener("mousemove", (e) => { const [x, y] = toWorld(e); cv.style.cursor = hitAgent(x, y) || onHeatScreen(x, y) ? "pointer" : "default"; });
+$("heatbtn").onclick = () => toggleHeat($("heat").hidden);
+$("heatclose").onclick = () => toggleHeat(false);
+addEventListener("keydown", (e) => { if (e.key === "Escape") toggleHeat(false); });
+function fit() { const s = Math.min(innerWidth / W, innerHeight / H); cv.style.width = Math.floor(W * s) + "px"; cv.style.height = Math.floor(H * s) + "px"; if (!$("heat").hidden) heatPanel(); }
 addEventListener("resize", fit);
 
 function tradingDays() { return [...new Set(D.events.map((e) => e.date))].slice(-15).reverse(); }
