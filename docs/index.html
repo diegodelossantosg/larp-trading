@@ -53,6 +53,27 @@ button:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-
 #pbody .hold{display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap}#pbody .hold table{flex:1;min-width:300px}
 #pbody .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px}
 #pbody .bigchart{width:100%;height:auto;display:block;margin-top:6px}
+#pbody .chartwrap{position:relative}
+#pbody .ctip{position:absolute;pointer-events:none;background:#1a1630;border:1px solid #3a3556;border-radius:6px;padding:7px 10px;font-size:13px;line-height:1.5;white-space:nowrap;box-shadow:0 6px 18px rgba(0,0,0,.45)}
+#pbody .tile{border-radius:6px}#pbody .tile b{font-size:19px;font-variant-numeric:tabular-nums}
+#pbody .trades{display:flex;flex-direction:column;gap:8px}
+#pbody .trade{display:grid;grid-template-columns:minmax(150px,1.4fr) 0.8fr 0.8fr 1.2fr;gap:4px 14px;align-items:center;background:#16132a;border:1px solid #2a2540;border-left:4px solid #5a5470;border-radius:6px;padding:10px 14px}
+#pbody .trade.won{border-left-color:#6fd08c}#pbody .trade.lost{border-left-color:#ef6f6c}
+#pbody .t-what{display:flex;gap:10px;align-items:center}#pbody .t-what div{display:flex;flex-direction:column}
+#pbody .t-icon{font-size:18px}#pbody .t-made{font-size:18px;font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
+#pbody .t-pills{display:flex;gap:10px;align-items:center;justify-content:flex-end}
+#pbody .pill{padding:2px 8px;border-radius:999px;font-size:12px;font-weight:600;background:#2a2540}#pbody .pill.up{background:rgba(111,208,140,.15)}#pbody .pill.down{background:rgba(239,111,108,.15)}
+#pbody .t-why{grid-column:1/-1;color:var(--dim);font-size:13px;border-top:1px dashed #2a2540;padding-top:6px;margin-top:2px}
+#pbody details summary{display:flex;justify-content:space-between;padding:8px 2px;margin-top:6px;border-bottom:1px solid #2a2540}
+#pbody .paper{background:#f4ecd8;color:#2a2230;border-radius:4px;padding:22px 28px;font-family:Georgia,"Times New Roman",serif;max-width:720px;margin:0 auto;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+#pbody .paper .mast{font-size:34px;font-weight:700;text-align:center;letter-spacing:.02em;border-bottom:3px double #2a2230;padding-bottom:6px}
+#pbody .paper .dateline{display:flex;justify-content:space-between;font-size:12px;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid #2a2230;padding:5px 0;margin-bottom:14px}
+#pbody .paper h2{font-size:23px;line-height:1.3;margin:0 0 12px;font-weight:700}
+#pbody .paper .bought{font-family:system-ui,sans-serif;font-size:14px;margin:0 0 14px}
+#pbody .paper .earlier{border-top:1px solid #2a2230;padding-top:10px;columns:2;column-gap:24px;font-size:14px}
+#pbody .paper .earlier .label{column-span:all;font-family:system-ui,sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;color:#6a6070}
+#pbody .paper .earlier p{margin:0 0 10px;break-inside:avoid}#pbody .paper .earlier span{display:block;font-family:system-ui,sans-serif;font-size:11px;color:#6a6070}
+@media (max-width:640px){#pbody .trade{grid-template-columns:1fr 1fr}#pbody .paper .earlier{columns:1}}
 @media (max-width:640px){#pbody .versus{grid-template-columns:1fr}#pbody{font-size:13px}}
 #tl{cursor:pointer}
 #toast{top:max(10px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);max-width:min(560px,calc(100vw - 24px));font-size:9px;border-color:var(--gold)}
@@ -539,6 +560,7 @@ function drawBackground(t) {
 
 
   R(410, 45, 10, 4, OUT);
+  sh(506, 126, 26, 44, "#8a8494"); for (let k = 0; k < 3; k++) { ob(508.5, 129 + k * 13.5, 21, 12, "#9a94a8", 0.5); R(515, 134 + k * 13.5, 8, 1.5, "#5a5466"); } ob(511, 130.5, 16, 4, "#f4ecd8", 0.5); txt("TRADES", 519 - tw("TRADES", 0.5) / 2, 131.25, OUT, 0.5);  // filing cabinet: the trade records
 
   g.restore();
   // ================= NEWSROOM (News Hunter)
@@ -566,7 +588,7 @@ function drawBackground(t) {
     ob(kx + 3, 296, 18, 3, "#2a2438", 0.5); sh(kx + 8, 274, 8, 23, "#4a5068");
     sh(kx, 250, 24, 26, "#5a6078"); R(kx + 2, 252, 20, 13, "#0b141c"); R(kx + 3, 267, 18, 6, "#3a3f55"); for (let i = 0; i < 4; i++) for (let j = 0; j < 2; j++) R(kx + 4 + i * 4.5, 268 + j * 2.5, 3.5, 1.5, "#c9c6d2");
   }
-  sh(688, 254, 26, 44, "#8a8494"); for (let k = 0; k < 3; k++) { ob(690.5, 257 + k * 13.5, 21, 12, "#9a94a8", 0.5); R(697, 262 + k * 13.5, 8, 1.5, "#5a5466"); } ob(693, 258.5, 16, 4, "#f4ecd8", 0.5); txt("TRADES", 701 - tw("TRADES", 0.5) / 2, 259.25, OUT, 0.5);
+
 
   g.restore();
   g.restore();
@@ -1213,24 +1235,34 @@ function panelChart(iv = chartIv) {
   const ys = (v) => m.t + (1 - (v - lo) / (hi - lo)) * (Hd - m.t - m.b);
   const path = (k) => rows.map((r, i) => `${i ? "L" : "M"}${xs(i).toFixed(1)},${ys(r[k]).toFixed(1)}`).join("");
   const last = rows.at(-1), xt = [...new Set([0, Math.floor((rows.length - 1) / 2), rows.length - 1])];
-  openPanel("AI VS S&P 500", `<div class="small" id="chartread">Point at the chart to read a value. The S&amp;P line is what your starting money would be worth in the S&amp;P 500.</div>
+  openPanel("AI VS S&P 500", `<div class="chartwrap">
   <svg viewBox="0 0 ${Wd} ${Hd}" class="bigchart" id="bigchart">
-    ${niceTicks(lo, hi, 4).map((t) => `<line x1="${m.l}" x2="${Wd - m.r}" y1="${ys(t)}" y2="${ys(t)}" stroke="#2a2540"/><text x="${m.l - 8}" y="${ys(t) + 4}" text-anchor="end" font-size="12" fill="#a49cc0">${usd(t, 0)}</text>`).join("")}
-    ${base >= lo && base <= hi ? `<line x1="${m.l}" x2="${Wd - m.r}" y1="${ys(base)}" y2="${ys(base)}" stroke="#5a5470" stroke-dasharray="2 3"/>` : ""}
-    ${xt.map((i) => `<text x="${xs(i)}" y="${Hd - 6}" text-anchor="${i === 0 ? "start" : i === rows.length - 1 ? "end" : "middle"}" font-size="12" fill="#a49cc0">${esc(rows[i].date)}</text>`).join("")}
-    <path d="${path("spy")}" fill="none" stroke="#ef6f6c" stroke-width="2" stroke-dasharray="5 3"/>
-    <path d="${path("agent")}" fill="none" stroke="#6fd08c" stroke-width="2.5"/>
-    <text x="${Wd - m.r + 6}" y="${ys(last.agent) + 4}" font-size="12" fill="#6fd08c">AI</text><text x="${Wd - m.r + 6}" y="${ys(last.spy) + 4}" font-size="12" fill="#ef6f6c">S&amp;P</text>
-    <line id="hx" y1="${m.t}" y2="${Hd - m.b}" stroke="#5a5470" visibility="hidden"/>
+    <defs><linearGradient id="fillA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6fd08c" stop-opacity=".22"/><stop offset="1" stop-color="#6fd08c" stop-opacity="0"/></linearGradient></defs>
+    ${niceTicks(lo, hi, 4).map((t) => `<line x1="${m.l}" x2="${Wd - m.r}" y1="${ys(t)}" y2="${ys(t)}" stroke="#221e36"/><text x="${m.l - 10}" y="${ys(t) + 4}" text-anchor="end" font-size="12" fill="#8a84a8">${usd(t, 0)}</text>`).join("")}
+    ${base >= lo && base <= hi ? `<line x1="${m.l}" x2="${Wd - m.r}" y1="${ys(base)}" y2="${ys(base)}" stroke="#4a4466" stroke-dasharray="2 4"/>` : ""}
+    ${xt.map((i) => `<text x="${xs(i)}" y="${Hd - 6}" text-anchor="${i === 0 ? "start" : i === rows.length - 1 ? "end" : "middle"}" font-size="12" fill="#8a84a8">${esc(rows[i].date)}</text>`).join("")}
+    <path d="${path("agent")}L${xs(rows.length - 1)},${Hd - m.b}L${xs(0)},${Hd - m.b}Z" fill="url(#fillA)"/>
+    <path d="${path("spy")}" fill="none" stroke="#ef6f6c" stroke-width="2" stroke-dasharray="5 4" stroke-linejoin="round"/>
+    <path d="${path("agent")}" fill="none" stroke="#6fd08c" stroke-width="2.5" stroke-linejoin="round"/>
+    <text x="${Wd - m.r + 8}" y="${ys(last.agent) + 4}" font-size="12" fill="#6fd08c">AI</text><text x="${Wd - m.r + 8}" y="${ys(last.spy) + 4}" font-size="12" fill="#ef6f6c">S&amp;P</text>
+    <g id="hov" visibility="hidden"><line id="hx" y1="${m.t}" y2="${Hd - m.b}" stroke="#4a4466"/>
+      <circle id="ha" r="5" fill="#6fd08c" stroke="#0e0c1a" stroke-width="2"/><circle id="hb" r="5" fill="#ef6f6c" stroke="#0e0c1a" stroke-width="2"/></g>
     <rect x="${m.l}" y="${m.t}" width="${Wd - m.l - m.r}" height="${Hd - m.t - m.b}" fill="transparent" id="hit"/>
-  </svg>`, tabs);
-  const svg = $("bigchart");
-  $("hit").addEventListener("pointermove", (e) => {
+  </svg><div class="ctip" id="ctip" hidden></div></div>
+  <p class="small">The red line is what your starting money would be worth if it had all gone into the S&amp;P 500 on day one.</p>`, tabs);
+  const svg = $("bigchart"), tipEl = $("ctip");
+  const show = (e) => {
     const b = svg.getBoundingClientRect(), x = ((e.clientX - b.left) * Wd) / b.width;
     const i = Math.max(0, Math.min(rows.length - 1, Math.round(((x - m.l) / (Wd - m.l - m.r)) * (rows.length - 1)))), r = rows[i], d = r.agent - r.spy;
-    $("hx").setAttribute("x1", xs(i)); $("hx").setAttribute("x2", xs(i)); $("hx").setAttribute("visibility", "visible");
-    $("chartread").innerHTML = `<b>${esc(r.date)}</b> · AI <b>${usd(r.agent)}</b> · S&amp;P <b>${usd(r.spy)}</b> · <span class="${cls(d)}">AI ${d >= 0 ? "ahead" : "behind"} by ${usd(Math.abs(d))}</span>`;
-  });
+    for (const [id, a, v] of [["hx", "x1", xs(i)], ["hx", "x2", xs(i)], ["ha", "cx", xs(i)], ["ha", "cy", ys(r.agent)], ["hb", "cx", xs(i)], ["hb", "cy", ys(r.spy)]]) $(id).setAttribute(a, v);
+    $("hov").setAttribute("visibility", "visible");
+    tipEl.innerHTML = `<div class="small">${esc(r.date)}</div><div><span class="dot" style="background:#6fd08c"></span>AI <b>${usd(r.agent)}</b></div><div><span class="dot" style="background:#ef6f6c"></span>S&amp;P <b>${usd(r.spy)}</b></div><div class="${cls(d)}">${d >= 0 ? "AI ahead by " : "AI behind by "}${usd(Math.abs(d))}</div>`;
+    tipEl.hidden = false;
+    const px = (xs(i) / Wd) * b.width, py = (((ys(r.agent) + ys(r.spy)) / 2) / Hd) * b.height, right = px > b.width * 0.65;
+    tipEl.style.left = px + "px"; tipEl.style.top = py + "px"; tipEl.style.transform = right ? "translate(calc(-100% - 14px), -50%)" : "translate(14px, -50%)";
+  };
+  $("hit").addEventListener("pointermove", show);
+  $("hit").addEventListener("pointerleave", () => { $("hov").setAttribute("visibility", "hidden"); tipEl.hidden = true; });
 }
 
 // --- trades: full sales and partial sales (trims), from sales.json
@@ -1268,7 +1300,16 @@ function saleReason(r) {
 function salesTiles(rows, label) {
   const won = rows.filter((r) => r.pnl > 0), lost = rows.filter((r) => r.pnl <= 0), total = rows.reduce((t, r) => t + r.pnl, 0);
   const avg = (xs) => (xs.length ? xs.reduce((t, r) => t + r.pnl_pct, 0) / xs.length : null);
-  return `<div class="tiles">${tile("Total made", signedUsd(total), cls(total))}${tile(label, `${rows.length} <span class="small">(<span class="up">${won.length} won</span> · <span class="down">${lost.length} lost</span>)</span>`)}${tile("Win rate", Math.round((won.length / rows.length) * 100) + "%")}${tile("Avg win", avg(won) != null ? pctN(avg(won)) : "–", "up")}${tile("Avg loss", avg(lost) != null ? pctN(avg(lost)) : "–", "down")}</div>`;
+  return `<div class="tiles">${tile("Total made", signedUsd(total), cls(total))}${tile(label, `${rows.length}`)}${tile("Won · lost", `<span class="up">${won.length}</span> · <span class="down">${lost.length}</span>`)}${tile("Win rate", Math.round((won.length / rows.length) * 100) + "%")}${tile("Avg win", avg(won) != null ? pctN(avg(won)) : "–", "up")}${tile("Avg loss", avg(lost) != null ? pctN(avg(lost)) : "–", "down")}</div>`;
+}
+function tradeCard(r, showDate) {
+  const nice = new Date(r.date + "T12:00:00Z").toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
+  return `<div class="trade ${r.pnl > 0 ? "won" : "lost"}">
+    <div class="t-what"><span class="t-icon">${WHO[r.bought_by] || "🧠"}</span><div><b>${esc(r.symbol)}</b><span class="small">${esc(r.name || "")}</span></div></div>
+    ${showDate ? `<div class="small">Sold ${nice}</div>` : "<div></div>"}
+    <div class="t-made ${cls(r.pnl)}">${signedUsd(r.pnl)}</div>
+    <div class="t-pills"><span class="pill ${cls(r.pnl_pct)}">${pctN(r.pnl_pct)}</span><span class="small">vs S&amp;P ${pctN(r.vs_spy_pct)}</span></div>
+    <div class="t-why">${esc(saleReason(r))}</div></div>`;
 }
 function panelTrades(tab = "closed") {
   panelState = panelTrades;
@@ -1277,8 +1318,7 @@ function panelTrades(tab = "closed") {
   if (tab === "closed") {
     const rows = all.filter((r) => r.full);
     if (!rows.length) return openPanel("TRADES", `<p class="small">No closed trades yet. A trade appears here once something is fully sold.</p>`, tabs);
-    return openPanel("TRADES", salesTiles(rows, "Trades") + `<table><thead><tr><th>What</th><th>Sold</th><th class="num">Made</th><th class="num">%</th><th class="num">vs S&amp;P</th><th>Why</th></tr></thead><tbody>
-      ${rows.map((r) => `<tr><td>${WHO[r.bought_by] || "🧠"} <b>${esc(r.symbol)}</b><div class="small">${esc(r.name || "")}</div></td><td>${esc(r.date)}</td><td class="num ${cls(r.pnl)}">${signedUsd(r.pnl)}</td><td class="num ${cls(r.pnl_pct)}">${pctN(r.pnl_pct)}</td><td class="num ${r.vs_spy_pct != null ? cls(r.vs_spy_pct) : ""}">${pctN(r.vs_spy_pct)}</td><td class="small">${esc(saleReason(r))}</td></tr>`).join("")}</tbody></table>`, tabs);
+    return openPanel("TRADES", salesTiles(rows, "Trades") + `<div class="trades">${rows.map((r) => tradeCard(r, true)).join("")}</div>`, tabs);
   }
   const rows = all.filter((r) => !r.full);
   if (!rows.length) return openPanel("TRADES", `<p class="small">No partial sales yet. When part of a holding is sold, it shows here with what it earned.</p>`, tabs);
@@ -1286,8 +1326,7 @@ function panelTrades(tab = "closed") {
   const nice = (d) => new Date(d + "T12:00:00Z").toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" });
   openPanel("TRADES", salesTiles(rows, "Partial sales") + days.map((day, i) => {
     const dr = rows.filter((r) => r.date === day), tot = dr.reduce((t, r) => t + r.pnl, 0);
-    return `<details${i === 0 ? " open" : ""}><summary>${nice(day)} · <b class="${cls(tot)}">${signedUsd(tot)}</b></summary><table><tbody>
-      ${dr.map((r) => `<tr><td>${WHO[r.bought_by] || "🧠"} <b>${esc(r.symbol)}</b><div class="small">${esc(r.name || "")}</div></td><td class="small">${esc(saleReason(r))}</td><td class="num ${cls(r.pnl)}"><b>${signedUsd(r.pnl)}</b></td><td class="num ${cls(r.pnl_pct)}">${pctN(r.pnl_pct)}</td><td class="num">${pctN(r.vs_spy_pct)} <span class="small">vs S&amp;P</span></td></tr>`).join("")}</tbody></table></details>`;
+    return `<details${i === 0 ? " open" : ""}><summary><span>${nice(day)}</span><b class="${cls(tot)}">${signedUsd(tot)}</b></summary><div class="trades">${dr.map((r) => tradeCard(r, false)).join("")}</div></details>`;
   }).join(""), tabs);
 }
 
@@ -1330,7 +1369,7 @@ function panelHoldings() {
   <table><thead><tr><th>Holding</th><th class="num">Share</th><th class="num">Value</th><th class="num">Today</th><th class="num">Total gain</th><th class="num">Total %</th></tr></thead><tbody>
   ${ps.map((p, i) => `<tr><td><span class="dot" style="background:${col(i)}"></span><b>${esc(p.symbol)}</b> <span class="small">${esc(p.name || "")}</span></td><td class="num">${((p.weight || 0) * 100).toFixed(0)}%</td><td class="num">${usd(p.market_value)}</td><td class="num ${cls(p.change_today_usd || 0)}">${signedUsd(p.change_today_usd)}</td><td class="num ${cls(p.unrealized_pl)}">${signedUsd(p.unrealized_pl)}</td><td class="num ${cls(p.unrealized_pl)}">${pctN((p.unrealized_plpc || 0) * 100)}</td></tr>`).join("")}
   ${s.cash != null && Math.abs(s.cash) >= 0.5 ? `<tr><td><span class="dot" style="background:#5a5470"></span><b>Cash</b></td><td class="num">${((s.cash / s.equity) * 100).toFixed(0)}%</td><td class="num">${usd(s.cash)}</td><td class="num">–</td><td class="num">–</td><td class="num">–</td></tr>` : ""}
-  </tbody></table></div><p class="small">The heatmap on the trading room wall shows the same holdings by size and today's move.</p>`);
+  </tbody></table></div>`);
 }
 
 // --- who's earning: the three agents against the S&P
@@ -1408,18 +1447,28 @@ const SPOTS = [
   { r: [220, 238, 290, 84], label: () => "Holdings heatmap (today) · click to enlarge", click: () => toggleHeat(true) },
   { r: [298, 80, 210, 72], label: () => "Holdings: value, share and gains · click to open", click: () => panelHoldings() },
   { r: [30, 238, 180, 84], label: () => "AI vs S&P 500 · click for the full chart", click: () => panelChart() },
-  { r: [688, 286, 28, 46], label: () => "Trades: closed trades and partial sales · click to open", click: () => panelTrades() },
+  { r: [504, 140, 30, 48], label: () => "Trades: closed trades and partial sales · click to open", click: () => panelTrades() },
   { r: [228, 156, 26, 18], label: () => "Claude's diary: the daily log · click to open", click: () => panelDiary() },
-  { r: [30, 210, 680, 24], label: () => "Your holdings, scrolling" },
+
   { r: [662, 78, 54, 38], label: () => "News Hunter's latest note · click to read", click: () => newsCard() },
   { r: [24, 352, 96, 70], label: () => "Who's earning: all three agents vs the S&P · click to open", click: () => panelAgents() },
   { r: [-1e4, -1e4, 2e4, 1e4 + 44], label: () => `Market mood: ${MOOD_TEXT[weatherOf()].toLowerCase()} · click for the gauges`, click: () => panelMood() },
 ];
 const spotAt = (x, y) => SPOTS.find(({ r }) => x >= r[0] && x <= r[0] + r[2] && y >= r[1] && y <= r[1] + r[3]);
 function newsCard() {
-  const e = [...D.events].reverse().find((v) => v.agent === "news");
-  selected = null; $("card").hidden = false;
-  $("card").innerHTML = `<h3 style="color:${COLOR.news}">NEWS HUNTER · LATEST</h3><p>${esc(e ? e.summary || e.full || "Checked the news." : "No news checks yet.")}</p>${e ? `<p class="dim" style="margin-top:6px">${esc(e.date.slice(5))} at ${hhmm(e.min)} NY</p>` : ""}`;
+  panelState = null; selected = null; $("card").hidden = true;
+  const all = D.events.filter((v) => v.agent === "news"), e = all.at(-1);
+  if (!e) return openPanel("NEWS HUNTER", `<p class="small">No news checks yet.</p>`);
+  const day = new Date(e.date + "T12:00:00Z").toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
+  const earlier = all.filter((v) => v !== e).slice(-5).reverse();
+  const bought = e.orders.filter((o) => o.side === "buy");
+  openPanel("NEWS HUNTER", `<div class="paper">
+    <div class="mast">The Daily Dip</div>
+    <div class="dateline"><span>${day}</span><span>${hhmm(e.min)} New York</span></div>
+    <h2>${esc(e.summary || e.full || "Checked the news.")}</h2>
+    ${bought.length ? `<p class="bought">Bought: ${bought.map((o) => `<b>${esc(o.symbol)}</b> ${usd(o.notional)}`).join(" · ")}</p>` : `<p class="bought">No buy on this check.</p>`}
+    ${earlier.length ? `<div class="earlier"><div class="label">Earlier checks</div>${earlier.map((v) => `<p><span>${esc(v.date.slice(5).replace("-", "/"))} ${hhmm(v.min)}</span>${esc(v.summary || v.full || "Nothing worth buying.")}</p>`).join("")}</div>` : ""}
+  </div>`);
 }
 cv.addEventListener("click", (e) => {
   const [x, y] = toWorld(e);
