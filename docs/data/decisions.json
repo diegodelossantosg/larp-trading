@@ -3189,5 +3189,26 @@
   "notes": [],
   "plain_summary": "Today's big drops are from Brazil's election shock, real business damage at FICO and Charter, a Netflix earnings fallout, or Merck reporting earnings in 3 days, so I bought nothing this hour and will recheck Dollar General's fresh lawsuit drop next hour.",
   "ideas": []
+ },
+ {
+  "date": "2026-10-26",
+  "time": "14:20",
+  "source": "news",
+  "dry_run": false,
+  "orders": [],
+  "notes": [
+   "skipped DG: trades $261.5M/day; drops on news only beat chance above $300M/day in our test"
+  ],
+  "plain_summary": "Many big stocks fell today, mostly on Brazil's election, earnings or real business changes; I picked only Dollar General, which dropped about 5% on a pricing lawsuit that looks small for its size.",
+  "ideas": [
+   {
+    "symbol": "DG",
+    "headline": "FTC and 20 states sue Dollar General over shelf-vs-register overcharges (Oct 26 2026, ~13:38 UTC; Benzinga 18:09 UTC 'Dollar General Stock Dips')",
+    "why_not_priced_in": "Shares are down ~4.8% (about -5.6% vs SPY), cutting roughly $1.5B off its market value. The suit is about price-tag accuracy, based on ~30,000 complaints over 7 years. Likely outcomes are refunds or a penalty plus fixing store pricing, which should be small next to ~$40B in yearly sales and over $1B in profit (penalty size not yet confirmed). Sales, customers and guidance are not affected. This is not an earnings drop: Q3 results are expected late Nov/early Dec, date unconfirmed. It fits the pattern of a lawsuit or regulator headline hitting a strong business.",
+    "plain_reason": "A pricing lawsuit likely costs little next to Dollar General's huge yearly sales.",
+    "next_earnings": "unknown",
+    "idea_type": "overreaction"
+   }
+  ]
  }
 ]
