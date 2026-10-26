@@ -10,7 +10,7 @@
 :root{--bg:#0b0a14;--ink:#f4ecd8;--dim:#a49cc0;--up:#6fd08c;--down:#ef6f6c;--gold:#f2c14e;--panel:rgba(14,12,28,.85);--line:#3a3556;
   --pixel:"Press Start 2P",ui-monospace,monospace;color-scheme:dark}
 html,body{margin:0;height:100%;background:var(--bg);overflow:hidden}
-canvas{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);image-rendering:pixelated;image-rendering:crisp-edges}
+canvas{position:fixed;inset:0;width:100vw;height:100vh;image-rendering:pixelated;image-rendering:crisp-edges}
 .hud{position:fixed;font-family:var(--pixel);font-size:10px;line-height:1.7;color:var(--ink);background:var(--panel);border:2px solid var(--line);padding:6px 10px;box-shadow:3px 3px 0 #000}
 #tl{top:max(10px,env(safe-area-inset-top));left:max(10px,env(safe-area-inset-left))}
 #tr{top:max(10px,env(safe-area-inset-top));right:max(10px,env(safe-area-inset-right));text-align:right}
@@ -27,7 +27,7 @@ button:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-
 .heathead{display:flex;justify-content:space-between;align-items:center;font-size:10px}
 #heatmap{position:relative;flex:1;min-height:0}
 .cell{position:absolute;box-sizing:border-box;border:1px solid #0b0e14;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;overflow:hidden;text-align:center;color:#fff;font-family:var(--pixel)}
-.cell span{font-size:9px}.cell small{font-size:7px;opacity:.85;padding:0 4px}
+.cell span{font-size:9px}.cell small{font-size:8px;opacity:.9;padding:0 4px;line-height:1.5}
 .heatnote{margin:0;font-size:8px}
 #toast{top:max(10px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);max-width:min(560px,calc(100vw - 24px));font-size:9px;border-color:var(--gold)}
 @media (max-width:640px){.hud{font-size:8px;padding:4px 6px}}
@@ -49,9 +49,9 @@ button:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-
 <div class="hud" id="toast" hidden></div>
 <div class="hud" id="card" hidden></div>
 <div class="hud" id="heat" hidden>
-  <div class="heathead"><span>YOUR HOLDINGS TODAY</span><button id="heatclose" aria-label="Close">✕</button></div>
+  <div class="heathead"><span id="heattitle">YOUR HOLDINGS · COLOUR = TODAY</span><span><button id="heatday" aria-pressed="true">TODAY</button> <button id="heattot" aria-pressed="false">TOTAL</button> <button id="heatclose" aria-label="Close">✕</button></span></div>
   <div id="heatmap"></div>
-  <p class="dim heatnote">Size: money in each holding. Colour: today's move.</p>
+  <p class="dim heatnote" id="heatnote">Size: money in each holding. Colour: today's move (switch to TOTAL for the move since you bought it).</p>
 </div>
 
 <script>
@@ -182,7 +182,10 @@ function plan(id, t) {
 const W = 800, H = 500;
 const cv = document.getElementById("cv");
 const main = cv.getContext("2d");
-main.setTransform(2, 0, 0, 2, 0, 0);  // the world is laid out in 800×450 units; half a unit is one pixel
+// The world is laid out in 800×500 units (half a unit = one pixel). The view widens or heightens to fill the
+// window; VIEW.ex / VIEW.ey are the extra units on each side, filled with street, sky and neighbours.
+const VIEW = { w: W, h: H, ex: 0, ey: 0 };
+main.setTransform(2, 0, 0, 2, 0, 0);
 main.imageSmoothingEnabled = false;
 let g = main;
 const R = (x, y, w, h, c) => { g.fillStyle = c; g.fillRect(Math.round(x * 2) / 2, Math.round(y * 2) / 2, w, h); };
@@ -274,7 +277,7 @@ const FEET = [187, 331, 475];
 const DOOR_L = 732, DOOR_R = 772, WAIT_X = 704, INSIDE_X = 742;
 const BEDS = [414, 514, 614];  // left edge of each bed, in AG order
 const SP = {
-  desk: { f: 0, x: 150, dir: 1, seat: true }, console: { f: 0, x: 356, dir: 1 },
+  desk: { f: 0, x: 150, dir: 1, seat: true }, console: { f: 0, x: 356, dir: 1, seat: true },
   armchair: { f: 0, x: 558, dir: 1, seat: true }, teletype: { f: 0, x: 648, dir: 1 },
   term_claude: { f: 1, x: 540, dir: 1 }, term_news: { f: 1, x: 590, dir: 1 }, term_watch: { f: 1, x: 640, dir: 1 },
   coffee_claude: { f: 2, x: 196, dir: 1 }, coffee_watch: { f: 2, x: 204, dir: 1 }, coffee_news: { f: 2, x: 212, dir: 1 },
@@ -324,15 +327,14 @@ function winBox(x, y, w, h, sky, o = {}) {
   }
   if (o.blinds) for (let by = y + 2; by < y + 2 + o.blinds; by += 2) { R(x + 2, by, w - 4, 1.5, "#ece6d8"); hl(x + 2, by + 1.5, w - 4, "#b8ae98"); }
 }
-function plant(x, y, s = 1) {
-  const pw = 12 * s, ph = 10 * s;
-  ob(x, y - ph, pw, ph, "#c9744a"); R(x - 1, y - ph, pw + 2, 2.5, "#d98a5e"); hl(x - 1, y - ph, pw + 2, OUT);
-  vl(x + 1.5, y - ph + 3, ph - 4, "#e09a70"); R(x + pw - 3, y - ph + 3, 1, ph - 4, "#a85e38");
-  const r = rng(Math.round(x * 7 + y));
-  for (let i = 0; i < 14 * s; i++) {
-    const a = -Math.PI / 2 + (r() - 0.5) * 2.6, len = (8 + r() * 10) * s, ex = x + pw / 2 + Math.cos(a) * len, ey = y - ph + Math.sin(a) * len;
-    line(x + pw / 2, y - ph, ex, ey, "#3f7f48", 0.5); ob(ex - 2, ey - 1.5, 4.5, 3, i % 3 ? "#5fae6a" : "#7cc884", 0.5);
-  }
+function blob(cx, cy, rx, ry, c) { for (let y = -ry; y <= ry; y += 0.5) { const w = rx * Math.sqrt(Math.max(0, 1 - (y * y) / (ry * ry))); R(cx - w, cy + y, w * 2, 0.5, c); } }
+function plant(x, y, s = 1) {  // a terracotta pot and a few big outlined leaves
+  const pw = 12 * s, ph = 10 * s, cx = x + pw / 2, top = y - ph;
+  for (let i = 0; i < ph; i += 0.5) { const ins = (i / ph) * 1.5 * s; R(x + ins - 0.5, top + i, pw - ins * 2 + 1, 0.5, OUT); R(x + ins + 0.5, top + i, pw - ins * 2 - 1, 0.5, i < 2.5 ? "#e09a6a" : "#c9744a"); }
+  R(x - 0.5, y - 0.5, pw + 1, 0.5, OUT); vl(x + 2, top + 3, ph - 4, "#e8a87a");
+  for (const [dx, dy] of [[-6, -9], [5, -12], [0, -15]]) line(cx, top, cx + dx * s, top + dy * s, "#3f7f48", 0.5);
+  const leaves = [[-7, -9, 5.5, 3.5, "#3f8a4a"], [6, -12, 5.5, 3.5, "#3f8a4a"], [0, -16, 4.5, 4.5, "#4f9a5a"], [-3, -5, 5, 3, "#5fae6a"], [4, -6.5, 4.5, 3, "#6fbf6a"]];
+  for (const [dx, dy, rx, ry, c] of leaves) { blob(cx + dx * s, top + dy * s, rx * s + 0.75, ry * s + 0.75, OUT); blob(cx + dx * s, top + dy * s, rx * s, ry * s, c); hl(cx + dx * s - rx * s * 0.4, top + dy * s - ry * s * 0.3, rx * s * 0.6, mix(c, 0.3)); }
 }
 function books(x, y, w, h, seed) {  // one shelf of books standing on y + h
   const r = rng(seed), cols = ["#c75b4a", "#e0b04a", "#4d8fbf", "#5fa66a", "#9b6bd1", "#e8e0c8", "#3a5a8a", "#d9845a"];
@@ -363,34 +365,63 @@ const MOOD_TEXT = { clear: "HEALTHY", cloudy: "CAUTIOUS", rain: "STRESSED", stor
 function drawWeatherSky(wx, sky) {
   if (wx === "clear") return;
   const dark = { cloudy: 0.18, rain: 0.38, storm: 0.55 }[wx];
-  g.fillStyle = `rgba(${sky.k === "night" ? "10,10,25" : "110,118,140"},${dark})`; g.fillRect(0, 0, W, 54);
-  const r = rng(wx.length * 97), n = { cloudy: 7, rain: 11, storm: 14 }[wx];
+  g.fillStyle = `rgba(${sky.k === "night" ? "10,10,25" : "110,118,140"},${dark})`; g.fillRect(-VIEW.ex - 1, -VIEW.ey - 1, W + VIEW.ex * 2 + 2, 55 + VIEW.ey);
+  const r = rng(wx.length * 97), n = Math.round({ cloudy: 7, rain: 11, storm: 14 }[wx] * (1 + VIEW.ex / 400));
   const base = sky.k === "night" ? "#2a2c3e" : wx === "cloudy" ? "#e8ecf4" : wx === "rain" ? "#9aa0b4" : "#6a6e84";
   for (let i = 0; i < n; i++) {
-    const cx = r() * (W + 40) - 20, cy = 4 + r() * 30, w = 30 + r() * 40;
+    const cx = -VIEW.ex + r() * (W + VIEW.ex * 2 + 40) - 20, cy = 4 + r() * 30, w = 30 + r() * 40;
     R(cx, cy + 4, w, 7, base); R(cx + w * 0.15, cy, w * 0.5, 5, base); R(cx + w * 0.45, cy + 1, w * 0.35, 4, base); hl(cx, cy + 10.5, w, mix(base, -0.15));
+  }
+}
+// the street on either side of our building: neighbour buildings, trees and lamp posts
+const LAMPS = [];
+function tree(x, y) {
+  R(x - 1.5, y - 22, 3, 22, "#5a3a24"); vl(x - 1, y - 22, 22, "#7a5034");
+  for (const [dx, dy, rx, ry, c] of [[-6, -26, 8, 7, "#3f7f48"], [6, -27, 8, 7, "#3f7f48"], [0, -34, 9, 8, "#4f9a5a"], [-3, -28, 6, 5, "#5fae6a"], [4, -31, 5, 4, "#6fbf6a"]]) { blob(x + dx, y + dy, rx + 0.75, ry + 0.75, OUT); blob(x + dx, y + dy, rx, ry, c); }
+}
+function lamp(x, y, sky) { R(x - 1, y - 44, 2, 44, "#2a2438"); R(x - 2.5, y - 2, 5, 2, "#2a2438"); R(x - 1, y - 46, 8, 1.5, "#2a2438"); ob(x + 4, y - 46, 6, 4, "#3a3448", 0.5); R(x + 5, y - 42.5, 4, 1, sky.k === "day" ? "#c9c6d2" : "#ffe7a0"); LAMPS.push([x + 7, y - 41]); }
+function neighbours(XL, XR, sky) {
+  LAMPS.length = 0;
+  const pal = ["#8a8fa8", "#b89a7a", "#7a8a7a", "#a87a7a", "#9a8ab0", "#c0a888"];
+  for (const [from, to, dir, seed] of [[4, XL, -1, 3], [796, XR, 1, 8]]) {
+    const r = rng(seed); let x = from;
+    while (dir < 0 ? x > to : x < to) {
+      const w = 60 + r() * 60, top = 120 + r() * 140, c = pal[(r() * pal.length) | 0], bx = dir < 0 ? x - w : x;
+      ob(bx, top, w, 488 - top, c); R(bx + 1, top + 1, w - 2, 3, mix(c, 0.25)); R(bx - 2, top - 3, w + 4, 4, mix(c, -0.3));
+      for (let wy = top + 12; wy < 470; wy += 18) for (let wx = bx + 8; wx < bx + w - 12; wx += 16) {
+        const lit = sky.lit && r() < sky.lit + 0.2;
+        ob(wx, wy, 9, 11, lit ? "#f4d27a" : sky.k === "day" ? mix(sky.bands[3], -0.1) : "#2a2c40", 0.5); vl(wx + 4.5, wy + 0.5, 10, mix(c, -0.3));
+      }
+      ob(bx + w / 2 - 6, 466, 12, 22, mix(c, -0.4)); R(bx + w / 2 + 2, 477, 1.5, 1.5, "#e0c070");
+      x += dir * (w + 6 + r() * 10);
+    }
+    for (let k = 0, lx = from + dir * 40; dir < 0 ? lx > to + 10 : lx < to - 10; lx += dir * 70, k++) (k % 2 ? tree : (xx, yy) => lamp(xx, yy, sky))(lx, 488);
   }
 }
 const bg = document.createElement("canvas"); bg.width = W * 2; bg.height = H * 2;
 let bgKey = "";
 function drawBackground(t) {
   const sky = skyOf(t), night = sky.k === "night", dayish = sky.k === "day";
-  g = bg.getContext("2d"); g.setTransform(2, 0, 0, 2, 0, 0); g.imageSmoothingEnabled = false;
+  g = bg.getContext("2d"); g.setTransform(2, 0, 0, 2, VIEW.ex * 2, VIEW.ey * 2); g.imageSmoothingEnabled = false;
+  const XL = -VIEW.ex - 1, XR = W + VIEW.ex + 1, YT = -VIEW.ey - 1, YB = H + VIEW.ey + 1;
   WINDOWS.length = 0;
   // ---------- sky, sun or moon, city behind
-  sky.bands.forEach((c, i) => R(0, i * 9, W, 9, c)); R(0, 54, W, H, sky.bands.at(-1));
-  if (!dayish) { const r = rng(4); for (let i = 0; i < 60; i++) R(r() * W, r() * 42, r() < 0.2 ? 1 : 0.5, r() < 0.2 ? 1 : 0.5, "#e8e4ff"); }
+  R(XL, YT, XR - XL, 10 - YT, sky.bands[0]); sky.bands.forEach((c, i) => R(XL, i * 9, XR - XL, 9, c)); R(XL, 54, XR - XL, YB - 54, sky.bands.at(-1));
+  if (!dayish) { const r = rng(4); for (let i = 0; i < 60 + VIEW.ex / 4; i++) R(XL + r() * (XR - XL), YT + r() * (42 - YT), r() < 0.2 ? 1 : 0.5, r() < 0.2 ? 1 : 0.5, "#e8e4ff"); }
   if (night) for (let y = -7; y <= 7; y += 0.5) for (let x = -7; x <= 7; x += 0.5) if (x * x + y * y <= 49 && (x - 4) * (x - 4) + (y + 2) * (y + 2) > 36) R(120 + x, 22 + y, 0.5, 0.5, "#f4efd8");
   const wx = weatherOf();
   if (dayish && (wx === "clear" || wx === "cloudy")) { for (let y = -8; y <= 8; y += 0.5) for (let x = -8; x <= 8; x += 0.5) if (x * x + y * y <= 64) R(120 + x, 22 + y, 0.5, 0.5, x * x + y * y > 50 ? "#ffe590" : "#fff4c0"); for (const [cx, cy] of [[600, 14], [210, 30]]) { R(cx, cy, 34, 7, "#ffffff"); R(cx + 7, cy - 5, 16, 5, "#ffffff"); hl(cx, cy + 6.5, 34, "#d8e8f8"); } }
   drawWeatherSky(wx, sky);
   const r = rng(23);
-  for (let x = -6; x < W; x += 30 + r() * 20) {
+  for (let x = XL - 6; x < XR; x += 30 + r() * 20) {
     const top = 8 + r() * 34, w = 26 + r() * 30; R(x, top, w, H, sky.city); hl(x, top, w, mix(sky.city, 0.15));
     for (let wy = top + 4; wy < 46; wy += 5) for (let wx = x + 3; wx < x + w - 3; wx += 4) if (r() < (sky.lit || 0.06)) R(wx, wy, 1.5, 2, sky.lit ? "#f4d27a" : mix(sky.city, 0.2));
   }
   // ---------- street
-  R(0, 488, W, 6, "#a8a2b6"); hl(0, 488, W, OUT); for (let x = 0; x < W; x += 10) vl(x, 489, 5, "#948ea4"); R(0, 494, W, 6, "#3a3646"); for (let x = 8; x < W; x += 36) R(x, 497, 16, 1, "#d8d0a8");
+  R(XL, 488, XR - XL, 6, "#a8a2b6"); hl(XL, 488, XR - XL, OUT); for (let x = Math.floor(XL / 10) * 10; x < XR; x += 10) vl(x, 489, 5, "#948ea4");
+  R(XL, 494, XR - XL, YB - 494, "#3a3646"); for (let x = Math.floor(XL / 36) * 36 + 8; x < XR; x += 36) R(x, 497 + Math.min(VIEW.ey, 12), 16, 1, "#d8d0a8");
+  if (VIEW.ey > 14) { R(XL, 510 + VIEW.ey * 0.3, XR - XL, 4, "#a8a2b6"); hl(XL, 510 + VIEW.ey * 0.3, XR - XL, OUT); }
+  neighbours(XL, XR, sky);
 
   // ---------- building shell: brick, cornice, roof with sign, antenna and AC
   ob(8, 50, 784, 440, "#b8705e");
@@ -424,9 +455,13 @@ function drawBackground(t) {
   for (let x = 19; x < 721; x += 12) for (let y = 325; y < 336; y += 6) R(x + ((y / 6) % 2) * 6, y, 6, 6, "#b4b0c8");
   { const rc = rng(6); for (let i = 0; i < 700; i++) R(401 + rc() * 320, 470 + rc() * 10, 0.5, 0.5, "#8a7a9a"); }
   // shared walls with doorways
-  for (const [x, fy] of [[278, 180], [538, 180], [400, 468], [720, 180], [720, 324], [720, 468]]) { R(x - 1, fy - 34, 4, 34, mix("#d8cfc0", -0.25)); R(x - 3, fy - 36, 8, 2, "#6b4a32"); hl(x - 3, fy - 36, 8, "#8a6a4a"); }
+  for (const [x, top, fy] of [[278, 58, 181], [538, 58, 181], [720, 58, 181], [720, 202, 325], [400, 346, 469], [720, 346, 469]]) {
+    R(x - 4, top, 8, fy - 38 - top, "#5a5068"); vl(x - 4, top, fy - 38 - top, "#7a7090"); vl(x + 3.5, top, fy - 38 - top, "#3a3448"); vl(x - 4.5, top, fy - top, OUT); vl(x + 4, top, fy - top, OUT);
+    R(x - 6, fy - 38, 12, 3, "#8a5a36"); hl(x - 6, fy - 38, 12, "#b07a50"); R(x - 6, fy - 35, 2.5, 35, "#8a5a36"); R(x + 3.5, fy - 35, 2.5, 35, "#8a5a36");
+    g.fillStyle = "rgba(20,14,40,.18)"; g.fillRect(x - 3.5, fy - 35, 7, 35);
+  }
   // slabs between floors
-  for (const y of [194, 338]) { R(9, y, 782, 8, "#b8b0c4"); hl(9, y, 782, OUT); hl(9, y + 7.5, 782, OUT); hl(9, y + 1, 782, "#d8d2e2"); for (let x = 12; x < 790; x += 14) R(x, y + 3, 7, 2.5, "#a09ab0"); }
+  for (const y of [194, 338]) { R(9, y, 782, 8, "#6a6278"); hl(9, y, 782, OUT); hl(9, y + 7.5, 782, OUT); hl(9, y + 1, 782, "#8a8298"); for (let x = 12; x < 790; x += 14) R(x, y + 3, 7, 2.5, "#5a5268"); }
   // lift halls: door frames
   for (const fy of FEET) {
     const top = fy - 50;
@@ -457,14 +492,17 @@ function drawBackground(t) {
   R(176, 146, 1.5, 8, "#3a3448"); line(176.5, 146, 182, 139, "#3a3448", 1); ob(179, 135, 10, 5, "#c9a64a", 0.5);
 
   // ================= CONTROL ROOM (Watcher)
-  R(290, 47, 236, 2, "#7a8494"); for (let x = 294; x < 524; x += 16) R(x, 49, 1, 3, "#7a8494"); for (const [x, c] of [[300, "#ef6f6c"], [304, "#5aa9e6"], [308, "#f2c14e"]]) R(x, 45, 1, 4, c);
+
   g.save(); g.translate(0, -8); ob(376, 62, 48, 9, "#2a3040"); txt("DAILY", 400 - tw("DAILY") / 2, 63, "#e8f0f6"); g.restore();
   for (const lx of [330, 470]) ceilingLight(lx, 50);
-  g.save(); g.translate(0, -8); for (let i = 0; i < 6; i++) { const mx = 300 + (i % 3) * 68, my = 72 + Math.floor(i / 3) * 32; R(mx + 29, my - 2, 4, 2, "#5a6470"); sh(mx, my, 62, 28, "#2a3040"); R(mx + 1.5, my + 1.5, 59, 25, "#0b141c"); } g.restore();
-  sh(508, 92, 26, 78, "#3a4252"); for (let y = 96; y < 166; y += 7) { R(510, y, 22, 5.5, "#232a36"); hl(510, y, 22, "#4a5468"); for (let k = 0; k < 4; k++) R(512 + k * 3, y + 2.5, 2, 0.5, "#5a6478"); }
-  sh(376, 154, 112, 6, "#8f9aa8"); sh(378, 160, 108, 10, "#6a7584");
-  for (let i = 0; i < 6; i++) { for (let a = 0; a < 6.28; a += 0.5) R(386 + i * 9 + Math.cos(a) * 2, 165 + Math.sin(a) * 2, 0.5, 0.5, "#d8dee8"); R(386 + i * 9, 163, 0.5, 2, OUT); }
-  for (let i = 0; i < 5; i++) { vl(450 + i * 6, 162, 6, "#2a3040"); R(449 + i * 6, 163 + ((i * 3) % 4), 2.5, 1.5, "#d8dee8"); }
+  g.save(); g.translate(0, -8); for (let i = 0; i < 6; i++) { const mx = 298 + (i % 3) * 70, my = 72 + Math.floor(i / 3) * 38; R(mx + 31, my - 2, 4, 2, "#5a6470"); sh(mx, my, 66, 34, "#2a3040"); R(mx + 1.5, my + 1.5, 63, 31, "#0b141c"); } g.restore();
+
+  ob(350, 132, 8, 22, "#2a3a5a"); hl(351, 133, 6, "#4a5a7a"); ob(349, 154, 22, 4, "#2a3a5a"); R(358, 158, 2, 8, "#6b6f80"); R(351, 166, 18, 1, "#6b6f80"); R(350, 167, 2, 2, OUT); R(368, 167, 2, 2, OUT);
+  sh(376, 154, 96, 5, "#7a8494"); R(380, 159, 3, 11, "#4a5262"); R(464, 159, 3, 11, "#4a5262"); sh(430, 159, 32, 11, "#6a7484"); R(444, 163, 6, 1, "#c9d0dc");
+  ob(386, 152, 18, 2, "#c9c3b0", 0.5); for (let i = 0; i < 8; i++) R(387 + i * 2, 152.5, 1, 0.5, "#8a8496"); ob(408, 151.5, 4, 2.5, "#e8e4f0", 0.5);
+  R(420, 146, 6, 8, "#f4ecd8"); R(426, 148, 2, 4, "#f4ecd8"); hl(420, 147, 6, "#3f8fe0"); ob(450, 149, 12, 5, "#2a2438", 0.5); R(452, 147, 8, 2, "#2a2438");
+
+
   R(410, 45, 10, 4, OUT);
 
   // ================= NEWSROOM (News Hunter)
@@ -497,9 +535,9 @@ function drawBackground(t) {
   // ================= LOUNGE
   g.save(); g.translate(0, 50);
   ceilingLight(110, 300); ceilingLight(300, 300);
-  g.save(); g.translate(0, -16); ob(36, 330, 70, 36, "#c9a64a"); R(38, 332, 66, 32, "#241f30"); txt("BEAT THE", 47.5, 336, "#f2c14e"); txt("S&P 500", 50.5, 346, "#ef6f6c"); hl(48, 356, 46, "#5a5070"); g.restore();
-  g.save(); g.translate(0, -16); winBox(118, 330, 44, 34, sky, { curtain: "#5aa0a8" }); plant(134, 364, 0.6); g.restore();
-  plant(184, 418, 1.1);
+
+  g.save(); g.translate(0, -16); winBox(126, 330, 44, 34, sky, { curtain: "#5aa0a8" }); g.restore();
+
   // sofa with cushions, side lamp and coffee table
   sh(30, 378, 110, 20, "#3f9aa0"); for (let i = 0; i < 3; i++) { sh(34 + i * 34, 380, 32, 16, "#4fb0b6"); hl(36 + i * 34, 382, 28, "#7ad0d4"); }
   sh(26, 394, 118, 18, "#3f8a90"); R(28, 396, 114, 3, "#5aaab0"); sh(24, 386, 10, 26, "#358086"); sh(136, 386, 10, 26, "#358086");
@@ -573,7 +611,7 @@ function squarify(items, x, y, w, h) {
 function heatItems() {
   return (D.status.positions || []).filter((p) => p.market_value > 0).map((p) => {
     const base = p.market_value - (p.change_today_usd || 0);
-    return { s: p.symbol, name: p.name || "", v: p.market_value, today: base ? ((p.change_today_usd || 0) / base) * 100 : 0, total: (p.unrealized_plpc || 0) * 100, w8: p.weight };
+    return { s: p.symbol, name: p.name || "", v: p.market_value, pl: p.unrealized_pl || 0, today: base ? ((p.change_today_usd || 0) / base) * 100 : 0, total: (p.unrealized_plpc || 0) * 100, w8: p.weight };
   });
 }
 function drawHeatmap(x, y, w, h, open) {
@@ -600,7 +638,7 @@ function place(a) { const s = SP[a.want]; a.floor = s.f; a.x = s.x; a.y = FEET[s
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const WALKING = new Set(["walk", "toLift", "enter", "exit"]);
 function stepAgent(a) {
-  const speed = V.mode === "live" ? 0.8 : 1.6;
+  const speed = (V.mode === "live" ? 0.6 : 1.2) * FR;
   if (a.phase === "idle" && a.at !== a.want) route(a);
   if (a.phase === "walk" && SP[a.want].f !== a.floor) route(a);
   const target = { walk: SP[a.want].x, toLift: WAIT_X, enter: INSIDE_X, exit: WAIT_X }[a.phase];
@@ -612,11 +650,11 @@ function stepAgent(a) {
     else if (a.phase === "enter") a.phase = "inside";
     else if (a.phase === "exit") a.phase = "out";
     else { a.phase = "idle"; a.at = a.want; a.dir = SP[a.want].dir; }
-  } else { a.x += Math.sign(d) * speed; a.dir = Math.sign(d); a.walkT = (a.walkT || 0) + 1; }
+  } else { a.x += Math.sign(d) * speed; a.dir = Math.sign(d); a.walkT = (a.walkT || 0) + FR; }
 }
 // idle → (moving to the caller) → opening → open (someone walks in or out) → closing → moving → …
 function stepLift() {
-  const L = lift, fast = V.mode === "live" ? 1 : 1.5;
+  const L = lift, fast = (V.mode === "live" ? 1 : 1.5) * FR;
   if (L.state === "idle") {
     const next = L.queue[0];
     if (!next) return;
@@ -631,7 +669,7 @@ function stepLift() {
     L.door = Math.min(1, L.door + 0.03 * fast);
     if (L.door === 1) { L.state = "open"; L.wait = 0; L.hold = false; if (L.rider && L.rider.phase === "inside") L.rider.phase = "exit"; }
   } else if (L.state === "open") {
-    L.wait++;
+    L.wait += FR;
     const a = L.rider;
     if (a) {
       if (a.phase === "inside") { if (!L.hold) { L.hold = true; L.wait = 0; } else if (L.wait > 24) { L.hold = false; L.state = "closing"; } }
@@ -664,18 +702,18 @@ function think(instant) {
 }
 function frameOf(a) {
   const dir = a.dir > 0 ? "right" : "left";
-  if (WALKING.has(a.phase)) { const k = ((a.walkT / 8) | 0) % 2; return { key: `${dir}-${k ? "walkA" : "stand"}`, bob: k ? -2 : 0 }; }
+  if (WALKING.has(a.phase)) { const k = ((a.walkT / 14) | 0) % 2; return { key: `${dir}-${k ? "walkA" : "stand"}`, bob: k ? -1 : 0 }; }
   if (a.phase === "wait") return { key: "right-stand", bob: 0 };
   if (a.phase === "out") return { key: "left-stand", bob: 0 };
   if (a.phase !== "idle") return { key: "front-stand", bob: 0 };
   const s = SP[a.at] || {}, act = a.plan.act, body = s.seat ? "sit" : "stand";
   if (act === "sleep") return { key: `front-${body}-z`, bob: 0 };
   const busy = act === "type" || act === "trade";
-  return { key: `${dir}-${body}`, bob: busy && ((T / 8) | 0) % 2 ? -2 : 0 };
+  return { key: `${dir}-${body}`, bob: busy && ((T / 45) | 0) % 2 ? -1 : 0 };  // a slow, small nod while working
 }
 
 // ================================================================ things that move every frame
-let T = 0;
+let T = 0, FR = 1;  // T: time in 60ths of a second; FR: length of this frame in the same unit
 function dayPoints(date) {
   const out = [];
   for (const p of D.intraday.points || []) { if (p[1] == null || p[2] == null) continue; const n = ny(Date.parse(p[0])); if (n.date === date) out.push([n.min, p[1], p[2]]); }
@@ -689,15 +727,16 @@ function live(t) {
   const flick = night && hash(String((T / 9) | 0)) % 23 === 0;
   if (!flick) { const s = "LARP CAPITAL"; txt(s, 400 - tw(s, 2) / 2, 13, sky.k === "day" ? "#e0b040" : "#f2c14e", 2); if (sky.k !== "day") glow(400, 20, 110, "242,193,78", 0.12); }
   if (((T / 40) | 0) % 2) { R(762.5, 6.5, 3.5, 2.5, "#ef4f4f"); if (night) glow(764, 8, 8, "239,79,79", 0.5); }
+  for (const [lx, ly] of LAMPS) if (sky.k !== "day") glow(lx, ly, 26, "255,231,160", 0.28);
   if (night) { glow(170, 88, 40, "255,226,150", 0.22); glow(184, 154, 22, "255,226,150", 0.3); glow(156, 430, 24, "255,226,150", 0.3); glow(500, 446, 16, "255,226,150", 0.35); glow(600, 446, 16, "255,226,150", 0.35); }
 
   g.save(); g.translate(0, 16);  // top floor furniture sits 16 lower than its drawing coordinates
 
   const wx = weatherOf();
   if (wx === "rain" || wx === "storm") {
-    const n = wx === "storm" ? 260 : 150, rr = rng(5);
+    const n = Math.round((wx === "storm" ? 260 : 150) * (1 + VIEW.ex / 400 + VIEW.ey / 250)), rr = rng(5);
     for (let i = 0; i < n; i++) {
-      const x0 = rr() * (W + 40), sp = 2.5 + rr() * 1.5, y = (rr() * 520 + T * sp) % 520 - 20, x = (x0 - y * 0.25 + W * 2) % (W + 40) - 20;
+      const span = W + VIEW.ex * 2 + 40, top = -VIEW.ey - 20, hgt = 508 - top, x0 = rr() * span, sp = 2.5 + rr() * 1.5, y = (rr() * hgt + T * sp) % hgt + top, x = ((x0 - y * 0.25) % span + span) % span - VIEW.ex - 20;
       if (y > 43 && y < 488 && x > 7 && x < 793) continue;
       R(x, y, 0.5, 3, "#c8d4ec88");
     }
@@ -707,7 +746,7 @@ function live(t) {
       if (wx === "storm" && T % 520 < 6) { g.fillStyle = "rgba(255,255,255,.55)"; g.fillRect(x, y, w, h); }
       g.restore();
     }
-    if (wx === "storm" && T % 520 < 6) { g.fillStyle = "rgba(255,255,255,.35)"; g.fillRect(0, 0, W, 44); const bx = 120 + (T / 520 | 0) * 173 % 560; line(bx, 0, bx - 6, 14, "#fff8c0", 1); line(bx - 6, 14, bx + 2, 22, "#fff8c0", 1); line(bx + 2, 22, bx - 4, 40, "#fff8c0", 1); }
+    if (wx === "storm" && T % 520 < 6) { g.fillStyle = "rgba(255,255,255,.35)"; g.fillRect(-VIEW.ex - 1, -VIEW.ey - 1, W + VIEW.ex * 2 + 2, 45 + VIEW.ey); const bx = 120 + (T / 520 | 0) * 173 % 560; line(bx, 0, bx - 6, 14, "#fff8c0", 1); line(bx - 6, 14, bx + 2, 22, "#fff8c0", 1); line(bx + 2, 22, bx - 4, 40, "#fff8c0", 1); }
   }
 
   // Claude's monitor
@@ -715,7 +754,7 @@ function live(t) {
   R(200, 128, 36, 22, "#0e1620");
   if (atDesk && c.plan.act !== "sleep") {
     R(200, 128, 36, 3, "#2a3a5a"); R(202, 128.5, 1, 1, "#ef6f6c"); R(204, 128.5, 1, 1, "#f2c14e");
-    for (let i = 0; i < 8; i++) { const w = c.plan.act === "type" ? ((T / 6 + i * 5) | 0) % 28 + 3 : 8 + (i * 7) % 20; R(202, 133 + i * 2, w, 1, i % 3 ? "#7fb8ff" : "#6fd08c"); }
+    for (let i = 0; i < 8; i++) { const w = c.plan.act === "type" ? ((T / 18 + i * 5) | 0) % 28 + 3 : 8 + (i * 7) % 20; R(202, 133 + i * 2, w, 1, i % 3 ? "#7fb8ff" : "#6fd08c"); }
     if (night) glow(218, 139, 22, "127,184,255", 0.18);
   } else if (((T / 50) | 0) % 2) R(233, 147, 1, 1, "#6fd08c");
 
@@ -724,19 +763,19 @@ function live(t) {
   const hs = heatItems(), pages = Math.max(1, Math.ceil(hs.length / 6)), page = Math.floor(T / 300) % pages;
   if (pages > 1) for (let p = 0; p < pages; p++) R(428 + p * 3, 57.5, 2, 2, p === page ? "#6fd08c" : "#3a4252");
   for (let i = 0; i < 6; i++) {
-    const mx = 301.5 + (i % 3) * 68, my = 65.5 + Math.floor(i / 3) * 32;
+    const mx = 299.5 + (i % 3) * 70, my = 65.5 + Math.floor(i / 3) * 38;
     const h = hs[page * 6 + i];
-    if (!h) { R(mx, my, 59, 25, "#0e1a26"); for (let gx = mx + 2; gx < mx + 58; gx += 8) vl(gx, my + 2, 21, "#132232"); txt("--", mx + 24, my + 9, "#2e4a5e"); continue; }
+    if (!h) { R(mx, my, 63, 31, "#0e1a26"); for (let gx = mx + 2; gx < mx + 62; gx += 8) vl(gx, my + 2, 27, "#132232"); txt("--", mx + 26, my + 12, "#2e4a5e"); continue; }
     const col = h.today >= 0 ? "#6fd08c" : "#ef6f6c", lbl = (h.today >= 0 ? "+" : "") + h.today.toFixed(1) + "%";
-    txt(h.s, mx + 2, my + 2, "#c9d6e6"); txt(lbl, mx + 57 - tw(lbl), my + 2, col);
-    for (let gx = mx + 2; gx < mx + 58; gx += 8) vl(gx, my + 9, 15, "#142030");
+    txt(h.s, mx + 3, my + 3, "#c9d6e6"); txt(lbl, mx + 60 - tw(lbl), my + 3, col);
+    for (let gx = mx + 2; gx < mx + 62; gx += 8) vl(gx, my + 12, 17, "#142030");
     const r = rng(hash(h.s + t.date)), tilt = Math.max(-1, Math.min(1, h.today / 2));
-    let y = 0, px = mx + 2, py = my + 18;
-    for (let k = 0; k < 55; k += 0.5) { y += (r() - 0.5) * 1.2 - tilt * 0.06; y = Math.max(-5, Math.min(5, y)); const yy = my + 18 + y; line(px, py, mx + 2 + k, yy, col, 0.5); px = mx + 2 + k; py = yy; }
-    if (night) glow(mx + 30, my + 13, 26, h.today >= 0 ? "111,208,140" : "239,111,108", 0.08);
+    let y = 0, px = mx + 2, py = my + 21;
+    for (let k = 0; k < 59; k += 0.5) { y += (r() - 0.5) * 1.2 - tilt * 0.06; y = Math.max(-7, Math.min(7, y)); const yy = my + 21 + y; line(px, py, mx + 2 + k, yy, col, 0.5); px = mx + 2 + k; py = yy; }
+    if (night) glow(mx + 32, my + 16, 28, h.today >= 0 ? "111,208,140" : "239,111,108", 0.08);
   }
-  for (let y = 96, i = 0; y < 166; y += 7, i++) { R(526, y + 2.5, 1.5, 1, ((T / 10 + i * 7) | 0) % 5 ? "#6fd08c" : "#1b2029"); R(529, y + 2.5, 1.5, 1, ((T / 13 + i * 3) | 0) % 3 ? "#f2c14e" : "#1b2029"); }
-  for (let i = 0; i < 10; i++) R(432 + i * 4, 157.5, 2, 1, open && ((T / 20 + i * 3) | 0) % 4 ? ["#6fd08c", "#f2c14e", "#ef6f6c", "#7fb8ff"][i % 4] : "#5a6470");
+
+
   const on = A.watch.plan.stop && ((T / 8) | 0) % 2;
   R(411, 46, 8, 2.5, on ? "#ff3b3b" : "#7a2a2a");
   if (on) { glow(415, 48, 60, "255,40,40", 0.25); g.fillStyle = "rgba(255,40,40,.08)"; g.fillRect(279, 43, 260, 134); }
@@ -752,12 +791,12 @@ function live(t) {
     R(664, 98, 50, 7, "#f2c14e");
     g.save(); g.beginPath(); g.rect(664, 98, 50, 7); g.clip();
     const s = head.toUpperCase().replace(/[^A-Z0-9 .,%$&!?'()/+-]/g, ""), len = tw(s) + 50;
-    txt(s, 714 - ((T / 2) % len), 98, OUT); g.restore();
+    txt(s, 714 - ((T / 6) % len), 98, OUT); g.restore();
     if (night) glow(689, 88, 30, "127,160,255", 0.12);
   }
   g.restore();
   const n = A.news;
-  if (n.phase === "idle" && n.at === "teletype") { const p = (T / 3) % 18; R(681, 139 - p, 16, p + 1, "#ffffff"); for (let i = 1; i < p; i += 2) hl(683, 139 - i, 10 - (i % 3) * 2, "#8a8496"); }
+  if (n.phase === "idle" && n.at === "teletype") { const p = (T / 10) % 18; R(681, 139 - p, 16, p + 1, "#ffffff"); for (let i = 1; i < p; i += 2) hl(683, 139 - i, 10 - (i % 3) * 2, "#8a8496"); }
   if (n.phase === "idle" && n.at === "armchair") {
     if (n.plan.act === "sleep") { ob(566, 160, 18, 4, "#ffffff", 0.5); hl(568, 161.5, 14, "#8a8496"); }
     else { const up = (T % 400) > 320 ? 3 : 0; ob(574, 140 + up, 20, 20, "#ffffff", 0.5); R(576, 142 + up, 16, 2, OUT); for (let i = 0; i < 6; i++) hl(576, 146 + up + i * 2, i % 2 ? 7 : 16, "#8a8496"); vl(584, 141 + up, 18, "#d8d0bc"); }
@@ -772,7 +811,7 @@ function live(t) {
   if (trades.length) tick = trades.map((id) => `${NAME[id]}: ${A[id].plan.say}`).join("   ") + "   " + tick;
   g.save(); g.beginPath(); g.rect(30, 180, 680, 20); g.clip();
   for (let x = 30; x < 710; x += 1) if (x % 2 === 0) vl(x, 180, 20, "#0b0d12");
-  if (tick) { const len = tw(tick, 2) + 120, off = (T * 0.7) % len; for (let rep = 0; rep < 2; rep++) drawTicker(tick, 708 - off + rep * len, 183, hs); }
+  if (tick) { const len = tw(tick, 2) + 240, off = (T * 0.35) % len; for (let rep = 0; rep < 2; rep++) drawTicker(tick, 708 - off + rep * len, 183, hs); }
   g.restore();
   const key = t.date + "|" + (D.intraday.points || []).length;
   if (ptsCache.key !== key) ptsCache = { key, pts: dayPoints(t.date) };
@@ -798,29 +837,20 @@ function live(t) {
     if (busy) { const p = A[id].plan; if (((T / 10) | 0) % 2) txt(p.side, kx + 12 - tw(p.side, 0.5) / 2, 256.5, p.side === "BUY" ? "#6fd08c" : "#ef6f6c", 0.5); if (night) glow(kx + 12, 258, 18, "111,208,140", 0.2); }
     else { hl(kx + 4, 255, 12, "#2f6b45"); hl(kx + 4, 258, 8, "#2f6b45"); hl(kx + 4, 261, 10, "#2f6b45"); }
   });
-  for (const id of trades) { const kx = { claude: 560, news: 610, watch: 660 }[id]; for (let k = 0; k < 7; k++) { const ph = (T * 0.8 + k * 9) % 44; ob(kx + 3 + ((k * 5) % 18), 246 - ph, 2.5, 2.5, ph < 32 ? "#f2c14e" : "#b8923a", 0.5); } }
+  for (const id of trades) { const kx = { claude: 560, news: 610, watch: 660 }[id]; for (let k = 0; k < 7; k++) { const ph = (T * 0.4 + k * 9) % 44; ob(kx + 3 + ((k * 5) % 18), 246 - ph, 2.5, 2.5, ph < 32 ? "#f2c14e" : "#b8923a", 0.5); } }
 
   g.restore();
 
   // Lounge: steam, arcade, ceiling fan, employee of the month
   g.save(); g.translate(0, 50);
-  const star = bestAgent();
-  g.save(); g.translate(0, -16);
-  ob(168, 330, 54, 46, "#c9a64a"); R(170, 332, 50, 42, "#2a2438"); hl(170, 332, 50, "#e0c070");
-  txt("TOP AGENT", 195 - tw("TOP AGENT", 0.5) / 2, 334, "#f2c14e", 0.5);
-  if (star) {
-    main.drawImage(SPR[star.id]["front-stand"], 184.5, 338.5, 21, 28.5);
-    const v = (star.v >= 0 ? "+" : "") + star.v.toFixed(1) + "%";
-    txt(v, 195 - tw(v) / 2, 367, star.v >= 0 ? "#6fd08c" : "#ef6f6c");
-  } else txt("NOBODY YET", 195 - tw("NOBODY YET", 0.5) / 2, 352, "#8a8494", 0.5);
-  g.restore();
-  if (AG.some((id) => A[id].phase === "idle" && A[id].at === "coffee_" + id)) for (let k = 0; k < 4; k++) R(240 + k * 2, 376 - ((T / 9 + k * 3) % 10), 1, 2, "#ffffff");
+  g.save(); g.translate(0, -16); topAgentFrame(24, 318, 96, 70); g.restore();
+  if (AG.some((id) => A[id].phase === "idle" && A[id].at === "coffee_" + id)) for (let k = 0; k < 4; k++) R(240 + k * 2, 376 - ((T / 18 + k * 3) % 10), 1, 2, "#ffffff");
   const playing = A.watch.phase === "idle" && A.watch.at === "arcade";
   R(334, 358, 24, 20, playing ? "#101028" : "#0b0b16");
-  if (playing) { R(336 + ((T / 4) | 0) % 20, 366, 2, 2, "#6fd08c"); R(344, 360 + ((T / 9) | 0) % 14, 2, 2, "#ef6f6c"); hl(336, 375, 20, "#7fb8ff"); txt(String((T / 6 | 0) % 1000).padStart(3, "0"), 349, 359.5, "#f2c14e", 0.5); if (night) glow(346, 368, 22, "127,184,255", 0.2); }
+  if (playing) { R(336 + ((T / 10) | 0) % 20, 366, 2, 2, "#6fd08c"); R(344, 360 + ((T / 18) | 0) % 14, 2, 2, "#ef6f6c"); hl(336, 375, 20, "#7fb8ff"); txt(String((T / 20 | 0) % 1000).padStart(3, "0"), 349, 359.5, "#f2c14e", 0.5); if (night) glow(346, 368, 22, "127,184,255", 0.2); }
   else if (((T / 60) | 0) % 2) txt("ZAP", 337.5, 364, "#3a2a5a");
   R(210, 296, 1, 25, OUT); ob(206, 320, 9, 3, "#5a3a24", 0.5);
-  const fa = (T / 6) % Math.PI; for (const dx of [-1, 1]) R(210.5 + (dx < 0 ? -18 * Math.abs(Math.cos(fa)) : 0), 322, 18 * Math.abs(Math.cos(fa)), 1, "#8a5a36");
+  const fa = (T / 14) % Math.PI; for (const dx of [-1, 1]) R(210.5 + (dx < 0 ? -18 * Math.abs(Math.cos(fa)) : 0), 322, 18 * Math.abs(Math.cos(fa)), 1, "#8a5a36");
   g.restore();
 
   // beds: pillow always, blanket on empty beds (a sleeper gets theirs drawn over them)
@@ -835,9 +865,25 @@ function blanket(bx, col, made) {
   ob(x, y, w, 461 - y, col, 0.5); R(x + 0.5, y + 0.5, 3, 461 - y - 1, mix(col, 0.2)); R(x + 0.5, y + 0.5, w - 1, 2, mix(col, 0.35)); for (let k = x + 6; k < x + w - 2; k += 8) vl(k, y + 3, 458 - y, mix(col, -0.15));
 }
 // the agent beating the S&P by the most on its buys (avg return vs the S&P over the same days)
+function topAgentFrame(x, y, w, h) {  // "employee of the month": gold frame, red ribbon, the agent on a little stand
+  const star = bestAgent(), cx = x + w / 2;
+  ob(x, y, w, h, "#b8892e"); R(x + 1, y + 1, w - 2, 1, "#f2d27a"); R(x + 1, y + h - 2, w - 2, 1, "#7a5a1e"); vl(x + 1, y + 1, h - 2, "#f2d27a");
+  ob(x + 3, y + 3, w - 6, h - 6, "#2a1f3a", 0.5); R(x + 3.5, y + 3.5, w - 7, 1, "#3a2c50");
+  for (const [dx, dy] of [[5, 5], [w - 7, 5], [5, h - 7], [w - 7, h - 7]]) R(x + dx, y + dy, 2, 2, "#f2d27a");
+  R(x + 8, y + 7, w - 16, 10, "#c73b3b"); R(x + 8, y + 7, w - 16, 1, "#e05a5a"); R(x + 5, y + 9, 3, 6, "#9a2a2a"); R(x + w - 8, y + 9, 3, 6, "#9a2a2a");
+  txt("TOP AGENT", cx - tw("TOP AGENT") / 2, y + 8.5, "#fff4d0");
+  if (!star) { txt("NOBODY YET", cx - tw("NOBODY YET") / 2, y + h / 2, "#8a8494"); return; }
+  const sparkle = ((T / 20) | 0) % 2;
+  for (const [sx, sy, on] of [[x + 16, y + 26, sparkle], [x + w - 18, y + 30, !sparkle], [x + 22, y + 40, !sparkle]]) if (on) { R(sx, sy - 1.5, 0.5, 3.5, "#f2d27a"); R(sx - 1.5, sy, 3.5, 0.5, "#f2d27a"); }
+  ob(cx - 10, y + 46, 20, 3, "#c9a64a", 0.5);
+  main.drawImage(SPR[star.id]["front-stand"], cx - 10.5, y + 18, 21, 28.5);
+  txt(NAME[star.id], cx - tw(NAME[star.id]) / 2, y + 51, COLOR[star.id]);
+  const v = `${star.v >= 0 ? "+" : ""}${star.v.toFixed(1)}% VS S&P`;
+  txt(v, cx - tw(v) / 2, y + 60, star.v >= 0 ? "#6fd08c" : "#ef6f6c");
+}
 function bestAgent() {
   let best = null;
-  for (const id of AG) { const s = (D.status.scorecard || {})[id]; if (s && s.buys && (!best || s.avg_vs_spy_pct > best.v)) best = { id, v: s.avg_vs_spy_pct }; }
+  for (const id of AG) { const s = (D.status.scorecard || {})[id]; if (s && s.buys && (!best || s.avg_vs_spy_pct > best.v)) best = { id, v: s.avg_vs_spy_pct, beat: s.beat_spy, buys: s.buys }; }
   return best;
 }
 function clock(x, y, t) {
@@ -852,7 +898,7 @@ function drawTicker(s, x, y, hs) {
     const h = hs.find((q) => part.startsWith(q.s + " "));
     const col = h ? (h.today >= 0 ? "#6fd08c" : "#ef6f6c") : "#f2c14e";
     if (cx < 712 && cx + tw(part, 2) > 28) txt(part, cx, y, col, 2);
-    cx += tw(part, 2) + 26;
+    cx += tw(part, 2) + 70;
   }
 }
 
@@ -873,7 +919,7 @@ function overlays() {
   AG.forEach((id, i) => {
     const a = agents[id];
     if (lift.rider === a) return;
-    if (a.plan.act === "sleep" && a.phase === "idle") { const z = ((T / 30) | 0) % 3; txt("Z", a.x + 14 + z * 2, a.y - 31 - z * 4, "#e8e4ff"); if (z) txt("Z", a.x + 18, a.y - 38 - z * 2, "#a49cc0"); return; }
+    if (a.plan.act === "sleep" && a.phase === "idle") { const z = ((T / 50) | 0) % 3; txt("Z", a.x + 14 + z * 2, a.y - 31 - z * 4, "#e8e4ff"); if (z) txt("Z", a.x + 18, a.y - 38 - z * 2, "#a49cc0"); return; }
     if (!a.plan.say || a.phase !== "idle") return;
     const cycle = (T / 60 + i * 6) % 18;
     if (a.plan.loud || selected === id || cycle < 5) bubble(a, a.plan.say);
@@ -884,7 +930,7 @@ function overlays() {
 // ================================================================ main loop
 let lastThink = 0, lastTs = 0, lastHud = -1;
 function frame(ts) {
-  const dt = Math.min(0.25, (ts - lastTs) / 1000 || 0); lastTs = ts; T++;
+  const dt = Math.min(0.25, (ts - lastTs) / 1000 || 0); lastTs = ts; FR = dt * 60; T += FR;
   if (V.mode === "replay" && V.playing) { V.min += dt * V.speed; if (V.min >= 975) { V.min = 975; V.playing = false; } }
   if (ts - lastThink > 400) { think(false); lastThink = ts; }
   const t = now();
@@ -892,7 +938,7 @@ function frame(ts) {
   if (sk !== bgKey) { drawBackground(t); bgKey = sk; }
   for (const id of AG) stepAgent(agents[id]);
   stepLift();
-  main.drawImage(bg, 0, 0, W, H);
+  main.drawImage(bg, -VIEW.ex, -VIEW.ey, VIEW.w, VIEW.h);
   live(t);
   for (const id of AG) if (lift.rider !== agents[id]) drawAgent(agents[id]);
   drawLift();
@@ -968,7 +1014,7 @@ function soundTriggers() {
   if (was.lift !== lift.state && lift.state === "opening") sounds.ding();
   was.lift = lift.state;
   const c = agents.claude;
-  if (c.phase === "idle" && c.at === "desk" && c.plan.act === "type" && T % 7 === 0 && Math.random() < 0.7) sounds.click();
+  if (c.phase === "idle" && c.at === "desk" && c.plan.act === "type" && Math.random() < 0.05 * FR) sounds.click();
 }
 const ALERTS = { on: store.get("office-alerts") === "1", seen: null };
 function toast(text) {
@@ -1014,27 +1060,37 @@ function hud(t) {
 }
 function card() {
   const id = selected, s = (D.status.scorecard || {})[id] || {};
-  const last = [...D.events].reverse().find((e) => e.agent === id && e.orders.length);
+  let line1 = "No buys yet.", line2 = "", sum = "Nothing to judge yet.";
+  if (s.buys) {
+    line1 = `Beat the S&amp;P on ${s.beat_spy} of ${s.buys} buys`;
+    line2 = `Average vs S&amp;P: <span class="${cls(s.avg_vs_spy_pct)}">${pct(s.avg_vs_spy_pct)}</span>`;
+    const share = s.beat_spy / s.buys, v = s.avg_vs_spy_pct;
+    sum = v > 1 && share >= 0.6 ? "Doing well: most of its buys are ahead of the S&amp;P."
+      : v > 0 ? "Slightly ahead of the S&amp;P overall."
+      : v > -1 ? "Roughly level with the S&amp;P."
+      : "Behind the S&amp;P so far.";
+  }
   $("card").hidden = false;
-  $("card").innerHTML = `<h3 style="color:${COLOR[id]}">${NAME[id]}</h3>
-    <p class="dim">${ROLE[id]}</p>
-    <p style="margin-top:6px">${s.buys ? `Beat S&amp;P on ${s.beat_spy}/${s.buys} buys · avg <span class="${cls(s.avg_vs_spy_pct)}">${pct(s.avg_vs_spy_pct)}</span>` : "No buys yet"}</p>
-    ${last ? `<p class="dim" style="margin-top:6px">${esc(last.date.slice(5))}: ${esc(last.full)}</p>` : ""}`;
+  $("card").innerHTML = `<h3 style="color:${COLOR[id]}">${NAME[id]}</h3><p>${line1}</p>${line2 ? `<p>${line2}</p>` : ""}<p class="dim" style="margin-top:6px">${sum}</p>`;
 }
+let heatMode = "today";
 function heatPanel() {
   const box = $("heatmap"), W2 = box.clientWidth, H2 = box.clientHeight;
-  const cells = squarify(heatItems(), 0, 0, W2, H2);
+  const cells = squarify(heatItems(), 0, 0, W2, H2), sg = (v) => (v >= 0 ? "+" : "−");
   box.innerHTML = cells.map((c) => {
-    const big = c.w > 110 && c.h > 70, mid = c.w > 60 && c.h > 40;
-    return `<div class="cell" style="left:${c.x}px;top:${c.y}px;width:${c.w}px;height:${c.h}px;background:${heatColor(c.today)}" title="${esc(c.name)}">
-      <b style="font-size:${big ? 18 : mid ? 12 : 8}px">${esc(c.s)}</b>
-      ${mid ? `<span>${c.today >= 0 ? "+" : ""}${c.today.toFixed(2)}%</span>` : ""}
-      ${big ? `<small>${esc(c.name)} · ${money(c.v)} · total ${c.total >= 0 ? "+" : ""}${c.total.toFixed(1)}%</small>` : ""}</div>`;
+    const big = c.w > 120 && c.h > 110, mid = c.w > 70 && c.h > 60, colour = heatMode === "today" ? heatColor(c.today) : heatColor(c.total * 0.3);
+    const lines = [`<b style="font-size:${big ? 18 : mid ? 13 : 9}px">${esc(c.s)}</b>`];
+    if (mid) lines.push(`<span>${sg(c.today)}${Math.abs(c.today).toFixed(2)}% today</span>`);
+    if (big) lines.push(`<small>${esc(c.name)}</small>`, `<small>${money(c.v)} (${sg(c.pl)}${money(Math.abs(c.pl))})</small>`);
+    if (mid) lines.push(`<small>Total ${sg(c.total)}${Math.abs(c.total).toFixed(1)}%</small>`);
+    return `<div class="cell" style="left:${c.x}px;top:${c.y}px;width:${c.w}px;height:${c.h}px;background:${colour}" title="${esc(c.name)}">${lines.join("")}</div>`;
   }).join("") || `<p class="dim" style="padding:20px">No holdings yet.</p>`;
+  $("heattitle").textContent = `YOUR HOLDINGS · COLOUR = ${heatMode.toUpperCase()}`;
+  $("heatday").setAttribute("aria-pressed", heatMode === "today"); $("heattot").setAttribute("aria-pressed", heatMode === "total");
 }
 function toggleHeat(show) { $("heat").hidden = !show; $("heatbtn").setAttribute("aria-pressed", show); if (show) heatPanel(); }
 const hitAgent = (x, y) => AG.find((id) => { const a = agents[id]; return a && lift.rider !== a && x >= a.x - 2 && x <= a.x + 22 && y >= a.y - 31 && y <= a.y + 2; });
-const toWorld = (e) => { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) / r.width * W, (e.clientY - r.top) / r.height * H]; };
+const toWorld = (e) => [e.clientX / innerWidth * VIEW.w - VIEW.ex, e.clientY / innerHeight * VIEW.h - VIEW.ey];
 const onHeatScreen = (x, y) => x >= 220 && x <= 510 && y >= 238 && y <= 322;
 cv.addEventListener("click", (e) => {
   const [x, y] = toWorld(e);
@@ -1046,8 +1102,16 @@ cv.addEventListener("click", (e) => {
 cv.addEventListener("mousemove", (e) => { const [x, y] = toWorld(e); cv.style.cursor = hitAgent(x, y) || onHeatScreen(x, y) ? "pointer" : "default"; });
 $("heatbtn").onclick = () => toggleHeat($("heat").hidden);
 $("heatclose").onclick = () => toggleHeat(false);
+$("heatday").onclick = () => { heatMode = "today"; heatPanel(); };
+$("heattot").onclick = () => { heatMode = "total"; heatPanel(); };
 addEventListener("keydown", (e) => { if (e.key === "Escape") toggleHeat(false); });
-function fit() { const s = Math.min(innerWidth / W, innerHeight / H); cv.style.width = Math.floor(W * s) + "px"; cv.style.height = Math.floor(H * s) + "px"; if (!$("heat").hidden) heatPanel(); }
+function fit() {
+  const a = innerWidth / innerHeight, vw = Math.max(W, H * a), vh = Math.max(H, W / a);
+  Object.assign(VIEW, { w: vw, h: vh, ex: (vw - W) / 2, ey: (vh - H) / 2 });
+  for (const c of [cv, bg]) { c.width = Math.round(vw * 2); c.height = Math.round(vh * 2); }
+  main.setTransform(2, 0, 0, 2, VIEW.ex * 2, VIEW.ey * 2); main.imageSmoothingEnabled = false;
+  bgKey = ""; if (!$("heat").hidden) heatPanel();
+}
 addEventListener("resize", fit);
 
 function tradingDays() { return [...new Set(D.events.map((e) => e.date))].slice(-15).reverse(); }
