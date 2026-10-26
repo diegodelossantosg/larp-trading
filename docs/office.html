@@ -632,7 +632,7 @@ function drawHeatmap(x, y, w, h, open) {
   if (!items.length) { txt("NO HOLDINGS", x + (w - tw("NO HOLDINGS")) / 2, y + h / 2 - 3, "#4a5568"); return; }
   for (const c of squarify(items, x, y, w, h)) {
     const rx = Math.round(c.x), ry = Math.round(c.y), rw = Math.round(c.x + c.w) - rx, rh = Math.round(c.y + c.h) - ry;
-    R(rx, ry, rw, rh, "#0b0e14"); R(rx + 1, ry + 1, rw - 2, rh - 2, open ? heatColor(c.today) : mix(heatColor(c.today), -0.35));
+    R(rx, ry, rw, rh, "#0b0e14"); R(rx + 1, ry + 1, rw - 2, rh - 2, open ? heatColor(c.today) : mix(heatColor(c.today), -0.6));
     const p = (c.today >= 0 ? "+" : "") + c.today.toFixed(1) + "%";
     if (rw >= tw(c.s) + 4 && rh >= 19) { txt(c.s, rx + (rw - tw(c.s)) / 2, ry + rh / 2 - 8, "#ffffff"); if (rw >= tw(p) + 4) txt(p, rx + (rw - tw(p)) / 2, ry + rh / 2 + 1, "#e8e4f0"); else if (rw >= tw(p, 0.5) + 2) txt(p, rx + (rw - tw(p, 0.5)) / 2, ry + rh / 2 + 1, "#e8e4f0", 0.5); }
     else if (rw >= tw(c.s) + 2 && rh >= 9) txt(c.s, rx + (rw - tw(c.s)) / 2, ry + (rh - 7) / 2, "#ffffff");
@@ -777,7 +777,7 @@ function live(t) {
   if (pages > 1) for (let p = 0; p < pages; p++) R(428 + p * 3, 57.5, 2, 2, p === page ? "#6fd08c" : "#3a4252");
   for (let i = 0; i < 6; i++) {
     const mx = 299.5 + (i % 3) * 70, my = 65.5 + Math.floor(i / 3) * 38;
-    const h = hs[page * 6 + i];
+    const h = open ? hs[page * 6 + i] : null;  // screens rest while the market is closed
     if (!h) { R(mx, my, 63, 31, "#0e1a26"); for (let gx = mx + 2; gx < mx + 62; gx += 8) vl(gx, my + 2, 27, "#132232"); txt("--", mx + 26, my + 12, "#2e4a5e"); continue; }
     const col = h.today >= 0 ? "#6fd08c" : "#ef6f6c", lbl = (h.today >= 0 ? "+" : "") + h.today.toFixed(1) + "%";
     txt(h.s, mx + 3, my + 3, "#c9d6e6"); txt(lbl, mx + 60 - tw(lbl), my + 3, col);
@@ -824,7 +824,7 @@ function live(t) {
   if (trades.length) tick = trades.map((id) => `${NAME[id]}: ${A[id].plan.say}`).join("   ") + "   " + tick;
   g.save(); g.beginPath(); g.rect(30, 180, 680, 20); g.clip();
   for (let x = 30; x < 710; x += 1) if (x % 2 === 0) vl(x, 180, 20, "#0b0d12");
-  if (tick) { const len = tw(tick, 2) + 240, off = (T * 0.35) % len; for (let rep = 0; rep < 2; rep++) drawTicker(tick, 708 - off + rep * len, 183, hs); }
+  if (tick) { const len = tw(tick, 2) + 240, off = (T * 0.35) % len; for (let rep = 0; rep < 2; rep++) drawTicker(tick, 708 - off + rep * len, 183, hs, open); }
   g.restore();
   const key = t.date + "|" + (D.intraday.points || []).length;
   if (ptsCache.key !== key) ptsCache = { key, pts: dayPoints(t.date) };
@@ -841,12 +841,12 @@ function live(t) {
     const fa = ai.at(-1), fs = sp.at(-1), f = (v) => (v >= 0 ? "+" : "") + v.toFixed(1) + "%";
     txt("AI " + f(fa), 34, 211, fa >= fs ? "#6fd08c" : "#ef6f6c"); txt("S&P " + f(fs), 94, 211, "#c9c0d8");
   } else { const m = open ? "LOADING" : "CLOSED"; txt(m, 30 + (180 - tw(m)) / 2, 244, "#4a5568"); }
-  drawHeatmap(221, 207, 288, 80, open || V.mode === "replay");
+  drawHeatmap(221, 207, 288, 80, open);
   [560, 610, 660].forEach((kx, i) => {
     const id = ["claude", "news", "watch"][i], busy = trades.includes(id);
     R(kx + 2, 252, 20, 13, busy ? "#0f2418" : "#0b141c");
     if (busy) { const p = A[id].plan; if (((T / 10) | 0) % 2) txt(p.side, kx + 12 - tw(p.side, 0.5) / 2, 256.5, p.side === "BUY" ? "#6fd08c" : "#ef6f6c", 0.5); if (night) glow(kx + 12, 258, 18, "111,208,140", 0.2); }
-    else { hl(kx + 4, 255, 12, "#2f6b45"); hl(kx + 4, 258, 8, "#2f6b45"); hl(kx + 4, 261, 10, "#2f6b45"); }
+    else if (open) { hl(kx + 4, 255, 12, "#2f6b45"); hl(kx + 4, 258, 8, "#2f6b45"); hl(kx + 4, 261, 10, "#2f6b45"); }
   });
   for (const id of trades) { const kx = { claude: 560, news: 610, watch: 660 }[id]; for (let k = 0; k < 7; k++) { const ph = (T * 0.4 + k * 9) % 44; ob(kx + 3 + ((k * 5) % 18), 246 - ph, 2.5, 2.5, ph < 32 ? "#f2c14e" : "#b8923a", 0.5); } }
 
@@ -903,11 +903,12 @@ function clock(x, y, t) {
   line(x, y, x + Math.cos(ha) * 5, y + Math.sin(ha) * 5, OUT); line(x, y, x + Math.cos(ma) * 8, y + Math.sin(ma) * 8, "#e05a4a");
   txt("NY", x - 3, y + 14, OUT);
 }
-function drawTicker(s, x, y, hs) {
+function drawTicker(s, x, y, hs, open = true) {
   let cx = x;
   for (const part of s.split("   ")) {
     const h = hs.find((q) => part.startsWith(q.s + " "));
-    const col = h ? (h.today >= 0 ? "#6fd08c" : "#ef6f6c") : "#f2c14e";
+    let col = h ? (h.today >= 0 ? "#6fd08c" : "#ef6f6c") : "#f2c14e";
+    if (!open) col = mix(col, -0.55);
     if (cx < 712 && cx + tw(part, 2) > 28) txt(part, cx, y, col, 2);
     cx += tw(part, 2) + 70;
   }
@@ -932,7 +933,7 @@ function overlays() {
     if (lift.rider === a) return;
     if (a.plan.act === "sleep" && a.phase === "idle") { const z = ((T / 50) | 0) % 3; txt("Z", a.x + 14 + z * 2, a.y - 31 - z * 4, "#e8e4ff"); if (z) txt("Z", a.x + 18, a.y - 38 - z * 2, "#a49cc0"); return; }
     if (!a.plan.say || a.phase !== "idle") return;
-    const cycle = (T / 60 + i * 6) % 18;
+    const cycle = (T / 60 + i * 10) % 30;  // each agent speaks for 5 s every 30 s, staggered
     if (a.plan.loud || selected === id || cycle < 5) bubble(a, a.plan.say);
   });
   if (selected) { const a = agents[selected]; if (lift.rider !== a) { const b = ((T / 15) | 0) % 2; R(a.x + 3, a.y + 0.5 + b * 0.5, 14, 1, "#f2c14e"); } }
