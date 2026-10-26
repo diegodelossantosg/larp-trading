@@ -86,7 +86,7 @@ skipped automatically.
 
 > This repository is **public**, so the dashboard and trade journal are visible to anyone.
 > Your API keys are not, because they live in GitHub secrets. To keep results private, make the repo
-> private. GitHub Pages on a private repo needs a paid GitHub plan; otherwise, open `docs/index.html`
+> private. GitHub Pages on a private repo needs a paid GitHub plan; otherwise, open `docs/index.html` (the Trading Floor; the classic dashboard is `docs/classic.html`)
 > locally as shown below.
 
 ## Run locally
@@ -141,7 +141,8 @@ trader/
   broker.py      Alpaca account, ETF vetting, order execution
   market.py      Alpaca daily bars and news
   universe.py    the ETF list
-docs/index.html  dashboard (reads docs/data/*.json)
+docs/index.html  the Trading Floor: pixel office dashboard (reads docs/data/*.json)
+docs/classic.html  the previous dashboard, kept as a classic view
 .github/workflows/trade.yml   schedule
 ```
 
