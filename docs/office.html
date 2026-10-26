@@ -33,7 +33,7 @@ button:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-
 </style>
 </head>
 <body>
-<canvas id="cv" width="1600" height="900" aria-label="Pixel building where the three trading agents work"></canvas>
+<canvas id="cv" width="1600" height="1000" aria-label="Pixel building where the three trading agents work"></canvas>
 <div class="hud" id="tl">…</div>
 <div class="hud" id="tr">…</div>
 <div class="hud" id="bl">
@@ -151,7 +151,8 @@ function plan(id, t) {
   if (id === "claude") {
     if (!open) {
       if (!isWeekend(t) && t.min >= 540 && t.min < 570) return { spot: "coffee_claude", act: "stand", say: "Coffee first" };
-      return { spot: "desk", act: "sleep" };
+      if (!isWeekend(t) && t.min >= 960 && t.min < 1020) return { spot: "desk", act: "read", say: "Writing today's diary" };
+      return { spot: "bed_claude", act: "sleep" };
     }
     if (t.min < 576) return { spot: "coffee_claude", act: "stand", say: "Deciding at 9:36" };
     if (!today && t.min < 690) return { spot: "desk", act: "type", say: "Researching…", loud: true };
@@ -159,11 +160,11 @@ function plan(id, t) {
     return { spot: "desk", act: "read", say: today && today.buys.length ? `New picks: ${short(today.buys)}` : "Holding my picks" };
   }
   if (id === "watch") {
-    if (!open) return t.min >= 960 && t.min < 1320 && !isWeekend(t) ? { spot: "arcade", act: "type", say: "Off duty!" } : { spot: "stool", act: "sleep" };
+    if (!open) return t.min >= 960 && t.min < 1320 && !isWeekend(t) ? { spot: "arcade", act: "type", say: "Off duty!" } : { spot: "bed_watch", act: "sleep" };
     if (coffeeBreak(id, t)) return { spot: "coffee_watch", act: "stand", say: "Quick coffee" };
     return { spot: "console", act: "type", say: watchLine() };
   }
-  if (!open) return { spot: "armchair", act: "sleep" };
+  if (!open) return !isWeekend(t) && t.min >= 960 && t.min < 1140 ? { spot: "armchair", act: "read", say: "Evening paper" } : { spot: "bed_news", act: "sleep" };
   const next = D.events.find((e) => e.agent === "news" && e.date === t.date && e.min >= t.min);
   const scanning = next ? next.min - t.min <= 5 : V.mode === "live" && t.min % 60 >= 15 && t.min % 60 < 21 && !(today && t.min - today.min < 40);
   if (scanning) return { spot: "teletype", act: "type", say: "Any big drops?", loud: true };
@@ -173,7 +174,7 @@ function plan(id, t) {
 }
 
 // ================================================================ drawing helpers
-const W = 800, H = 450;
+const W = 800, H = 500;
 const cv = document.getElementById("cv");
 const main = cv.getContext("2d");
 main.setTransform(2, 0, 0, 2, 0, 0);  // the world is laid out in 800×450 units; half a unit is one pixel
@@ -246,20 +247,25 @@ function buildSprites() {
       grid.forEach((r, y) => r.forEach((k, xx) => { if (k !== ".") { x.fillStyle = SPAL[k]; x.fillRect(xx, y, 1, 1); } }));
       SPR[id][`${dir}-${body}${closed ? "-z" : ""}`] = c;
     }
+    const src = SPR[id]["front-stand-z"], ly = document.createElement("canvas"); ly.width = 19; ly.height = 14;
+    const lx = ly.getContext("2d"); lx.translate(0, 14); lx.rotate(-Math.PI / 2); lx.drawImage(src, 0, 0);  // head to the left, on the pillow
+    SPR[id].lying = ly;
   }
 }
 
 // ================================================================ the building: three floors and a lift
 // Floor 0 is the top floor (the agents' own rooms), 1 the trading room, 2 the ground floor.
-const FEET = [171, 299, 425];
+const FEET = [187, 331, 475];
 // the lift: one door per floor at the right; agents wait at WAIT_X and stand at INSIDE_X in the cabin
 const DOOR_L = 732, DOOR_R = 772, WAIT_X = 704, INSIDE_X = 742;
+const BEDS = [414, 514, 614];  // left edge of each bed, in AG order
 const SP = {
-  desk: { f: 0, x: 150, dir: 1, seat: true }, console: { f: 0, x: 356, dir: 1 }, stool: { f: 0, x: 299, dir: 1, seat: true },
+  desk: { f: 0, x: 150, dir: 1, seat: true }, console: { f: 0, x: 356, dir: 1 },
   armchair: { f: 0, x: 558, dir: 1, seat: true }, teletype: { f: 0, x: 648, dir: 1 },
   term_claude: { f: 1, x: 540, dir: 1 }, term_news: { f: 1, x: 590, dir: 1 }, term_watch: { f: 1, x: 640, dir: 1 },
   coffee_claude: { f: 2, x: 196, dir: 1 }, coffee_watch: { f: 2, x: 204, dir: 1 }, coffee_news: { f: 2, x: 212, dir: 1 },
   arcade: { f: 2, x: 308, dir: 1 },
+  bed_claude: { f: 2, x: 438, dir: -1, bed: 414 }, bed_watch: { f: 2, x: 538, dir: -1, bed: 514 }, bed_news: { f: 2, x: 638, dir: -1, bed: 614 },
 };
 
 function skyOf(t) {
@@ -340,56 +346,61 @@ function drawBackground(t) {
     for (let wy = top + 4; wy < 46; wy += 5) for (let wx = x + 3; wx < x + w - 3; wx += 4) if (r() < (sky.lit || 0.06)) R(wx, wy, 1.5, 2, sky.lit ? "#f4d27a" : mix(sky.city, 0.2));
   }
   // ---------- street
-  R(0, 436, W, 6, "#a8a2b6"); hl(0, 436, W, OUT); for (let x = 0; x < W; x += 10) vl(x, 437, 5, "#948ea4"); R(0, 442, W, 8, "#3a3646"); for (let x = 8; x < W; x += 36) R(x, 446, 16, 1, "#d8d0a8");
+  R(0, 488, W, 6, "#a8a2b6"); hl(0, 488, W, OUT); for (let x = 0; x < W; x += 10) vl(x, 489, 5, "#948ea4"); R(0, 494, W, 6, "#3a3646"); for (let x = 8; x < W; x += 36) R(x, 497, 16, 1, "#d8d0a8");
 
   // ---------- building shell: brick, cornice, roof with sign, antenna and AC
-  ob(8, 50, 784, 388, "#b8705e");
-  for (let y = 51; y < 437; y += 3) { hl(9, y, 782, "#9a5a4a"); for (let x = 9 + ((y / 3) % 2) * 3; x < 791; x += 6) vl(x, y, 3, "#9a5a4a"); }
-  { const rb = rng(77); for (let i = 0; i < 500; i++) R(9 + rb() * 778, 51 + ((rb() * 128) | 0) * 3 + 0.5, 2.5, 2, rb() < 0.5 ? "#c4806c" : "#a8604e"); }
+  ob(8, 50, 784, 440, "#b8705e");
+  for (let y = 51; y < 489; y += 3) { hl(9, y, 782, "#9a5a4a"); for (let x = 9 + ((y / 3) % 2) * 3; x < 791; x += 6) vl(x, y, 3, "#9a5a4a"); }
+  { const rb = rng(77); for (let i = 0; i < 560; i++) R(9 + rb() * 778, 51 + ((rb() * 145) | 0) * 3 + 0.5, 2.5, 2, rb() < 0.5 ? "#c4806c" : "#a8604e"); }
   ob(4, 43, 792, 9, "#b8b0c4"); hl(5, 44, 790, "#d8d2e2"); R(5, 50, 790, 1, "#8a8494"); for (let x = 8; x < 792; x += 5) R(x, 47, 2.5, 2.5, "#9a94a8");
   R(330, 30, 3, 14, OUT); R(467, 30, 3, 14, OUT); ob(300, 8, 200, 24, "#241f30"); R(302, 10, 196, 1, "#3a3448");
   R(763, 8, 2.5, 36, OUT); R(756, 18, 16, 1.5, OUT); R(758, 26, 12, 1.5, OUT);
 
-  // ---------- rooms
-  room(18, 58, 262, 120, "#efe3cc", "#b98a5e");   // study
-  room(278, 58, 262, 120, "#d6e0e8", "#8f9aa8");  // control room
-  room(538, 58, 184, 120, "#f0dcdc", "#8a6a90");  // newsroom
-  room(18, 186, 704, 120, "#dedcec", "#a8a4bc");  // trading room
-  room(18, 314, 384, 118, "#dcebdc", "#c09a6a");  // lounge
-  room(400, 314, 322, 118, "#efe8da", "#d8d0c4");  // lobby
-  for (const [top, h] of [[58, 120], [186, 120], [314, 118]]) room(720, top, 66, h, "#cfc8dc", "#8a8498");
+  // ---------- rooms: three floors, each 136 tall (tops at 58, 202, 346)
+  const RH = 136;
+  room(18, 58, 262, RH, "#efe3cc", "#b98a5e");   // study
+  room(278, 58, 262, RH, "#d6e0e8", "#8f9aa8");  // control room
+  room(538, 58, 184, RH, "#f0dcdc", "#8a6a90");  // newsroom
+  room(18, 202, 704, RH, "#dedcec", "#a8a4bc");  // trading room
+  room(18, 346, 384, RH, "#dcebdc", "#c09a6a");  // lounge
+  room(400, 346, 322, RH, "#e4e0f0", "#7a6a8a");  // bedroom
+  for (const top of [58, 202, 346]) room(720, top, 66, RH, "#cfc8dc", "#8a8498");
   // wall textures and floors
-  for (let x = 22; x < 278; x += 8) for (let y = 66; y < 136; y += 8) R(x + ((y / 8) % 2) * 4, y, 0.5, 0.5, "#dccdb0");       // study wallpaper dots
-  R(19, 136, 260, 26, "#c9a07a"); hl(19, 136, 260, "#e0c09a"); R(19, 137, 260, 1, "#a87e58"); for (let x = 24; x < 276; x += 30) { ob(x, 141, 26, 17, "#c09670", 0.5); hl(x + 1, 157, 24, "#e0c09a"); }
-  for (let x = 278; x < 540; x += 16) { vl(x, 62, 98, "#c2ced8"); vl(x + 0.5, 62, 98, "#e8f0f6"); for (let y = 68; y < 160; y += 12) { R(x + 2, y, 0.5, 0.5, "#9aa8b6"); R(x + 13, y, 0.5, 0.5, "#9aa8b6"); } }
-  for (let x = 542; x < 720; x += 9) for (let y = 66; y < 160; y += 9) { const ox = ((y / 9) % 2) * 4.5; vl(x + ox, y, 2, "#e4c8c8"); hl(x + ox - 0.5, y + 0.5, 1.5, "#e4c8c8"); }
-  for (let x = 20; x < 720; x += 40) vl(x, 190, 86, "#cfcce2");
-  R(19, 270, 702, 20, "#c6c2da"); hl(19, 270, 702, "#c9a64a"); R(19, 270.5, 702, 0.5, "#e0c070"); { const rm = rng(3); for (let i = 0; i < 60; i++) line(20 + rm() * 690, 272 + rm() * 16, 26 + rm() * 690, 273 + rm() * 16, "#d6d2e8", 0.5); }
-  for (let x = 22; x < 400; x += 10) for (let y = 322; y < 400; y += 10) { R(x + 2, y, 0.5, 0.5, "#b8d4bc"); R(x + 1.5, y + 0.5, 1.5, 0.5, "#b8d4bc"); R(x + 2, y + 1, 0.5, 0.5, "#b8d4bc"); }
-  grain(19, 165, 260, 11, "#a87a50", 1); grain(19, 419, 382, 11, "#a8845a", 2);
-  for (let x = 279; x < 539; x += 3) for (let y = 166; y < 176; y += 3) R(x, y, 2, 2, "#7f8a98");
-  { const rc = rng(5); for (let i = 0; i < 400; i++) R(539 + rc() * 182, 166 + rc() * 10, 0.5, 0.5, "#a080a8"); }
-  for (let x = 19; x < 721; x += 12) for (let y = 293; y < 304; y += 6) R(x + ((y / 6) % 2) * 6, y, 6, 6, "#b4b0c8");
-  for (let x = 401; x < 721; x += 10) for (let y = 419; y < 430; y += 5) R(x + ((y / 5) % 2) * 5, y, 5, 5, "#e8e2d8");
+  for (let x = 22; x < 278; x += 8) for (let y = 66; y < 152; y += 8) R(x + ((y / 8) % 2) * 4, y, 0.5, 0.5, "#dccdb0");
+  R(19, 152, 260, 26, "#c9a07a"); hl(19, 152, 260, "#e0c09a"); R(19, 153, 260, 1, "#a87e58"); for (let x = 24; x < 276; x += 30) { ob(x, 157, 26, 17, "#c09670", 0.5); hl(x + 1, 173, 24, "#e0c09a"); }
+  for (let x = 278; x < 540; x += 16) { vl(x, 62, 114, "#c2ced8"); vl(x + 0.5, 62, 114, "#e8f0f6"); for (let y = 68; y < 176; y += 12) { R(x + 2, y, 0.5, 0.5, "#9aa8b6"); R(x + 13, y, 0.5, 0.5, "#9aa8b6"); } }
+  for (let x = 542; x < 720; x += 9) for (let y = 66; y < 176; y += 9) { const ox = ((y / 9) % 2) * 4.5; vl(x + ox, y, 2, "#e4c8c8"); hl(x + ox - 0.5, y + 0.5, 1.5, "#e4c8c8"); }
+  for (let x = 20; x < 720; x += 40) vl(x, 206, 96, "#cfcce2");
+  R(19, 302, 702, 20, "#c6c2da"); hl(19, 302, 702, "#c9a64a"); R(19, 302.5, 702, 0.5, "#e0c070"); { const rm = rng(3); for (let i = 0; i < 60; i++) line(20 + rm() * 690, 304 + rm() * 16, 26 + rm() * 690, 305 + rm() * 16, "#d6d2e8", 0.5); }
+  for (let x = 22; x < 400; x += 10) for (let y = 354; y < 450; y += 10) { R(x + 2, y, 0.5, 0.5, "#b8d4bc"); R(x + 1.5, y + 0.5, 1.5, 0.5, "#b8d4bc"); R(x + 2, y + 1, 0.5, 0.5, "#b8d4bc"); }
+  for (let x = 404; x < 720; x += 14) for (let y = 354; y < 450; y += 14) { R(x, y, 1, 1, "#d4cce4"); R(x + 7, y + 7, 1, 1, "#d4cce4"); }
+  grain(19, 181, 260, 11, "#a87a50", 1); grain(19, 469, 382, 11, "#a8845a", 2);
+  for (let x = 279; x < 539; x += 3) for (let y = 182; y < 192; y += 3) R(x, y, 2, 2, "#7f8a98");
+  { const rc = rng(5); for (let i = 0; i < 400; i++) R(539 + rc() * 182, 182 + rc() * 10, 0.5, 0.5, "#a080a8"); }
+  for (let x = 19; x < 721; x += 12) for (let y = 325; y < 336; y += 6) R(x + ((y / 6) % 2) * 6, y, 6, 6, "#b4b0c8");
+  { const rc = rng(6); for (let i = 0; i < 700; i++) R(401 + rc() * 320, 470 + rc() * 10, 0.5, 0.5, "#8a7a9a"); }
   // shared walls with doorways
-  for (const [x, fy] of [[278, 164], [538, 164], [400, 418], [720, 164], [720, 292], [720, 418]]) { R(x - 1, fy - 34, 4, 34, mix("#d8cfc0", -0.25)); R(x - 3, fy - 36, 8, 2, "#6b4a32"); hl(x - 3, fy - 36, 8, "#8a6a4a"); }
+  for (const [x, fy] of [[278, 180], [538, 180], [400, 468], [720, 180], [720, 324], [720, 468]]) { R(x - 1, fy - 34, 4, 34, mix("#d8cfc0", -0.25)); R(x - 3, fy - 36, 8, 2, "#6b4a32"); hl(x - 3, fy - 36, 8, "#8a6a4a"); }
   // slabs between floors
-  for (const y of [178, 306]) { R(9, y, 782, 8, "#b8b0c4"); hl(9, y, 782, OUT); hl(9, y + 7.5, 782, OUT); hl(9, y + 1, 782, "#d8d2e2"); for (let x = 12; x < 790; x += 14) R(x, y + 3, 7, 2.5, "#a09ab0"); }
+  for (const y of [194, 338]) { R(9, y, 782, 8, "#b8b0c4"); hl(9, y, 782, OUT); hl(9, y + 7.5, 782, OUT); hl(9, y + 1, 782, "#d8d2e2"); for (let x = 12; x < 790; x += 14) R(x, y + 3, 7, 2.5, "#a09ab0"); }
   // lift halls: door frames
   for (const fy of FEET) {
     const top = fy - 50;
     ob(DOOR_L - 4, top - 4, 48, 56, "#7a7488"); hl(DOOR_L - 3, top - 3, 46, "#9a94a8");
     R(DOOR_L, top, 40, 51, "#2a2438"); R(DOOR_L - 2, fy + 1, 44, 1.5, "#5a5466");
   }
-  ceilingLight(753, 62); ceilingLight(753, 190); ceilingLight(753, 318);
+  ceilingLight(753, 62); ceilingLight(753, 206); ceilingLight(753, 350);
 
+  // Each floor's furniture was laid out for the old, shorter floors: shift it down so it stands on the new floor.
+  // Things hanging from the ceiling get longer cords instead.
+  g.save(); g.translate(0, 16);
   // ================= STUDY (Claude)
   sh(28, 78, 52, 92, "#8a5a36"); R(30, 80, 48, 88, "#5a3a22");
   for (let s = 0; s < 4; s++) { books(31, 82 + s * 21, 46, 18, 50 + s); R(29, 100 + s * 21, 50, 2, "#a0704a"); hl(29, 100 + s * 21, 50, "#c09060"); }
   plant(34, 78, 0.7); ob(64, 70, 8, 8, "#e0b04a", 0.5); R(66, 66, 4, 4, "#f2c14e");
   winBox(96, 76, 50, 42, sky, { curtain: "#a84848" });
   ob(192, 76, 40, 28, "#c9a64a"); R(194, 78, 36, 24, sky.bands[3]); R(194, 92, 36, 10, "#5fae6a"); line(194, 92, 206, 84, "#8a9ab2"); line(206, 84, 214, 90, "#8a9ab2"); R(222, 81, 3, 3, "#fff1b0");
-  R(214, 59, 0.5, 13, OUT); ob(206, 72, 17, 6, "#3a6a4a"); hl(207, 73, 15, "#5a8a6a"); R(212, 78, 5, 1, "#fff1b0");
+  R(214, 43, 0.5, 29, OUT); ob(206, 72, 17, 6, "#3a6a4a"); hl(207, 73, 15, "#5a8a6a"); R(212, 78, 5, 1, "#fff1b0");
   R(140, 169, 130, 2.5, "#a84848"); for (let x = 142; x < 268; x += 3) R(x, 169.5, 1.5, 1, "#e0b04a");
   // office chair
   ob(144, 132, 8, 22, "#3a3448"); hl(145, 133, 6, "#5a5466"); ob(143, 154, 22, 4, "#3a3448"); R(152, 158, 2, 8, "#6b6f80"); R(145, 166, 18, 1, "#6b6f80"); R(144, 167, 2, 2, OUT); R(162, 167, 2, 2, OUT); R(153, 167, 2, 2, OUT);
@@ -403,15 +414,15 @@ function drawBackground(t) {
   R(176, 146, 1.5, 8, "#3a3448"); line(176.5, 146, 182, 139, "#3a3448", 1); ob(179, 135, 10, 5, "#c9a64a", 0.5);
 
   // ================= CONTROL ROOM (Watcher)
-  R(290, 63, 236, 2, "#7a8494"); for (let x = 294; x < 524; x += 16) R(x, 65, 1, 3, "#7a8494"); for (const [x, c] of [[300, "#ef6f6c"], [304, "#5aa9e6"], [308, "#f2c14e"]]) R(x, 61, 1, 4, c);
-  for (const lx of [330, 410, 490]) ceilingLight(lx, 66);
+  R(290, 47, 236, 2, "#7a8494"); for (let x = 294; x < 524; x += 16) R(x, 49, 1, 3, "#7a8494"); for (const [x, c] of [[300, "#ef6f6c"], [304, "#5aa9e6"], [308, "#f2c14e"]]) R(x, 45, 1, 4, c);
+  ob(376, 62, 48, 9, "#2a3040"); txt("DAILY", 400 - tw("DAILY") / 2, 64, "#e8f0f6");
+  for (const lx of [330, 470]) ceilingLight(lx, 50);
   for (let i = 0; i < 6; i++) { const mx = 300 + (i % 3) * 68, my = 72 + Math.floor(i / 3) * 32; R(mx + 29, my - 2, 4, 2, "#5a6470"); sh(mx, my, 62, 28, "#2a3040"); R(mx + 1.5, my + 1.5, 59, 25, "#0b141c"); }
   sh(508, 92, 26, 78, "#3a4252"); for (let y = 96; y < 166; y += 7) { R(510, y, 22, 5.5, "#232a36"); hl(510, y, 22, "#4a5468"); for (let k = 0; k < 4; k++) R(512 + k * 3, y + 2.5, 2, 0.5, "#5a6478"); }
   sh(376, 154, 112, 6, "#8f9aa8"); sh(378, 160, 108, 10, "#6a7584");
   for (let i = 0; i < 6; i++) { for (let a = 0; a < 6.28; a += 0.5) R(386 + i * 9 + Math.cos(a) * 2, 165 + Math.sin(a) * 2, 0.5, 0.5, "#d8dee8"); R(386 + i * 9, 163, 0.5, 2, OUT); }
   for (let i = 0; i < 5; i++) { vl(450 + i * 6, 162, 6, "#2a3040"); R(449 + i * 6, 163 + ((i * 3) % 4), 2.5, 1.5, "#d8dee8"); }
-  R(410, 61, 10, 4, OUT);
-  ob(298, 160, 22, 3, "#3f8fe0"); R(308, 163, 2, 6, "#6b6f80"); R(302, 169, 14, 1, "#6b6f80");
+  R(410, 45, 10, 4, OUT);
 
   // ================= NEWSROOM (News Hunter)
   winBox(548, 76, 40, 36, sky, { blinds: 16 });
@@ -423,8 +434,11 @@ function drawBackground(t) {
   ob(548, 132, 12, 38, "#8a5cc8"); for (let i = 0; i < 4; i++) R(553, 138 + i * 7, 1, 1, "#5e3a96"); ob(552, 154, 42, 12, "#9b6bd1"); hl(553, 155, 40, "#b890e8"); ob(586, 146, 10, 14, "#7a4cb8"); R(554, 166, 2, 4, "#3d2a20"); R(590, 166, 2, 4, "#3d2a20");
   sh(668, 142, 46, 28, "#9aa0ae"); R(672, 146, 38, 8, "#3a3f55"); for (let i = 0; i < 8; i++) for (let j = 0; j < 2; j++) R(673 + i * 4.5, 157 + j * 3.5, 3.5, 2.5, "#e8e4f0"); ob(678, 139, 22, 4, "#f4ecd8", 0.5);
 
+  g.restore();
+
   // ================= TRADING ROOM
-  for (const lx of [120, 320, 520]) ceilingLight(lx, 190);
+  g.save(); g.translate(0, 32);
+  for (const lx of [120, 320, 520]) ceilingLight(lx, 174);
   sh(28, 194, 684, 24, "#2a2438"); R(30, 196, 680, 20, "#050608"); for (const bx of [31, 708]) for (const by of [197, 214]) R(bx, by, 1, 1, "#9aa0ae");
   sh(28, 222, 184, 68, "#2a2438"); R(30, 224, 180, 64, "#0b141c");
   sh(218, 220, 294, 70, "#2a2438"); R(220, 222, 290, 66, "#0b0e14");
@@ -435,8 +449,11 @@ function drawBackground(t) {
   }
   plant(696, 304, 1);
 
+  g.restore();
+
   // ================= LOUNGE
-  ceilingLight(110, 318); ceilingLight(300, 318);
+  g.save(); g.translate(0, 50);
+  ceilingLight(110, 300); ceilingLight(300, 300);
   ob(36, 330, 70, 36, "#c9a64a"); R(38, 332, 66, 32, "#241f30"); txt("BEAT THE", 55, 339, "#f2c14e"); txt("S&P 500", 57, 349, "#ef6f6c"); hl(48, 357, 46, "#5a5070");
   winBox(118, 330, 44, 34, sky, { curtain: "#5aa0a8" }); plant(134, 364, 0.6);
   plant(184, 418, 1.1);
@@ -461,19 +478,23 @@ function drawBackground(t) {
   ob(342, 396, 8, 8, "#2a1a48", 0.5); R(345, 398, 2, 4, "#f2c14e"); for (let y = 408; y < 418; y += 3) hl(332, y, 28, "#7a4cb8");
   plant(374, 418, 0.9);
 
-  // ================= LOBBY
-  R(580, 314, 0.5, 8, OUT); ob(570, 322, 20, 5, "#c9a64a"); for (let i = 0; i < 5; i++) R(572 + i * 4, 327, 1.5, 3, "#fff1b0");
-  ob(410, 344, 62, 76, "#5a5466"); R(412, 346, 58, 72, "#a8d8ec"); R(412, 346, 58, 18, sky.bands[3]); R(412, 396, 58, 22, "#8a8498"); hl(412, 396, 58, "#6a6476");
-  for (let x = 414; x < 468; x += 9) R(x, 380, 6, 16, sky.city);
-  line(418, 410, 430, 350, "#ffffff60", 1); line(448, 410, 460, 350, "#ffffff40", 1);
-  R(440, 344, 2, 76, "#5a5466"); R(432, 378, 2, 12, "#c9a64a"); R(448, 378, 2, 12, "#c9a64a");
-  sh(520, 386, 114, 34, "#c08a5a"); R(518, 383, 118, 4, "#e8e2d4"); hl(518, 383, 118, "#ffffff"); R(522, 398, 110, 3, "#2a2438"); grain(522, 402, 110, 16, "#a8744a", 12);
-  ob(536, 370, 22, 13, "#2a2438"); R(538, 372, 18, 9, "#5aa9e6"); R(546, 383, 2, 0.5, "#2a2438");
-  for (const px of [492, 646]) { ob(px, 404, 14, 16, "#c9744a"); R(px + 6, 372, 2, 32, "#7a5a3a"); for (let i = 0; i < 7; i++) { const a = -2.8 + i * 0.95; line(px + 7, 372, px + 7 + Math.cos(a) * 14, 372 + Math.sin(a) * 9 + 4, i % 2 ? "#4f9a5a" : "#6fbf6a", 1); } }
-  sh(666, 402, 46, 5, "#4a4458"); R(670, 407, 2, 11, "#2a2438"); R(706, 407, 2, 11, "#2a2438"); ob(674, 398, 10, 4, "#f4ecd8", 0.5);
+  g.restore();
 
-  if (night) { g.fillStyle = "rgba(8,6,30,.5)"; g.fillRect(8, 50, 784, 388); }
-  else if (!dayish) { g.fillStyle = "rgba(20,12,40,.2)"; g.fillRect(8, 50, 784, 388); }
+  // ================= BEDROOM: one bed per agent
+  R(560, 346, 0.5, 14, OUT); ob(552, 360, 17, 5, "#c9a64a"); hl(553, 361, 15, "#e0c070");
+  winBox(578, 382, 40, 32, sky, { curtain: "#7a5aa8" });
+  R(420, 476.5, 270, 2.5, "#9a6ab8"); for (let x = 422; x < 688; x += 3) R(x, 477, 1.5, 1, "#e0b04a");
+  BEDS.forEach((bx, i) => {
+    const col = COLOR[AG[i]];
+    ob(bx + 22, 396, 26, 20, "#c9a64a"); R(bx + 24, 398, 22, 16, mix(col, 0.55)); R(bx + 24, 408, 22, 6, mix(col, 0.15));
+    sh(bx, 440, 8, 35, "#8a5a36"); R(bx + 2, 444, 4, 1, "#a87a50");
+    sh(bx + 66, 454, 6, 21, "#8a5a36");
+    R(bx + 6, 465, 61, 6, "#6b4226"); R(bx + 8, 471, 2, 4, "#5a3a22"); R(bx + 63, 471, 2, 4, "#5a3a22");
+    sh(bx + 6, 457, 61, 8, "#f4f0e8");
+    if (i < 2) { sh(bx + 76, 458, 16, 17, "#a0704a"); R(bx + 82, 465, 4, 1, "#e0c070"); R(bx + 83, 450, 2, 8, "#3a3448"); ob(bx + 78, 444, 12, 7, "#f4dcaa", 0.5); }
+  });
+  if (night) { g.fillStyle = "rgba(8,6,30,.5)"; g.fillRect(8, 50, 784, 440); }
+  else if (!dayish) { g.fillStyle = "rgba(20,12,40,.2)"; g.fillRect(8, 50, 784, 440); }
   g = main;
 }
 
@@ -624,7 +645,9 @@ function live(t) {
   const flick = night && hash(String((T / 9) | 0)) % 23 === 0;
   if (!flick) { const s = "LARP CAPITAL"; txt(s, 400 - tw(s, 2) / 2, 15, sky.k === "day" ? "#e0b040" : "#f2c14e", 2); if (sky.k !== "day") glow(400, 20, 110, "242,193,78", 0.12); }
   if (((T / 40) | 0) % 2) { R(762.5, 6.5, 3.5, 2.5, "#ef4f4f"); if (night) glow(764, 8, 8, "239,79,79", 0.5); }
-  if (night) { glow(214, 80, 40, "255,226,150", 0.22); glow(184, 138, 22, "255,226,150", 0.3); glow(156, 380, 24, "255,226,150", 0.3); glow(580, 330, 60, "255,226,150", 0.14); }
+  if (night) { glow(214, 96, 40, "255,226,150", 0.22); glow(184, 154, 22, "255,226,150", 0.3); glow(156, 430, 24, "255,226,150", 0.3); glow(500, 446, 16, "255,226,150", 0.35); glow(600, 446, 16, "255,226,150", 0.35); }
+
+  g.save(); g.translate(0, 16);  // top floor furniture sits 16 lower than its drawing coordinates
 
   // Claude's monitor
   const c = A.claude, atDesk = c.phase === "idle" && c.at === "desk";
@@ -636,11 +659,13 @@ function live(t) {
   } else if (((T / 50) | 0) % 2) R(233, 147, 1, 1, "#6fd08c");
 
   // Watcher's wall: six holdings and how they move today
-  const hs = heatItems(), page = Math.floor(T / 300);
+  // pages of six: with 8 holdings, one page of six and one of two; spare screens stay on in standby
+  const hs = heatItems(), pages = Math.max(1, Math.ceil(hs.length / 6)), page = Math.floor(T / 300) % pages;
+  if (pages > 1) for (let p = 0; p < pages; p++) R(428 + p * 3, 65.5, 2, 2, p === page ? "#6fd08c" : "#3a4252");
   for (let i = 0; i < 6; i++) {
     const mx = 301.5 + (i % 3) * 68, my = 73.5 + Math.floor(i / 3) * 32;
-    const h = hs.length ? hs[(page * 6 + i) % hs.length] : null;
-    if (!h || (!open && i % 2)) { R(mx + 1, my + 1, 1, 1, "#1d2633"); continue; }
+    const h = hs[page * 6 + i];
+    if (!h) { R(mx, my, 59, 25, "#0e1a26"); for (let gx = mx + 2; gx < mx + 58; gx += 8) vl(gx, my + 2, 21, "#132232"); txt("--", mx + 26, my + 10, "#2e4a5e"); continue; }
     const col = h.today >= 0 ? "#6fd08c" : "#ef6f6c", lbl = (h.today >= 0 ? "+" : "") + h.today.toFixed(1) + "%";
     txt(h.s, mx + 2, my + 2, "#c9d6e6"); txt(lbl, mx + 57 - tw(lbl), my + 2, col);
     for (let gx = mx + 2; gx < mx + 58; gx += 8) vl(gx, my + 9, 15, "#142030");
@@ -652,8 +677,8 @@ function live(t) {
   for (let y = 96, i = 0; y < 166; y += 7, i++) { R(526, y + 2.5, 1.5, 1, ((T / 10 + i * 7) | 0) % 5 ? "#6fd08c" : "#1b2029"); R(529, y + 2.5, 1.5, 1, ((T / 13 + i * 3) | 0) % 3 ? "#f2c14e" : "#1b2029"); }
   for (let i = 0; i < 10; i++) R(432 + i * 4, 157.5, 2, 1, open && ((T / 20 + i * 3) | 0) % 4 ? ["#6fd08c", "#f2c14e", "#ef6f6c", "#7fb8ff"][i % 4] : "#5a6470");
   const on = A.watch.plan.stop && ((T / 8) | 0) % 2;
-  R(411, 62, 8, 2.5, on ? "#ff3b3b" : "#7a2a2a");
-  if (on) { glow(415, 64, 60, "255,40,40", 0.25); g.fillStyle = "rgba(255,40,40,.08)"; g.fillRect(279, 59, 260, 118); }
+  R(411, 46, 8, 2.5, on ? "#ff3b3b" : "#7a2a2a");
+  if (on) { glow(415, 48, 60, "255,40,40", 0.25); g.fillStyle = "rgba(255,40,40,.08)"; g.fillRect(279, 43, 260, 134); }
 
   // Newsroom TV with the latest News Hunter line
   const lastNews = lastEvent("news", t, false), head = (lastNews && (lastNews.summary || lastNews.full)) || "MARKETS TODAY";
@@ -675,7 +700,10 @@ function live(t) {
     else { const up = (T % 400) > 320 ? 3 : 0; ob(574, 140 + up, 20, 20, "#ffffff", 0.5); R(576, 142 + up, 16, 2, OUT); for (let i = 0; i < 6; i++) hl(576, 146 + up + i * 2, i % 2 ? 7 : 16, "#8a8496"); vl(584, 141 + up, 18, "#d8d0bc"); }
   }
 
+  g.restore();
+
   // Trading room: ticker, chart, heatmap, terminals, bell, coins
+  g.save(); g.translate(0, 32);
   const trades = AG.filter((id) => A[id].phase === "idle" && A[id].at === "term_" + id);
   let tick = hs.map((h) => `${h.s} ${h.today >= 0 ? "+" : ""}${h.today.toFixed(1)}%`).join("   ");
   if (trades.length) tick = trades.map((id) => `${NAME[id]}: ${A[id].plan.say}`).join("   ") + "   " + tick;
@@ -709,14 +737,29 @@ function live(t) {
   });
   for (const id of trades) { const kx = { claude: 560, news: 610, watch: 660 }[id]; for (let k = 0; k < 7; k++) { const ph = (T * 0.8 + k * 9) % 44; ob(kx + 3 + ((k * 5) % 18), 246 - ph, 2.5, 2.5, ph < 32 ? "#f2c14e" : "#b8923a", 0.5); } }
 
+  g.restore();
+
   // Lounge: steam, arcade, ceiling fan
+  g.save(); g.translate(0, 50);
   if (AG.some((id) => A[id].phase === "idle" && A[id].at === "coffee_" + id)) for (let k = 0; k < 4; k++) R(240 + k * 2, 376 - ((T / 9 + k * 3) % 10), 1, 2, "#ffffff");
   const playing = A.watch.phase === "idle" && A.watch.at === "arcade";
   R(334, 358, 24, 20, playing ? "#101028" : "#0b0b16");
   if (playing) { R(336 + ((T / 4) | 0) % 20, 366, 2, 2, "#6fd08c"); R(344, 360 + ((T / 9) | 0) % 14, 2, 2, "#ef6f6c"); hl(336, 375, 20, "#7fb8ff"); txt(String((T / 6 | 0) % 1000).padStart(3, "0"), 349, 359.5, "#f2c14e"); if (night) glow(346, 368, 22, "127,184,255", 0.2); }
   else if (((T / 60) | 0) % 2) txt("ZAP", 340, 365, "#3a2a5a");
-  R(210, 315, 1, 6, OUT); ob(206, 320, 9, 3, "#5a3a24", 0.5);
+  R(210, 296, 1, 25, OUT); ob(206, 320, 9, 3, "#5a3a24", 0.5);
   const fa = (T / 6) % Math.PI; for (const dx of [-1, 1]) R(210.5 + (dx < 0 ? -18 * Math.abs(Math.cos(fa)) : 0), 322, 18 * Math.abs(Math.cos(fa)), 1, "#8a5a36");
+  g.restore();
+
+  // beds: pillow always, blanket on empty beds (a sleeper gets theirs drawn over them)
+  BEDS.forEach((bx, i) => {
+    ob(bx + 7, 451, 14, 6, "#ffffff", 0.5); hl(bx + 8, 455, 12, "#d8d4e0");
+    const a = agents[AG[i]];
+    if (!(a.phase === "idle" && a.at === "bed_" + AG[i])) blanket(bx, COLOR[AG[i]], true);
+  });
+}
+function blanket(bx, col, made) {
+  const x = made ? bx + 24 : bx + 19, w = made ? 43 : 48, y = made ? 452 : 448;
+  ob(x, y, w, 461 - y, col, 0.5); R(x + 0.5, y + 0.5, 3, 461 - y - 1, mix(col, 0.2)); R(x + 0.5, y + 0.5, w - 1, 2, mix(col, 0.35)); for (let k = x + 6; k < x + w - 2; k += 8) vl(k, y + 3, 458 - y, mix(col, -0.15));
 }
 function clock(x, y, t) {
   for (let yy = -11; yy <= 11; yy++) for (let xx = -11; xx <= 11; xx++) { const d = xx * xx + yy * yy; if (d <= 121) R(x + xx, y + yy, 1, 1, d > 90 ? OUT : "#ffffff"); }
@@ -781,6 +824,8 @@ function frame(ts) {
 }
 
 function drawAgent(a) {  // sprites are 14×19, drawn at 1.5 units (3 pixels) per sprite pixel
+  const s = SP[a.at];
+  if (a.phase === "idle" && s && s.bed != null) { main.drawImage(SPR[a.id].lying, s.bed + 3, 441.5, 28.5, 21); blanket(s.bed, COLOR[a.id], false); return; }
   const f = frameOf(a);
   main.drawImage(SPR[a.id][f.key], Math.round((a.x - 0.5) * 2) / 2, Math.round((a.y - 28.5 + f.bob * 0.75) * 2) / 2, 21, 28.5);
 }
@@ -844,7 +889,7 @@ function heatPanel() {
 function toggleHeat(show) { $("heat").hidden = !show; $("heatbtn").setAttribute("aria-pressed", show); if (show) heatPanel(); }
 const hitAgent = (x, y) => AG.find((id) => { const a = agents[id]; return a && lift.rider !== a && x >= a.x - 2 && x <= a.x + 22 && y >= a.y - 31 && y <= a.y + 2; });
 const toWorld = (e) => { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) / r.width * W, (e.clientY - r.top) / r.height * H]; };
-const onHeatScreen = (x, y) => x >= 220 && x <= 510 && y >= 224 && y <= 290;
+const onHeatScreen = (x, y) => x >= 220 && x <= 510 && y >= 254 && y <= 322;
 cv.addEventListener("click", (e) => {
   const [x, y] = toWorld(e);
   if (onHeatScreen(x, y)) { toggleHeat(true); return; }
