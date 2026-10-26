@@ -7,7 +7,7 @@
   "entry": 66.0807,
   "spy_entry": 778.1,
   "last": 69.48,
-  "spy_last": 767.155,
+  "spy_last": 766.99,
   "open": true,
   "approx": true
  },
@@ -32,7 +32,7 @@
   "entry": 227.54,
   "spy_entry": 778.1,
   "last": 224.17,
-  "spy_last": 767.155,
+  "spy_last": 766.99,
   "open": true,
   "approx": true
  },
@@ -43,8 +43,8 @@
   "amount": 99.0,
   "entry": 171.7012,
   "spy_entry": 778.1,
-  "last": 179.21,
-  "spy_last": 767.155,
+  "last": 179.29,
+  "spy_last": 766.99,
   "open": true,
   "approx": true
  },
@@ -55,8 +55,8 @@
   "amount": 79.2,
   "entry": 194.316,
   "spy_entry": 778.1,
-  "last": 204.455,
-  "spy_last": 767.155,
+  "last": 204.39,
+  "spy_last": 766.99,
   "open": true,
   "approx": true
  },
@@ -68,7 +68,7 @@
   "entry": 66.0807,
   "spy_entry": 778.1,
   "last": 69.48,
-  "spy_last": 767.155,
+  "spy_last": 766.99,
   "open": true,
   "approx": true
  },
@@ -79,8 +79,8 @@
   "amount": 79.94,
   "entry": 171.7012,
   "spy_entry": 778.1,
-  "last": 179.21,
-  "spy_last": 767.155,
+  "last": 179.29,
+  "spy_last": 766.99,
   "open": true,
   "approx": true
  },
@@ -91,8 +91,8 @@
   "amount": 80.01,
   "entry": 87.775,
   "spy_entry": 772.33,
-  "last": 87.795,
-  "spy_last": 767.155,
+  "last": 87.71,
+  "spy_last": 766.99,
   "open": true
  },
  {
@@ -102,8 +102,8 @@
   "amount": 50.11,
   "entry": 535.93,
   "spy_entry": 768.73,
-  "last": 560.06,
-  "spy_last": 767.155,
+  "last": 559.6,
+  "spy_last": 766.99,
   "open": true
  },
  {
@@ -113,8 +113,8 @@
   "amount": 50.17,
   "entry": 171.15,
   "spy_entry": 769.67,
-  "last": 173.6,
-  "spy_last": 767.155,
+  "last": 173.49,
+  "spy_last": 766.99,
   "open": true
  },
  {
@@ -124,8 +124,8 @@
   "amount": 50.23,
   "entry": 590.21,
   "spy_entry": 765.64,
-  "last": 625.81,
-  "spy_last": 767.155,
+  "last": 624.05,
+  "spy_last": 766.99,
   "open": true
  },
  {
@@ -135,8 +135,8 @@
   "amount": 40.03,
   "entry": 165.235,
   "spy_entry": 765.64,
-  "last": 159.78,
-  "spy_last": 767.155,
+  "last": 159.71,
+  "spy_last": 766.99,
   "open": true
  }
 ]
