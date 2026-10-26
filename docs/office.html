@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Trading Floor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap">
+<style>
+/* One look on purpose: a night-shift pixel office. Scene on top, agent cards and the day's log below. */
+:root{
+  --bg:#14121f; --panel:#1f1c30; --line:#3a3556; --ink:#ece6d6; --dim:#9a93b5;
+  --gold:#f2c14e; --up:#6fd08c; --down:#ef6f6c;
+  --claude:#d9845a; --watch:#5aa9e6; --news:#b98be0;
+  --pixel:"Press Start 2P", ui-monospace, monospace;
+  --mono:"VT323", ui-monospace, "Courier New", monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{background:var(--bg);color:var(--ink);margin:0}
+body{font-family:var(--mono);font-size:20px;line-height:1.25;padding:20px max(16px,env(safe-area-inset-right,0px)) 40px max(16px,env(safe-area-inset-left,0px))}
+.wrap{max-width:1120px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 20px}
+h1{font-family:var(--pixel);font-size:clamp(14px,2.4vw,20px);margin:0;letter-spacing:.04em;color:var(--gold)}
+.meta{color:var(--dim);font-size:19px;font-variant-numeric:tabular-nums}
+.meta b{color:var(--ink);font-weight:normal}
+.up{color:var(--up)} .down{color:var(--down)}
+
+.stage{position:relative;width:100%;aspect-ratio:16/9;border:4px solid var(--line);background:#000;overflow:hidden}
+canvas{display:block;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges;cursor:pointer}
+.bubble{position:absolute;max-width:min(38%,300px);background:var(--ink);color:#1a1726;font-size:clamp(13px,1.7vw,19px);line-height:1.05;padding:6px 8px;border:3px solid #1a1726;box-shadow:3px 3px 0 rgba(0,0,0,.45);transform:translate(-50%,-100%);pointer-events:none;transition:opacity .3s}
+.bubble::after{content:"";position:absolute;left:var(--tail,50%);bottom:-9px;width:8px;height:8px;background:var(--ink);border-right:3px solid #1a1726;border-bottom:3px solid #1a1726;transform:translateX(-50%) rotate(45deg)}
+.bubble .who{font-family:var(--pixel);font-size:clamp(6px,.75vw,8px);display:block;margin-bottom:3px}
+.bubble.hide{opacity:0}
+@media (max-width:600px){.bubble{max-width:48%;font-size:12px;padding:4px 5px;border-width:2px}}
+
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.bar .lbl{color:var(--dim);font-size:18px}
+button,select{font-family:var(--pixel);font-size:10px;color:var(--ink);background:var(--panel);border:3px solid var(--line);padding:8px 10px;cursor:pointer;box-shadow:3px 3px 0 #000}
+button:hover,select:hover{border-color:var(--gold)}
+button[aria-pressed="true"]{border-color:var(--gold);color:var(--gold)}
+button:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #000}
+button:focus-visible,select:focus-visible,.card:focus-visible,input:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+input[type=range]{flex:1 1 200px;min-width:0;accent-color:var(--gold)}
+.clock{font-family:var(--pixel);font-size:11px;color:var(--gold);font-variant-numeric:tabular-nums}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.card{background:var(--panel);border:3px solid var(--line);padding:14px;display:flex;flex-direction:column;gap:8px;min-width:0;cursor:pointer}
+.card.sel{border-color:var(--c)}
+.card h2{font-family:var(--pixel);font-size:11px;margin:0;color:var(--c);display:flex;justify-content:space-between;gap:8px}
+.card h2 small{color:var(--dim);font-size:8px;align-self:center}
+.role{color:var(--dim);font-size:18px;margin:0}
+.now{background:var(--bg);padding:6px 8px;font-size:18px;min-height:2.6em}
+.now b{font-family:var(--pixel);font-size:8px;color:var(--c);font-weight:normal;display:block;margin-bottom:2px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;font-variant-numeric:tabular-nums}
+.stats div{background:var(--bg);padding:6px 8px;display:flex;flex-direction:column;min-width:0}
+.stats .k{font-size:15px;color:var(--dim)}
+.stats .v{font-size:23px}
+.log{margin:0;padding:0;list-style:none;font-size:18px;display:flex;flex-direction:column;gap:4px}
+.log li{display:flex;gap:8px;min-width:0}
+.log time{color:var(--dim);flex:none;font-variant-numeric:tabular-nums}
+.log span{min-width:0;overflow-wrap:anywhere}
+.feed{background:var(--panel);border:3px solid var(--line);padding:14px;display:flex;flex-direction:column;gap:8px}
+.feed h2{font-family:var(--pixel);font-size:11px;margin:0;color:var(--gold)}
+.feed li{cursor:pointer}
+.feed li.future{opacity:.35}
+.feed li:hover span{color:var(--gold)}
+.ic{flex:none}
+footer{color:var(--dim);font-size:17px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>THE TRADING FLOOR</h1>
+    <div class="meta" id="meta">Loading the office…</div>
+  </header>
+
+  <div class="stage" id="stage">
+    <canvas id="cv" width="384" height="216" aria-label="Pixel office where the three trading agents work: Claude at the research desk, the Watcher at the window, the News Hunter by the newspapers"></canvas>
+    <div class="bubble hide" id="b-claude"><span class="who" style="color:var(--claude)">🧠 CLAUDE</span><span class="t"></span></div>
+    <div class="bubble hide" id="b-watch"><span class="who" style="color:var(--watch)">⚡ WATCHER</span><span class="t"></span></div>
+    <div class="bubble hide" id="b-news"><span class="who" style="color:var(--news)">📰 NEWS HUNTER</span><span class="t"></span></div>
+  </div>
+
+  <div class="bar">
+    <span class="clock" id="clock">NY --:--</span>
+    <button id="live" aria-pressed="true">LIVE</button>
+    <button id="replay" aria-pressed="false">REPLAY</button>
+    <select id="day" aria-label="Day to replay"></select>
+    <button id="speed" title="Replay speed">30×</button>
+    <input type="range" id="scrub" min="560" max="970" step="1" value="570" aria-label="Replay time">
+  </div>
+
+  <div class="grid" id="cards"></div>
+
+  <section class="feed">
+    <h2 id="feed-title">TODAY ON THE FLOOR</h2>
+    <ul class="log" id="feed"></ul>
+  </section>
+
+  <footer>Everything here is real: the agents move to where their real runs put them, using the same data as the dashboard (refreshed every minute). Click a character or a card to follow one agent. Replay plays back a past trading day. Watch-only for now; pause, messages and rules come next.</footer>
+</div>
+
+<script>
+"use strict";
+// ---------------------------------------------------------------- data
+const RAW = "https://raw.githubusercontent.com/diegodelossantosg/larp-trading/main/docs/data/";
+const LIVE = "https://api.github.com/repos/diegodelossantosg/larp-trading/contents/live.json?ref=live";
+const LIVE_RAW = "https://raw.githubusercontent.com/diegodelossantosg/larp-trading/live/";
+async function load(name, fallback) {
+  for (const url of [`${RAW}${name}?t=${Date.now()}`, `data/${name}?t=${Date.now()}`]) {
+    try { const r = await fetch(url, { cache: "no-store" }); if (r.ok) return await r.json(); } catch {}
+  }
+  return fallback;
+}
+let apiBlockedUntil = 0;
+async function fetchLive() {
+  if (Date.now() > apiBlockedUntil) {
+    try {
+      const r = await fetch(LIVE, { headers: { Accept: "application/vnd.github.raw" }, cache: "no-store" });
+      if (r.ok) return await r.json();
+      const reset = Number(r.headers.get("x-ratelimit-reset"));
+      apiBlockedUntil = reset ? reset * 1000 : Date.now() + 10 * 60000;
+    } catch {}
+  }
+  for (let back = 1; back <= 4; back++) {
+    const t = new Date(Date.now() - back * 60000);
+    const name = `m-${String(t.getUTCHours()).padStart(2, "0")}${String(t.getUTCMinutes()).padStart(2, "0")}.json`;
+    try { const r = await fetch(LIVE_RAW + name); if (r.ok) return await r.json(); } catch {}
+  }
+  return null;
+}
+
+const D = { status: {}, decisions: [], intraday: { points: [] }, watch: {}, events: [] };
+const AG = ["claude", "watch", "news"];
+const NAME = { claude: "Claude", watch: "Watcher", news: "News Hunter" };
+const ICON = { claude: "🧠", watch: "⚡", news: "📰" };
+const ROLE = {
+  claude: ["DAILY · 9:36 NY", "Researches the market each morning and sets what the portfolio should hold."],
+  watch: ["EVERY MINUTE", "Watches every holding and sells one if it falls past its stop."],
+  news: ["EVERY HOUR", "Buys stocks that fell too hard on news that isn't earnings."],
+};
+
+// New York date and minute-of-day for a moment in time
+const NYF = new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23", weekday: "short" });
+function ny(ms) {
+  const p = Object.fromEntries(NYF.formatToParts(new Date(ms)).map((x) => [x.type, x.value]));
+  return { date: `${p.year}-${p.month}-${p.day}`, min: +p.hour * 60 + +p.minute + +p.second / 60, wd: p.weekday };
+}
+const hhmm = (m) => `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(Math.floor(m % 60)).padStart(2, "0")}`;
+const money = (v) => "$" + Number(v).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const pct = (v) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(2) + "%";
+const cls = (v) => (v > 0.005 ? "up" : v < -0.005 ? "down" : "");
+const clip = (s, n) => (s.length > n ? s.slice(0, n - 1).trimEnd() + "…" : s);
+
+function ordersText(orders) {
+  const buys = orders.filter((o) => o.side === "buy"), sells = orders.filter((o) => o.side === "sell");
+  const part = (list, verb) => list.length ? `${verb} ${list.map((o) => `${o.symbol} ${money(o.notional)}`).join(", ")}` : "";
+  return [part(buys, "Bought"), part(sells, "sold")].filter(Boolean).join("; ").replace(/^sold/, "Sold");
+}
+function buildEvents() {
+  D.events = D.decisions.filter((d) => d.date && d.time).map((d) => {
+    const agent = d.source === "watch" ? "watch" : d.source === "news" ? "news" : "claude";
+    const [h, m] = d.time.split(":").map(Number);
+    const orders = (d.orders || []).filter((o) => o.symbol && o.side);
+    const stop = orders.some((o) => o.side === "sell" && /stop/i.test(o.reason || ""));
+    let text = d.plain_summary || "";
+    if (!text && orders.length) text = ordersText(orders) + ".";
+    if (!text) text = (d.notes || []).find((n) => !/earnings dates checked/i.test(n)) || (agent === "news" ? "Checked the news. Nothing worth buying." : "Checked. No trades.");
+    return { agent, date: d.date, min: h * 60 + m, orders, stop, text, trade: orders.length ? ordersText(orders) : "" };
+  }).sort((a, b) => a.date.localeCompare(b.date) || a.min - b.min);
+}
+
+// ---------------------------------------------------------------- clock (live or replay)
+const V = { mode: "live", day: null, min: 570, speed: 0.5 /* virtual minutes per real second */ };
+function now() {
+  if (V.mode === "live") return ny(Date.now());
+  const wd = new Date(V.day + "T12:00:00Z").toLocaleDateString("en-US", { weekday: "short", timeZone: "UTC" });
+  return { date: V.day, min: V.min, wd };
+}
+const isWeekend = (t) => t.wd === "Sat" || t.wd === "Sun";
+const isOpen = (t) => !isWeekend(t) && t.min >= 570 && t.min < 960;
+const tradeWindow = () => (V.mode === "live" ? 10 : Math.max(6, 10 * V.speed));
+
+// ---------------------------------------------------------------- what each agent is doing
+const hash = (s) => { let h = 7; for (const c of s) h = (h * 31 + c.charCodeAt(0)) | 0; return Math.abs(h); };
+function coffeeBreak(id, t) {  // a short, repeatable coffee break now and then while the market is open
+  const slot = Math.floor(t.min / 41);
+  return hash(id + t.date + slot) % 5 === 0 && t.min % 41 < 3;
+}
+function lastEvent(id, t, onlyToday) {
+  for (let i = D.events.length - 1; i >= 0; i--) {
+    const e = D.events[i];
+    if (e.agent !== id) continue;
+    if (e.date > t.date || (e.date === t.date && e.min > t.min)) continue;
+    if (onlyToday && e.date !== t.date) return null;
+    return e;
+  }
+  return null;
+}
+function watcherLine() {
+  const pos = (D.status.positions || []).filter((p) => p.current_price);
+  const highs = D.watch.highs || {};
+  let worst = null;
+  for (const p of pos) {
+    const hi = Math.max(highs[p.symbol] || 0, p.current_price);
+    const off = (p.current_price / hi - 1) * 100;
+    if (!worst || off < worst.off) worst = { sym: p.symbol, off };
+  }
+  if (!pos.length) return "Watching. No holdings yet.";
+  return worst && worst.off < -0.3
+    ? `Watching ${pos.length} holdings. ${worst.sym} is furthest down: ${Math.abs(worst.off).toFixed(1)}% under its high.`
+    : `Watching ${pos.length} holdings. All near their highs.`;
+}
+function plan(id, t) {
+  const open = isOpen(t), TW = tradeWindow();
+  const today = lastEvent(id, t, true);
+  const recent = today && t.min - today.min < TW ? today : null;
+  const last = lastEvent(id, t, false);
+  const lastText = last ? last.text : "No runs yet.";
+  if (recent && recent.orders.length) {
+    const say = id === "watch" && recent.stop ? `Stop hit! ${recent.trade}.` : recent.trade + ".";
+    return { spot: "terminal", label: "Placing orders", say, busy: true };
+  }
+  if (id === "claude") {
+    if (!open) {
+      if (!isWeekend(t) && t.min >= 540 && t.min < 570) return { spot: "coffee", label: "Getting ready", say: "Coffee first. Market opens at 9:30." };
+      return { spot: "sofa", label: "Asleep", say: "Zzz… next decision at 9:36 NY.", sleep: true };
+    }
+    if (t.min < 576) return { spot: "coffee", label: "Getting ready", say: "Coffee first. I decide at 9:36." };
+    if (!today && t.min < 690) return { spot: "desk", label: "Researching", say: "Reading today's news, earnings and trends before I decide…", busy: true };
+    if (coffeeBreak(id, t)) return { spot: "coffee", label: "Coffee break", say: lastText };
+    return { spot: "desk", label: today ? "Following the plan" : "At the desk", say: lastText };
+  }
+  if (id === "watch") {
+    if (!open) return { spot: "arcade", label: "Off duty", say: isWeekend(t) ? "Weekend. Back at the window Monday 9:30." : "Market closed. Back at the window at 9:30." };
+    if (coffeeBreak(id, t)) return { spot: "coffee", label: "Quick coffee", say: watcherLine() };
+    return { spot: "window", label: "Watching prices", say: watcherLine() };
+  }
+  // news
+  if (!open) return { spot: "armchair", label: "Asleep", say: "Next news check after the open.", sleep: true };
+  const next = D.events.find((e) => e.agent === "news" && e.date === t.date && e.min >= t.min);
+  const scanning = next ? next.min - t.min <= 5 : (V.mode === "live" && t.min % 60 >= 15 && t.min % 60 < 21 && !(today && t.min - today.min < 40));
+  if (scanning) return { spot: "rack", label: "Scanning the news", say: "Checking today's biggest drops…", busy: true };
+  if (coffeeBreak(id, t)) return { spot: "coffee", label: "Coffee break", say: lastText };
+  return { spot: "armchair", label: "Reading", say: recent ? recent.text : lastText };
+}
+
+// ---------------------------------------------------------------- scene
+const cv = document.getElementById("cv"), g = cv.getContext("2d");
+const W = 384, H = 216, LANE = 182;
+const C = {
+  wall: "#332d4f", wallTop: "#2a2540", wallLine: "#3d3660", floor: "#4a3a33", floor2: "#54423a", floorLine: "#3b2e29",
+  desk: "#7a5236", deskTop: "#9a6b45", deskDark: "#563923", metal: "#6b6f80", screen: "#0f1a24",
+  skin: "#f0c39a", skin2: "#c98e66", ink: "#1a1726", white: "#ece6d6", paper: "#d8d0bc",
+  gold: "#f2c14e", up: "#6fd08c", down: "#ef6f6c", dim: "#9a93b5",
+  chair: "#6b3f63", chair2: "#523050", sofa: "#3f6f78", sofa2: "#4c8590", plant: "#4f9a5a", pot: "#a35a3c",
+};
+const LOOK = {
+  claude: { shirt: "#d9845a", shirt2: "#b96a44", pants: "#3b3550", hair: "#5a3a2a", glasses: true },
+  watch: { shirt: "#5aa9e6", shirt2: "#3d7fb3", pants: "#2b2f45", hair: "#2a2a2a", cap: "#3d7fb3" },
+  news: { shirt: "#b98be0", shirt2: "#9168b8", pants: "#4a3d5c", hair: "#c9b26a", long: true },
+};
+const SPOTS = {
+  desk: { x: 128, y: 163, pose: "sitfront", door: [98, 168] },
+  terminal: { x: 226, y: 160, pose: "type", dir: -1 },
+  window: { x: 54, y: 150, pose: "scope" },
+  rack: { x: 288, y: 154, pose: "stand", dir: 1 },
+  coffee: { x: 352, y: 152, pose: "stand", dir: 1 },
+  sofa: { x: 50, y: 204, pose: "lie", door: [50, 186] },
+  armchair: { x: 316, y: 206, pose: "read", door: [346, 204] },
+  arcade: { x: 259, y: 160, pose: "back" },
+};
+const OFFSET = { claude: -10, watch: 0, news: 10 };  // so two agents at the same spot don't stand inside each other
+const R = (x, y, w, h, c) => { g.fillStyle = c; g.fillRect(Math.round(x), Math.round(y), w, h); };
+
+const F = {A:"010101111101101",B:"110101110101110",C:"011100100100011",D:"110101101101110",E:"111100110100111",F:"111100110100100",G:"011100101101011",H:"101101111101101",I:"111010010010111",K:"101101110101101",L:"100100100100111",M:"101111111101101",N:"110101101101101",O:"010101101101010",P:"110101110100100",R:"110101110101101",S:"011100010001110",T:"111010010010010",U:"101101101101111",W:"101101111111101",Y:"101101010010010",Z:"111001010100111","&":"010101010101011","+":"000010111010000","-":"000000111000000",".":"000000000000010",":":"000010000010000","%":"101001010100101","!":"010010010000010","0":"111101101101111","1":"010110010010111","2":"110001010100111","3":"110001010001110","4":"101101111001001","5":"111100110001110","6":"011100111101111","7":"111001010010010","8":"111101111101111","9":"111101111001110"," ":"000000000000000"};
+function txt(s, x, y, c) { for (const ch of String(s).toUpperCase()) { const f = F[ch] || F[" "]; for (let i = 0; i < 15; i++) if (f[i] === "1") R(x + (i % 3), y + ((i / 3) | 0), 1, 1, c); x += 4; } }
+
+let T = 0;  // frame counter for animation
+function room(t) {
+  const open = isOpen(t), night = t.min < 420 || t.min >= 1140;
+  R(0, 0, W, 124, C.wall); R(0, 0, W, 6, C.wallTop);
+  for (let x = 0; x < W; x += 16) R(x, 6, 1, 118, C.wallLine);
+  R(0, 120, W, 4, C.wallTop);
+  for (let y = 124; y < H; y += 8) { R(0, y, W, 8, ((y / 8) | 0) % 2 ? C.floor : C.floor2); R(0, y, W, 1, C.floorLine); }
+  // window with the city outside
+  R(12, 16, 84, 64, "#1a1630");
+  const sky = night ? "#0d1430" : t.min < 480 || t.min >= 1080 ? "#5a3f6e" : "#3e6aa8";
+  R(15, 19, 78, 58, sky);
+  if (night) { for (const [x, y] of [[20, 24], [33, 29], [55, 22], [70, 31], [47, 34], [84, 24]]) R(x, y, 1, 1, C.white); R(76, 24, 6, 6, "#e8e2c0"); R(78, 24, 4, 4, sky); }
+  else R(26, 25, 7, 7, "#f6d27a");
+  for (const [x, y, w] of [[16, 50, 9], [25, 40, 8], [33, 54, 7], [40, 34, 10], [50, 46, 8], [58, 38, 7], [65, 52, 8], [73, 42, 9], [82, 50, 10]]) {
+    R(x, y, w, 77 - y, "#151230");
+    for (let wy = y + 3; wy < 74; wy += 4) for (let wx = x + 1; wx < x + w - 1; wx += 3) if ((wx * 7 + wy * 3 + ((T / 240) | 0)) % (night ? 4 : 9) === 0) R(wx, wy, 1, 2, C.gold);
+  }
+  R(12, 47, 84, 3, "#1a1630"); R(52, 16, 3, 64, "#1a1630"); R(10, 80, 88, 4, "#1a1630");
+  // wall screen: portfolio vs S&P for the day on screen
+  R(118, 12, 132, 72, "#16131f"); R(121, 15, 126, 66, C.screen);
+  chartOnScreen(t, 125, 244, 26, 76);
+  // clock
+  R(262, 16, 30, 30, "#1a1630"); R(264, 18, 26, 26, C.white);
+  const cx = 277, cy = 31, hA = ((t.min / 60) % 12) / 12 * Math.PI * 2 - Math.PI / 2, mA = ((t.min % 60) / 60) * Math.PI * 2 - Math.PI / 2;
+  line(cx, cy, cx + Math.cos(hA) * 6, cy + Math.sin(hA) * 6, C.ink); line(cx, cy, cx + Math.cos(mA) * 10, cy + Math.sin(mA) * 10, C.down);
+  txt(open ? "OPEN" : "CLOSED", open ? 270 : 266, 50, open ? C.up : C.down);
+  txt(hhmm(t.min), 267, 58, C.dim);
+  // poster: the rule the whole team lives by
+  R(304, 18, 64, 34, "#2a2540"); R(306, 20, 60, 30, C.paper); txt("BEAT THE", 320, 25, C.ink); txt("S&P 500", 322, 33, C.down); R(312, 42, 48, 1, C.ink);
+}
+function line(x0, y0, x1, y1, c) { const n = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0), 1); for (let i = 0; i <= n; i++) R(x0 + (x1 - x0) * i / n, y0 + (y1 - y0) * i / n, 1, 1, c); }
+let dayPoints = { date: null, pts: [] };
+function pointsFor(date) {
+  if (dayPoints.date === date && dayPoints.n === D.intraday.points.length) return dayPoints.pts;
+  const pts = [];
+  for (const p of D.intraday.points || []) {
+    if (p[1] == null || p[2] == null) continue;
+    const n = ny(Date.parse(p[0]));
+    if (n.date === date) pts.push([n.min, p[1], p[2]]);
+  }
+  dayPoints = { date, n: D.intraday.points.length, pts };
+  return pts;
+}
+function chartOnScreen(t, x0, x1, y0, y1) {
+  const pts = pointsFor(t.date).filter((p) => p[0] <= t.min);
+  txt(V.mode === "live" ? "TODAY" : t.date.slice(5).replace("-", "."), x0, 18, C.dim);
+  if (pts.length < 2) { txt(isOpen(t) ? "WAITING FOR DATA" : "MARKET CLOSED", x0 + 20, 48, C.dim); return; }
+  const a0 = pts[0][1], s0 = pts[0][2];
+  const ai = pts.map((p) => (p[1] / a0 - 1) * 100), sp = pts.map((p) => (p[2] / s0 - 1) * 100);
+  let lo = Math.min(...ai, ...sp, -0.3), hi = Math.max(...ai, ...sp, 0.3);
+  const pad = (hi - lo) * 0.1; lo -= pad; hi += pad;
+  const px = (m) => x0 + (x1 - x0) * (m - 570) / 390, py = (v) => y1 - (v - lo) / (hi - lo) * (y1 - y0);
+  R(x0, py(0), x1 - x0, 1, "#24384a");
+  const draw = (arr, c) => { for (let i = 1; i < pts.length; i++) line(px(pts[i - 1][0]), py(arr[i - 1]), px(pts[i][0]), py(arr[i]), c); };
+  draw(sp, C.down); draw(ai, C.up);
+  if (((T / 30) | 0) % 2) R(px(pts.at(-1)[0]) - 1, py(ai.at(-1)) - 1, 3, 3, C.up);
+  const a = ai.at(-1), s = sp.at(-1), f = (v) => (v >= 0 ? "+" : "-") + Math.abs(v).toFixed(1) + "%";
+  txt("AI " + f(a), x0 + 40, 18, a >= s ? C.up : C.down); txt("S&P " + f(s), x0 + 80, 18, C.dim);
+}
+
+// furniture: each piece has a baseline y so people can walk in front of or behind it
+function furniture(t) {
+  const items = [];
+  items.push({ y: 140, draw() { R(100, 104, 12, 14, C.pot); R(102, 118, 8, 22, C.pot); for (const [x, y] of [[98, 92], [104, 86], [110, 94], [101, 98], [107, 100]]) R(x, y, 6, 8, C.plant); } });
+  items.push({ y: 156, draw() { R(119, 134, 18, 18, C.chair2); R(121, 136, 14, 6, C.chair); } });  // desk chair
+  items.push({ y: 172, draw() {  // research desk
+    R(104, 148, 72, 4, C.deskTop); R(104, 152, 72, 20, C.desk); R(106, 172, 4, 6, C.deskDark); R(170, 172, 4, 6, C.deskDark);
+    R(108, 156, 18, 12, C.deskDark); R(116, 161, 3, 1, C.gold);
+    R(148, 130, 24, 16, "#2c2a3a"); R(150, 132, 20, 12, C.screen); R(158, 146, 4, 2, C.metal); R(154, 147, 12, 1, C.metal);
+    const busy = agents.claude.spot === "desk" && !agents.claude.moving && agents.claude.plan.busy;
+    for (let i = 0; i < 5; i++) { const w = busy ? ((T / 7 + i * 3) | 0) % 14 + 3 : 6 + (i * 5) % 9; R(151, 133 + i * 2, w, 1, i % 2 ? C.up : "#5aa9e6"); }
+    R(108, 145, 12, 3, C.white); R(109, 143, 11, 2, C.paper); R(110, 141, 9, 2, C.white);
+    R(140, 144, 5, 4, C.down); R(145, 145, 1, 2, C.down);
+  } });
+  items.push({ y: 152, draw() {  // order terminal
+    txt("ORDERS", 199, 104, C.gold);
+    R(200, 112, 20, 40, "#3a3f55"); R(202, 115, 16, 12, C.screen); R(203, 130, 14, 6, "#2c2f3a");
+    const using = AG.some((id) => agents[id].spot === "terminal" && !agents[id].moving);
+    if (using && ((T / 15) | 0) % 2) txt("GO", 207, 119, C.up); else R(204, 117, 3, 1, C.up);
+    for (let i = 0; i < 4; i++) R(204 + i * 3, 132, 2, 2, C.metal);
+    R(198, 150, 24, 2, "#2c2f3a");
+  } });
+  items.push({ y: 146, draw() {  // newspaper rack
+    txt("NEWS", 288, 92, C.gold);
+    R(280, 98, 36, 48, "#6b4a33"); R(282, 100, 32, 44, "#4f3626");
+    for (let s = 0; s < 3; s++) { R(282, 112 + s * 14, 32, 2, "#6b4a33"); for (let k = 0; k < 4; k++) { R(284 + k * 7, 102 + s * 14, 6, 10, k % 2 ? C.white : C.paper); R(285 + k * 7, 104 + s * 14, 4, 1, k === 1 ? C.down : C.ink); } }
+  } });
+  items.push({ y: 142, draw() {  // coffee counter
+    R(334, 114, 46, 28, "#5b6170"); R(334, 112, 46, 3, "#7a8090");
+    R(342, 94, 16, 18, "#2c2f3a"); R(345, 97, 10, 4, "#1b1d26"); R(354, 99, 2, 2, ((T / 40) | 0) % 2 ? C.down : "#7a2a2a");
+    R(347, 106, 6, 6, C.white); R(364, 106, 5, 6, C.white); R(371, 106, 5, 6, C.white);
+    if (AG.some((id) => agents[id].spot === "coffee" && !agents[id].moving)) for (let k = 0; k < 3; k++) R(349 + k * 2, 102 - ((T / 10 + k * 3) % 6), 1, 2, C.paper);
+  } });
+  items.push({ y: 198, draw() {  // sofa (back and seat)
+    R(12, 180, 78, 14, C.sofa2); R(12, 194, 78, 12, C.sofa); R(16, 206, 4, 4, C.deskDark); R(82, 206, 4, 4, C.deskDark);
+  } });
+  items.push({ y: 213, draw() { R(8, 188, 8, 20, C.sofa2); R(86, 188, 8, 20, C.sofa2); } });  // sofa arms
+  items.push({ y: 199, draw() {  // armchair (back and seat) + side table
+    R(300, 178, 32, 22, C.chair); R(302, 198, 28, 10, C.chair2); R(304, 208, 3, 4, C.deskDark); R(325, 208, 3, 4, C.deskDark);
+    R(352, 186, 18, 3, C.deskTop); R(359, 189, 4, 16, C.deskDark); R(354, 181, 5, 5, C.white); R(363, 184, 5, 2, C.ink);
+  } });
+  items.push({ y: 214, draw() { R(295, 190, 7, 20, C.chair2); R(330, 190, 7, 20, C.chair2); } });  // armchair arms
+  items.push({ y: 150, draw() {  // arcade cabinet against the wall, for the Watcher's evenings
+    R(246, 96, 26, 54, "#5a2d6e"); R(246, 96, 26, 6, C.gold); txt("ZAP", 253, 97, "#5a2d6e");
+    R(250, 105, 18, 14, "#0b0b16");
+    const playing = agents.watch.spot === "arcade" && !agents.watch.moving;
+    if (playing) { R(252 + ((T / 4) | 0) % 14, 111, 2, 2, C.up); R(258, 107 + ((T / 9) | 0) % 8, 2, 2, C.down); R(252, 117, 14, 1, "#5aa9e6"); }
+    else txt("ZZ", 255, 109, "#3a2a4a");
+    R(248, 122, 22, 6, "#43204f"); R(252, 123, 2, 3, C.down); R(260, 124, 2, 2, C.gold); R(264, 124, 2, 2, C.up);
+  } });
+  return items;
+}
+
+// ---------------------------------------------------------------- people
+function person(a) {
+  const L = LOOK[a.id], dir = a.dir, x = a.x, y = a.y;
+  const P = (dx, dy, w, h, c) => R(x + (dir > 0 ? dx : -dx - w), y + dy, w, h, c);
+  const f = ((T / 8) | 0) % 2, pose = a.moving ? "walk" : a.pose;
+  const mood = a.mood;
+  const head = (top, mode) => {
+    if (mode === "back") { P(-5, top - 1, 10, 10, L.hair); if (L.cap) P(-5, top - 2, 10, 3, L.cap); return; }
+    P(-4, top, 8, 8, C.skin); P(-4, top + 7, 8, 1, C.skin2);
+    P(-5, top - 1, 10, 3, L.hair);
+    if (L.long) { if (mode === "side") P(-5, top, 3, 10, L.hair); else { P(-5, top, 2, 9, L.hair); P(3, top, 2, 9, L.hair); } }
+    else if (mode === "side") P(-5, top, 2, 6, L.hair); else { P(-5, top + 1, 1, 3, L.hair); P(4, top + 1, 1, 3, L.hair); }
+    if (L.cap) { P(-5, top - 2, 10, 3, L.cap); if (mode === "side") P(4, top, 4, 1, L.cap); else P(-5, top + 1, 10, 1, L.shirt2); }
+    const front = mode !== "side";
+    if (mode === "closed") { P(-3, top + 4, 2, 1, C.ink); P(1, top + 4, 2, 1, C.ink); }
+    else if (front) { P(-2, top + 3, 1, 2, C.ink); P(1, top + 3, 1, 2, C.ink); }
+    else { P(1, top + 3, 1, 2, C.ink); P(3, top + 3, 1, 2, C.ink); }
+    if (L.glasses && mode !== "closed") { if (front) { P(-3, top + 2, 3, 1, C.ink); P(0, top + 2, 3, 1, C.ink); } else P(0, top + 2, 5, 1, C.ink); }
+    const mx = front ? -1 : 1;
+    if (mood === "happy") { P(mx, top + 6, 2, 1, C.ink); P(mx - 1, top + 5, 1, 1, C.ink); P(mx + 2, top + 5, 1, 1, C.ink); }
+    else if (mood === "worried") { P(mx, top + 5, 2, 1, C.ink); P(mx - 1, top + 6, 1, 1, C.ink); P(mx + 2, top + 6, 1, 1, C.ink); }
+    else P(mx, top + 6, 2, 1, C.ink);
+  };
+  const torso = (top) => { P(-5, top, 10, 10, L.shirt); P(-5, top + 8, 10, 2, L.shirt2); if (a.id === "watch") P(-1, top, 2, 10, L.shirt2); if (a.id === "claude") P(-2, top, 4, 1, C.white); };
+  const legs = (walk) => {
+    P(-4, -8, 3, walk && f ? 6 : 8, L.pants); P(1, -8, 3, walk && !f ? 6 : 8, L.pants);
+    P(-5, walk && f ? -3 : -1, 4, 1, C.ink); P(1, walk && !f ? -3 : -1, 4, 1, C.ink);
+  };
+  // shadow
+  g.fillStyle = "rgba(0,0,0,.25)";
+  if (pose !== "sitfront" && pose !== "lie" && pose !== "read") g.fillRect(Math.round(x - 6), Math.round(y), 12, 2);
+
+  if (pose === "lie") {  // on the sofa, head on the left arm
+    const by = y - 10;
+    R(x - 18, by, 8, 8, C.skin); R(x - 19, by - 1, 3, 9, L.hair); if (L.long) R(x - 19, by, 3, 12, L.hair);
+    R(x - 15, by + 3, 2, 1, C.ink); R(x - 12, by + 3, 2, 1, C.ink);
+    R(x - 10, by + 1, 16, 8, L.shirt); R(x - 10, by + 7, 16, 2, L.shirt2);
+    R(x + 6, by + 3, 12, 5, L.pants); R(x + 18, by + 2, 2, 6, C.ink);
+    R(x - 6, by - 1, 14, 3, "#8fb3c9");  // blanket edge
+    const z = ((T / 40) | 0) % 3; txt("Z", x - 10 + z * 3, by - 8 - z * 3, C.white); if (z > 0) txt("Z", x - 4, by - 14 - z, C.dim);
+    return;
+  }
+  if (pose === "sitfront") {  // behind the desk, facing us, typing
+    const busy = a.plan.busy, k = busy ? ((T / 5) | 0) % 2 : 0, bob = busy ? 0 : ((T / 50) | 0) % 2;
+    torso(-20 + bob); head(-29 + bob, "front");
+    P(-7, -14, 3, 2, C.skin); P(4, -14, 3, 2, C.skin);
+    if (busy) { P(-6 + k * 2, -13, 3, 1, C.skin); P(3 - k * 2, -13, 3, 1, C.skin); }
+    return;
+  }
+  if (pose === "read") {  // armchair, newspaper up (or on the lap when asleep)
+    torso(-18); head(-26, a.plan.sleep ? "closed" : "front");
+    P(-4, -8, 3, 4, L.pants); P(1, -8, 3, 4, L.pants);
+    const peek = !a.plan.sleep && ((T % 420) > 300);
+    const py = a.plan.sleep ? -14 : peek ? -20 : -25;
+    P(-9, py, 18, 12, C.white); P(-1, py, 1, 12, C.paper);
+    for (let i = 0; i < 3; i++) { P(-7, py + 3 + i * 3, 5, 1, "#8a8496"); P(2, py + 3 + i * 3, 5, 1, "#8a8496"); }
+    P(-7, py + 1, 5, 1, C.ink);
+    P(-10, py + 5, 2, 3, C.skin); P(8, py + 5, 2, 3, C.skin);
+    if (a.plan.sleep) { const z = ((T / 40) | 0) % 3; txt("Z", x + 6 + z * 2, y - 34 - z * 3, C.white); }
+    return;
+  }
+  if (pose === "scope") {  // at the window with binoculars, glances at the screen now and then
+    const glance = (T % 360) > 250;
+    legs(false); torso(-18); head(-26, glance ? "side" : "front");
+    if (glance) { P(-1, -17, 3, 8, L.shirt2); P(-1, -9, 3, 2, C.skin); return; }
+    P(-6, -18, 2, 8, L.shirt2); P(4, -18, 2, 8, L.shirt2);
+    P(-4, -24, 8, 3, C.ink); P(-3, -23, 2, 1, "#9ad1ff"); P(1, -23, 2, 1, "#9ad1ff");
+    return;
+  }
+  if (pose === "back") {  // playing the arcade, back to us
+    legs(false); torso(-18); head(-26, "back");
+    const k = ((T / 6) | 0) % 2; P(-7, -17 - k, 2, 6, L.shirt); P(5, -17 - (1 - k), 2, 6, L.shirt);
+    return;
+  }
+  // standing, walking, typing at the terminal
+  legs(pose === "walk"); torso(-18); head(-26, "side");
+  if (pose === "type") {
+    const k = ((T / 6) | 0) % 2;
+    P(0, -15, 7, 2, L.shirt2); P(7, -15 - k, 2, 2, C.skin);
+  } else {
+    const sw = pose === "walk" ? (f ? 1 : -1) : 0;
+    P(-1 + sw, -17, 3, 8, L.shirt2); P(-1 + sw, -9, 3, 2, C.skin);
+  }
+  if (a.id === "news" && pose !== "walk") { P(3, -16, 6, 8, C.white); P(4, -14, 4, 1, C.ink); }  // carries a paper
+}
+
+// ---------------------------------------------------------------- agents moving between spots
+const agents = {};
+function spotPos(id, name) { const s = SPOTS[name]; const off = name === "terminal" || name === "coffee" ? OFFSET[id] : 0; return [s.x + off, s.y]; }
+function moodOf(id) {
+  const s = (D.status.scorecard || {})[id];
+  if (!s || !s.buys) return "flat";
+  return s.avg_vs_spy_pct > 0.2 ? "happy" : s.avg_vs_spy_pct < -0.2 ? "worried" : "flat";
+}
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+function setTarget(a, name, instant) {
+  const [tx, ty] = spotPos(a.id, name), s = SPOTS[name];
+  a.spot = name; a.pose = s.pose; a.dir = s.dir || a.dir || 1;
+  if (instant || reduceMotion) { a.x = tx; a.y = ty; a.path = []; a.moving = false; return; }
+  const from = a.prevSpot && SPOTS[a.prevSpot].door, to = s.door;
+  const pts = [];
+  if (from) pts.push(from);
+  const sx = from ? from[0] : a.x, ex = to ? to[0] : tx;
+  pts.push([sx, LANE], [ex, LANE]);
+  if (to) pts.push(to);
+  pts.push([tx, ty]);
+  a.path = pts; a.moving = true; a.endDir = s.dir || null;
+}
+function step(a) {
+  if (!a.moving) return;
+  const speed = V.mode === "live" ? 0.7 : 1.2;
+  let budget = speed;
+  while (budget > 0 && a.path.length) {
+    const [tx, ty] = a.path[0], dx = tx - a.x, dy = ty - a.y, d = Math.hypot(dx, dy);
+    if (d <= budget) { a.x = tx; a.y = ty; a.path.shift(); budget -= d; continue; }
+    a.x += dx / d * budget; a.y += dy / d * budget;
+    if (Math.abs(dx) > 0.5) a.dir = dx > 0 ? 1 : -1;
+    budget = 0;
+  }
+  if (!a.path.length) { a.moving = false; if (a.endDir) a.dir = a.endDir; }
+}
+function think(instant) {
+  const t = now();
+  for (const id of AG) {
+    const a = agents[id] || (agents[id] = { id, x: 0, y: 0, dir: 1, path: [], moving: false, spot: null, plan: {} });
+    const p = plan(id, t);
+    a.plan = p; a.mood = moodOf(id);
+    if (a.spot !== p.spot) { a.prevSpot = a.spot; setTarget(a, p.spot, instant || !a.spot); }
+  }
+}
+
+// ---------------------------------------------------------------- bubbles
+const B = Object.fromEntries(AG.map((id) => [id, document.getElementById("b-" + id)]));
+let selected = null, rot = 0;
+function bubbles() {
+  const busy = AG.filter((id) => agents[id].plan.busy && !agents[id].moving);
+  const pool = busy.length ? busy : AG;
+  const turn = pool[Math.floor(rot / 420) % pool.length];
+  for (const id of AG) {
+    const a = agents[id], el = B[id];
+    const show = selected ? id === selected : id === turn;
+    el.classList.toggle("hide", !show || a.moving);
+    if (!show) continue;
+    const dy = a.pose === "lie" ? -16 : a.pose === "read" ? (a.plan.sleep ? -36 : -30) : a.pose === "sitfront" ? -33 : -30;
+    const left = Math.min(Math.max(a.x / W * 100, 4), 96);
+    el.style.left = left + "%";
+    el.style.top = ((a.y + dy) / H * 100) + "%";
+    // keep the bubble inside the stage near the edges
+    el.style.transform = left < 20 ? "translate(-12%,-100%)" : left > 80 ? "translate(-88%,-100%)" : "translate(-50%,-100%)";
+    el.style.setProperty("--tail", left < 20 ? "12%" : left > 80 ? "88%" : "50%");
+    const text = clip(a.plan.say || "", 120);
+    const t = el.querySelector(".t"); if (t.textContent !== text) t.textContent = text;
+  }
+}
+
+// ---------------------------------------------------------------- loop
+let lastThink = 0, lastReal = performance.now();
+function frame(ts) {
+  const dt = Math.min(0.25, (ts - lastReal) / 1000); lastReal = ts;
+  T++; rot++;
+  if (V.mode === "replay" && V.playing) {
+    V.min += dt * V.speed * 60 / 60;  // speed = virtual minutes per real second
+    if (V.min >= 975) { V.min = 975; V.playing = false; }
+    scrub.value = Math.round(V.min);
+  }
+  if (ts - lastThink > 400) { think(false); lastThink = ts; ui(); }
+  for (const id of AG) step(agents[id]);
+  const t = now();
+  room(t);
+  const items = furniture(t).concat(AG.map((id) => ({ y: agents[id].y, draw: () => person(agents[id]) })));
+  items.sort((a, b) => a.y - b.y).forEach((i) => i.draw());
+  // highlight the followed agent with a little arrow
+  if (selected) { const a = agents[selected]; const ay = a.pose === "lie" ? a.y - 22 : a.y - 40; R(a.x - 2, ay + (((T / 15) | 0) % 2), 5, 2, C.gold); R(a.x - 1, ay + 2 + (((T / 15) | 0) % 2), 3, 1, C.gold); R(a.x, ay + 3 + (((T / 15) | 0) % 2), 1, 1, C.gold); }
+  if (!isOpen(t) && (t.min < 420 || t.min >= 1140 || isWeekend(t))) { g.fillStyle = "rgba(6,6,24,.35)"; g.fillRect(0, 0, W, H); }
+  bubbles();
+  requestAnimationFrame(frame);
+}
+
+// ---------------------------------------------------------------- page around the scene
+const $ = (id) => document.getElementById(id);
+const scrub = $("scrub");
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+function header() {
+  const s = D.status, p = s.performance || {};
+  if (s.equity == null) { $("meta").textContent = "Waiting for the first run."; return; }
+  $("meta").innerHTML = `Portfolio <b>${money(s.equity)}</b> · since ${esc(p.since || "start")} <span class="${cls(p.agent_return_pct)}">${pct(p.agent_return_pct || 0)}</span> vs S&amp;P <span class="${cls(p.spy_return_pct)}">${pct(p.spy_return_pct || 0)}</span>`;
+}
+function cards() {
+  $("cards").innerHTML = AG.map((id) => `
+    <article class="card" data-a="${id}" tabindex="0" style="--c:var(--${id})">
+      <h2>${ICON[id]} ${NAME[id].toUpperCase()} <small>${ROLE[id][0]}</small></h2>
+      <p class="role">${ROLE[id][1]}</p>
+      <div class="now" id="now-${id}"></div>
+      <div class="stats" id="stats-${id}"></div>
+      <ul class="log" id="log-${id}"></ul>
+    </article>`).join("");
+  document.querySelectorAll(".card").forEach((c) => {
+    c.onclick = () => select(c.dataset.a);
+    c.onkeydown = (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); select(c.dataset.a); } };
+  });
+}
+function select(id) {
+  selected = selected === id ? null : id;
+  document.querySelectorAll(".card").forEach((c) => c.classList.toggle("sel", c.dataset.a === selected));
+}
+function statsHtml(id) {
+  const s = (D.status.scorecard || {})[id];
+  if (!s || !s.buys) return `<div><span class="k">Buys</span><span class="v">0</span></div><div><span class="k">vs S&amp;P</span><span class="v">–</span></div><div><span class="k">Beat S&amp;P</span><span class="v">–</span></div>`;
+  return `<div><span class="k">Buys</span><span class="v">${s.buys}</span></div>
+    <div><span class="k">Avg vs S&amp;P</span><span class="v ${cls(s.avg_vs_spy_pct)}">${pct(s.avg_vs_spy_pct)}</span></div>
+    <div><span class="k">Beat S&amp;P</span><span class="v">${s.beat_spy}/${s.buys}</span></div>`;
+}
+let lastUi = "";
+function ui() {
+  const t = now();
+  $("clock").textContent = `NY ${t.wd.toUpperCase()} ${hhmm(t.min)} · ${isOpen(t) ? "MARKET OPEN" : "MARKET CLOSED"}`;
+  for (const id of AG) {
+    const a = agents[id];
+    const html = `<b>NOW: ${esc((a.moving ? "walking to the " + a.spot : a.plan.label).toUpperCase())}</b>${esc(a.plan.say)}`;
+    const el = $("now-" + id); if (el.innerHTML !== html) el.innerHTML = html;
+  }
+  // the day's log, past entries solid and later ones faded in replay
+  const day = V.mode === "live" ? (D.events.some((e) => e.date === t.date) ? t.date : D.events.at(-1)?.date) : t.date;
+  const evs = D.events.filter((e) => e.date === day && (e.orders.length || e.agent !== "news" || !/Nothing worth|No trades/.test(e.text)));
+  const key = day + "|" + evs.length + "|" + Math.floor(t.min);
+  if (key === lastUi) return;
+  lastUi = key;
+  $("feed-title").textContent = day === t.date ? "TODAY ON THE FLOOR" : `LAST TRADING DAY · ${day || "—"}`;
+  $("feed").innerHTML = evs.length ? evs.map((e) => `<li data-min="${e.min}" data-date="${e.date}" class="${day === t.date && e.min > t.min ? "future" : ""}"><time>${hhmm(e.min)}</time><span class="ic">${ICON[e.agent]}</span><span>${esc(e.trade ? e.trade + "." : e.text)}</span></li>`).join("")
+    : `<li><span>No runs logged for this day yet.</span></li>`;
+  $("feed").querySelectorAll("li[data-min]").forEach((li) => li.onclick = () => startReplay(li.dataset.date, +li.dataset.min - 3));
+}
+function agentLogs() {
+  for (const id of AG) {
+    const evs = D.events.filter((e) => e.agent === id && e.orders.length).slice(-4).reverse();
+    $("stats-" + id).innerHTML = statsHtml(id);
+    $("log-" + id).innerHTML = evs.length ? evs.map((e) => `<li><time>${e.date.slice(5)} ${hhmm(e.min)}</time><span>${esc(e.trade)}</span></li>`).join("") : `<li><span>No trades yet.</span></li>`;
+  }
+}
+
+// ---------------------------------------------------------------- live / replay controls
+function tradingDays() { return [...new Set(D.events.map((e) => e.date))].slice(-15).reverse(); }
+function fillDays() {
+  const days = tradingDays();
+  $("day").innerHTML = days.map((d) => `<option value="${d}">${d}</option>`).join("");
+  if (V.day && days.includes(V.day)) $("day").value = V.day;
+}
+function setMode(mode) {
+  V.mode = mode;
+  $("live").setAttribute("aria-pressed", mode === "live"); $("replay").setAttribute("aria-pressed", mode === "replay");
+  for (const id of ["day", "speed", "scrub"]) $(id).disabled = mode === "live";
+  lastUi = ""; think(true); ui();
+}
+function startReplay(day, min) {
+  V.day = day || $("day").value || tradingDays()[0];
+  $("day").value = V.day;
+  V.min = min ?? 560; V.playing = true; scrub.value = V.min;
+  setMode("replay");
+}
+$("live").onclick = () => setMode("live");
+$("replay").onclick = () => startReplay();
+$("day").onchange = () => startReplay($("day").value);
+$("speed").onclick = () => { V.speed = V.speed === 0.5 ? 2 : V.speed === 2 ? 0.1 : 0.5; $("speed").textContent = V.speed === 0.5 ? "30×" : V.speed === 2 ? "120×" : "6×"; };
+scrub.oninput = () => { if (V.mode !== "replay") startReplay(null, +scrub.value); V.min = +scrub.value; V.playing = true; think(true); };
+cv.onclick = (e) => {
+  const r = cv.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * W, y = (e.clientY - r.top) / r.height * H;
+  let best = null, bd = 26;
+  for (const id of AG) { const a = agents[id]; const d = Math.hypot(a.x - x, a.y - 12 - y); if (d < bd) { bd = d; best = id; } }
+  if (best) select(best);
+};
+
+// ---------------------------------------------------------------- start and keep fresh
+async function refreshAll() {
+  const [status, decisions, intraday, watch] = await Promise.all([load("status.json", D.status), load("decisions.json", D.decisions), load("intraday.json", D.intraday), load("watch.json", D.watch)]);
+  Object.assign(D, { status, decisions, intraday: intraday && intraday.points ? intraday : { points: [] }, watch: watch || {} });
+  buildEvents(); header(); agentLogs(); fillDays(); lastUi = "";
+}
+async function refreshLive() {
+  if (document.visibilityState !== "visible") return;
+  const live = await fetchLive();
+  if (!live) return;
+  const st = live.status || {};
+  if (st.updated && (!D.status.updated || new Date(st.updated) >= new Date(D.status.updated))) D.status = st;
+  const pts = (D.intraday.points || []).slice(), seen = new Set(pts.map((p) => p[0]));
+  for (const p of live.intraday_tail || []) if (!seen.has(p[0])) pts.push(p);
+  D.intraday = { points: pts.sort((a, b) => a[0].localeCompare(b[0])) };
+  header(); agentLogs();
+}
+(async () => {
+  cards();
+  await refreshAll();
+  setMode("live");
+  think(true);
+  requestAnimationFrame((ts) => { lastReal = ts; frame(ts); });
+  refreshLive();
+  setInterval(refreshLive, 61000);
+  setInterval(refreshAll, 3 * 60000);
+})();
+</script>
+</body>
+</html>
