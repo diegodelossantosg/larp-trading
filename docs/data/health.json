@@ -5,31 +5,31 @@
   "fear": {
    "title": "Fear (S&P swings)",
    "display": "10%",
-   "value": 9.7,
+   "value": 9.6,
    "label": "calm",
    "source": "SPY 20-day volatility (annualised)"
   },
   "rates": {
    "title": "Bonds (rates)",
-   "display": "+1.6%",
-   "ief_return_20d_pct": 1.56,
-   "label": "stable",
+   "display": "+2.2%",
+   "ief_return_20d_pct": 2.25,
+   "label": "yields falling",
    "source": "IEF 7-10y Treasury ETF, 20-day change"
   },
   "credit": {
    "title": "Credit stress",
-   "display": "-2.4%",
-   "hyg_vs_ief_20d_pct": -2.36,
+   "display": "-2.2%",
+   "hyg_vs_ief_20d_pct": -2.23,
    "label": "stressed",
    "source": "high-yield (HYG) vs Treasuries (IEF), 20 days"
   },
   "breadth": {
    "title": "ETFs in uptrend",
-   "display": "52%",
-   "above_200d_pct": 52,
-   "above_50d_pct": 40,
+   "display": "54%",
+   "above_200d_pct": 54,
+   "above_50d_pct": 45,
    "label": "mixed"
   }
  },
- "checked": "2026-10-23T14:16"
+ "checked": "2026-10-26T14:13"
 }
