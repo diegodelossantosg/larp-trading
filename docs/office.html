@@ -71,6 +71,7 @@ const D = { status: {}, decisions: [], intraday: { points: [] }, watch: {}, even
 const AG = ["claude", "watch", "news"];
 const NAME = { claude: "CLAUDE", watch: "WATCHER", news: "NEWS HUNTER" };
 const ROLE = { claude: "Researches every morning at 9:36 and sets the plan.", watch: "Checks every holding each minute and sells on a stop.", news: "Every hour, buys stocks that fell too hard on news." };
+const COLOR = { claude: "#d9845a", watch: "#5aa9e6", news: "#b98be0" };
 
 const NYF = new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23", weekday: "short" });
 function ny(ms) {
@@ -162,173 +163,190 @@ function plan(id, t) {
 const W = 640, H = 360;
 const cv = document.getElementById("cv");
 const main = cv.getContext("2d");
+main.imageSmoothingEnabled = false;
 let g = main;
 const R = (x, y, w, h, c) => { g.fillStyle = c; g.fillRect(Math.round(x), Math.round(y), w, h); };
-const box = (x, y, w, h, fill, edge) => { R(x, y, w, h, edge); R(x + 1, y + 1, w - 2, h - 2, fill); };
+const OUT = "#1a1426";
+const box = (x, y, w, h, fill, edge = OUT) => { R(x, y, w, h, edge); R(x + 1, y + 1, w - 2, h - 2, fill); };
+function mix(hex, f) {  // f > 0 lightens towards white, f < 0 darkens
+  const c = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).map((v) => Math.round(f > 0 ? v + (255 - v) * f : v * (1 + f)));
+  return "#" + c.map((v) => Math.max(0, Math.min(255, v)).toString(16).padStart(2, "0")).join("");
+}
+// a shaded block: light top edge, dark bottom and right edge, outline
+function block(x, y, w, h, c) { box(x, y, w, h, c); R(x + 1, y + 1, w - 2, 1, mix(c, 0.25)); R(x + 1, y + h - 2, w - 2, 1, mix(c, -0.25)); R(x + w - 2, y + 1, 1, h - 2, mix(c, -0.15)); }
 function rng(seed) { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
 const F = {A:"010101111101101",B:"110101110101110",C:"011100100100011",D:"110101101101110",E:"111100110100111",F:"111100110100100",G:"011100101101011",H:"101101111101101",I:"111010010010111",J:"001001001101010",K:"101101110101101",L:"100100100100111",M:"101111111101101",N:"110101101101101",O:"010101101101010",P:"110101110100100",Q:"010101101110011",R:"110101110101101",S:"011100010001110",T:"111010010010010",U:"101101101101111",V:"101101101101010",W:"101101111111101",X:"101101010101101",Y:"101101010010010",Z:"111001010100111","&":"010101010101011","+":"000010111010000","-":"000000111000000","−":"000000111000000",".":"000000000000010",",":"000000000010100",":":"000010000010000","%":"101001010100101","!":"010010010000010","?":"110001010000010","$":"011110010011110","/":"001001010100100","(":"010100100100010",")":"010001001001010","'":"010010000000000","…":"000000000000101","0":"111101101101111","1":"010110010010111","2":"110001010100111","3":"110001010001110","4":"101101111001001","5":"111100110001110","6":"011100111101111","7":"111001010010010","8":"111101111101111","9":"111101111001110"," ":"000000000000000"};
 function txt(s, x, y, c, k = 1) { for (const ch of String(s).toUpperCase()) { const f = F[ch] || F[" "]; for (let i = 0; i < 15; i++) if (f[i] === "1") R(x + (i % 3) * k, y + ((i / 3) | 0) * k, k, k, c); x += 4 * k; } }
 const tw = (s, k = 1) => String(s).length * 4 * k - k;
 function line(x0, y0, x1, y1, c) { const n = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0), 1); for (let i = 0; i <= n; i++) R(x0 + (x1 - x0) * i / n, y0 + (y1 - y0) * i / n, 1, 1, c); }
-const OUT = "#1a1426";
+function glow(x, y, r, rgb, a) { const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, `rgba(${rgb},${a})`); gr.addColorStop(1, `rgba(${rgb},0)`); g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2); }
 
-// ================================================================ characters (16×26 sprites, facing right)
-const ROWS = {
-  head: ["................", ".....oooooo.....", "....ohhhhhhoo...", "...ohhhhhhhhho..", "...ohhhhhhhhhho.", "...ohhhssssssso.", "...ohhsssssesso.", "...ohSsssssssso.", "....oSsssssSo...", ".....oSSSSSo....", "......oSSo......"],
-  hang: ["....occcccccco..", "...occcccccccco.", "...occcCCccccco.", "...occcCCccccco.", "...occcCCccccco.", "...occcCCccccco.", "...occcssccccco.", "...oCCCssCCCCCo."],
-  reachA: ["....occcccccco..", "...occcccccccco.", "...occcccccccco.", "...occcCCCCCCsso", "...occcccccccoo.", "...occcccccccco.", "...occcccccccco.", "...oCCCCCCCCCCo."],
-  reachB: ["....occcccccco..", "...occcccccccco.", "...occcccccccco.", "...occcccccccco.", "...occcCCCCCCsso", "...occcccccccoo.", "...occcccccccco.", "...oCCCCCCCCCCo."],
-  stand: ["....oppppppppo..", "....opppoppppo..", "....opppoppppo..", "....oPPPoPPPPo..", "....oPPPoPPPPo..", "....okkkookkkkoo", "....oooo.ooooo.."],
-  walk: ["....oppppppppo..", "...opppo.oppppo.", "..opppo...oppppo", "..oPPPo...oPPPPo", ".oPPPo.....oPPPo", ".okkko.....okkko", ".oooo......oooo."],
-  sit: ["....oppppppppppo", "....oPPPPPPPPPPo", ".....oooooooopPo", "............opPo", "............opPo", "...........okkko", "...........ooooo"],
+// ================================================================ characters: one white base model, a detail per agent
+// Drawn at 1 pixel = 2 world pixels. Base body is 10×16, placed at (2,3) inside a 14×19 canvas so hats fit.
+const BASE_HEAD = ["..oooooo..", ".owwwwwwo.", "owwwwwwwwo", "owwwwwwwwo", "owwwwwwwwo", "owwwwwwwwo", "ogwwwwwwgo", ".oggggggo."];
+const BODY = {
+  stand: ["..oooooo..", "..oggggo..", "..owwwwo..", "..owwwwo..", "..owwwwo..", "..owwowo..", "..owgowo..", "..oooooo.."],
+  walkA: ["..oooooo..", "..oggggo..", "..owwwwo..", "..owwwwo..", "..owwwwo..", "..owowwo..", "..ogowwo..", "..oooooo.."],
+  sit: ["..oooooo..", "..oggggo..", "..owwwwo..", "..owwwwo..", "..oooooo.."],
 };
-const FRAMES = { stand: ["head", "hang", "stand"], walk: ["head", "hang", "walk"], sit: ["head", "hang", "sit"], sitA: ["head", "reachA", "sit"], sitB: ["head", "reachB", "sit"], standA: ["head", "reachA", "stand"], standB: ["head", "reachB", "stand"] };
-const PAL = {
-  claude: { o: OUT, h: "#4a2e22", H: "#33201a", s: "#f2c9a0", S: "#d49a73", e: OUT, c: "#d9845a", C: "#a8603c", p: "#3b3a5a", P: "#2b2a44", k: "#2a1e1a", g: OUT, w: "#f4ecd8" },
-  watch: { o: OUT, h: "#26262f", H: "#18181f", s: "#e8b48c", S: "#c08660", e: OUT, c: "#4f8fd6", C: "#3567a3", p: "#2d3244", P: "#1f2333", k: "#15151c", g: "#3a3a46", r: "#ef4f4f" },
-  news: { o: OUT, h: "#e6c574", H: "#b8964c", s: "#f5d0b0", S: "#d8a888", e: OUT, c: "#9b6bd1", C: "#744aa8", p: "#4a3d5c", P: "#352a44", k: "#2a2233", r: "#f2c14e" },
+const EYES = { right: [4, 7], left: [2, 5], front: [3, 6] };
+const ACCENT = {
+  claude: (put) => {  // orange starburst on top, orange tie
+    put(6, 1, "c"); put(5, 0, "c"); put(7, 0, "c"); put(6, 0, "c"); put(6, 2, "c"); put(5, 2, "c"); put(7, 2, "c");
+    put(6, 12, "c"); put(7, 12, "c"); put(6, 13, "C"); put(7, 13, "C"); put(6, 14, "c"); put(7, 14, "c");
+  },
+  watch: (put, dir) => {  // blue cap with a brim on the side it faces
+    for (let x = 3; x <= 10; x++) { put(x, 2, "o"); put(x, 3, "b"); put(x, 4, "b"); }
+    put(2, 3, "o"); put(11, 3, "o"); put(2, 4, "o"); put(11, 4, "o"); put(6, 3, "B"); put(7, 3, "B");
+    const bx = dir === "left" ? [0, 1, 2] : dir === "right" ? [11, 12, 13] : [];
+    for (const x of bx) { put(x, 5, "o"); put(x, 4, x === bx[1] ? "b" : "o"); }
+    if (!bx.length) for (let x = 2; x <= 11; x++) put(x, 5, "B");
+  },
+  news: (put) => {  // purple fedora with a press card
+    for (let x = 4; x <= 9; x++) { put(x, 0, "o"); put(x, 1, "p"); put(x, 2, "p"); }
+    put(3, 1, "o"); put(10, 1, "o"); put(3, 2, "o"); put(10, 2, "o"); put(5, 1, "P");
+    for (let x = 1; x <= 12; x++) { put(x, 3, "o"); put(x, 4, x === 1 || x === 12 ? "o" : "P"); }
+    put(7, 2, "w"); put(8, 2, "w"); put(8, 1, "w");
+  },
 };
-const ACC = {
-  claude: [[10, 5, "g"], [11, 5, "g"], [12, 5, "g"], [10, 6, "g"], [12, 6, "g"], [8, 11, "w"], [9, 11, "w"], [10, 11, "w"]],
-  watch: [[7, 1, "g"], [7, 2, "g"], [7, 3, "g"], [7, 4, "g"], [7, 5, "g"], [6, 6, "g"], [7, 6, "g"], [6, 7, "g"], [7, 7, "g"], [8, 8, "g"], [9, 8, "g"], [10, 8, "g"], [11, 8, "r"]],
-  news: [[5, 7, "h"], [3, 8, "o"], [4, 8, "h"], [5, 8, "h"], [3, 9, "o"], [4, 9, "h"], [5, 9, "H"], [3, 10, "o"], [4, 10, "H"], [5, 10, "o"], [6, 10, "r"], [7, 10, "r"], [8, 10, "r"], [9, 10, "r"], [5, 11, "r"], [6, 11, "r"], [7, 11, "r"], [8, 11, "r"], [9, 11, "r"], [10, 11, "r"]],
-};
+const SPAL = { o: "#141018", w: "#ffffff", g: "#c9c6d2", e: "#141018", c: "#e07a4a", C: "#b8582e", b: "#3f8fe0", B: "#2a6bb0", p: "#8a5cc8", P: "#5e3a96" };
 const SPR = {};
 function buildSprites() {
   for (const id of AG) {
     SPR[id] = {};
-    for (const [fr, parts] of Object.entries(FRAMES)) for (const closed of [false, true]) {
-      const rows = parts.flatMap((k) => ROWS[k]).map((r) => r.split(""));
-      for (const [x, y, k] of ACC[id]) rows[y][x] = k;
-      if (closed) { rows[6][11] = "s"; rows[7][10] = "e"; rows[7][11] = "e"; }
-      const c = document.createElement("canvas"); c.width = 16; c.height = 26;
+    for (const dir of ["right", "left", "front"]) for (const body of ["stand", "walkA", "sit"]) for (const closed of [false, true]) {
+      const c = document.createElement("canvas"); c.width = 14; c.height = 19;
       const x = c.getContext("2d");
-      rows.forEach((r, y) => r.forEach((k, xx) => { if (k !== ".") { x.fillStyle = PAL[id][k] || "#f0f"; x.fillRect(xx, y, 1, 1); } }));
-      const f = document.createElement("canvas"); f.width = 16; f.height = 26;
-      const fx = f.getContext("2d"); fx.translate(16, 0); fx.scale(-1, 1); fx.drawImage(c, 0, 0);
-      SPR[id][fr + (closed ? "z" : "")] = [c, f];
+      const grid = Array.from({ length: 19 }, () => Array(14).fill("."));
+      const rows = BASE_HEAD.concat(BODY[body]);
+      // the head keeps its place; a sitting body is shorter, so the whole figure drops
+      const oy = body === "sit" ? 3 + 3 : 3;
+      rows.forEach((r, y) => [...r].forEach((k, xx) => { if (k !== ".") grid[oy + y][2 + xx] = k; }));
+      const [e1, e2] = EYES[dir];
+      for (const ex of [e1, e2]) {
+        if (closed) { grid[oy + 4][2 + ex] = "e"; if (ex + 1 < 9) grid[oy + 4][2 + ex + (dir === "left" ? -1 : 1)] = "e"; }
+        else { grid[oy + 3][2 + ex] = "e"; grid[oy + 4][2 + ex] = "e"; }
+      }
+      const put = (px, py, k) => { const yy = py + oy - 3; if (yy >= 0 && yy < 19 && px >= 0 && px < 14) grid[yy][px] = k; };
+      ACCENT[id](put, dir);
+      grid.forEach((r, y) => r.forEach((k, xx) => { if (k !== ".") { x.fillStyle = SPAL[k]; x.fillRect(xx, y, 1, 1); } }));
+      SPR[id][`${dir}-${body}${closed ? "-z" : ""}`] = c;
     }
   }
 }
 
 // ================================================================ the building
-const FEET = [212, 306];          // where feet touch the floor, top floor and ground floor
-const ELEV_X = 580, CAR = [172, 266];
+const FEET = [211, 305];
+const ELEV_X = 580, CAR = [171, 265];
 const SP = {
-  desk: { f: 0, x: 112, dir: 1, seat: true }, console: { f: 0, x: 284, dir: 1 }, stool: { f: 0, x: 246, dir: 1, seat: true },
-  armchair: { f: 0, x: 446, dir: 1, seat: true }, teletype: { f: 0, x: 504, dir: 1 },
-  term_claude: { f: 1, x: 180, dir: 1 }, term_news: { f: 1, x: 234, dir: 1 }, term_watch: { f: 1, x: 288, dir: 1 },
-  coffee_claude: { f: 1, x: 396, dir: 1 }, coffee_watch: { f: 1, x: 406, dir: 1 }, coffee_news: { f: 1, x: 416, dir: 1 },
-  arcade: { f: 1, x: 472, dir: 1 },
+  desk: { f: 0, x: 116, dir: 1, seat: true }, console: { f: 0, x: 282, dir: 1 }, stool: { f: 0, x: 244, dir: 1, seat: true },
+  armchair: { f: 0, x: 440, dir: 1, seat: true }, teletype: { f: 0, x: 510, dir: 1 },
+  term_claude: { f: 1, x: 176, dir: 1 }, term_news: { f: 1, x: 232, dir: 1 }, term_watch: { f: 1, x: 288, dir: 1 },
+  coffee_claude: { f: 1, x: 392, dir: 1 }, coffee_watch: { f: 1, x: 402, dir: 1 }, coffee_news: { f: 1, x: 412, dir: 1 },
+  arcade: { f: 1, x: 474, dir: 1 },
 };
 
 function skyOf(t) {
   const m = t.min;
-  if (m < 360 || m >= 1230) return { k: "night", bands: ["#070a1c", "#0b1026", "#101633", "#151c40", "#1b2350", "#22295c"], city: "#0e0c1e", lit: 0.35 };
-  if (m < 450) return { k: "dawn", bands: ["#2a2f6e", "#4b3f86", "#7a4f8f", "#b5658a", "#e48a7c", "#f6b383"], city: "#2a2140", lit: 0.12 };
-  if (m >= 1110) return { k: "dusk", bands: ["#24306e", "#433f8a", "#7b4e92", "#c0628a", "#ec8a6e", "#f7b768"], city: "#251d3a", lit: 0.2 };
-  return { k: "day", bands: ["#4a8fd8", "#5b9de0", "#6fabe6", "#86bbec", "#a0cbf0", "#bcdcf4"], city: "#5d6a92", lit: 0 };
+  if (m < 360 || m >= 1230) return { k: "night", bands: ["#070a1c", "#0b1026", "#101633", "#151c40", "#1b2350", "#22295c"], city: "#0e0c1e", far: "#151330", lit: 0.35 };
+  if (m < 450) return { k: "dawn", bands: ["#2a2f6e", "#4b3f86", "#7a4f8f", "#b5658a", "#e48a7c", "#f6b383"], city: "#2a2140", far: "#4a3a60", lit: 0.12 };
+  if (m >= 1110) return { k: "dusk", bands: ["#24306e", "#433f8a", "#7b4e92", "#c0628a", "#ec8a6e", "#f7b768"], city: "#251d3a", far: "#4a3660", lit: 0.2 };
+  return { k: "day", bands: ["#4a8fd8", "#5b9de0", "#6fabe6", "#86bbec", "#a0cbf0", "#bcdcf4"], city: "#5d6a92", far: "#8fa6cf", lit: 0 };
 }
+
+// --- minimal furniture: flat colours, thick outlines
+const ob = (x, y, w, h, fill) => { R(x, y, w, h, OUT); R(x + 2, y + 2, w - 4, h - 4, fill); };
+const shelf = (x, y, w, h, fill) => { ob(x, y, w, h, fill); R(x + 2, y + 2, w - 4, 2, mix(fill, 0.3)); };
+function winBox(x, y, w, h, sky) {
+  ob(x, y, w, h, sky.bands[3]); R(x + 2, y + h - 2 - ((h - 4) >> 2), w - 4, (h - 4) >> 2, sky.city);
+  R(x + (w >> 1) - 1, y, 2, h, OUT); R(x, y + (h >> 1) - 1, w, 2, OUT);
+}
+function plantMin(x, y) { ob(x, y - 10, 12, 10, "#c9744a"); for (const [lx, ly] of [[2, -20], [-2, -16], [6, -18], [4, -24]]) ob(x + lx, y + ly, 8, 8, "#5fae6a"); }
+
 const bg = document.createElement("canvas"); bg.width = W; bg.height = H;
 let bgKey = "";
 function drawBackground(t) {
-  const sky = skyOf(t), night = sky.k === "night";
+  const sky = skyOf(t), night = sky.k === "night", dayish = sky.k === "day";
   g = bg.getContext("2d");
-  // sky in bands, far city, near city
+  // sky and one flat skyline
   sky.bands.forEach((c, i) => R(0, i * 22, W, 22, c)); R(0, 132, W, 200, sky.bands.at(-1));
-  if (night || sky.k === "dawn" || sky.k === "dusk") { const r = rng(4); for (let i = 0; i < 60; i++) R(r() * W, r() * 100, 1, 1, night ? "#e8e4ff" : "#ffe8d0"); }
-  if (night) for (let y = -7; y <= 7; y++) for (let x = -7; x <= 7; x++) if (x * x + y * y <= 49 && (x - 4) * (x - 4) + (y + 2) * (y + 2) > 36) R(76 + x, 32 + y, 1, 1, "#efe9c8"); else if (sky.k === "day") { R(80, 30, 14, 14, "#fff1b0"); R(78, 32, 18, 10, "#fff1b0"); }
-  const r = rng(11);
-  for (let x = -10; x < W; x += 18 + r() * 14) { const h = 40 + r() * 70, w = 16 + r() * 22; R(x, 330 - h - 60, w, h + 60, sky.k === "day" ? "#8fa6cf" : "#1d1938"); }
-  const r2 = rng(23);
-  for (let x = -6; x < W; x += 22 + r2() * 18) {
-    const h = 60 + r2() * 90, w = 20 + r2() * 26, top = 330 - h;
-    R(x, top, w, h, sky.city);
-    for (let wy = top + 5; wy < 326; wy += 7) for (let wx = x + 3; wx < x + w - 3; wx += 5) if (r2() < (sky.lit || 0.04)) R(wx, wy, 2, 3, "#f4d27a");
-  }
+  if (!dayish) { const r = rng(4); for (let i = 0; i < 40; i++) R(r() * W, r() * 100, 2, 2, "#e8e4ff"); }
+  if (night) for (let y = -8; y <= 8; y++) for (let x = -8; x <= 8; x++) if (x * x + y * y <= 64 && (x - 5) * (x - 5) + (y + 2) * (y + 2) > 49) R(150 + x, 32 + y, 1, 1, "#f4efd8");
+  if (dayish) { for (let y = -9; y <= 9; y++) for (let x = -9; x <= 9; x++) if (x * x + y * y <= 81) R(150 + x, 34 + y, 1, 1, "#fff1b0"); for (const [cx, cy] of [[300, 40], [470, 24], [40, 60]]) { R(cx, cy, 34, 8, "#ffffff"); R(cx + 8, cy - 6, 16, 6, "#ffffff"); } }
+  const r = rng(23);
+  for (let x = -6; x < W; x += 24 + r() * 16) { const h = 90 + r() * 100, w = 26 + r() * 24; R(x, 318 - h, w, h, sky.city); if (sky.lit) for (let wy = 324 - h; wy < 314; wy += 10) for (let wx = x + 4; wx < x + w - 4; wx += 8) if (r() < sky.lit) R(wx, wy, 3, 4, "#f4d27a"); }
   // street
-  R(0, 316, W, 8, "#77708a"); R(0, 316, W, 1, "#9a93b0"); R(0, 324, W, 36, "#2e2b3a");
-  for (let x = 0; x < W; x += 28) R(x, 341, 14, 2, "#c9c09a");
-  for (const lx of [8, 628]) { R(lx, 270, 3, 46, "#3a3448"); R(lx - 3, 266, 9, 5, "#3a3448"); if (sky.k !== "day") { R(lx - 2, 271, 7, 2, "#ffe7a0"); g.fillStyle = "rgba(255,231,160,.10)"; g.fillRect(lx - 14, 273, 31, 43); } }
+  R(0, 318, W, 10, "#a8a2b6"); R(0, 318, W, 2, OUT); R(0, 328, W, 32, "#3a3646"); for (let x = 6; x < W; x += 34) R(x, 343, 16, 2, "#d8d0a8");
+  for (const lx of [8, 626]) { R(lx, 266, 4, 52, OUT); ob(lx - 5, 258, 14, 8, sky.k === "day" ? "#c9c6d2" : "#ffe7a0"); }
 
-  // building shell
-  box(22, 124, 596, 194, "#4b3f63", OUT);
-  R(18, 116, 604, 9, "#3a3050"); R(18, 116, 604, 1, "#5b4f75");
-  for (let x = 28; x < 612; x += 24) R(x, 118, 12, 4, "#2e2640");
-  R(590, 92, 2, 24, "#3a3448"); R(586, 104, 10, 2, "#3a3448");
-  // floors and walls
-  const rooms = [
-    [26, 128, 194, 86, "#5a4636", "#644e3d"], [222, 128, 192, 86, "#1d3742", "#22414e"], [416, 128, 148, 86, "#4f3449", "#5a3d53"],
-    [26, 222, 318, 86, "#2b2740", "#312c48"], [346, 222, 218, 86, "#3d4c38", "#44553f"],
-  ];
-  for (const [x, y, w, h, c1, c2] of rooms) { R(x, y, w, h, c1); for (let sx = x + 4; sx < x + w; sx += 10) R(sx, y, 4, h, c2); R(x, y, w, 3, "#00000033"); }
-  for (const [y, fl] of [[206, "#7a5236"], [300, "#5b5568"]]) { R(26, y, 538, 8, fl); for (let x = 26; x < 564; x += 16) R(x, y, 1, 8, "#00000030"); R(26, y, 538, 1, "#ffffff22"); }
-  R(22, 214, 596, 8, "#3a3050"); R(22, 214, 596, 1, OUT); R(22, 221, 596, 1, OUT);
-  // partitions with door frames
-  for (const [x, top, bot] of [[220, 128, 214], [414, 128, 214], [344, 222, 308]]) { R(x, top, 2, bot - top - 34, "#2a2238"); R(x - 2, bot - 36, 6, 2, "#2a2238"); }
-  // elevator shaft
-  R(564, 128, 52, 180, "#2a2438"); R(566, 128, 2, 180, "#1f1a2c"); R(612, 128, 2, 180, "#1f1a2c");
-  for (let y = 132; y < 306; y += 12) R(569, y, 42, 1, "#332c44");
-  R(589, 128, 2, 180, "#463c5c");
+  // building: plain facade, bold outline, roof line, sign
+  ob(16, 112, 608, 208, "#d8cfc0");
+  R(12, 106, 616, 8, OUT); R(14, 108, 612, 4, "#a89c8a");
+  R(250, 90, 4, 18, OUT); R(386, 90, 4, 18, OUT); ob(240, 76, 160, 18, "#241f30");
+  R(596, 62, 4, 46, OUT); R(588, 76, 20, 3, OUT);
+  // rooms: each is its own box with a thick outline, a flat wall and a flat floor
+  const room = (x, y, w, h, wall, floorC) => { ob(x, y, w, h, wall); R(x + 2, y + h - 12, w - 4, 10, floorC); R(x + 2, y + h - 12, w - 4, 2, mix(floorC, -0.25)); R(x + 2, y + 2, w - 4, 3, mix(wall, -0.12)); };
+  room(24, 124, 196, 92, "#efe3cc", "#b98a5e");   // study
+  room(218, 124, 194, 92, "#d6e0e8", "#8f9aa8");  // control room
+  room(410, 124, 154, 92, "#f0dcdc", "#9a7aa0");  // newsroom
+  room(24, 222, 322, 90, "#dedcec", "#a8a4bc");   // trading room
+  room(344, 222, 220, 90, "#dcebdc", "#c09a6a");  // lounge
+  ob(562, 124, 56, 188, "#3a3448");               // lift shaft
+  R(574, 126, 2, 184, "#2a2438"); R(604, 126, 2, 184, "#2a2438");
+  // doorways between rooms (gaps in the shared wall)
+  for (const [x, fy] of [[218, 204], [410, 204], [344, 300]]) { R(x - 2, fy - 30, 6, 30, mix("#d8cfc0", -0.35)); R(x - 4, fy - 32, 10, 2, OUT); }
+  for (const fy of [204, 300]) { R(562, fy - 30, 4, 30, "#2a2438"); }
 
-  // ---------- Claude's study
-  // bookshelf
-  box(32, 140, 44, 68, "#5c3a22", OUT);
-  const rb = rng(5);
-  for (let s = 0; s < 4; s++) {
-    const sy = 143 + s * 16; R(33, sy + 13, 42, 2, "#3f2716");
-    for (let bx = 35; bx < 72;) { const bw = 2 + ((rb() * 3) | 0), bh = 8 + ((rb() * 5) | 0); R(bx, sy + 13 - bh, bw, bh, ["#c75b4a", "#e0b04a", "#4d8fbf", "#5fa66a", "#9b6bd1", "#e8e0c8"][(rb() * 6) | 0]); bx += bw + (rb() < 0.15 ? 2 : 0); }
-  }
-  // window
-  box(84, 138, 40, 40, "#20263a", OUT); R(86, 140, 36, 36, sky.bands[3]); R(86, 160, 36, 16, sky.city); if (sky.lit) for (let i = 0; i < 9; i++) R(88 + i * 4, 164 + (i % 3) * 4, 1, 2, "#f4d27a");
-  R(103, 140, 2, 36, "#20263a"); R(86, 157, 36, 2, "#20263a"); R(82, 176, 44, 3, "#5c3a22");
-  // whiteboard with a rising line
-  box(160, 138, 54, 32, "#e9e6dc", "#6b6f80");
-  line(164, 162, 176, 156, "#5fa66a"); line(176, 156, 186, 159, "#5fa66a"); line(186, 159, 208, 146, "#5fa66a");
-  line(164, 158, 180, 160, "#c75b4a"); line(180, 160, 208, 163, "#c75b4a"); R(165, 143, 14, 1, "#4d8fbf"); R(165, 146, 10, 1, "#4d8fbf");
-  // rug, chair, desk
-  R(92, 211, 110, 2, "#8a3b3b");
-  R(108, 176, 3, 24, "#3d2a20"); R(108, 196, 16, 3, "#3d2a20"); R(112, 199, 2, 13, "#3d2a20"); R(120, 199, 2, 13, "#3d2a20"); R(106, 174, 7, 14, "#8a3b3b");
-  box(134, 196, 66, 5, "#9a6b45", OUT); R(138, 201, 4, 11, "#5c3a22"); R(192, 201, 4, 11, "#5c3a22"); box(170, 201, 22, 11, "#7a5236", OUT); R(178, 205, 6, 1, "#e0b04a");
-  box(158, 174, 30, 21, "#2c2a3a", OUT); R(171, 195, 4, 1, "#6b6f80"); R(166, 195, 14, 1, "#6b6f80");
-  R(138, 186, 2, 10, "#6b6f80"); R(135, 182, 8, 4, "#e0b04a"); R(192, 191, 5, 5, "#e8e0c8"); R(197, 192, 1, 2, "#e8e0c8");
-  R(145, 193, 10, 3, "#e8e0c8"); R(146, 191, 9, 2, "#d8d0bc");
+  // ===== STUDY
+  shelf(30, 140, 40, 64, "#a0704a");
+  for (let s = 0; s < 3; s++) { R(32, 160 + s * 20, 36, 2, OUT); const cols = ["#e07a4a", "#3f8fe0", "#5fae6a", "#f2c14e", "#8a5cc8"]; for (let i = 0; i < 5; i++) R(34 + i * 7, 146 + s * 20, 5, 14 - (i % 2) * 3 + (i % 2) * 3, cols[(i + s) % 5]); }
+  winBox(84, 140, 36, 30, sky);
+  ob(150, 142, 26, 18, "#f2c14e"); R(154, 146, 18, 10, sky.bands[3]); R(154, 152, 18, 4, "#5fae6a");
+  R(176, 126, 2, 8, OUT); ob(170, 132, 14, 6, "#e07a4a");
+  ob(108, 172, 8, 26, "#4a4458"); ob(108, 196, 18, 6, "#4a4458"); R(116, 202, 2, 8, OUT);
+  ob(134, 196, 76, 6, "#c08a5a"); R(138, 202, 4, 10, OUT); R(202, 202, 4, 10, OUT); ob(176, 202, 26, 10, "#c08a5a");
+  ob(162, 172, 34, 22, "#2a2438"); R(177, 194, 6, 3, OUT);
+  ob(140, 180, 10, 6, "#f2c14e"); R(144, 186, 2, 10, OUT);
+  ob(198, 188, 8, 8, "#ffffff");
+  plantMin(84, 204);
 
-  // ---------- Watcher's control room
-  for (let i = 0; i < 6; i++) { const mx = 236 + (i % 3) * 58, my = 136 + Math.floor(i / 3) * 28; box(mx, my, 54, 25, "#0b141c", "#3a4a5a"); }
-  box(300, 196, 74, 16, "#3a4652", OUT); R(301, 196, 72, 3, "#55657a");
-  R(240, 200, 18, 3, "#55657a"); R(242, 203, 2, 9, "#3a4652"); R(254, 203, 2, 9, "#3a4652");
-  R(382, 182, 18, 30, "#2f3a46"); R(384, 184, 14, 6, "#1b232c"); R(384, 194, 14, 2, "#55657a");
-  R(330, 128, 8, 4, "#3a4652");
+  // ===== CONTROL ROOM
+  for (let i = 0; i < 6; i++) { const mx = 236 + (i % 3) * 54, my = 139 + Math.floor(i / 3) * 27; ob(mx, my, 50, 25, "#0e1620"); }
+  ob(388, 146, 20, 58, "#3a4252"); for (let y = 152; y < 200; y += 8) R(390, y, 16, 2, OUT);
+  ob(300, 196, 82, 16, "#8f9aa8"); R(302, 198, 78, 2, "#b8c2cc");
+  ob(244, 198, 18, 4, "#3f8fe0"); R(252, 202, 2, 8, OUT); R(246, 208, 14, 2, OUT);
+  ob(226, 186, 8, 18, "#e05a4a");
+  R(330, 126, 8, 4, OUT);
 
-  // ---------- Newsroom
-  box(424, 138, 50, 34, "#b58d5a", "#5c3a22");
-  const rn = rng(9);
-  for (let i = 0; i < 7; i++) { const px = 428 + ((rn() * 38) | 0), py = 141 + ((rn() * 22) | 0); R(px, py, 9, 7, "#ece6d6"); R(px + 1, py + 2, 6, 1, "#8a8496"); R(px + 1, py + 4, 5, 1, "#8a8496"); R(px + 4, py, 1, 1, "#c75b4a"); }
-  line(432, 146, 462, 160, "#c75b4a");
-  box(486, 138, 56, 34, "#101018", "#2c2a3a"); R(511, 172, 6, 4, "#2c2a3a");
-  // armchair (side view)
-  R(436, 180, 6, 28, "#7a3f5c"); R(436, 196, 30, 8, "#7a3f5c"); R(438, 198, 26, 4, "#91506f"); R(438, 204, 2, 8, "#3d2a20"); R(460, 204, 2, 8, "#3d2a20"); R(462, 190, 6, 8, "#7a3f5c");
-  // teletype and paper stacks
-  box(522, 186, 34, 26, "#6b6f80", OUT); R(526, 190, 26, 6, "#3a3f55"); R(470, 202, 14, 10, "#ece6d6"); R(470, 198, 14, 4, "#d8d0bc"); R(472, 205, 10, 1, "#8a8496");
+  // ===== NEWSROOM
+  winBox(422, 140, 32, 28, sky); for (let y = 144; y < 156; y += 4) R(424, y, 28, 2, "#f4ecd8");
+  ob(462, 138, 44, 32, "#d8a86a");
+  const rn = rng(9); for (let i = 0; i < 5; i++) { const px = 466 + ((rn() * 28) | 0), py = 142 + ((rn() * 16) | 0); ob(px, py, 10, 8, "#ffffff"); R(px + 4, py, 2, 2, "#e05a4a"); }
+  ob(512, 136, 46, 30, "#16131f"); R(533, 166, 4, 4, OUT);
+  ob(430, 176, 12, 32, "#8a5cc8"); ob(436, 196, 32, 12, "#8a5cc8"); ob(460, 190, 8, 12, "#6e46a6");
+  ob(486, 192, 18, 4, "#c08a5a"); R(489, 196, 2, 14, OUT); R(499, 196, 2, 14, OUT); ob(488, 184, 14, 8, "#e05a4a");
+  ob(528, 186, 32, 26, "#9aa0ae"); R(532, 192, 24, 4, OUT);
+  for (let i = 0; i < 3; i++) ob(416, 196 - i * 6, 14, 8, "#f4ecd8");
 
-  // ---------- Trading pit
-  box(34, 228, 304, 18, "#050608", "#4a4458");
-  box(36, 252, 112, 50, "#0b141c", "#4a4458");
-  for (const kx of [198, 252, 306]) { box(kx, 262, 22, 44, "#3a3f55", OUT); box(kx + 3, 266, 16, 12, "#0b141c", "#22262f"); for (let i = 0; i < 3; i++) R(kx + 5 + i * 4, 284, 3, 2, "#6b6f80"); }
-  R(170, 252, 8, 54, "#2b2740");
-  // ---------- Lounge
-  box(422, 276, 52, 30, "#5b6170", OUT); R(423, 276, 50, 3, "#7a8090");
-  box(430, 256, 16, 20, "#2c2f3a", OUT); R(434, 268, 6, 6, "#ece6d6"); R(452, 268, 6, 8, "#ece6d6"); R(460, 270, 5, 6, "#ece6d6");
-  box(488, 248, 24, 58, "#5a2d6e", OUT); R(489, 249, 22, 6, "#f2c14e"); txt("ZAP", 494, 250, "#5a2d6e"); box(492, 258, 16, 13, "#0b0b16", OUT); R(491, 276, 18, 6, "#43204f");
-  box(352, 282, 60, 18, "#3f6f78", OUT); R(352, 274, 60, 10, "#4c8590"); R(352, 274, 60, 1, OUT); R(350, 278, 6, 22, "#4c8590"); R(408, 278, 6, 22, "#4c8590"); R(358, 300, 3, 6, "#2a2238"); R(404, 300, 3, 6, "#2a2238");
-  box(522, 234, 34, 34, "#20263a", OUT); R(524, 236, 30, 30, sky.bands[3]); R(524, 254, 30, 12, sky.city); R(538, 236, 2, 30, "#20263a");
-  R(530, 286, 12, 14, "#a35a3c"); R(532, 300, 8, 6, "#a35a3c"); for (const [x, y] of [[526, 274], [532, 268], [538, 276], [530, 280], [540, 270]]) R(x, y, 7, 8, "#4f9a5a");
-  box(372, 236, 18, 18, "#ece6d6", OUT);
+  // ===== TRADING ROOM
+  ob(34, 229, 302, 20, "#050608");
+  ob(34, 253, 114, 44, "#0e1620");
+  R(160, 276, 6, 22, OUT); ob(154, 294, 18, 6, "#c9a64a");
+  for (const kx of [196, 252, 308]) { ob(kx + 6, 278, 10, 22, "#4a5068"); ob(kx, 256, 22, 24, "#4a5068"); R(kx + 2, 258, 18, 13, "#0b141c"); }
+  plantMin(330, 300);
 
-  // night: darken the rooms a little; lamps and screens are drawn on top every frame
-  if (night) { g.fillStyle = "rgba(6,6,24,.45)"; g.fillRect(26, 128, 538, 180); }
-  else if (sky.k !== "day") { g.fillStyle = "rgba(10,8,30,.18)"; g.fillRect(26, 128, 538, 180); }
+  // ===== LOUNGE
+  ob(372, 230, 42, 26, "#241f30"); txt("BEAT THE", 377, 236, "#f2c14e"); txt("S&P 500", 379, 244, "#ef6f6c");
+  ob(354, 270, 66, 14, "#3fa3a8"); ob(352, 280, 70, 20, "#3fa3a8"); R(354, 282, 66, 3, "#6ac2c6");
+  ob(430, 274, 48, 26, "#c08a5a"); R(432, 276, 44, 2, "#e0b88a");
+  ob(434, 256, 18, 20, "#3a3646"); R(440, 268, 6, 6, "#ffffff");
+  ob(458, 266, 8, 10, "#ffffff"); ob(466, 266, 8, 10, "#e07a4a");
+  ob(494, 240, 26, 60, "#8a5cc8"); R(496, 242, 22, 6, "#f2c14e"); txt("ZAP", 501, 243, "#5e3a96"); ob(496, 249, 22, 18, "#0b0b16"); ob(494, 268, 26, 8, "#5e3a96");
+  ob(528, 262, 28, 38, "#f4f6fa"); R(530, 278, 24, 2, OUT); R(550, 266, 2, 8, OUT); R(550, 284, 2, 10, OUT);
+  winBox(528, 232, 28, 22, sky);
+
+  if (night) { g.fillStyle = "rgba(8,6,30,.5)"; g.fillRect(16, 112, 608, 208); }
+  else if (!dayish) { g.fillStyle = "rgba(20,12,40,.2)"; g.fillRect(16, 112, 608, 208); }
   g = main;
 }
 
@@ -382,13 +400,13 @@ function think(instant) {
   }
 }
 function frameOf(a) {
-  if (a.phase === "walk" || a.phase === "toLift") return ((a.walkT / 8) | 0) % 2 ? "walk" : "stand";
-  if (a.phase !== "idle") return "stand";
-  const s = SP[a.at] || {}, act = a.plan.act, k = ((T / 7) | 0) % 2;
-  if (act === "sleep") return (s.seat ? "sit" : "stand") + "z";
-  if (s.seat) return act === "type" ? (k ? "sitA" : "sitB") : act === "read" ? (a.id === "news" ? "sitA" : "sit") : "sit";
-  if (act === "type" || act === "trade") return k ? "standA" : "standB";
-  return "stand";
+  const dir = a.dir > 0 ? "right" : "left";
+  if (a.phase === "walk" || a.phase === "toLift") { const k = ((a.walkT / 8) | 0) % 2; return { key: `${dir}-${k ? "walkA" : "stand"}`, bob: k ? -2 : 0 }; }
+  if (a.phase !== "idle") return { key: "front-stand", bob: 0 };
+  const s = SP[a.at] || {}, act = a.plan.act, body = s.seat ? "sit" : "stand";
+  if (act === "sleep") return { key: `front-${body}-z`, bob: 0 };
+  const busy = act === "type" || act === "trade";
+  return { key: `${dir}-${body}`, bob: busy && ((T / 8) | 0) % 2 ? -2 : 0 };
 }
 
 // ================================================================ things that move every frame
@@ -406,107 +424,123 @@ function dayPoints(date) {
 }
 let ptsCache = { key: "", pts: [] };
 function live(t) {
-  const night = skyOf(t).k === "night", open = isOpen(t);
+  const sky = skyOf(t), night = sky.k === "night", open = isOpen(t);
   const A = agents;
   // roof sign
   const flick = night && hash(String((T / 9) | 0)) % 23 === 0;
-  if (!flick) txt("LARP CAPITAL", 320 - tw("LARP CAPITAL", 2) / 2, 100, night || skyOf(t).k !== "day" ? "#f2c14e" : "#c99a2e", 2);
-  if (((T / 40) | 0) % 2) R(589, 90, 4, 3, "#ef4f4f");
+  if (!flick) { const s = "LARP CAPITAL", c = sky.k === "day" ? "#c99a2e" : "#f2c14e"; txt(s, 320 - tw(s, 2) / 2, 82, c, 2); if (!dayish(sky)) glow(320, 87, 90, "242,193,78", 0.12); }
+  if (((T / 40) | 0) % 2) { R(597, 62, 4, 3, "#ef4f4f"); if (night) glow(599, 63, 8, "239,79,79", 0.5); }
 
-  // Claude's desk: monitor and lamp
+  // lamps at night
+  if (night) {
+    glow(176, 136, 40, "255,226,150", 0.22); glow(148, 178, 26, "255,226,150", 0.3);
+    for (const lx of [10, 628]) glow(lx + 1, 264, 30, "255,231,160", 0.25);
+  }
+
+  // Claude's monitor
   const c = A.claude, atDesk = c.phase === "idle" && c.at === "desk";
   if (atDesk && c.plan.act !== "sleep") {
-    for (let i = 0; i < 6; i++) { const w = c.plan.act === "type" ? ((T / 6 + i * 5) | 0) % 22 + 3 : 8 + (i * 7) % 15; R(161, 177 + i * 3, w, 1, i % 2 ? "#6fd08c" : "#7fb8ff"); }
-  } else R(161, 177, 2, 2, "#3a3a46");
-  if (night || (atDesk && c.plan.act === "sleep")) { g.fillStyle = "rgba(255,220,140,.16)"; g.beginPath(); g.moveTo(135, 186); g.lineTo(143, 186); g.lineTo(166, 206); g.lineTo(112, 206); g.fill(); R(135, 182, 8, 4, "#ffe08a"); }
+    R(164, 174, 30, 18, "#0f1c2a"); R(164, 174, 30, 3, "#2a3a5a");
+    for (let i = 0; i < 5; i++) { const w = c.plan.act === "type" ? ((T / 6 + i * 5) | 0) % 24 + 3 : 8 + (i * 7) % 16; R(166, 179 + i * 3, w, 1, i % 2 ? "#6fd08c" : "#7fb8ff"); }
+    if (night) glow(178, 183, 20, "127,184,255", 0.18);
+  } else if (((T / 50) | 0) % 2) R(191, 190, 1, 1, "#6fd08c");
 
-  // Watcher's wall of screens: each shows one holding, today's move
+  // Watcher's wall of screens: each shows one holding and how it moves today
   const hs = holdings(), page = Math.floor(T / 300);
   for (let i = 0; i < 6; i++) {
-    const mx = 237 + (i % 3) * 58, my = 137 + Math.floor(i / 3) * 28;
+    const mx = 238 + (i % 3) * 54, my = 141 + Math.floor(i / 3) * 27;
     const h = hs.length ? hs[(page * 6 + i) % hs.length] : null;
-    if (!h || (!open && i % 2)) { R(mx + 2, my + 2, 2, 2, "#223"); continue; }
+    if (!h || (!open && i % 2)) { R(mx + 2, my + 2, 2, 2, "#1d2633"); continue; }
     const col = h.today >= 0 ? "#6fd08c" : "#ef6f6c";
+    R(mx, my, 46, 21, "#0c1824");
     txt(h.s, mx + 2, my + 2, "#c9d6e6");
-    const r = rng(hash(h.s + t.date));
-    let y = 0, px = mx + 3, py = my + 17;
-    const tilt = Math.max(-1, Math.min(1, h.today / 2));
-    for (let k = 0; k < 46; k++) { y += (r() - 0.5) * 1.6 - tilt * 0.12; y = Math.max(-6, Math.min(5, y)); const ny_ = my + 16 + y; line(px, py, mx + 3 + k, ny_, col); px = mx + 3 + k; py = ny_; }
-    txt((h.today >= 0 ? "+" : "") + h.today.toFixed(1) + "%", mx + 52 - tw((h.today >= 0 ? "+" : "") + h.today.toFixed(1) + "%"), my + 2, col);
+    const lbl = (h.today >= 0 ? "+" : "") + h.today.toFixed(1) + "%";
+    txt(lbl, mx + 45 - tw(lbl), my + 2, col);
+    const r = rng(hash(h.s + t.date)), tilt = Math.max(-1, Math.min(1, h.today / 2));
+    let y = 0, px = mx + 2, py = my + 15;
+    for (let k = 0; k < 42; k++) { y += (r() - 0.5) * 1.6 - tilt * 0.12; y = Math.max(-5, Math.min(4, y)); const yy = my + 15 + y; line(px, py, mx + 2 + k, yy, col); px = mx + 2 + k; py = yy; }
+    if (night) glow(mx + 23, my + 11, 22, h.today >= 0 ? "111,208,140" : "239,111,108", 0.08);
   }
-  for (let i = 0; i < 8; i++) R(304 + i * 8, 199, 3, 2, open && ((T / 20 + i * 3) | 0) % 4 ? ["#6fd08c", "#f2c14e", "#ef6f6c", "#7fb8ff"][i % 4] : "#2a323c");
-  const siren = A.watch.plan.stop;
-  R(331, 132, 6, 3, siren && ((T / 8) | 0) % 2 ? "#ff3b3b" : "#7a2a2a");
-  if (siren && ((T / 8) | 0) % 2) { g.fillStyle = "rgba(255,40,40,.12)"; g.fillRect(222, 128, 192, 86); }
+  for (let y = 150, i = 0; y < 200; y += 6, i++) { R(400, y + 2, 2, 1, ((T / 10 + i * 7) | 0) % 5 ? "#6fd08c" : "#1b2029"); R(403, y + 2, 2, 1, ((T / 13 + i * 3) | 0) % 3 ? "#f2c14e" : "#1b2029"); }
+  for (let i = 0; i < 6; i++) R(350 + i * 5, 198, 2, 1, open && ((T / 20 + i * 3) | 0) % 4 ? ["#6fd08c", "#f2c14e", "#ef6f6c", "#7fb8ff"][i % 4] : "#2a323c");
+  const siren = A.watch.plan.stop, on = siren && ((T / 8) | 0) % 2;
+  R(331, 129, 6, 3, on ? "#ff3b3b" : "#7a2a2a");
+  if (on) { g.fillStyle = "rgba(255,40,40,.12)"; g.fillRect(222, 126, 188, 88); }
 
   // Newsroom TV: the latest news line scrolls by
   const lastNews = lastEvent("news", t, false);
   const head = (lastNews && (lastNews.summary || lastNews.full)) || "MARKETS TODAY";
-  R(488, 140, 52, 30, open ? "#16203a" : "#0b0b12");
   if (open || !night) {
-    txt("NEWS", 490, 142, "#ef6f6c"); R(488, 160, 52, 8, "#f2c14e");
-    g.save(); g.beginPath(); g.rect(488, 160, 52, 8); g.clip();
-    const s = head.toUpperCase().replace(/[^A-Z0-9 .,%$&!?'()/+-]/g, ""); const len = tw(s) + 60;
-    txt(s, 540 - ((T / 2) % len), 162, "#1a1426"); g.restore();
-    R(492, 149, 10, 8, "#e8b48c"); R(491, 148, 12, 3, "#26262f"); R(504, 150, 14, 2, "#7fb8ff"); R(504, 154, 10, 2, "#7fb8ff");
+    R(514, 138, 42, 26, "#16203a"); R(514, 138, 42, 6, "#c73b3b"); txt("NEWS", 516, 139, "#f4ecd8");
+    R(517, 147, 9, 9, "#e8b48c"); R(516, 146, 11, 3, "#26262f"); R(518, 156, 7, 2, "#3567a3"); R(529, 148, 22, 2, "#7fb8ff"); R(529, 152, 16, 2, "#7fb8ff");
+    R(514, 158, 42, 6, "#f2c14e");
+    g.save(); g.beginPath(); g.rect(514, 158, 42, 6); g.clip();
+    const s = head.toUpperCase().replace(/[^A-Z0-9 .,%$&!?'()/+-]/g, ""), len = tw(s) + 50;
+    txt(s, 556 - ((T / 2) % len), 159, OUT); g.restore();
+    if (night) glow(535, 151, 26, "127,160,255", 0.12);
   }
   const n = A.news;
-  if (n.phase === "idle" && n.at === "teletype") { const p = (T / 3) % 14; R(530, 186 - p, 18, p + 2, "#ece6d6"); for (let i = 0; i < p; i += 3) R(532, 186 - i, 10, 1, "#8a8496"); }
+  if (n.phase === "idle" && n.at === "teletype") { const p = (T / 3) % 16; R(539, 184 - p, 10, p + 1, "#f4ecd8"); for (let i = 1; i < p; i += 3) R(540, 184 - i, 7, 1, "#8a8496"); }
   if (n.phase === "idle" && n.at === "armchair") {
-    if (n.plan.act === "sleep") { R(449, 196, 14, 6, "#ece6d6"); R(450, 198, 10, 1, "#8a8496"); }
-    else { const up = ((T % 400) > 320) ? 3 : 0; box(456, 180 + up, 14, 16, "#ece6d6", "#8a8496"); R(458, 183 + up, 10, 1, OUT); for (let i = 0; i < 4; i++) R(458, 186 + up + i * 2, 10, 1, "#8a8496"); }
+    if (n.plan.act === "sleep") { R(447, 196, 14, 4, "#f4ecd8"); R(448, 197, 10, 1, "#8a8496"); }
+    else { const up = (T % 400) > 320 ? 4 : 0; box(456, 177 + up, 16, 18, "#f4ecd8", "#8a8496"); R(458, 179 + up, 12, 2, OUT); for (let i = 0; i < 5; i++) R(458, 183 + up + i * 2, i % 2 ? 6 : 12, 1, "#8a8496"); R(464, 177 + up, 1, 18, "#d8d0bc"); }
   }
 
-  // Trading pit: the ticker board, today's chart, the terminals
+  // Trading room: ticker, chart, terminals, bell, coins
   const trades = AG.filter((id) => A[id].phase === "idle" && A[id].at === "term_" + id);
   let tick = hs.map((h) => `${h.s} ${h.today >= 0 ? "+" : ""}${h.today.toFixed(1)}%`).join("   ");
   if (trades.length) tick = trades.map((id) => `${NAME[id]}: ${A[id].plan.say}`).join("   ") + "   " + tick;
-  g.save(); g.beginPath(); g.rect(36, 230, 300, 14); g.clip();
-  if (tick) { const len = tw(tick) + 80, off = (T * 0.6) % len; for (let rep = 0; rep < 2; rep++) drawTicker(tick, 336 - off + rep * len, 234, hs); }
+  g.save(); g.beginPath(); g.rect(36, 231, 298, 16); g.clip();
+  if (tick) { const len = tw(tick) + 80, off = (T * 0.6) % len; for (let rep = 0; rep < 2; rep++) drawTicker(tick, 334 - off + rep * len, 236, hs); }
   g.restore();
   const key = t.date + "|" + (D.intraday.points || []).length;
   if (ptsCache.key !== key) ptsCache = { key, pts: dayPoints(t.date) };
   const pts = ptsCache.pts.filter((p) => p[0] <= t.min);
   if (pts.length > 1) {
     const a0 = pts[0][1], s0 = pts[0][2], ai = pts.map((p) => (p[1] / a0 - 1) * 100), sp = pts.map((p) => (p[2] / s0 - 1) * 100);
-    let lo = Math.min(...ai, ...sp, -0.3), hi = Math.max(...ai, ...sp, 0.3);
+    const lo = Math.min(...ai, ...sp, -0.3), hi = Math.max(...ai, ...sp, 0.3);
     const m0 = pts[0][0], span = Math.max(pts.at(-1)[0] - m0 + 20, 60);
-    const px = (m) => 40 + 104 * (m - m0) / span, py = (v) => 296 - (v - lo) / (hi - lo) * 34;
-    R(38, py(0), 108, 1, "#1d2f3d");
+    const px = (m) => 40 + 102 * (m - m0) / span, py = (v) => 292 - (v - lo) / (hi - lo) * 28;
+    for (let gx = 40; gx < 144; gx += 10) R(gx, 266, 1, 27, "#122230");
+    R(38, py(0), 106, 1, "#1d3a4d");
     for (const [arr, col] of [[sp, "#ef6f6c"], [ai, "#6fd08c"]]) for (let i = 1; i < pts.length; i++) line(px(pts[i - 1][0]), py(arr[i - 1]), px(pts[i][0]), py(arr[i]), col);
     const fa = ai.at(-1), fs = sp.at(-1), f = (v) => (v >= 0 ? "+" : "") + v.toFixed(1) + "%";
-    txt("AI " + f(fa), 40, 255, fa >= fs ? "#6fd08c" : "#ef6f6c"); txt("S&P " + f(fs), 88, 255, "#c9c0d8");
-  } else txt(open ? "LOADING" : "CLOSED", 72, 274, "#4a5568");
-  [198, 252, 306].forEach((kx, i) => {
+    txt("AI " + f(fa), 40, 258, fa >= fs ? "#6fd08c" : "#ef6f6c"); txt("S&P " + f(fs), 90, 258, "#c9c0d8");
+  } else txt(open ? "LOADING" : "CLOSED", open ? 76 : 78, 272, "#4a5568");
+  const ring = trades.length && ((T / 6) | 0) % 2;
+  R(158 + (ring ? 1 : 0), 268, 10, 6, "#e0b04a"); R(160 + (ring ? 1 : 0), 266, 6, 2, "#c9a64a"); R(162 + (ring ? 1 : 0), 264, 2, 2, "#8a6a2a"); R(156, 274, 14, 2, "#c9a64a");
+  [196, 252, 308].forEach((kx, i) => {
     const id = ["claude", "news", "watch"][i], busy = trades.includes(id);
-    if (busy) { const p = A[id].plan; if (((T / 10) | 0) % 2) txt(p.side, kx + 11 - tw(p.side) / 2, 270, p.side === "BUY" ? "#6fd08c" : "#ef6f6c"); }
-    else R(kx + 5, 268, 3, 1, "#2f6b45");
+    R(kx + 2, 258, 18, 13, busy ? "#0f2418" : "#0b141c");
+    if (busy) { const p = A[id].plan; if (((T / 10) | 0) % 2) txt(p.side, kx + 11 - tw(p.side) / 2, 262, p.side === "BUY" ? "#6fd08c" : "#ef6f6c"); }
+    else { R(kx + 4, 261, 8, 1, "#2f6b45"); R(kx + 4, 264, 5, 1, "#2f6b45"); }
   });
-  for (const id of trades) { const kx = { claude: 198, news: 252, watch: 306 }[id]; for (let k = 0; k < 5; k++) { const ph = (T * 0.8 + k * 13) % 40; R(kx + 4 + ((k * 5) % 14), 262 - ph, 2, 2, ph < 30 ? "#f2c14e" : "#b8923a"); } }
+  for (const id of trades) { const kx = { claude: 196, news: 252, watch: 308 }[id]; for (let k = 0; k < 6; k++) { const ph = (T * 0.8 + k * 11) % 40; R(kx + 3 + ((k * 5) % 16), 256 - ph, 2, 2, ph < 30 ? "#f2c14e" : "#b8923a"); } }
 
-  // Lounge: steam, arcade, clock
-  if (AG.some((id) => A[id].phase === "idle" && A[id].at === "coffee_" + id)) for (let k = 0; k < 3; k++) R(436 + k * 2, 262 - ((T / 9 + k * 3) % 8), 1, 2, "#d8d0bc");
+  // Lounge: steam, arcade, ceiling fan
+  if (AG.some((id) => A[id].phase === "idle" && A[id].at === "coffee_" + id)) for (let k = 0; k < 3; k++) R(441 + k * 2, 266 - ((T / 9 + k * 3) % 8), 1, 2, "#d8d0bc");
   const playing = A.watch.phase === "idle" && A.watch.at === "arcade";
-  if (playing) { R(494 + ((T / 4) | 0) % 12, 264, 2, 2, "#6fd08c"); R(500, 260 + ((T / 9) | 0) % 8, 2, 2, "#ef6f6c"); R(494, 269, 12, 1, "#7fb8ff"); } else R(499, 263, 2, 2, "#2a1a33");
-  const ca = ((t.min / 60) % 12) / 12 * Math.PI * 2 - Math.PI / 2, ma = (t.min % 60) / 60 * Math.PI * 2 - Math.PI / 2;
-  line(381, 245, 381 + Math.cos(ca) * 4, 245 + Math.sin(ca) * 4, OUT); line(381, 245, 381 + Math.cos(ma) * 6, 245 + Math.sin(ma) * 6, "#c75b4a");
+  R(498, 251, 18, 14, playing ? "#101028" : "#0b0b16");
+  if (playing) { R(500 + ((T / 4) | 0) % 14, 258, 2, 2, "#6fd08c"); R(506, 253 + ((T / 9) | 0) % 9, 2, 2, "#ef6f6c"); R(500, 263, 14, 1, "#7fb8ff"); if (night) glow(507, 258, 18, "127,184,255", 0.2); }
+  else if (((T / 60) | 0) % 2) txt("ZAP", 502, 255, "#3a2a5a");
+  R(455, 224, 1, 5, OUT); R(452, 229, 7, 2, "#3a3448");
+  const fb = ((T / 4) | 0) % 3; R(440 + fb * 2, 230, 14 - fb * 2, 1, "#6b4a32"); R(456, 230, 14 - fb * 2, 1, "#6b4a32");
 
-  // lift car
+  // lift car with its light
   const ly = lift.y;
-  R(589, 128, 2, ly - 128, "#6b6f80");
-  box(570, ly, 40, 40, "#6a5f80", OUT); R(572, ly + 2, 36, 36, "#8a7fa0"); R(572, ly + 2, 36, 3, "#ffe7a0");
-  // passing car on the street
-  const cx = ((T * 1.4) % 1400) - 200;
-  if (cx > -40 && cx < W + 40) { R(cx, 330, 34, 8, "#c75b4a"); R(cx + 6, 324, 20, 7, "#c75b4a"); R(cx + 9, 325, 6, 5, "#9fd0f0"); R(cx + 17, 325, 6, 5, "#9fd0f0"); R(cx + 4, 337, 6, 4, OUT); R(cx + 24, 337, 6, 4, OUT); R(cx + 32, 332, 2, 2, "#ffe7a0"); }
+  R(590, 126, 2, ly - 126, "#8a8494");
+  block(572, ly, 38, 40, "#6a5f80"); R(574, ly + 2, 34, 36, "#9a8fb0"); R(574, ly + 2, 34, 2, "#ffe7a0"); R(574, ly + 26, 34, 1, "#c9a64a");
+  for (let i = 0; i < 3; i++) R(576 + i * 11, ly + 28, 8, 9, "#8a7fa0");
+  for (const [fy, f] of [[128, 0], [226, 1]]) { R(586, fy, 10, 4, "#1a1426"); R(588 + (lift.dest === f && lift.rider ? 0 : 4), fy + 1, 2, 2, Math.abs(ly - CAR[f]) < 2 ? "#6fd08c" : "#7a2a2a"); }
 }
+const dayish = (sky) => sky.k === "day";
 function drawTicker(s, x, y, hs) {
-  // colour each holding by its move, agent messages in gold
   let cx = x;
   for (const part of s.split("   ")) {
     const h = hs.find((q) => part.startsWith(q.s + " "));
     const col = h ? (h.today >= 0 ? "#6fd08c" : "#ef6f6c") : "#f2c14e";
-    if (cx < 340 && cx + tw(part) > 30) txt(part, cx, y, col);
-    cx += tw(part) + 4 * 3 + 1;
+    if (cx < 338 && cx + tw(part) > 30) txt(part, cx, y, col);
+    cx += tw(part) + 13;
   }
 }
 
@@ -515,8 +549,8 @@ function bubble(a, text) {
   const words = text.toUpperCase().split(" "), lines = [""];
   for (const w of words) { if ((lines.at(-1) + " " + w).trim().length > 18) lines.push(w); else lines[lines.length - 1] = (lines.at(-1) + " " + w).trim(); }
   const bw = Math.max(...lines.map((l) => tw(l))) + 8, bh = lines.length * 7 + 5;
-  const cx = a.x + 8;
-  let bx = Math.round(Math.min(Math.max(cx - bw / 2, 24), 616 - bw)), by = Math.round(a.y - 30 - bh);
+  const cx = Math.round(a.x + 10);
+  const bx = Math.round(Math.min(Math.max(cx - bw / 2, 24), 616 - bw)), by = Math.round(a.y - 36 - bh);
   R(bx - 1, by, bw + 2, bh, OUT); R(bx, by - 1, bw, bh + 2, OUT); R(bx, by, bw, bh, "#f4ecd8");
   R(cx - 1, by + bh, 3, 1, "#f4ecd8"); R(cx - 2, by + bh, 1, 2, OUT); R(cx + 2, by + bh, 1, 2, OUT); R(cx - 1, by + bh + 1, 3, 1, OUT); R(cx, by + bh + 1, 1, 1, "#f4ecd8"); R(cx, by + bh + 2, 1, 1, OUT);
   const col = { claude: "#a8603c", watch: "#3567a3", news: "#744aa8" }[a.id];
@@ -527,22 +561,22 @@ function overlays() {
   AG.forEach((id, i) => {
     const a = agents[id];
     if (a.phase === "ride" || a.phase === "wait") return;
-    if (a.plan.act === "sleep" && a.phase === "idle") { const z = ((T / 30) | 0) % 3; txt("Z", a.x + 12 + z * 2, a.y - 30 - z * 4, "#e8e4ff"); if (z) txt("Z", a.x + 16, a.y - 38 - z * 2, "#a49cc0"); return; }
+    if (a.plan.act === "sleep" && a.phase === "idle") { const z = ((T / 30) | 0) % 3; txt("Z", a.x + 14 + z * 2, a.y - 36 - z * 4, "#e8e4ff"); if (z) txt("Z", a.x + 18, a.y - 44 - z * 2, "#a49cc0"); return; }
     if (!a.plan.say || a.phase !== "idle") return;
     const cycle = (T / 60 + i * 6) % 18;
     if (a.plan.loud || selected === id || cycle < 5) bubble(a, a.plan.say);
   });
-  if (selected) { const a = agents[selected]; if (a.phase !== "ride") { const b = ((T / 15) | 0) % 2; R(a.x + 6, a.y + 2 + b, 5, 1, "#f2c14e"); } }
+  if (selected) { const a = agents[selected]; if (a.phase !== "ride" && a.phase !== "wait") { const b = ((T / 15) | 0) % 2; R(a.x + 6, a.y + 1 + b, 9, 1, "#f2c14e"); } }
 }
 
 // ================================================================ main loop
-let lastThink = 0, lastTs = 0, lastSecond = -1;
+let lastThink = 0, lastTs = 0, lastHud = -1;
 function frame(ts) {
   const dt = Math.min(0.25, (ts - lastTs) / 1000 || 0); lastTs = ts; T++;
   if (V.mode === "replay" && V.playing) { V.min += dt * V.speed; if (V.min >= 975) { V.min = 975; V.playing = false; } }
   if (ts - lastThink > 400) { think(false); lastThink = ts; }
   const t = now();
-  const sk = skyOf(t).k + "|" + (V.mode);
+  const sk = skyOf(t).k;
   if (sk !== bgKey) { drawBackground(t); bgKey = sk; }
   for (const id of AG) stepAgent(agents[id]);
   stepLift();
@@ -550,15 +584,14 @@ function frame(ts) {
   live(t);
   for (const id of AG) {
     const a = agents[id];
-    if (a.phase === "wait") continue;  // waiting inside the lift doors
-    const fr = frameOf(a), spr = SPR[id][fr] || SPR[id].stand;
-    main.drawImage(spr[a.dir > 0 ? 0 : 1], Math.round(a.x), Math.round(a.y - 26));
+    if (a.phase === "wait") continue;
+    const f = frameOf(a);
+    main.drawImage(SPR[id][f.key], Math.round(a.x - 4), Math.round(a.y - 38 + f.bob), 28, 38);
   }
-  // lift front frame drawn over riders so they look inside
-  R(570, lift.y, 40, 2, OUT); R(570, lift.y, 2, 40, OUT); R(608, lift.y, 2, 40, OUT); R(570, lift.y + 38, 40, 2, "#4a4060");
+  R(572, lift.y, 38, 2, OUT); R(572, lift.y, 2, 40, OUT); R(608, lift.y, 2, 40, OUT); R(572, lift.y + 38, 38, 2, "#4a4060");
   overlays();
-  const sec = Math.floor(t.min * 60 / 15);
-  if (sec !== lastSecond) { lastSecond = sec; hud(t); }
+  const tick = Math.floor(t.min * 4);
+  if (tick !== lastHud) { lastHud = tick; hud(t); }
   requestAnimationFrame(frame);
 }
 
@@ -572,28 +605,23 @@ function hud(t) {
   if (selected) card();
 }
 function card() {
-  const id = selected, a = agents[id], s = (D.status.scorecard || {})[id] || {};
+  const id = selected, s = (D.status.scorecard || {})[id] || {};
   const last = [...D.events].reverse().find((e) => e.agent === id && e.orders.length);
   $("card").hidden = false;
-  $("card").innerHTML = `<h3 style="color:${{ claude: "#d9845a", watch: "#5aa9e6", news: "#b98be0" }[id]}">${NAME[id]}</h3>
+  $("card").innerHTML = `<h3 style="color:${COLOR[id]}">${NAME[id]}</h3>
     <p class="dim">${ROLE[id]}</p>
     <p style="margin-top:6px">${s.buys ? `Beat S&amp;P on ${s.beat_spy}/${s.buys} buys · avg <span class="${cls(s.avg_vs_spy_pct)}">${pct(s.avg_vs_spy_pct)}</span>` : "No buys yet"}</p>
     ${last ? `<p class="dim" style="margin-top:6px">${esc(last.date.slice(5))}: ${esc(last.full)}</p>` : ""}`;
 }
+const hitAgent = (x, y) => AG.find((id) => { const a = agents[id]; return a && a.phase !== "wait" && x >= a.x && x <= a.x + 20 && y >= a.y - 34 && y <= a.y + 2; });
+const toWorld = (e) => { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) / r.width * W, (e.clientY - r.top) / r.height * H]; };
 cv.addEventListener("click", (e) => {
-  const r = cv.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * W, y = (e.clientY - r.top) / r.height * H;
-  const hit = AG.find((id) => { const a = agents[id]; return a.phase !== "wait" && x >= a.x - 2 && x <= a.x + 18 && y >= a.y - 30 && y <= a.y + 2; });
+  const hit = hitAgent(...toWorld(e));
   selected = hit && hit !== selected ? hit : null;
   if (selected) card(); else $("card").hidden = true;
 });
-cv.addEventListener("mousemove", (e) => {
-  const r = cv.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * W, y = (e.clientY - r.top) / r.height * H;
-  cv.style.cursor = AG.some((id) => { const a = agents[id]; return a && x >= a.x - 2 && x <= a.x + 18 && y >= a.y - 30 && y <= a.y + 2; }) ? "pointer" : "default";
-});
-function fit() {
-  const s = Math.min(innerWidth / W, innerHeight / H);
-  cv.style.width = Math.floor(W * s) + "px"; cv.style.height = Math.floor(H * s) + "px";
-}
+cv.addEventListener("mousemove", (e) => { cv.style.cursor = hitAgent(...toWorld(e)) ? "pointer" : "default"; });
+function fit() { const s = Math.min(innerWidth / W, innerHeight / H); cv.style.width = Math.floor(W * s) + "px"; cv.style.height = Math.floor(H * s) + "px"; }
 addEventListener("resize", fit);
 
 function tradingDays() { return [...new Set(D.events.map((e) => e.date))].slice(-15).reverse(); }
@@ -601,7 +629,7 @@ function setMode(mode) {
   V.mode = mode;
   $("live").setAttribute("aria-pressed", mode === "live"); $("replay").setAttribute("aria-pressed", mode === "replay");
   $("day").hidden = $("speed").hidden = mode === "live";
-  think(true); bgKey = ""; lastSecond = -1;
+  think(true); bgKey = ""; lastHud = -1;
 }
 function startReplay(day) {
   const days = tradingDays();
@@ -618,7 +646,7 @@ $("speed").onclick = () => { V.speed = V.speed === 0.5 ? 2 : V.speed === 2 ? 0.1
 async function refreshAll() {
   const [status, decisions, intraday, watch] = await Promise.all([load("status.json", D.status), load("decisions.json", D.decisions), load("intraday.json", D.intraday), load("watch.json", D.watch)]);
   Object.assign(D, { status: status || {}, decisions: decisions || [], intraday: intraday && intraday.points ? intraday : { points: [] }, watch: watch || {} });
-  buildEvents(); lastSecond = -1;
+  buildEvents(); lastHud = -1;
 }
 async function refreshLive() {
   if (document.visibilityState !== "visible") return;
@@ -629,7 +657,7 @@ async function refreshLive() {
   const pts = (D.intraday.points || []).slice(), seen = new Set(pts.map((p) => p[0]));
   for (const p of lv.intraday_tail || []) if (!seen.has(p[0])) pts.push(p);
   D.intraday = { points: pts.sort((a, b) => a[0].localeCompare(b[0])) };
-  lastSecond = -1;
+  lastHud = -1;
 }
 (async () => {
   fit(); buildSprites();
