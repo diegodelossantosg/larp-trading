@@ -103,7 +103,7 @@ button:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-
 <div class="hud" id="heat" hidden>
   <div class="heathead"><span id="heattitle">YOUR HOLDINGS · COLOUR = TODAY</span><span><button id="heatday" aria-pressed="true">TODAY</button> <button id="heattot" aria-pressed="false">TOTAL</button> <button id="heatclose" aria-label="Close">✕</button></span></div>
   <div id="heatmap"></div>
-  <p class="dim heatnote" id="heatnote">Size: money in each holding. Colour: today's move (switch to TOTAL for the move since you bought it).</p>
+  <p class="dim heatnote" id="heatnote">Size: money in each holding. TODAY shows today's move; TOTAL shows the move since it was bought.</p>
 </div>
 
 <script>
@@ -674,7 +674,7 @@ function squarify(items, x, y, w, h) {
 function heatItems() {
   return (D.status.positions || []).filter((p) => p.market_value > 0).map((p) => {
     const base = p.market_value - (p.change_today_usd || 0);
-    return { s: p.symbol, name: p.name || "", v: p.market_value, pl: p.unrealized_pl || 0, today: base ? ((p.change_today_usd || 0) / base) * 100 : 0, total: (p.unrealized_plpc || 0) * 100, w8: p.weight };
+    return { s: p.symbol, name: p.name || "", v: p.market_value, pl: p.unrealized_pl || 0, td: p.change_today_usd || 0, today: base ? ((p.change_today_usd || 0) / base) * 100 : 0, total: (p.unrealized_plpc || 0) * 100, w8: p.weight };
   });
 }
 function drawHeatmap(x, y, w, h, open) {
@@ -1428,10 +1428,11 @@ function heatPanel() {
   const cells = squarify(heatItems(), 0, 0, W2, H2), sg = (v) => (v >= 0 ? "+" : "−");
   box.innerHTML = cells.map((c) => {
     const big = c.w > 120 && c.h > 110, mid = c.w > 70 && c.h > 60, colour = heatMode === "today" ? heatColor(c.today) : heatColor(c.total * 0.3);
+    // the text follows the mode: today's move, or the move since it was bought
+    const today = heatMode === "today", p = today ? c.today : c.total, d = today ? c.td : c.pl, when = today ? "today" : "total";
     const lines = [`<b style="font-size:${big ? 18 : mid ? 13 : 9}px">${esc(c.s)}</b>`];
-    if (mid) lines.push(`<span>${sg(c.today)}${Math.abs(c.today).toFixed(2)}% today</span>`);
-    if (big) lines.push(`<small>${esc(c.name)}</small>`, `<small>${money(c.v)} (${sg(c.pl)}${money(Math.abs(c.pl))})</small>`);
-    if (mid) lines.push(`<small>Total ${sg(c.total)}${Math.abs(c.total).toFixed(1)}%</small>`);
+    if (mid) lines.push(`<span>${sg(p)}${Math.abs(p).toFixed(2)}% ${when}</span>`);
+    if (big) lines.push(`<small>${esc(c.name)}</small>`, `<small>${money(c.v)} · ${sg(d)}${money(Math.abs(d))} ${when}</small>`);
     return `<div class="cell" style="left:${c.x}px;top:${c.y}px;width:${c.w}px;height:${c.h}px;background:${colour}" title="${esc(c.name)}">${lines.join("")}</div>`;
   }).join("") || `<p class="dim" style="padding:20px">No holdings yet.</p>`;
   $("heattitle").textContent = `YOUR HOLDINGS · COLOUR = ${heatMode.toUpperCase()}`;
