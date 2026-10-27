@@ -1,11 +1,11 @@
 {
- "updated": "2026-10-27T11:44-04:00",
+ "updated": "2026-10-27T12:01-04:00",
  "mode": "paper",
  "capital": 1000.0,
  "spy_start": 779.38,
  "idle_asset": "SSO",
  "model": "opus",
- "equity": 1008.64,
+ "equity": 1008.03,
  "cash": -0.01,
  "performance": {
   "since": "2026-10-12",
@@ -17,27 +17,27 @@
  "scorecard": {
   "claude": {
    "buys": 5,
-   "avg_return_pct": 0.97,
-   "avg_vs_spy_pct": 1.95,
+   "avg_return_pct": 1.01,
+   "avg_vs_spy_pct": 1.94,
    "beat_spy": 3,
-   "dollars": 5.08,
-   "dollars_vs_spy": 10.45
+   "dollars": 5.23,
+   "dollars_vs_spy": 10.3
   },
   "watch": {
    "buys": 3,
-   "avg_return_pct": 2.52,
-   "avg_vs_spy_pct": 3.29,
+   "avg_return_pct": 2.51,
+   "avg_vs_spy_pct": 3.2,
    "beat_spy": 2,
-   "dollars": 6.06,
-   "dollars_vs_spy": 7.89
+   "dollars": 6.02,
+   "dollars_vs_spy": 7.69
   },
   "news": {
    "buys": 4,
-   "avg_return_pct": 2.06,
-   "avg_vs_spy_pct": 1.69,
+   "avg_return_pct": 1.86,
+   "avg_vs_spy_pct": 1.42,
    "beat_spy": 3,
-   "dollars": 4.52,
-   "dollars_vs_spy": 3.84
+   "dollars": 4.13,
+   "dollars_vs_spy": 3.32
   }
  },
  "health": {
@@ -79,158 +79,158 @@
   {
    "symbol": "XLV",
    "qty": 0.837,
-   "market_value": 149.9319,
+   "market_value": 149.9026,
    "avg_entry_price": 171.7475,
-   "current_price": 179.14,
-   "unrealized_pl": 6.1872,
-   "unrealized_plpc": 0.043,
-   "change_today_usd": -0.1172,
+   "current_price": 179.105,
+   "unrealized_pl": 6.1579,
+   "unrealized_plpc": 0.0428,
+   "change_today_usd": -0.1465,
    "name": "Health care",
-   "weight": 0.1486
+   "weight": 0.1487
   },
   {
    "symbol": "XLE",
    "qty": 2.0618,
-   "market_value": 141.0138,
+   "market_value": 141.0241,
    "avg_entry_price": 66.0542,
-   "current_price": 68.395,
-   "unrealized_pl": 4.8262,
-   "unrealized_plpc": 0.0354,
-   "change_today_usd": -2.5669,
+   "current_price": 68.4,
+   "unrealized_pl": 4.8365,
+   "unrealized_plpc": 0.0355,
+   "change_today_usd": -2.5566,
    "name": "Energy",
-   "weight": 0.1398
+   "weight": 0.1399
   },
   {
    "symbol": "QUAL",
    "qty": 0.435,
-   "market_value": 97.2585,
+   "market_value": 97.2933,
    "avg_entry_price": 227.54,
-   "current_price": 223.56,
-   "unrealized_pl": -1.7315,
-   "unrealized_plpc": -0.0175,
-   "change_today_usd": 0.0043,
+   "current_price": 223.64,
+   "unrealized_pl": -1.6967,
+   "unrealized_plpc": -0.0171,
+   "change_today_usd": 0.0392,
    "name": "US quality",
-   "weight": 0.0964
+   "weight": 0.0965
   },
   {
    "symbol": "XOP",
    "qty": 0.4075,
-   "market_value": 81.649,
+   "market_value": 81.7143,
    "avg_entry_price": 194.316,
-   "current_price": 200.35,
-   "unrealized_pl": 2.459,
-   "unrealized_plpc": 0.0311,
-   "change_today_usd": -1.838,
+   "current_price": 200.51,
+   "unrealized_pl": 2.5243,
+   "unrealized_plpc": 0.0319,
+   "change_today_usd": -1.7728,
    "name": "Oil & gas exploration",
-   "weight": 0.0809
+   "weight": 0.0811
   },
   {
    "symbol": "XRT",
    "qty": 0.9113,
-   "market_value": 79.8378,
+   "market_value": 79.774,
    "avg_entry_price": 87.788,
-   "current_price": 87.61,
-   "unrealized_pl": -0.1622,
-   "unrealized_plpc": -0.002,
-   "change_today_usd": 0.1731,
+   "current_price": 87.54,
+   "unrealized_pl": -0.226,
+   "unrealized_plpc": -0.0028,
+   "change_today_usd": 0.1094,
    "name": "Retail",
-   "weight": 0.0792
+   "weight": 0.0791
   },
   {
    "symbol": "AAPL",
    "qty": 0.2289,
-   "market_value": 79.5393,
+   "market_value": 79.4031,
    "avg_entry_price": 344.454,
-   "current_price": 347.465,
-   "unrealized_pl": 0.6893,
-   "unrealized_plpc": 0.0087,
-   "change_today_usd": 0.8138,
+   "current_price": 346.87,
+   "unrealized_pl": 0.5531,
+   "unrealized_plpc": 0.007,
+   "change_today_usd": 0.6776,
    "name": "Apple",
-   "weight": 0.0789
+   "weight": 0.0788
   },
   {
    "symbol": "LLY",
    "qty": 0.0544,
-   "market_value": 70.0899,
+   "market_value": 69.9198,
    "avg_entry_price": 1267.296,
-   "current_price": 1287.5,
-   "unrealized_pl": 1.0999,
-   "unrealized_plpc": 0.0159,
-   "change_today_usd": 0.4551,
+   "current_price": 1284.375,
+   "unrealized_pl": 0.9298,
+   "unrealized_plpc": 0.0135,
+   "change_today_usd": 0.285,
    "name": "Eli Lilly",
-   "weight": 0.0695
+   "weight": 0.0694
   },
   {
    "symbol": "WMT",
    "qty": 0.4957,
-   "market_value": 59.1767,
+   "market_value": 59.0701,
    "avg_entry_price": 119.296,
-   "current_price": 119.37,
-   "unrealized_pl": 0.0367,
-   "unrealized_plpc": 0.0006,
-   "change_today_usd": -0.4561,
+   "current_price": 119.155,
+   "unrealized_pl": -0.0699,
+   "unrealized_plpc": -0.0012,
+   "change_today_usd": -0.5627,
    "name": "Walmart",
-   "weight": 0.0587
+   "weight": 0.0586
   },
   {
    "symbol": "SSO",
    "qty": 0.7845,
-   "market_value": 55.2163,
+   "market_value": 55.3183,
    "avg_entry_price": 71.1153,
-   "current_price": 70.38,
-   "unrealized_pl": -0.5769,
-   "unrealized_plpc": -0.0103,
-   "change_today_usd": 0.7061,
+   "current_price": 70.51,
+   "unrealized_pl": -0.4749,
+   "unrealized_plpc": -0.0085,
+   "change_today_usd": 0.8081,
    "name": "2x S&P 500",
-   "weight": 0.0547
+   "weight": 0.0549
   },
   {
    "symbol": "LMT",
    "qty": 0.0851,
-   "market_value": 53.6562,
+   "market_value": 53.5166,
    "avg_entry_price": 589.888,
-   "current_price": 630.25,
-   "unrealized_pl": 3.4362,
-   "unrealized_plpc": 0.0684,
-   "change_today_usd": -0.4214,
+   "current_price": 628.61,
+   "unrealized_pl": 3.2966,
+   "unrealized_plpc": 0.0656,
+   "change_today_usd": -0.561,
    "name": "Lockheed Martin",
-   "weight": 0.0532
+   "weight": 0.0531
   },
   {
    "symbol": "NOC",
    "qty": 0.0934,
-   "market_value": 52.4343,
+   "market_value": 52.2955,
    "avg_entry_price": 536.25,
-   "current_price": 561.235,
-   "unrealized_pl": 2.3343,
-   "unrealized_plpc": 0.0466,
-   "change_today_usd": -0.3901,
+   "current_price": 559.75,
+   "unrealized_pl": 2.1955,
+   "unrealized_plpc": 0.0438,
+   "change_today_usd": -0.5288,
    "name": "",
-   "weight": 0.052
+   "weight": 0.0519
   },
   {
    "symbol": "MMM",
    "qty": 0.2932,
-   "market_value": 50.3529,
+   "market_value": 50.3558,
    "avg_entry_price": 171.102,
-   "current_price": 171.76,
-   "unrealized_pl": 0.1929,
+   "current_price": 171.77,
+   "unrealized_pl": 0.1958,
    "unrealized_plpc": 0.0039,
-   "change_today_usd": -0.302,
+   "change_today_usd": -0.299,
    "name": "",
-   "weight": 0.0499
+   "weight": 0.05
   },
   {
    "symbol": "PG",
    "qty": 0.242,
-   "market_value": 38.4898,
+   "market_value": 38.4511,
    "avg_entry_price": 165.342,
-   "current_price": 159.02,
-   "unrealized_pl": -1.5302,
-   "unrealized_plpc": -0.0382,
-   "change_today_usd": -0.2178,
+   "current_price": 158.86,
+   "unrealized_pl": -1.5689,
+   "unrealized_plpc": -0.0392,
+   "change_today_usd": -0.2566,
    "name": "Procter & Gamble",
-   "weight": 0.0382
+   "weight": 0.0381
   }
  ]
 }
