@@ -244,14 +244,21 @@ function mix(hex, f) {  // f > 0 lightens towards white, f < 0 darkens
   return "#" + c.map((v) => Math.max(0, Math.min(255, v)).toString(16).padStart(2, "0")).join("");
 }
 function rng(seed) { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+// Every solid shape gets a dark outline (OL), except tiny details and see-through fills
+const OUTLINE = { c: INK, w: 1.1 }, SOFT = { c: "rgba(43,45,66,.35)", w: 0.8 };
+let OL = OUTLINE;
+const outlined = (fill, size) => OL && typeof fill === "string" && fill[0] === "#" && size >= 2.6;
 function rr(x, y, w, h, r, fill, stroke, lw = 1.2) {
+  if (!stroke && outlined(fill, Math.min(w, h))) { stroke = OL.c; lw = OL.w; }
   g.beginPath(); g.roundRect(x, y, w, h, Math.min(r, w / 2, h / 2));
   if (fill) { g.fillStyle = fill; g.fill(); }
   if (stroke) { g.strokeStyle = stroke; g.lineWidth = lw; g.stroke(); }
 }
-function circle(x, y, r, fill, stroke, lw = 1.2) { g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); if (fill) { g.fillStyle = fill; g.fill(); } if (stroke) { g.strokeStyle = stroke; g.lineWidth = lw; g.stroke(); } }
-function ellipse(x, y, rx, ry, rot, fill) { g.beginPath(); g.ellipse(x, y, rx, ry, rot, 0, Math.PI * 2); g.fillStyle = fill; g.fill(); }
-function poly(pts, fill) { g.beginPath(); pts.forEach(([x, y], i) => (i ? g.lineTo(x, y) : g.moveTo(x, y))); g.closePath(); g.fillStyle = fill; g.fill(); }
+function circle(x, y, r, fill, stroke, lw = 1.2) { if (!stroke && outlined(fill, r * 1.6)) { stroke = OL.c; lw = OL.w; } g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); if (fill) { g.fillStyle = fill; g.fill(); } if (stroke) { g.strokeStyle = stroke; g.lineWidth = lw; g.stroke(); } }
+function ellipse(x, y, rx, ry, rot, fill) { g.beginPath(); g.ellipse(x, y, rx, ry, rot, 0, Math.PI * 2); g.fillStyle = fill; g.fill(); if (outlined(fill, Math.min(rx, ry) * 2)) { g.strokeStyle = OL.c; g.lineWidth = OL.w; g.stroke(); } }
+function poly(pts, fill) { g.beginPath(); pts.forEach(([x, y], i) => (i ? g.lineTo(x, y) : g.moveTo(x, y))); g.closePath(); g.fillStyle = fill; g.fill(); if (outlined(fill, 3)) { g.strokeStyle = OL.c; g.lineWidth = OL.w; g.lineJoin = "round"; g.stroke(); } }
+// overlapping circles as one puffy shape: all outlines first, then all fills, so no lines show inside
+function puff(list, fill) { const o = OL; OL = null; if (o) for (const [x, y, r] of list) circle(x, y, r + o.w / 2, o.c); for (const [x, y, r] of list) circle(x, y, r, fill); OL = o; }
 function stroke(pts, color, lw = 1.2) { g.beginPath(); pts.forEach(([x, y], i) => (i ? g.lineTo(x, y) : g.moveTo(x, y))); g.strokeStyle = color; g.lineWidth = lw; g.lineJoin = g.lineCap = "round"; g.stroke(); }
 function shadow(on, blur = 6, y = 2, a = 0.12) { g.shadowColor = on ? `rgba(30,35,60,${a})` : "transparent"; g.shadowBlur = on ? blur * VIEW.k : 0; g.shadowOffsetY = on ? y * VIEW.k : 0; }
 function text(s, x, y, size, color, weight = 600, align = "left") { g.font = `${weight} ${size}px ${FONT}`; g.fillStyle = color; g.textAlign = align; g.textBaseline = "middle"; g.fillText(s, x, y); }
@@ -352,19 +359,19 @@ function skyFill(sky, wx, y0, y1) {
   const dim = { clear: 0, cloudy: 0.15, rain: 0.35, storm: 0.5 }[wx];
   gr.addColorStop(0, mix(sky.top, -dim)); gr.addColorStop(1, mix(sky.bot, -dim * 0.8)); return gr;
 }
-function cloud(x, y, s, c) { for (const [dx, dy, r] of [[0, 0, 6], [7, -3, 7], [15, 0, 6], [8, 2, 6]]) circle(x + dx * s, y + dy * s, r * s, c); }
+function cloud(x, y, s, c) { puff([[0, 0, 6], [7, -3, 7], [15, 0, 6], [8, 2, 6]].map(([dx, dy, r]) => [x + dx * s, y + dy * s, r * s]), c); }
 
 // ---------- furniture that reads as what it is
 const WINDOWS = [];  // glass of every window, filled while drawing the background (rain falls in it)
 function windowView(x, y, w, h, sky, o = {}) {
   shadow(true, 4, 1, 0.1); rr(x, y, w, h, 3, "#ffffff"); shadow(false);
-  g.save(); g.beginPath(); g.roundRect(x + 3, y + 3, w - 6, h - 6, 2); g.clip();
+  const ol = OL; OL = null; g.save(); g.beginPath(); g.roundRect(x + 3, y + 3, w - 6, h - 6, 2); g.clip();
   const wx = weatherOf(); g.fillStyle = skyFill(sky, wx, y, y + h); g.fillRect(x, y, w, h);
   g.fillStyle = sky.city; const r = rng(x * 3 + y);
   for (let bx = x + 3; bx < x + w - 3;) { const bw = 5 + r() * 8, bh = h * (0.25 + r() * 0.35); rr(bx, y + h - 3 - bh, bw, bh + 2, 1, sky.city); if (sky.lit) for (let wy = y + h - bh; wy < y + h - 5; wy += 4) if (r() < 0.5) R(bx + 2, wy, 1.5, 1.8, "#f6d77a"); bx += bw + 1.5; }
   if (wx !== "clear") { const cc = sky.k === "night" ? "#3a4066" : wx === "cloudy" ? "#ffffff" : "#aab2c4"; cloud(x + w * 0.25, y + h * 0.28, 0.45, cc); cloud(x + w * 0.62, y + h * 0.18, 0.4, cc); }
-  g.restore();
-  if (wx === "rain" || wx === "storm") { const m = g.getTransform(); WINDOWS.push([x + 3, y + 3, w - 6, h - 6]); }
+  g.restore(); OL = ol; rr(x + 3, y + 3, w - 6, h - 6, 2, null, OL.c, 0.8);
+  if (wx === "rain" || wx === "storm") { WINDOWS.push([x + 3, y + 3, w - 6, h - 6]); }
   R(x + w / 2 - 0.8, y + 2, 1.6, h - 4, "#ffffff"); R(x + 2, y + h / 2 - 0.8, w - 4, 1.6, "#ffffff");
   rr(x - 3, y + h - 1, w + 6, 4, 2, "#ffffff");
   if (o.blinds) { for (let k = 0; k < o.blinds; k++) rr(x + 3, y + 4 + k * 4, w - 6, 2.4, 1, "rgba(255,255,255,.9)"); }
@@ -391,12 +398,12 @@ function desk(x, w, floor, top = "#c9966b", leg = "#b07f56", drawer = true) {
   if (drawer) { rr(x + w - 40, y + 5, 30, 12, 2, mix(top, -0.06)); rr(x + w - 29, y + 10, 8, 1.6, 0.8, leg); }
 }
 function monitor(x, y, w, h) { shadow(true, 4, 1, 0.12); rr(x, y, w, h, 3, INK); shadow(false); rr(x + 3, y + 3, w - 6, h - 6, 2, "#1f2a40"); rr(x + w / 2 - 3, y + h, 6, 5, 1, "#8a8fa6"); rr(x + w / 2 - 8, y + h + 4, 16, 2, 1, "#8a8fa6"); }
-function ceilingLamp(x, ceil, len, color = "#f2c14e") { R(x - 0.4, ceil, 0.8, len, "#8a8fa6"); g.beginPath(); g.moveTo(x - 8, ceil + len + 6); g.lineTo(x - 4, ceil + len); g.lineTo(x + 4, ceil + len); g.lineTo(x + 8, ceil + len + 6); g.closePath(); g.fillStyle = color; g.fill(); }
+function ceilingLamp(x, ceil, len, color = "#f2c14e") { R(x - 0.4, ceil, 0.8, len, "#8a8fa6"); g.beginPath(); g.moveTo(x - 8, ceil + len + 6); g.lineTo(x - 4, ceil + len); g.lineTo(x + 4, ceil + len); g.lineTo(x + 8, ceil + len + 6); g.closePath(); g.fillStyle = color; g.fill(); if (OL) { g.strokeStyle = OL.c; g.lineWidth = OL.w; g.lineJoin = "round"; g.stroke(); } }
 function stripLight(x, y) { rr(x - 12, y, 24, 2.5, 1.2, "#ffffff"); }
 
 // ---------- the street on either side of our building
 const LAMPS = [];
-function tree(x, y) { rr(x - 1.8, y - 24, 3.6, 24, 1.8, "#9a7a5a"); circle(x, y - 34, 11, "#7fc79a"); circle(x - 7, y - 28, 8, "#6fb98a"); circle(x + 7, y - 28, 8, "#6fb98a"); }
+function tree(x, y) { rr(x - 1.8, y - 24, 3.6, 24, 1.8, "#9a7a5a"); puff([[x, y - 34, 11], [x - 7, y - 28, 8], [x + 7, y - 28, 8]], "#7fc79a"); }
 function lamp(x, y, sky) { rr(x - 1.2, y - 46, 2.4, 46, 1.2, "#5d6075"); rr(x - 1, y - 48, 10, 2.4, 1.2, "#5d6075"); rr(x + 5, y - 47, 7, 4, 2, sky.k === "day" ? "#d7dbe4" : "#ffe7a0"); LAMPS.push([x + 8.5, y - 43]); }
 function neighbours(XL, XR, sky) {
   LAMPS.length = 0;
@@ -415,12 +422,13 @@ function neighbours(XL, XR, sky) {
 
 const bg = document.createElement("canvas");
 let bgKey = "";
-function room(x, y, w, h, wall, floor) { rr(x, y, w, h, 4, wall); R(x, y + h - 13, w, 13, floor); R(x, y + h - 13, w, 1.2, mix(floor, -0.12)); }
+function room(x, y, w, h, wall, floor) { const o = OL; OL = null; rr(x, y, w, h, 4, wall); R(x, y + h - 13, w, 13, floor); R(x, y + h - 13, w, 1.2, mix(floor, -0.12)); OL = o; rr(x, y, w, h, 4, null, OL.c, OL.w); }
 function drawBackground(t) {
   const sky = skyOf(t), night = sky.k === "night", wx = weatherOf();
   g = bg.getContext("2d"); g.setTransform(VIEW.k, 0, 0, VIEW.k, VIEW.ex * VIEW.k, VIEW.ey * VIEW.k);
   const XL = -VIEW.ex - 1, XR = W + VIEW.ex + 1, YT = -VIEW.ey - 1, YB = H + VIEW.ey + 1;
   WINDOWS.length = 0;
+  OL = null;
   // sky, sun or moon, clouds, far city
   g.fillStyle = skyFill(sky, wx, YT, 330); g.fillRect(XL, YT, XR - XL, YB - YT);
   if (night) { const r = rng(4); for (let i = 0; i < 70; i++) circle(XL + r() * (XR - XL), YT + r() * (60 - YT), r() < 0.2 ? 0.9 : 0.5, "#e8e4ff"); circle(120, 24, 8, "#f4efd8"); circle(124, 21, 7, sky.top); }
@@ -432,7 +440,7 @@ function drawBackground(t) {
   for (let x = XL - 6; x < XR; x += 46 + r() * 30) { const top = 24 + r() * 26, w = 28 + r() * 26; rr(x, top, w, H, 2, sky.city); }
   // street
   R(XL, 488, XR - XL, 6, "#cfd3dc"); R(XL, 494, XR - XL, YB - 494, "#4a4d5e"); for (let x = Math.floor(XL / 36) * 36 + 8; x < XR; x += 36) rr(x, 497 + Math.min(VIEW.ey, 12), 16, 1.4, 0.7, "#e8e2c8");
-  neighbours(XL, XR, sky);
+  OL = SOFT; neighbours(XL, XR, sky); OL = OUTLINE;
 
   // building: facade, roof, sign posts
   shadow(true, 16, 5, 0.14); rr(8, 48, 784, 442, 6, "#f4efe6"); shadow(false);
@@ -445,7 +453,7 @@ function drawBackground(t) {
   // walls between rooms: solid above a doorway
   for (const [x, top, fy] of [[279, 58, 181], [539, 58, 181], [721, 58, 181], [721, 202, 325], [401, 346, 469], [721, 346, 469]]) rr(x - 2.5, top, 5, fy - 38 - top, 2, "#ddd5c8");
   // floors between storeys
-  for (const y of [194, 338]) R(8, y, 784, 8, "#ddd5c8");
+  for (const y of [194, 338]) { R(8, y, 784, 8, "#ddd5c8"); line(8, y, 792, y, INK, 1.1); line(8, y + 8, 792, y + 8, INK, 1.1); }
 
   // ===== STUDY (Claude)
   rr(28, 70, 50, 111, 3, "#c9966b"); const cols = ["#e07a4a", "#5b8fd6", "#6fb98a", "#f2c14e", "#9b7bd6", "#e8a0a0"];
@@ -535,6 +543,7 @@ function drawBackground(t) {
     rr(744, top - 18, 24, 11, 5.5, INK); rr(722, fy - 32, 7, 9, 2, "#c3c8d4");
   }
 
+  OL = OUTLINE;
   if (night) { g.fillStyle = "rgba(14,16,46,.42)"; g.fillRect(8, 48, 784, 442); }
   else if (sky.k !== "day") { g.fillStyle = "rgba(60,40,90,.12)"; g.fillRect(8, 48, 784, 442); }
   g = main;
