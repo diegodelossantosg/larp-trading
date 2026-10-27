@@ -3479,5 +3479,27 @@
   "notes": [],
   "plain_summary": "I looked into today's biggest drops and found no clear overreaction worth buying, so I made no buys this hour.",
   "ideas": []
+ },
+ {
+  "date": "2026-10-27",
+  "time": "11:25",
+  "source": "news",
+  "dry_run": false,
+  "orders": [],
+  "notes": [
+   "earnings dates checked on Nasdaq's calendar",
+   "skipped CTAS: already at its size limit"
+  ],
+  "plain_summary": "Cintas dropped about 5% because of an unconfirmed report that regulators will block a deal it hasn't finished yet, so I picked it as the one buy. I skipped drops caused by earnings reports.",
+  "ideas": [
+   {
+    "symbol": "CTAS",
+    "headline": "2026-10-27 morning: Semafor reports the FTC told Cintas and UniFirst it will sue to block Cintas's ~$5.5B purchase of UniFirst; CTAS down ~5% vs SPY",
+    "why_not_priced_in": "The drop wiped out roughly the whole deal's value (~$4-5B), even though the deal has not closed and today's business does not depend on it. If the deal fails, Cintas owes a $350M break fee, which is small for a company worth about $85-90B. Last quarter (reported in September) had record revenue, about 11% growth and a raised full-year forecast. The report relies on unnamed sources and no lawsuit has been filed. The deal can't close before Dec 11, which leaves time for fixes. The drop has eased from -5.9% this morning, so it isn't still falling fast. Next earnings not announced; one calendar estimates 2026-12-16.",
+    "plain_reason": "Strong company fell because a deal may be blocked; its own business is unchanged.",
+    "next_earnings": "unknown",
+    "idea_type": "overreaction"
+   }
+  ]
  }
 ]
