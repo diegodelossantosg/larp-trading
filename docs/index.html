@@ -5,32 +5,31 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>The Trading Floor</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
 <style>
 :root{--bg:#0b0a14;--ink:#f4ecd8;--dim:#a49cc0;--up:#6fd08c;--down:#ef6f6c;--gold:#f2c14e;--panel:rgba(14,12,28,.85);--line:#3a3556;
-  --pixel:"Press Start 2P",ui-monospace,monospace;color-scheme:dark}
+  --pixel:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color-scheme:dark}
 html,body{margin:0;height:100%;background:var(--bg);overflow:hidden}
-canvas{position:fixed;inset:0;width:100vw;height:100vh;image-rendering:pixelated;image-rendering:crisp-edges}
-.hud{position:fixed;font-family:var(--pixel);font-size:10px;line-height:1.7;color:var(--ink);background:var(--panel);border:2px solid var(--line);padding:6px 10px;box-shadow:3px 3px 0 #000}
+canvas{position:fixed;inset:0;width:100vw;height:100vh}
+.hud{position:fixed;font-family:var(--pixel);font-size:13px;font-weight:600;line-height:1.5;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px 12px;box-shadow:0 6px 20px rgba(0,0,0,.25)}
 #tl{top:max(10px,env(safe-area-inset-top));left:max(10px,env(safe-area-inset-left))}
 #tr{top:max(10px,env(safe-area-inset-top));right:max(10px,env(safe-area-inset-right));text-align:right}
 #bl{bottom:max(10px,env(safe-area-inset-bottom));left:max(10px,env(safe-area-inset-left));display:flex;gap:6px;align-items:center;padding:5px}
-#card{bottom:max(10px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);width:min(440px,calc(100vw - 24px));font-size:9px;padding:10px 12px}
-#card h3{margin:0 0 6px;font-size:10px;font-weight:normal}
+#card{bottom:max(10px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);width:min(440px,calc(100vw - 24px));font-size:13px;font-weight:500;padding:12px 14px}
+#card h3{margin:0 0 6px;font-size:14px;font-weight:700}
 #card p{margin:0}
 .dim{color:var(--dim)} .up{color:var(--up)} .down{color:var(--down)}
-button,select{font-family:var(--pixel);font-size:8px;color:var(--ink);background:#221d38;border:2px solid var(--line);padding:6px 8px;cursor:pointer}
+button,select{font-family:var(--pixel);font-size:12px;font-weight:600;color:var(--ink);background:#221d38;border:1px solid var(--line);border-radius:8px;padding:6px 10px;cursor:pointer}
 button[aria-pressed="true"]{border-color:var(--gold);color:var(--gold)}
 button:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 #heat{background:#0e0c1a;left:50%;top:50%;transform:translate(-50%,-50%);width:min(960px,calc(100vw - 24px));height:min(620px,calc(100vh - 24px));display:flex;flex-direction:column;gap:8px;padding:10px;box-sizing:border-box}
 #heat[hidden]{display:none}
-.heathead{display:flex;justify-content:space-between;align-items:center;font-size:10px}
+.heathead{display:flex;justify-content:space-between;align-items:center;font-size:14px}
 #heatmap{position:relative;flex:1;min-height:0}
 .cell{position:absolute;box-sizing:border-box;border:1px solid #0b0e14;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;overflow:hidden;text-align:center;color:#fff;font-family:var(--pixel)}
-.cell span{font-size:9px}.cell small{font-size:8px;opacity:.9;padding:0 4px;line-height:1.5}
-.heatnote{margin:0;font-size:8px}
-#hint{left:50%;bottom:calc(max(10px,env(safe-area-inset-bottom)) + 96px);transform:translateX(-50%);font-size:8px;white-space:nowrap;color:var(--dim)}
-#tip{pointer-events:none;font-size:8px;padding:4px 7px;box-shadow:2px 2px 0 #000;white-space:nowrap}
+.cell span{font-size:14px;font-weight:800}.cell small{font-size:12px;opacity:.9;padding:0 4px;line-height:1.5}
+.heatnote{margin:0;font-size:12px;font-weight:500}
+#hint{left:50%;bottom:calc(max(10px,env(safe-area-inset-bottom)) + 96px);transform:translateX(-50%);font-size:12px;white-space:nowrap;color:var(--dim)}
+#tip{pointer-events:none;font-size:12px;padding:5px 9px;border-radius:8px;white-space:nowrap}
 #panel{background:#0e0c1a;left:50%;top:50%;transform:translate(-50%,-50%);width:min(980px,calc(100vw - 24px));max-height:calc(100vh - 24px);display:flex;flex-direction:column;gap:10px;padding:12px 14px;box-sizing:border-box}
 #panel[hidden]{display:none}
 #pbody{overflow:auto;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-size:14px;line-height:1.45;color:var(--ink);min-height:0}
@@ -230,96 +229,84 @@ function plan(id, t) {
   return { spot: "armchair", act: "read", say: nothing ? "Nothing worth buying" : "Reading the news" };
 }
 
-// ================================================================ drawing helpers
+// ================================================================ drawing helpers (flat 2D: smooth shapes, real text)
 const W = 800, H = 500;
 const cv = document.getElementById("cv");
 const main = cv.getContext("2d");
-// The world is laid out in 800×500 units (half a unit = one pixel). The view widens or heightens to fill the
-// window; VIEW.ex / VIEW.ey are the extra units on each side, filled with street, sky and neighbours.
-const VIEW = { w: W, h: H, ex: 0, ey: 0 };
-main.setTransform(2, 0, 0, 2, 0, 0);
-main.imageSmoothingEnabled = false;
+// The world is laid out in 800×500 units. The view widens or heightens to fill the window; VIEW.ex / VIEW.ey
+// are the extra units on each side, filled with street, sky and neighbours.
+const VIEW = { w: W, h: H, ex: 0, ey: 0, k: 2 };
 let g = main;
-const R = (x, y, w, h, c) => { g.fillStyle = c; g.fillRect(Math.round(x * 2) / 2, Math.round(y * 2) / 2, w, h); };
-const OUT = "#1a1426";
-const box = (x, y, w, h, fill, edge = OUT) => { R(x, y, w, h, edge); R(x + 1, y + 1, w - 2, h - 2, fill); };
+const INK = "#2b2d42", FONT = 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+const R = (x, y, w, h, c) => { g.fillStyle = c; g.fillRect(x, y, w, h); };
 function mix(hex, f) {  // f > 0 lightens towards white, f < 0 darkens
   const c = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).map((v) => Math.round(f > 0 ? v + (255 - v) * f : v * (1 + f)));
   return "#" + c.map((v) => Math.max(0, Math.min(255, v)).toString(16).padStart(2, "0")).join("");
 }
-// a shaded block: light top edge, dark bottom and right edge, outline
-function block(x, y, w, h, c) { box(x, y, w, h, c); R(x + 1, y + 1, w - 2, 1, mix(c, 0.25)); R(x + 1, y + h - 2, w - 2, 1, mix(c, -0.25)); R(x + w - 2, y + 1, 1, h - 2, mix(c, -0.15)); }
 function rng(seed) { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
-// classic 5×7 pixel font: five column bytes per glyph, bit 0 is the top row
-const F5 = {A:[124,18,17,18,124],B:[127,73,73,73,54],C:[62,65,65,65,34],D:[127,65,65,34,28],E:[127,73,73,73,65],F:[127,9,9,9,1],G:[62,65,73,73,122],H:[127,8,8,8,127],I:[0,65,127,65,0],J:[32,64,65,63,1],K:[127,8,20,34,65],L:[127,64,64,64,64],M:[127,2,12,2,127],N:[127,4,8,16,127],O:[62,65,65,65,62],P:[127,9,9,9,6],Q:[62,65,81,33,94],R:[127,9,25,41,70],S:[70,73,73,73,49],T:[1,1,127,1,1],U:[63,64,64,64,63],V:[31,32,64,32,31],W:[63,64,56,64,63],X:[99,20,8,20,99],Y:[7,8,112,8,7],Z:[97,81,73,69,67],
-  "0":[62,81,73,69,62],"1":[0,66,127,64,0],"2":[66,97,81,73,70],"3":[33,65,69,75,49],"4":[24,20,18,127,16],"5":[39,69,69,69,57],"6":[60,74,73,73,48],"7":[1,113,9,5,3],"8":[54,73,73,73,54],"9":[6,73,73,41,30],
-  " ":[0,0,0,0,0],".":[0,96,96,0,0],",":[0,80,48,0,0],":":[0,54,54,0,0],"%":[35,19,8,100,98],"!":[0,0,95,0,0],"?":[2,1,81,9,6],"$":[36,42,127,42,18],"/":[32,16,8,4,2],"(":[0,28,34,65,0],")":[0,65,34,28,0],"'":[0,5,3,0,0],"+":[8,8,62,8,8],"-":[8,8,8,8,8],"−":[8,8,8,8,8],"&":[54,73,85,34,80],"…":[64,0,64,0,64],"#":[20,127,20,127,20]};
-function txt(s, x, y, c, k = 1) {
-  for (const ch of String(s).toUpperCase()) {
-    const cols = F5[ch] || F5[" "];
-    for (let i = 0; i < 5; i++) for (let r = 0; r < 7; r++) if ((cols[i] >> r) & 1) R(x + i * k, y + r * k, k, k, c);
-    x += 6 * k;
-  }
+function rr(x, y, w, h, r, fill, stroke, lw = 1.2) {
+  g.beginPath(); g.roundRect(x, y, w, h, Math.min(r, w / 2, h / 2));
+  if (fill) { g.fillStyle = fill; g.fill(); }
+  if (stroke) { g.strokeStyle = stroke; g.lineWidth = lw; g.stroke(); }
 }
-const tw = (s, k = 1) => String(s).length * 6 * k - k;
-function line(x0, y0, x1, y1, c, s = 1) { const n = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0), s) / s; for (let i = 0; i <= n; i++) R(x0 + (x1 - x0) * i / n, y0 + (y1 - y0) * i / n, s, s, c); }
+function circle(x, y, r, fill, stroke, lw = 1.2) { g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); if (fill) { g.fillStyle = fill; g.fill(); } if (stroke) { g.strokeStyle = stroke; g.lineWidth = lw; g.stroke(); } }
+function ellipse(x, y, rx, ry, rot, fill) { g.beginPath(); g.ellipse(x, y, rx, ry, rot, 0, Math.PI * 2); g.fillStyle = fill; g.fill(); }
+function poly(pts, fill) { g.beginPath(); pts.forEach(([x, y], i) => (i ? g.lineTo(x, y) : g.moveTo(x, y))); g.closePath(); g.fillStyle = fill; g.fill(); }
+function stroke(pts, color, lw = 1.2) { g.beginPath(); pts.forEach(([x, y], i) => (i ? g.lineTo(x, y) : g.moveTo(x, y))); g.strokeStyle = color; g.lineWidth = lw; g.lineJoin = g.lineCap = "round"; g.stroke(); }
+function shadow(on, blur = 6, y = 2, a = 0.12) { g.shadowColor = on ? `rgba(30,35,60,${a})` : "transparent"; g.shadowBlur = on ? blur * VIEW.k : 0; g.shadowOffsetY = on ? y * VIEW.k : 0; }
+function text(s, x, y, size, color, weight = 600, align = "left") { g.font = `${weight} ${size}px ${FONT}`; g.fillStyle = color; g.textAlign = align; g.textBaseline = "middle"; g.fillText(s, x, y); }
+function textW(s, size, weight = 600) { g.font = `${weight} ${size}px ${FONT}`; return g.measureText(s).width; }
+function line(x0, y0, x1, y1, c, w = 1) { stroke([[x0, y0], [x1, y1]], c, w); }
 function glow(x, y, r, rgb, a) { const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, `rgba(${rgb},${a})`); gr.addColorStop(1, `rgba(${rgb},0)`); g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2); }
 
-// ================================================================ characters: one white base model, a detail per agent
-// Drawn at 1 pixel = 2 world pixels. Base body is 10×16, placed at (2,3) inside a 14×19 canvas so hats fit.
-const BASE_HEAD = ["..oooooo..", ".owwwwwwo.", "owwwwwwwwo", "owwwwwwwwo", "owwwwwwwwo", "owwwwwwwwo", "ogwwwwwwgo", ".oggggggo."];
-const BODY = {
-  stand: ["..oooooo..", "..oggggo..", "..owwwwo..", "..owwwwo..", "..owwwwo..", "..owwowo..", "..owgowo..", "..oooooo.."],
-  walkA: ["..oooooo..", "..oggggo..", "..owwwwo..", "..owwwwo..", "..owwwwo..", "..owowwo..", "..ogowwo..", "..oooooo.."],
-  sit: ["..oooooo..", "..oggggo..", "..owwwwo..", "..owwwwo..", "..oooooo.."],
-};
-const EYES = { right: [4, 7], left: [2, 5], front: [3, 6] };
-const ACCENT = {
-  claude: (put) => {  // orange starburst on top, orange tie
-    put(6, 1, "c"); put(5, 0, "c"); put(7, 0, "c"); put(6, 0, "c"); put(6, 2, "c"); put(5, 2, "c"); put(7, 2, "c");
-    put(6, 12, "c"); put(7, 12, "c"); put(6, 13, "C"); put(7, 13, "C"); put(6, 14, "c"); put(7, 14, "c");
-  },
-  watch: (put, dir) => {  // blue cap with a brim on the side it faces
-    for (let x = 3; x <= 10; x++) { put(x, 2, "o"); put(x, 3, "b"); put(x, 4, "b"); }
-    put(2, 3, "o"); put(11, 3, "o"); put(2, 4, "o"); put(11, 4, "o"); put(6, 3, "B"); put(7, 3, "B");
-    const bx = dir === "left" ? [0, 1, 2] : dir === "right" ? [11, 12, 13] : [];
-    for (const x of bx) { put(x, 5, "o"); put(x, 4, x === bx[1] ? "b" : "o"); }
-    if (!bx.length) for (let x = 2; x <= 11; x++) put(x, 5, "B");
-  },
-  news: (put) => {  // purple fedora with a press card
-    for (let x = 4; x <= 9; x++) { put(x, 0, "o"); put(x, 1, "p"); put(x, 2, "p"); }
-    put(3, 1, "o"); put(10, 1, "o"); put(3, 2, "o"); put(10, 2, "o"); put(5, 1, "P");
-    for (let x = 1; x <= 12; x++) { put(x, 3, "o"); put(x, 4, x === 1 || x === 12 ? "o" : "P"); }
-    put(7, 2, "w"); put(8, 2, "w"); put(8, 1, "w");
-  },
-};
-const SPAL = { o: "#141018", w: "#ffffff", g: "#c9c6d2", e: "#141018", c: "#e07a4a", C: "#b8582e", b: "#3f8fe0", B: "#2a6bb0", p: "#8a5cc8", P: "#5e3a96" };
-const SPR = {};
-function buildSprites() {
-  for (const id of AG) {
-    SPR[id] = {};
-    for (const dir of ["right", "left", "front"]) for (const body of ["stand", "walkA", "sit"]) for (const closed of [false, true]) {
-      const c = document.createElement("canvas"); c.width = 14; c.height = 19;
-      const x = c.getContext("2d");
-      const grid = Array.from({ length: 19 }, () => Array(14).fill("."));
-      const rows = BASE_HEAD.concat(BODY[body]);
-      // the head keeps its place; a sitting body is shorter, so the whole figure drops
-      const oy = body === "sit" ? 3 + 3 : 3;
-      rows.forEach((r, y) => [...r].forEach((k, xx) => { if (k !== ".") grid[oy + y][2 + xx] = k; }));
-      const [e1, e2] = EYES[dir];
-      for (const ex of [e1, e2]) {
-        if (closed) { grid[oy + 4][2 + ex] = "e"; if (ex + 1 < 9) grid[oy + 4][2 + ex + (dir === "left" ? -1 : 1)] = "e"; }
-        else { grid[oy + 3][2 + ex] = "e"; grid[oy + 4][2 + ex] = "e"; }
-      }
-      const put = (px, py, k) => { const yy = py + oy - 3; if (yy >= 0 && yy < 19 && px >= 0 && px < 14) grid[yy][px] = k; };
-      ACCENT[id](put, dir);
-      grid.forEach((r, y) => r.forEach((k, xx) => { if (k !== ".") { x.fillStyle = SPAL[k]; x.fillRect(xx, y, 1, 1); } }));
-      SPR[id][`${dir}-${body}${closed ? "-z" : ""}`] = c;
-    }
-    const src = SPR[id]["front-stand-z"], ly = document.createElement("canvas"); ly.width = 19; ly.height = 14;
-    const lx = ly.getContext("2d"); lx.translate(0, 14); lx.rotate(-Math.PI / 2); lx.drawImage(src, 0, 0);  // head to the left, on the pillow
-    SPR[id].lying = ly;
+// ================================================================ characters: one round base, a detail each
+// Standing: feet on y. Sitting: on a seat whose top is at y - 12, thighs along the seat, shins down to the floor.
+const AC = { claude: "#e07a4a", watch: "#3f8fe0", news: "#8a5cc8" };
+function figure(id, x, y, o = {}) {
+  const dir = o.dir || 1, sit = o.pose === "sit", walk = o.walk || 0, eyes = o.eyes || "open";
+  const seat = y - 12, bodyB = sit ? seat + 0.5 : y - 6 - (o.bob || 0), bodyT = bodyB - 14, hy = bodyT - 7.5;
+  g.save();
+  // legs
+  if (sit) {
+    rr(x - 2 * dir - (dir < 0 ? 12 : 0), seat - 4.5, 13, 5, 2.5, "#ffffff", INK, 1.3);            // thighs along the seat
+    rr(x + 9 * dir - 2.5, seat - 1, 5, y - seat - 0.5, 2.5, "#ffffff", INK, 1.3);                  // shins down to the floor
+    ellipse(x + 9 * dir + 1.5 * dir, y - 1, 3.6, 1.6, 0, INK);
+  } else {
+    const a = walk ? Math.sin(walk) * 2.2 : 0;
+    for (const [dx, s] of [[-2.6, 1], [2.6, -1]]) { rr(x + dx - 2.3 + a * s * dir, y - 7.5, 4.6, 7, 2.3, "#ffffff", INK, 1.3); ellipse(x + dx + a * s * dir + dir, y - 0.8, 3, 1.4, 0, INK); }
   }
+  rr(x - 7, bodyT, 14, 14, 5, "#ffffff", INK, 1.4);                                                 // body
+  circle(x, hy, 9, "#ffffff", INK, 1.4);                                                            // head
+  // eyes look the way the figure faces
+  const ex = o.front ? 0 : 2.4 * dir;
+  for (const dx of [-2.8, 2.8]) {
+    if (eyes === "closed") stroke([[x + ex + dx - 1.4, hy + 1], [x + ex + dx, hy + 1.8], [x + ex + dx + 1.4, hy + 1]], INK, 1.1);
+    else rr(x + ex + dx - 1, hy - 2.2, 2, 4, 1, INK);
+  }
+  accessory(id, x, hy, bodyT, dir, o.front);
+  g.restore();
+}
+function accessory(id, x, hy, bodyT, dir, front) {
+  if (id === "claude") {  // orange starburst on top, orange tie
+    g.save(); g.translate(x, hy - 10.5); for (let k = 0; k < 8; k++) { g.rotate(Math.PI / 4); rr(-0.9, -4.6, 1.8, 4.6, 0.9, AC.claude); } g.restore();
+    poly([[x, bodyT + 1.5], [x - 2, bodyT + 4], [x, bodyT + 10], [x + 2, bodyT + 4]], AC.claude);
+  }
+  if (id === "watch") {   // blue cap with the brim on the side it faces
+    g.beginPath(); g.arc(x, hy - 2.5, 9.2, Math.PI, 0); g.closePath(); g.fillStyle = AC.watch; g.fill(); g.strokeStyle = INK; g.lineWidth = 1.2; g.stroke();
+    if (front) rr(x - 7, hy - 3.5, 14, 2.6, 1.3, "#2a6bb0"); else rr(dir > 0 ? x + 4 : x - 13, hy - 3.6, 9, 2.6, 1.3, "#2a6bb0");
+  }
+  if (id === "news") {    // purple fedora with a press card
+    rr(x - 11.5, hy - 9, 23, 3, 1.5, "#5e3a96"); rr(x - 6.5, hy - 16.5, 13, 8.5, 3, AC.news); rr(x - 6.5, hy - 11.2, 13, 2, 0.6, "#5e3a96");
+    rr(x + 1.5, hy - 15.5, 4, 3.4, 0.6, "#ffffff");
+  }
+}
+// lying in bed, head on the pillow: only the head shows above the blanket
+function sleeper(id, x, y) {
+  circle(x, y, 8.5, "#ffffff", INK, 1.4);
+  for (const dx of [-2.6, 2.6]) stroke([[x + dx - 1.4, y - 0.5], [x + dx, y + 0.4], [x + dx + 1.4, y - 0.5]], INK, 1.1);
+  if (id === "claude") { g.save(); g.translate(x - 10, y); for (let k = 0; k < 8; k++) { g.rotate(Math.PI / 4); rr(-0.8, -4, 1.6, 4, 0.8, AC.claude); } g.restore(); }
+  if (id === "watch") { g.beginPath(); g.arc(x - 1, y, 9, Math.PI * 0.55, Math.PI * 1.45); g.closePath(); g.fillStyle = AC.watch; g.fill(); }
+  if (id === "news") { rr(x - 12, y - 4, 4, 8, 1.5, AC.news); }
 }
 
 // ================================================================ the building: three floors and a lift
@@ -328,85 +315,30 @@ const FEET = [187, 331, 475];
 // the lift: one door per floor at the right; agents wait at WAIT_X and stand at INSIDE_X in the cabin
 const DOOR_L = 732, DOOR_R = 772, WAIT_X = 704, INSIDE_X = 742;
 const BEDS = [414, 514, 614];  // left edge of each bed, in AG order
+// spots: x is the left of a 20-wide slot (the figure stands at x + 10)
 const SP = {
   desk: { f: 0, x: 150, dir: 1, seat: true }, console: { f: 0, x: 356, dir: 1, seat: true },
   armchair: { f: 0, x: 558, dir: 1, seat: true }, teletype: { f: 0, x: 648, dir: 1 },
   term_claude: { f: 1, x: 540, dir: 1 }, term_news: { f: 1, x: 590, dir: 1 }, term_watch: { f: 1, x: 640, dir: 1 },
-  coffee_claude: { f: 2, x: 196, dir: 1 }, coffee_watch: { f: 2, x: 204, dir: 1 }, coffee_news: { f: 2, x: 212, dir: 1 },
+  coffee_claude: { f: 2, x: 186, dir: 1 }, coffee_watch: { f: 2, x: 196, dir: 1 }, coffee_news: { f: 2, x: 206, dir: 1 },
   arcade: { f: 2, x: 308, dir: 1 },
   bed_claude: { f: 2, x: 438, dir: -1, bed: 414 }, bed_watch: { f: 2, x: 538, dir: -1, bed: 514 }, bed_news: { f: 2, x: 638, dir: -1, bed: 614 },
+};
+// where the moving parts sit (shared by the background, the animation and the click areas)
+const L = {
+  claudeScreen: [199, 129, 38, 24], watchScreens: [288, 78, 70, 44, 68, 36], daily: [376, 63, 48, 10],
+  cabinet: [500, 125, 30, 62], tv: [662, 72, 52, 36], teletype: [668, 150, 46, 37], diary: [234, 155, 16, 6],
+  ticker: [30, 212, 680, 20], chart: [30, 240, 180, 80], heat: [218, 236, 294, 88], terminals: [560, 610, 660],
+  frame: [26, 356, 98, 72], arcadeScreen: [334, 410, 24, 20],
 };
 
 function skyOf(t) {
   const m = t.min;
-  if (m < 360 || m >= 1230) return { k: "night", bands: ["#070a1c", "#0b1026", "#101633", "#151c40", "#1b2350", "#22295c"], city: "#0e0c1e", lit: 0.35 };
-  if (m < 450) return { k: "dawn", bands: ["#2a2f6e", "#4b3f86", "#7a4f8f", "#b5658a", "#e48a7c", "#f6b383"], city: "#2a2140", lit: 0.12 };
-  if (m >= 1110) return { k: "dusk", bands: ["#24306e", "#433f8a", "#7b4e92", "#c0628a", "#ec8a6e", "#f7b768"], city: "#251d3a", lit: 0.2 };
-  return { k: "day", bands: ["#4a8fd8", "#5b9de0", "#6fabe6", "#86bbec", "#a0cbf0", "#bcdcf4"], city: "#5d6a92", lit: 0 };
+  if (m < 360 || m >= 1230) return { k: "night", top: "#141a3a", bot: "#2b3566", city: "#232a4e", lit: 0.35 };
+  if (m < 450) return { k: "dawn", top: "#7f8ccf", bot: "#f6c4a0", city: "#a596b8", lit: 0.12 };
+  if (m >= 1110) return { k: "dusk", top: "#6a6fc0", bot: "#f3b28a", city: "#9a88b0", lit: 0.2 };
+  return { k: "day", top: "#8ec2ef", bot: "#d9ecfa", city: "#bccbe0", lit: 0 };
 }
-
-// --- furniture helpers. Units are half a real pixel: 0.5 = one pixel on the 1600×900 canvas.
-const ob = (x, y, w, h, fill, t = 1) => { R(x, y, w, h, OUT); R(x + t, y + t, w - 2 * t, h - 2 * t, fill); };
-const hl = (x, y, w, c) => R(x, y, w, 0.5, c);
-const vl = (x, y, h, c) => R(x, y, 0.5, h, c);
-function sh(x, y, w, h, c) { ob(x, y, w, h, c); hl(x + 1, y + 1, w - 2, mix(c, 0.3)); R(x + 1, y + h - 2, w - 2, 1, mix(c, -0.18)); }
-function grain(x, y, w, h, c, seed) { const r = rng(seed); for (let i = 0; i < (w * h) / 30; i++) hl(x + r() * (w - 6), y + r() * (h - 0.5), 2 + r() * 6, c); }
-const WINDOWS = [];  // glass of every window, filled while drawing the background
-function winBox(x, y, w, h, sky, o = {}) {
-  ob(x, y, w, h, "#f4f0e8");
-  const ix = x + 2, iy = y + 2, iw = w - 4, ih = h - 4;
-  R(ix, iy, iw, ih / 2, sky.bands[2]); R(ix, iy + ih / 2, iw, ih / 2, sky.bands[4]);
-  const r = rng(x * 3 + y);
-  for (let bx = ix; bx < ix + iw;) {
-    const bw = 3 + r() * 6, bh = ih * (0.2 + r() * 0.45);
-    R(bx, iy + ih - bh, Math.min(bw, ix + iw - bx), bh, sky.city);
-    if (sky.lit) for (let wy = iy + ih - bh + 2; wy < iy + ih - 1; wy += 2.5) if (r() < 0.45 && bx + 1 < ix + iw) R(bx + 1, wy, 0.5, 1, "#f4d27a");
-    bx += bw + 0.5;
-  }
-  const wx = weatherOf(), m = g.getTransform();
-  if (wx !== "clear") {
-    g.fillStyle = `rgba(${sky.k === "night" ? "10,10,25" : "110,118,140"},${{ cloudy: 0.2, rain: 0.42, storm: 0.58 }[wx]})`; g.fillRect(ix, iy, iw, ih);
-    const cc = sky.k === "night" ? "#2a2c3e" : wx === "cloudy" ? "#eef0f6" : wx === "rain" ? "#a0a6b8" : "#70748a";
-    R(ix + iw * 0.1, iy + 2, iw * 0.45, 3, cc); R(ix + iw * 0.2, iy, iw * 0.25, 2, cc); R(ix + iw * 0.55, iy + ih * 0.22, iw * 0.4, 3, cc);
-  }
-  if (wx === "rain" || wx === "storm") WINDOWS.push([ix + m.e / 2, iy + m.f / 2, iw, ih]);
-  else if (sky.k === "day") { line(ix + 3, iy + ih - 3, ix + 9, iy + 2, "#ffffff70", 0.5); line(ix + 6, iy + ih - 3, ix + 12, iy + 2, "#ffffff40", 0.5); }
-  R(x + w / 2 - 0.5, y, 1, h, "#f4f0e8"); R(x, y + h / 2 - 0.5, w, 1, "#f4f0e8"); vl(x + w / 2 + 0.5, y + 1, h - 2, "#c8c0b0");
-  ob(x - 2, y + h - 0.5, w + 4, 3, "#f4f0e8"); hl(x - 1, y + h + 1.5, w + 2, "#c8c0b0");
-  if (o.curtain) {
-    const c = o.curtain; R(x - 5, y - 3, w + 10, 1.5, "#5a3a24"); R(x - 6, y - 3.5, 2, 2.5, "#c9a64a"); R(x + w + 4, y - 3.5, 2, 2.5, "#c9a64a");
-    for (const cx of [x - 5, x + w - 3]) { ob(cx, y - 2, 8, h + 5, c, 0.5); for (let i = 1.5; i < 7; i += 2) vl(cx + i, y - 1, h + 3, mix(c, -0.25)); R(cx + 0.5, y + h * 0.55, 7, 1.5, "#c9a64a"); }
-  }
-  if (o.blinds) for (let by = y + 2; by < y + 2 + o.blinds; by += 2) { R(x + 2, by, w - 4, 1.5, "#ece6d8"); hl(x + 2, by + 1.5, w - 4, "#b8ae98"); }
-}
-function blob(cx, cy, rx, ry, c) { for (let y = -ry; y <= ry; y += 0.5) { const w = rx * Math.sqrt(Math.max(0, 1 - (y * y) / (ry * ry))); R(cx - w, cy + y, w * 2, 0.5, c); } }
-function plant(x, y, s = 1) {  // a terracotta pot and a few big outlined leaves
-  const pw = 12 * s, ph = 10 * s, cx = x + pw / 2, top = y - ph;
-  for (let i = 0; i < ph; i += 0.5) { const ins = (i / ph) * 1.5 * s; R(x + ins - 0.5, top + i, pw - ins * 2 + 1, 0.5, OUT); R(x + ins + 0.5, top + i, pw - ins * 2 - 1, 0.5, i < 2.5 ? "#e09a6a" : "#c9744a"); }
-  R(x - 0.5, y - 0.5, pw + 1, 0.5, OUT); vl(x + 2, top + 3, ph - 4, "#e8a87a");
-  for (const [dx, dy] of [[-6, -9], [5, -12], [0, -15]]) line(cx, top, cx + dx * s, top + dy * s, "#3f7f48", 0.5);
-  const leaves = [[-7, -9, 5.5, 3.5, "#3f8a4a"], [6, -12, 5.5, 3.5, "#3f8a4a"], [0, -16, 4.5, 4.5, "#4f9a5a"], [-3, -5, 5, 3, "#5fae6a"], [4, -6.5, 4.5, 3, "#6fbf6a"]];
-  for (const [dx, dy, rx, ry, c] of leaves) { blob(cx + dx * s, top + dy * s, rx * s + 0.75, ry * s + 0.75, OUT); blob(cx + dx * s, top + dy * s, rx * s, ry * s, c); hl(cx + dx * s - rx * s * 0.4, top + dy * s - ry * s * 0.3, rx * s * 0.6, mix(c, 0.3)); }
-}
-function books(x, y, w, h, seed) {  // one shelf of books standing on y + h
-  const r = rng(seed), cols = ["#c75b4a", "#e0b04a", "#4d8fbf", "#5fa66a", "#9b6bd1", "#e8e0c8", "#3a5a8a", "#d9845a"];
-  for (let bx = x; bx < x + w - 2;) {
-    if (r() < 0.08) { ob(bx, y + h - 5, 6, 5, "#c9a64a", 0.5); bx += 7; continue; }
-    const bw = 2 + ((r() * 3) | 0), bh = h * (0.6 + r() * 0.4), c = cols[(r() * cols.length) | 0];
-    if (bx + bw > x + w) break;
-    R(bx, y + h - bh, bw, bh, c); vl(bx, y + h - bh, bh, mix(c, 0.3)); hl(bx, y + h - bh + 1.5, bw, mix(c, -0.35)); hl(bx, y + h - bh + bh * 0.7, bw, mix(c, -0.35)); vl(bx + bw - 0.5, y + h - bh, bh, mix(c, -0.3));
-    bx += bw + (r() < 0.1 ? 1 : 0);
-  }
-}
-function ceilingLight(x, y) { R(x - 8, y, 16, 1.5, "#9aa0ae"); R(x - 7, y + 1.5, 14, 1, "#f4f6ff"); }
-const clipRoom = (x, y, w, h) => { g.save(); g.beginPath(); g.rect(x, y, w, h); g.clip(); };
-function room(x, y, w, h, wall, floorC) {
-  ob(x, y, w, h, wall);
-  R(x + 1, y + h - 13, w - 2, 12, floorC); hl(x + 1, y + h - 13, w - 2, mix(floorC, 0.25)); R(x + 1, y + h - 12.5, w - 2, 1, mix(floorC, -0.2));
-  R(x + 1, y + 1, w - 2, 3, mix(wall, -0.15)); hl(x + 1, y + 4, w - 2, mix(wall, 0.2));
-  R(x + 1, y + h - 16, w - 2, 3, mix(wall, -0.22)); hl(x + 1, y + h - 16, w - 2, mix(wall, 0.15));  // skirting board
-}
-
 // The market's mood (from status.health) sets the weather: healthy = clear, cautious = clouds,
 // stressed = rain, 3+ stress points = storm.
 function weatherOf() {
@@ -415,230 +347,196 @@ function weatherOf() {
   return sp >= 3 ? "storm" : h.mood === "stressed" ? "rain" : h.mood === "cautious" ? "cloudy" : "clear";
 }
 const MOOD_TEXT = { clear: "HEALTHY", cloudy: "CAUTIOUS", rain: "STRESSED", storm: "VERY STRESSED" };
-function drawWeatherSky(wx, sky) {
-  if (wx === "clear") return;
-  const dark = { cloudy: 0.18, rain: 0.38, storm: 0.55 }[wx];
-  g.fillStyle = `rgba(${sky.k === "night" ? "10,10,25" : "110,118,140"},${dark})`; g.fillRect(-VIEW.ex - 1, -VIEW.ey - 1, W + VIEW.ex * 2 + 2, 55 + VIEW.ey);
-  const r = rng(wx.length * 97), n = Math.round({ cloudy: 7, rain: 11, storm: 14 }[wx] * (1 + VIEW.ex / 400));
-  const base = sky.k === "night" ? "#2a2c3e" : wx === "cloudy" ? "#e8ecf4" : wx === "rain" ? "#9aa0b4" : "#6a6e84";
-  for (let i = 0; i < n; i++) {
-    const cx = -VIEW.ex + r() * (W + VIEW.ex * 2 + 40) - 20, cy = 4 + r() * 30, w = 30 + r() * 40;
-    R(cx, cy + 4, w, 7, base); R(cx + w * 0.15, cy, w * 0.5, 5, base); R(cx + w * 0.45, cy + 1, w * 0.35, 4, base); hl(cx, cy + 10.5, w, mix(base, -0.15));
-  }
+function skyFill(sky, wx, y0, y1) {
+  const gr = g.createLinearGradient(0, y0, 0, y1);
+  const dim = { clear: 0, cloudy: 0.15, rain: 0.35, storm: 0.5 }[wx];
+  gr.addColorStop(0, mix(sky.top, -dim)); gr.addColorStop(1, mix(sky.bot, -dim * 0.8)); return gr;
 }
-// the street on either side of our building: neighbour buildings, trees and lamp posts
+function cloud(x, y, s, c) { for (const [dx, dy, r] of [[0, 0, 6], [7, -3, 7], [15, 0, 6], [8, 2, 6]]) circle(x + dx * s, y + dy * s, r * s, c); }
+
+// ---------- furniture that reads as what it is
+const WINDOWS = [];  // glass of every window, filled while drawing the background (rain falls in it)
+function windowView(x, y, w, h, sky, o = {}) {
+  shadow(true, 4, 1, 0.1); rr(x, y, w, h, 3, "#ffffff"); shadow(false);
+  g.save(); g.beginPath(); g.roundRect(x + 3, y + 3, w - 6, h - 6, 2); g.clip();
+  const wx = weatherOf(); g.fillStyle = skyFill(sky, wx, y, y + h); g.fillRect(x, y, w, h);
+  g.fillStyle = sky.city; const r = rng(x * 3 + y);
+  for (let bx = x + 3; bx < x + w - 3;) { const bw = 5 + r() * 8, bh = h * (0.25 + r() * 0.35); rr(bx, y + h - 3 - bh, bw, bh + 2, 1, sky.city); if (sky.lit) for (let wy = y + h - bh; wy < y + h - 5; wy += 4) if (r() < 0.5) R(bx + 2, wy, 1.5, 1.8, "#f6d77a"); bx += bw + 1.5; }
+  if (wx !== "clear") { const cc = sky.k === "night" ? "#3a4066" : wx === "cloudy" ? "#ffffff" : "#aab2c4"; cloud(x + w * 0.25, y + h * 0.28, 0.45, cc); cloud(x + w * 0.62, y + h * 0.18, 0.4, cc); }
+  g.restore();
+  if (wx === "rain" || wx === "storm") { const m = g.getTransform(); WINDOWS.push([x + 3, y + 3, w - 6, h - 6]); }
+  R(x + w / 2 - 0.8, y + 2, 1.6, h - 4, "#ffffff"); R(x + 2, y + h / 2 - 0.8, w - 4, 1.6, "#ffffff");
+  rr(x - 3, y + h - 1, w + 6, 4, 2, "#ffffff");
+  if (o.blinds) { for (let k = 0; k < o.blinds; k++) rr(x + 3, y + 4 + k * 4, w - 6, 2.4, 1, "rgba(255,255,255,.9)"); }
+  if (o.curtain) for (const cx of [x - 6, x + w - 2]) { rr(cx, y - 3, 8, h + 6, 3, o.curtain); rr(cx + 2, y - 3, 1.2, h + 6, 0.6, mix(o.curtain, -0.12)); }
+  if (o.curtain) rr(x - 8, y - 5, w + 16, 2.4, 1.2, "#b0a090");
+}
+function plant(x, y, s = 1) {  // pot on the floor at (x, y)
+  for (const [dx, dy, r, c] of [[-5, -16, -0.6, "#5fa57a"], [5, -18, 0.6, "#5fa57a"], [0, -22, 0, "#6fb98a"], [-3, -10, -1, "#7fc79a"], [4, -11, 1, "#7fc79a"]]) ellipse(x + dx * s, y + dy * s, 4 * s, 8 * s, r, c);
+  poly([[x - 6 * s, y - 8 * s], [x + 6 * s, y - 8 * s], [x + 4.5 * s, y], [x - 4.5 * s, y]], "#e08a62"); rr(x - 6.5 * s, y - 9 * s, 13 * s, 2.5 * s, 1, "#ea9a74");
+}
+function officeChair(cx, floor, color) {  // side view: backrest, seat, gas column, five-star base on wheels
+  const seat = floor - 12;
+  rr(cx - 10, seat - 21, 5, 22, 2.5, color);                    // backrest
+  rr(cx - 8, seat - 9, 2, 9, 1, mix(color, -0.2));              // backrest stem
+  rr(cx - 10, seat, 20, 4, 2, color);                           // seat cushion
+  rr(cx - 1, seat + 4, 2, 6, 1, "#8a8fa6");                     // gas column
+  rr(cx - 9, floor - 3, 18, 1.8, 0.9, "#8a8fa6");               // base
+  for (const dx of [-8, 0, 8]) circle(cx + dx, floor - 1, 1.2, "#5d6075");
+}
+function desk(x, w, floor, top = "#c9966b", leg = "#b07f56", drawer = true) {
+  const y = floor - 26;
+  shadow(true, 5, 2, 0.1); rr(x, y, w, 5, 2.5, top); shadow(false);
+  rr(x + 4, y + 5, 3.5, 26, 1.5, leg); rr(x + w - 7.5, y + 5, 3.5, 26, 1.5, leg);
+  if (drawer) { rr(x + w - 40, y + 5, 30, 12, 2, mix(top, -0.06)); rr(x + w - 29, y + 10, 8, 1.6, 0.8, leg); }
+}
+function monitor(x, y, w, h) { shadow(true, 4, 1, 0.12); rr(x, y, w, h, 3, INK); shadow(false); rr(x + 3, y + 3, w - 6, h - 6, 2, "#1f2a40"); rr(x + w / 2 - 3, y + h, 6, 5, 1, "#8a8fa6"); rr(x + w / 2 - 8, y + h + 4, 16, 2, 1, "#8a8fa6"); }
+function ceilingLamp(x, ceil, len, color = "#f2c14e") { R(x - 0.4, ceil, 0.8, len, "#8a8fa6"); g.beginPath(); g.moveTo(x - 8, ceil + len + 6); g.lineTo(x - 4, ceil + len); g.lineTo(x + 4, ceil + len); g.lineTo(x + 8, ceil + len + 6); g.closePath(); g.fillStyle = color; g.fill(); }
+function stripLight(x, y) { rr(x - 12, y, 24, 2.5, 1.2, "#ffffff"); }
+
+// ---------- the street on either side of our building
 const LAMPS = [];
-function tree(x, y) {
-  R(x - 1.5, y - 22, 3, 22, "#5a3a24"); vl(x - 1, y - 22, 22, "#7a5034");
-  for (const [dx, dy, rx, ry, c] of [[-6, -26, 8, 7, "#3f7f48"], [6, -27, 8, 7, "#3f7f48"], [0, -34, 9, 8, "#4f9a5a"], [-3, -28, 6, 5, "#5fae6a"], [4, -31, 5, 4, "#6fbf6a"]]) { blob(x + dx, y + dy, rx + 0.75, ry + 0.75, OUT); blob(x + dx, y + dy, rx, ry, c); }
-}
-function lamp(x, y, sky) { R(x - 1, y - 44, 2, 44, "#2a2438"); R(x - 2.5, y - 2, 5, 2, "#2a2438"); R(x - 1, y - 46, 8, 1.5, "#2a2438"); ob(x + 4, y - 46, 6, 4, "#3a3448", 0.5); R(x + 5, y - 42.5, 4, 1, sky.k === "day" ? "#c9c6d2" : "#ffe7a0"); LAMPS.push([x + 7, y - 41]); }
+function tree(x, y) { rr(x - 1.8, y - 24, 3.6, 24, 1.8, "#9a7a5a"); circle(x, y - 34, 11, "#7fc79a"); circle(x - 7, y - 28, 8, "#6fb98a"); circle(x + 7, y - 28, 8, "#6fb98a"); }
+function lamp(x, y, sky) { rr(x - 1.2, y - 46, 2.4, 46, 1.2, "#5d6075"); rr(x - 1, y - 48, 10, 2.4, 1.2, "#5d6075"); rr(x + 5, y - 47, 7, 4, 2, sky.k === "day" ? "#d7dbe4" : "#ffe7a0"); LAMPS.push([x + 8.5, y - 43]); }
 function neighbours(XL, XR, sky) {
   LAMPS.length = 0;
-  const pal = ["#9aa0b8", "#c4ab8e", "#93a393", "#b89494", "#a99cc0", "#ccb89a"], haze = sky.k === "day" ? 0.25 : -0.1;
-  for (const [from, to, dir, seed] of [[-28, XL, -1, 3], [828, XR, 1, 8]]) {
-    lamp(from + 10 * -dir + (dir < 0 ? 0 : -6), 488, sky);
+  const pal = sky.k === "night" ? ["#3a4270", "#433d6a", "#38507a"] : ["#d7dde8", "#e4dccf", "#d6e4dc", "#e6d6d8"];
+  for (const [from, to, dir, seed] of [[-30, XL, -1, 3], [830, XR, 1, 8]]) {
+    lamp(from + (dir < 0 ? 8 : -8), 488, sky);
     const r = rng(seed); let x = from;
     while (dir < 0 ? x > to : x < to) {
-      const w = 70 + r() * 40, top = 230 + r() * 80, c = mix(pal[(r() * pal.length) | 0], haze), bx = dir < 0 ? x - w : x;
-      ob(bx, top, w, 488 - top, c, 0.5); R(bx - 1.5, top - 2, w + 3, 2.5, mix(c, -0.2));
-      for (let wy = top + 14; wy < 456; wy += 24) for (let wx = bx + 10; wx < bx + w - 14; wx += 22) {
-        const lit = sky.lit && r() < sky.lit + 0.15;
-        R(wx, wy, 8, 10, lit ? "#f4d27a" : mix(c, -0.18)); hl(wx, wy, 8, mix(c, -0.3));
-      }
-      R(bx + w / 2 - 5, 470, 10, 18, mix(c, -0.3));
-      const gap = 34 + r() * 26;
-      tree(dir < 0 ? bx - gap / 2 : bx + w + gap / 2, 488);
-      x += dir * (w + gap);
+      const w = 72 + r() * 40, top = 240 + r() * 80, c = pal[(r() * pal.length) | 0], bx = dir < 0 ? x - w : x;
+      rr(bx, top, w, 488 - top + 2, 4, c);
+      for (let wy = top + 14; wy < 456; wy += 24) for (let wx = bx + 10; wx < bx + w - 14; wx += 22) rr(wx, wy, 9, 11, 2, sky.lit && r() < sky.lit + 0.15 ? "#f6d77a" : mix(c, sky.k === "night" ? 0.12 : -0.08));
+      const gap = 34 + r() * 24; tree(dir < 0 ? bx - gap / 2 : bx + w + gap / 2, 488); x += dir * (w + gap);
     }
   }
 }
 
-const bg = document.createElement("canvas"); bg.width = W * 2; bg.height = H * 2;
+const bg = document.createElement("canvas");
 let bgKey = "";
+function room(x, y, w, h, wall, floor) { rr(x, y, w, h, 4, wall); R(x, y + h - 13, w, 13, floor); R(x, y + h - 13, w, 1.2, mix(floor, -0.12)); }
 function drawBackground(t) {
-  const sky = skyOf(t), night = sky.k === "night", dayish = sky.k === "day";
-  g = bg.getContext("2d"); g.setTransform(2, 0, 0, 2, VIEW.ex * 2, VIEW.ey * 2); g.imageSmoothingEnabled = false;
+  const sky = skyOf(t), night = sky.k === "night", wx = weatherOf();
+  g = bg.getContext("2d"); g.setTransform(VIEW.k, 0, 0, VIEW.k, VIEW.ex * VIEW.k, VIEW.ey * VIEW.k);
   const XL = -VIEW.ex - 1, XR = W + VIEW.ex + 1, YT = -VIEW.ey - 1, YB = H + VIEW.ey + 1;
   WINDOWS.length = 0;
-  // ---------- sky, sun or moon, city behind
-  R(XL, YT, XR - XL, 10 - YT, sky.bands[0]); sky.bands.forEach((c, i) => R(XL, i * 9, XR - XL, 9, c)); R(XL, 54, XR - XL, YB - 54, sky.bands.at(-1));
-  if (!dayish) { const r = rng(4); for (let i = 0; i < 60 + VIEW.ex / 4; i++) R(XL + r() * (XR - XL), YT + r() * (42 - YT), r() < 0.2 ? 1 : 0.5, r() < 0.2 ? 1 : 0.5, "#e8e4ff"); }
-  if (night) for (let y = -7; y <= 7; y += 0.5) for (let x = -7; x <= 7; x += 0.5) if (x * x + y * y <= 49 && (x - 4) * (x - 4) + (y + 2) * (y + 2) > 36) R(120 + x, 22 + y, 0.5, 0.5, "#f4efd8");
-  const wx = weatherOf();
-  if (dayish && (wx === "clear" || wx === "cloudy")) { for (let y = -8; y <= 8; y += 0.5) for (let x = -8; x <= 8; x += 0.5) if (x * x + y * y <= 64) R(120 + x, 22 + y, 0.5, 0.5, x * x + y * y > 50 ? "#ffe590" : "#fff4c0"); for (const [cx, cy] of [[600, 14], [210, 30]]) { R(cx, cy, 34, 7, "#ffffff"); R(cx + 7, cy - 5, 16, 5, "#ffffff"); hl(cx, cy + 6.5, 34, "#d8e8f8"); } }
-  drawWeatherSky(wx, sky);
+  // sky, sun or moon, clouds, far city
+  g.fillStyle = skyFill(sky, wx, YT, 330); g.fillRect(XL, YT, XR - XL, YB - YT);
+  if (night) { const r = rng(4); for (let i = 0; i < 70; i++) circle(XL + r() * (XR - XL), YT + r() * (60 - YT), r() < 0.2 ? 0.9 : 0.5, "#e8e4ff"); circle(120, 24, 8, "#f4efd8"); circle(124, 21, 7, sky.top); }
+  else if (sky.k === "day" && (wx === "clear" || wx === "cloudy")) circle(120, 24, 9, "#fff1b0");
+  const cc = night ? "#3a4066" : wx === "clear" ? "#ffffff" : wx === "cloudy" ? "#f4f6fa" : wx === "rain" ? "#aab2c4" : "#7c8296";
+  const rc = rng(wx.length * 97);
+  for (let i = 0; i < (wx === "clear" ? 3 : 10) * (1 + VIEW.ex / 400); i++) cloud(XL + rc() * (XR - XL), 4 + rc() * 34, 0.8 + rc() * 0.6, cc);
   const r = rng(23);
-  const far = mix(sky.city, sky.k === "day" ? 0.35 : 0.08);
-  for (let x = XL - 6; x < XR; x += 46 + r() * 30) {
-    const top = 22 + r() * 26, w = 28 + r() * 26; R(x, top, w, H, far);
-    if (sky.lit) for (let wy = top + 5; wy < 44; wy += 7) for (let wx = x + 4; wx < x + w - 4; wx += 7) if (r() < sky.lit * 0.6) R(wx, wy, 1.5, 2, "#e8c870");
-  }
-  // ---------- street
-  R(XL, 488, XR - XL, 6, "#a8a2b6"); hl(XL, 488, XR - XL, OUT); for (let x = Math.floor(XL / 10) * 10; x < XR; x += 10) vl(x, 489, 5, "#948ea4");
-  R(XL, 494, XR - XL, YB - 494, "#3a3646"); for (let x = Math.floor(XL / 36) * 36 + 8; x < XR; x += 36) R(x, 497 + Math.min(VIEW.ey, 12), 16, 1, "#d8d0a8");
-  if (VIEW.ey > 14) { R(XL, 510 + VIEW.ey * 0.3, XR - XL, 4, "#a8a2b6"); hl(XL, 510 + VIEW.ey * 0.3, XR - XL, OUT); }
+  for (let x = XL - 6; x < XR; x += 46 + r() * 30) { const top = 24 + r() * 26, w = 28 + r() * 26; rr(x, top, w, H, 2, sky.city); }
+  // street
+  R(XL, 488, XR - XL, 6, "#cfd3dc"); R(XL, 494, XR - XL, YB - 494, "#4a4d5e"); for (let x = Math.floor(XL / 36) * 36 + 8; x < XR; x += 36) rr(x, 497 + Math.min(VIEW.ey, 12), 16, 1.4, 0.7, "#e8e2c8");
   neighbours(XL, XR, sky);
 
-  // ---------- building shell: brick, cornice, roof with sign, antenna and AC
-  ob(8, 50, 784, 440, "#b8705e");
-  for (let y = 51; y < 489; y += 3) { hl(9, y, 782, "#9a5a4a"); for (let x = 9 + ((y / 3) % 2) * 3; x < 791; x += 6) vl(x, y, 3, "#9a5a4a"); }
-  { const rb = rng(77); for (let i = 0; i < 560; i++) R(9 + rb() * 778, 51 + ((rb() * 145) | 0) * 3 + 0.5, 2.5, 2, rb() < 0.5 ? "#c4806c" : "#a8604e"); }
-  ob(4, 43, 792, 9, "#b8b0c4"); hl(5, 44, 790, "#d8d2e2"); R(5, 50, 790, 1, "#8a8494"); for (let x = 8; x < 792; x += 5) R(x, 47, 2.5, 2.5, "#9a94a8");
-  R(330, 30, 3, 14, OUT); R(467, 30, 3, 14, OUT); ob(300, 8, 200, 24, "#241f30"); R(302, 10, 196, 1, "#3a3448");
-  R(763, 8, 2.5, 36, OUT); R(756, 18, 16, 1.5, OUT); R(758, 26, 12, 1.5, OUT);
-
-  // ---------- rooms: three floors, each 136 tall (tops at 58, 202, 346)
+  // building: facade, roof, sign posts
+  shadow(true, 16, 5, 0.14); rr(8, 48, 784, 442, 6, "#f4efe6"); shadow(false);
+  rr(2, 42, 796, 10, 5, "#ddd5c8"); R(330, 28, 3, 16, "#8a8fa6"); R(467, 28, 3, 16, "#8a8fa6"); R(764, 10, 2.4, 34, "#8a8fa6");
+  // rooms
   const RH = 136;
-  room(18, 58, 262, RH, "#efe3cc", "#b98a5e");   // study
-  room(278, 58, 262, RH, "#d6e0e8", "#8f9aa8");  // control room
-  room(538, 58, 184, RH, "#f0dcdc", "#8a6a90");  // newsroom
-  room(18, 202, 704, RH, "#dedcec", "#a8a4bc");  // trading room
-  room(18, 346, 384, RH, "#dcebdc", "#c09a6a");  // lounge
-  room(400, 346, 322, RH, "#e4e0f0", "#7a6a8a");  // bedroom
-  for (const top of [58, 202, 346]) room(720, top, 66, RH, "#cfc8dc", "#8a8498");
-  // wall details and floors, one quiet detail per room, each kept inside its own room
-  clipRoom(22, 58, 252, 136); R(19, 152, 260, 26, "#d8b48c"); hl(19, 152, 260, "#e8caa4"); R(19, 177, 260, 1, "#b8946c"); grain(19, 181, 260, 11, "#a87a50", 1); g.restore();
-  clipRoom(282, 58, 252, 136); for (let x = 294; x < 534; x += 24) vl(x, 62, 114, "#c8d4de"); for (let x = 279; x < 539; x += 3) for (let y = 182; y < 192; y += 3) R(x, y, 2, 2, "#848fa0"); g.restore();
-  clipRoom(542, 58, 174, 136); R(539, 166, 182, 12, "#e4c8cc"); hl(539, 166, 182, "#f4e0e2"); { const rc = rng(5); for (let i = 0; i < 160; i++) R(539 + rc() * 182, 182 + rc() * 10, 0.5, 0.5, "#9a7aa8"); } g.restore();
-  clipRoom(22, 202, 694, 136); R(19, 302, 702, 20, "#cfcbe2"); hl(19, 302, 702, "#c9a64a"); for (let x = 19; x < 721; x += 12) for (let y = 325; y < 336; y += 6) R(x + ((y / 6) % 2) * 6, y, 6, 6, "#b4b0c8"); g.restore();
-  clipRoom(22, 346, 374, 136); R(19, 440, 382, 26, "#cfe4d2"); hl(19, 440, 382, "#e4f2e6"); grain(19, 469, 382, 11, "#a8845a", 2); g.restore();
-  clipRoom(404, 346, 312, 136); { const rc = rng(6); for (let i = 0; i < 260; i++) R(401 + rc() * 320, 470 + rc() * 10, 0.5, 0.5, "#8a7a9a"); } g.restore();
-  // shared walls with doorways
-  const ROOMC = { study: ["#efe3cc", "#b98a5e"], control: ["#d6e0e8", "#8f9aa8"], news: ["#f0dcdc", "#8a6a90"], hall: ["#cfc8dc", "#8a8498"], trading: ["#dedcec", "#a8a4bc"], lounge: ["#dcebdc", "#c09a6a"], bed: ["#e4e0f0", "#7a6a8a"] };
-  for (const [x, top, fy, l, rr] of [[278, 58, 181, "study", "control"], [538, 58, 181, "control", "news"], [720, 58, 181, "news", "hall"], [720, 202, 325, "trading", "hall"], [400, 346, 469, "lounge", "bed"], [720, 346, 469, "bed", "hall"]]) {
-    // open the doorway: paint over the two rooms' outlines with their own wall and floor colours
-    R(x - 4, fy - 36, 4, 36, ROOMC[l][0]); R(x, fy - 36, 4, 36, ROOMC[rr][0]); R(x - 4, fy, 4, 12, ROOMC[l][1]); R(x, fy, 4, 12, ROOMC[rr][1]); hl(x - 4, fy, 8, mix(ROOMC[l][1], 0.25));
-    const h = fy - 36 - top;  // solid wall above a doorway 36 tall
-    R(x - 4, top, 8, h, "#5a5068"); vl(x - 3.5, top, h, "#7a7090"); vl(x + 3, top, h, "#3a3448"); vl(x - 4.5, top, h + 0.5, OUT); vl(x + 4, top, h + 0.5, OUT); hl(x - 4.5, top + h, 9, OUT);
-    // below it the doorway is left open: the two rooms simply meet
+  room(18, 58, 260, RH, "#fbf3e6", "#d9b48c"); room(280, 58, 258, RH, "#edf3f8", "#bdc7d3"); room(540, 58, 180, RH, "#fbeef0", "#ccb0cc");
+  room(18, 202, 702, RH, "#efeef8", "#c9c7da"); room(18, 346, 382, RH, "#eef6ee", "#d9bf98"); room(402, 346, 318, RH, "#f2f0f8", "#cfc4dc");
+  for (const top of [58, 202, 346]) room(722, top, 64, RH, "#eceaf2", "#c9c6d4");
+  // walls between rooms: solid above a doorway
+  for (const [x, top, fy] of [[279, 58, 181], [539, 58, 181], [721, 58, 181], [721, 202, 325], [401, 346, 469], [721, 346, 469]]) rr(x - 2.5, top, 5, fy - 38 - top, 2, "#ddd5c8");
+  // floors between storeys
+  for (const y of [194, 338]) R(8, y, 784, 8, "#ddd5c8");
+
+  // ===== STUDY (Claude)
+  rr(28, 70, 50, 111, 3, "#c9966b"); const cols = ["#e07a4a", "#5b8fd6", "#6fb98a", "#f2c14e", "#9b7bd6", "#e8a0a0"];
+  for (let s = 0; s < 4; s++) { const sy = 74 + s * 26; R(28, sy + 22, 50, 3, "#b07f56"); let bx = 32; for (let k = 0; k < 6; k++) { const bw = 4 + ((k * 7 + s * 3) % 3), bh = 14 + ((k * 5 + s) % 6); rr(bx, sy + 22 - bh, bw, bh, 1, cols[(k + s) % 6]); bx += bw + 2; } }
+  windowView(96, 74, 52, 42, sky, { curtain: "#d98a8a" });
+  rr(186, 78, 40, 28, 3, "#ffffff"); rr(189, 81, 34, 22, 2, "#d6ecdf"); poly([[189, 98], [199, 88], [207, 95], [213, 90], [223, 98], [223, 103], [189, 103]], "#8fc3a2"); circle(216, 86, 2.5, "#f6d77a");
+  ceilingLamp(168, 58, 18);
+  R(118, 179, 152, 3, "#d98a8a");                                     // rug
+  plant(100, 181, 1.05);
+  officeChair(160, 187, "#5d6075");
+  desk(166, 104, 187);
+  monitor(196, 126, 44, 30);
+  stroke([[176, 161], [176, 146], [183, 140]], "#8a8fa6", 1.6); rr(178, 136, 12, 6, 3, "#f2c14e");    // desk lamp
+  rr(254, 151, 8, 10, 2, "#ffffff"); rr(262, 154, 2.4, 4, 1, "#ffffff");                                 // mug
+  rr(234, 155, 16, 6, 1.5, "#c0504d"); R(236, 155, 1.6, 6, "#9a3a38"); R(240, 157.4, 8, 1, "#f2c14e");  // Claude's diary
+
+  // ===== CONTROL ROOM (Watcher)
+  for (const lx of [330, 470]) stripLight(lx, 60);
+  rr(376, 63, 48, 10, 5, INK); text("DAILY", 400, 68.3, 6, "#ffffff", 700, "center");
+  for (let i = 0; i < 6; i++) { const mx = 288 + (i % 3) * 70, my = 78 + Math.floor(i / 3) * 44; shadow(true, 5, 2, 0.12); rr(mx, my, 66, 36, 4, "#1e2235"); shadow(false); }
+  officeChair(366, 187, "#3f5a80");
+  desk(380, 92, 187, "#aeb8c6", "#8f9aa8", true);
+  rr(392, 157, 22, 4, 2, "#dfe4ec"); rr(418, 157, 6, 4, 2, "#dfe4ec");                                    // keyboard and mouse
+  rr(448, 151, 8, 10, 2, "#ffffff"); rr(456, 154, 2.4, 4, 1, "#ffffff");                                 // mug
+  shadow(true, 5, 2, 0.12); rr(500, 125, 30, 62, 3, "#c3c8d4"); shadow(false);                          // filing cabinet
+  for (let k = 0; k < 3; k++) { rr(503, 129 + k * 19.5, 24, 17, 2, "#d5d9e2"); rr(511, 136 + k * 19.5, 8, 2.4, 1.2, "#9aa2b2"); }
+  rr(506, 130, 18, 5, 1, "#ffffff"); text("TRADES", 515, 132.6, 3.6, INK, 700, "center");
+  rr(406, 58, 10, 4, 2, "#8a8fa6");                                                                      // siren mount
+
+  // ===== NEWSROOM (News Hunter)
+  windowView(550, 76, 42, 38, sky, { blinds: 4 });
+  rr(602, 74, 52, 38, 3, "#e2b98a"); for (const [nx, ny, nc] of [[608, 79, "#ffffff"], [624, 83, "#fff7c2"], [639, 78, "#ffffff"], [613, 95, "#ffffff"], [633, 97, "#ffe0e0"]]) { rr(nx, ny, 11, 9, 1, nc); circle(nx + 5.5, ny + 1, 1.3, "#d64545"); }
+  R(686.5, 108, 3, 6, "#8a8fa6");                                                                        // TV bracket
+  // armchair (side view): back, seat; the near armrest is drawn in front of whoever sits in it
+  rr(552, 141, 9, 46, 4, "#8a5cc8"); rr(554, 171, 40, 9, 4, "#9b6bd1"); rr(556, 180, 3, 7, 1, "#6e46a6"); rr(588, 180, 3, 7, 1, "#6e46a6");
+  // teletype on its stand
+  rr(672, 162, 3, 25, 1.5, "#8a8fa6"); rr(707, 162, 3, 25, 1.5, "#8a8fa6");
+  shadow(true, 5, 2, 0.12); rr(668, 145, 46, 18, 4, "#c3c8d4"); shadow(false); rr(672, 148, 38, 6, 2, "#5d6075"); for (let k = 0; k < 8; k++) rr(673 + k * 4.6, 156, 3.4, 2.5, 0.8, "#ffffff");
+  rr(681, 141, 20, 5, 1, "#ffffff");                                                                     // paper roll
+
+  // ===== TRADING ROOM
+  for (const lx of [120, 320, 520, 660]) stripLight(lx, 204);
+  rr(28, 210, 684, 24, 5, INK);
+  shadow(true, 6, 2, 0.12); rr(28, 238, 184, 84, 5, "#1e2235"); rr(218, 236, 294, 88, 5, "#1e2235"); shadow(false);
+  for (const kx of L.terminals) {  // order terminals: screen on a stand
+    rr(kx + 9, 302, 6, 29, 2, "#8a8fa6"); rr(kx + 3, 328, 18, 3, 1.5, "#8a8fa6");
+    shadow(true, 5, 2, 0.12); rr(kx, 280, 24, 24, 4, "#5d6075"); shadow(false); rr(kx + 2.5, 282.5, 19, 13, 2, "#1e2235"); rr(kx + 4, 298, 16, 3, 1.5, "#c3c8d4");
   }
-  // slabs between floors
-  for (const y of [194, 338]) { R(9, y, 782, 8, "#6a6278"); hl(9, y, 782, OUT); hl(9, y + 7.5, 782, OUT); hl(9, y + 1, 782, "#8a8298"); for (let x = 12; x < 790; x += 14) R(x, y + 3, 7, 2.5, "#5a5268"); }
-  // lift halls: door frames
+  plant(704, 331, 1.05);
+
+  // ===== LOUNGE
+  stripLight(110, 348); stripLight(300, 348);
+  windowView(136, 364, 46, 36, sky, { curtain: "#7fc3c8" });
+  // sofa (front view): back cushions, seat, arms, little legs
+  rr(30, 432, 112, 24, 6, "#5fb3b8"); for (let k = 0; k < 3; k++) rr(35 + k * 35, 436, 32, 18, 5, "#78c4c8");
+  rr(26, 452, 120, 16, 6, "#4fa3a8"); rr(22, 440, 12, 28, 6, "#5fb3b8"); rr(138, 440, 12, 28, 6, "#5fb3b8");
+  for (const lx of [32, 136]) rr(lx, 468, 4, 7, 1, "#8a6a4a");
+  rr(40, 443, 13, 11, 3, "#f2c14e"); rr(120, 444, 12, 10, 3, "#e07a4a");                                  // cushions
+  rr(156, 430, 3, 45, 1.5, "#8a8fa6"); poly([[150, 430], [165, 430], [162, 418], [153, 418]], "#f6e2b0");     // floor lamp
+  // coffee bar: counter with cupboards, espresso machine, cups, menu board
+  rr(262, 372, 42, 24, 4, "#36424a"); text("COFFEE", 283, 380, 6.5, "#f4ecd8", 700, "center"); rr(268, 387, 30, 1.4, 0.7, "#9ac0a8"); rr(268, 391, 22, 1.4, 0.7, "#9ac0a8");
+  shadow(true, 5, 2, 0.1); rr(224, 445, 86, 30, 3, "#c9966b"); shadow(false); rr(222, 442, 90, 5, 2.5, "#efe8dc");
+  for (let k = 0; k < 3; k++) { rr(228 + k * 27.5, 450, 25, 21, 2, mix("#c9966b", -0.05)); rr(238 + k * 27.5, 459, 6, 1.6, 0.8, "#8a6a4a"); }
+  rr(232, 420, 26, 22, 4, "#5d6075"); rr(236, 424, 18, 6, 2, "#3a3d4e"); circle(250, 427, 1.4, "#ef6f6c"); rr(242, 431, 6, 3, 1, "#3a3d4e"); rr(241, 435, 8, 7, 2, "#ffffff");
+  rr(264, 434, 7, 8, 2, "#ffffff"); rr(274, 434, 7, 8, 2, "#e07a4a");
+  // arcade cabinet
+  shadow(true, 6, 2, 0.14); rr(326, 398, 40, 77, 5, "#7a4cb8"); shadow(false); rr(326, 398, 40, 10, 5, "#f2c14e"); text("ZAP", 346, 403.5, 6.5, "#5e3a96", 800, "center");
+  rr(332, 410, 28, 22, 3, "#1e1e33"); rr(326, 436, 40, 8, 3, "#5e3a96"); circle(338, 440, 2, "#ef6f6c"); circle(348, 440, 1.6, "#f2c14e"); circle(354, 440, 1.6, "#7fd0a0"); rr(342, 452, 8, 8, 2, "#5e3a96");
+  plant(384, 475, 1);
+  R(209.4, 339, 1.2, 12, "#8a8fa6");                                                                        // fan mount
+
+  // ===== BEDROOM
+  ceilingLamp(560, 346, 14);
+  windowView(580, 368, 40, 34, sky, { curtain: "#b39ad8" });
+  R(418, 476, 270, 2.4, "#c9b0dc");
+  BEDS.forEach((bx, i) => {
+    rr(bx, 440, 7, 35, 3, "#b07f56"); rr(bx + 66, 452, 6, 23, 3, "#b07f56");          // headboard, footboard
+    rr(bx + 5, 463, 64, 6, 2, "#c9966b"); rr(bx + 9, 469, 3, 6, 1, "#8a6a4a"); rr(bx + 62, 469, 3, 6, 1, "#8a6a4a");
+    rr(bx + 6, 455, 62, 9, 3, "#ffffff");                                              // mattress
+    if (i < 2) { rr(bx + 77, 456, 16, 19, 3, "#c9966b"); rr(bx + 82, 463, 6, 1.6, 0.8, "#8a6a4a"); rr(bx + 84, 446, 2, 10, 1, "#8a8fa6"); poly([[bx + 79, 446], [bx + 91, 446], [bx + 89, 439], [bx + 81, 439]], "#f6e2b0"); }
+  });
+
+  // lift halls: doors in a frame, with a floor display and a call button
   for (const fy of FEET) {
     const top = fy - 50;
-    ob(DOOR_L - 4, top - 4, 48, 56, "#7a7488"); hl(DOOR_L - 3, top - 3, 46, "#9a94a8");
-    R(DOOR_L, top, 40, 51, "#2a2438"); R(DOOR_L - 2, fy + 1, 44, 1.5, "#5a5466");
-  }
-  ceilingLight(753, 62); ceilingLight(753, 206); ceilingLight(753, 350);
-
-  // Each floor's furniture was laid out for the old, shorter floors: shift it down so it stands on the new floor.
-  // Things hanging from the ceiling get longer cords instead.
-  g.save(); g.translate(0, 16);
-  // ================= STUDY (Claude)
-  clipRoom(22, 42, 252, 136);
-  sh(28, 62, 52, 108, "#8a5a36"); R(30, 64, 48, 104, "#5a3a22");
-  for (let s = 0; s < 5; s++) { books(31, 66 + s * 21, 46, 18, 50 + s); R(29, 84 + s * 21, 50, 2, "#a0704a"); hl(29, 84 + s * 21, 50, "#c09060"); }
-  g.save(); g.translate(0, -8); winBox(96, 76, 50, 42, sky, { curtain: "#a84848" }); g.restore();
-  g.save(); g.translate(0, -8); ob(192, 76, 40, 28, "#c9a64a"); R(194, 78, 36, 24, sky.bands[3]); R(194, 92, 36, 10, "#5fae6a"); line(194, 92, 206, 84, "#8a9ab2"); line(206, 84, 214, 90, "#8a9ab2"); R(222, 81, 3, 3, "#fff1b0"); g.restore();
-  R(170, 43, 0.5, 21, OUT); ob(162, 64, 17, 6, "#3a6a4a"); hl(163, 65, 15, "#5a8a6a"); R(168, 70, 5, 1, "#fff1b0");
-  R(140, 169, 130, 2.5, "#a84848");
-  // office chair
-  ob(144, 132, 8, 22, "#3a3448"); hl(145, 133, 6, "#5a5466"); ob(143, 154, 22, 4, "#3a3448"); R(152, 158, 2, 8, "#6b6f80"); R(145, 166, 18, 1, "#6b6f80"); R(144, 167, 2, 2, OUT); R(162, 167, 2, 2, OUT); R(153, 167, 2, 2, OUT);
-  // desk
-  sh(170, 154, 100, 5, "#b0784a"); grain(171, 155, 98, 3, "#9a6438", 9);
-  R(174, 159, 3, 11, "#6b4226"); R(262, 159, 3, 11, "#6b4226"); sh(226, 159, 34, 11, "#a06c42"); R(240, 163, 6, 1, "#e0c070"); hl(227, 164.5, 32, "#7a4e2e");
-  ob(198, 126, 40, 26, "#2c2a3a"); R(216, 152, 4, 2, "#4a4458"); R(210, 153, 16, 1, "#4a4458");
-  ob(180, 152, 16, 2, "#c9c3b0", 0.5); for (let i = 0; i < 7; i++) R(181 + i * 2, 152.5, 1, 0.5, "#8a8496");
-  R(250, 145, 6, 9, "#f4ecd8"); R(256, 147, 2, 4, "#f4ecd8"); hl(250, 146, 6, "#c75b4a");
-  ob(234, 148, 14, 6, "#a84848", 0.5); R(234.5, 148.5, 2, 5, "#7a2e2e"); R(240, 150.5, 6, 1, "#e0c070"); hl(236, 153.5, 12, "#f4ecd8");  // Claude's diary
-  R(176, 146, 1.5, 8, "#3a3448"); line(176.5, 146, 182, 139, "#3a3448", 1); ob(179, 135, 10, 5, "#c9a64a", 0.5);
-
-  g.restore();
-  // ================= CONTROL ROOM (Watcher)
-  clipRoom(282, 42, 252, 136);
-
-  g.save(); g.translate(0, -8); ob(376, 62, 48, 9, "#2a3040"); txt("DAILY", 400 - tw("DAILY") / 2, 63, "#e8f0f6"); g.restore();
-  for (const lx of [330, 470]) ceilingLight(lx, 50);
-  g.save(); g.translate(0, -8); for (let i = 0; i < 6; i++) { const mx = 298 + (i % 3) * 70, my = 72 + Math.floor(i / 3) * 38; R(mx + 31, my - 2, 4, 2, "#5a6470"); sh(mx, my, 66, 34, "#2a3040"); R(mx + 1.5, my + 1.5, 63, 31, "#0b141c"); } g.restore();
-
-  ob(350, 132, 8, 22, "#2a3a5a"); hl(351, 133, 6, "#4a5a7a"); ob(349, 154, 22, 4, "#2a3a5a"); R(358, 158, 2, 8, "#6b6f80"); R(351, 166, 18, 1, "#6b6f80"); R(350, 167, 2, 2, OUT); R(368, 167, 2, 2, OUT);
-  sh(376, 154, 96, 5, "#7a8494"); R(380, 159, 3, 11, "#4a5262"); R(464, 159, 3, 11, "#4a5262"); sh(430, 159, 32, 11, "#6a7484"); R(444, 163, 6, 1, "#c9d0dc");
-  ob(386, 152, 18, 2, "#c9c3b0", 0.5); for (let i = 0; i < 8; i++) R(387 + i * 2, 152.5, 1, 0.5, "#8a8496"); ob(408, 151.5, 4, 2.5, "#e8e4f0", 0.5);
-  R(420, 146, 6, 8, "#f4ecd8"); R(426, 148, 2, 4, "#f4ecd8"); hl(420, 147, 6, "#3f8fe0"); ob(450, 149, 12, 5, "#2a2438", 0.5); R(452, 147, 8, 2, "#2a2438");
-
-
-  R(410, 45, 10, 4, OUT);
-  sh(506, 126, 26, 44, "#8a8494"); for (let k = 0; k < 3; k++) { ob(508.5, 129 + k * 13.5, 21, 12, "#9a94a8", 0.5); R(515, 134 + k * 13.5, 8, 1.5, "#5a5466"); } ob(511, 130.5, 16, 4, "#f4ecd8", 0.5); txt("TRADES", 519 - tw("TRADES", 0.5) / 2, 131.25, OUT, 0.5);  // filing cabinet: the trade records
-
-  g.restore();
-  // ================= NEWSROOM (News Hunter)
-  clipRoom(542, 42, 174, 136);
-  g.save(); g.translate(0, -8); winBox(548, 76, 40, 36, sky, { blinds: 16 }); g.restore();
-  g.save(); g.translate(0, -8); ob(598, 74, 58, 40, "#8a5a36"); R(600, 76, 54, 36, "#d8a86a"); { const rc = rng(31); for (let i = 0; i < 80; i++) R(600 + rc() * 53, 76 + rc() * 35, 0.5, 0.5, "#c09050"); } g.restore();
-  const rn = rng(9), pins = [];
-  g.save(); g.translate(0, -8); for (let i = 0; i < 7; i++) { const px = 602 + ((rn() * 42) | 0), py = 78 + ((rn() * 24) | 0); ob(px, py, 10, 8, i % 3 ? "#ffffff" : "#fff4b0", 0.5); hl(px + 1.5, py + 3, 7, "#8a8496"); hl(px + 1.5, py + 5, 5, "#8a8496"); R(px + 4.5, py - 0.5, 1.5, 1.5, "#e05a4a"); pins.push([px + 5, py]); } g.restore();
-  g.save(); g.translate(0, -8); for (let i = 1; i < pins.length; i++) line(pins[i - 1][0], pins[i - 1][1], pins[i][0], pins[i][1], "#c73b3b", 0.5); g.restore();
-  g.save(); g.translate(0, -8); R(688, 108, 4, 4, "#3a3448"); sh(662, 70, 54, 38, "#1b1b24"); g.restore();
-  ob(548, 132, 12, 38, "#8a5cc8"); for (let i = 0; i < 4; i++) R(553, 138 + i * 7, 1, 1, "#5e3a96"); ob(552, 154, 42, 12, "#9b6bd1"); hl(553, 155, 40, "#b890e8"); ob(586, 146, 10, 14, "#7a4cb8"); R(554, 166, 2, 4, "#3d2a20"); R(590, 166, 2, 4, "#3d2a20");
-  sh(668, 142, 46, 28, "#9aa0ae"); R(672, 146, 38, 8, "#3a3f55"); for (let i = 0; i < 8; i++) for (let j = 0; j < 2; j++) R(673 + i * 4.5, 157 + j * 3.5, 3.5, 2.5, "#e8e4f0"); ob(678, 139, 22, 4, "#f4ecd8", 0.5);
-
-  g.restore();
-  g.restore();
-
-  // ================= TRADING ROOM
-  g.save(); g.translate(0, 32);
-  clipRoom(22, 170, 694, 136);
-  for (const lx of [120, 320, 520]) ceilingLight(lx, 174);
-  sh(28, 178, 684, 24, "#2a2438"); R(30, 180, 680, 20, "#050608"); for (const bx of [31, 708]) for (const by of [181, 198]) R(bx, by, 1, 1, "#9aa0ae");
-  sh(28, 206, 184, 84, "#2a2438"); R(30, 208, 180, 80, "#0b141c");
-  sh(218, 204, 294, 86, "#2a2438"); R(220, 206, 290, 82, "#0b0e14");
-  for (const kx of [560, 610, 660]) {
-    ob(kx + 3, 296, 18, 3, "#2a2438", 0.5); sh(kx + 8, 274, 8, 23, "#4a5068");
-    sh(kx, 250, 24, 26, "#5a6078"); R(kx + 2, 252, 20, 13, "#0b141c"); R(kx + 3, 267, 18, 6, "#3a3f55"); for (let i = 0; i < 4; i++) for (let j = 0; j < 2; j++) R(kx + 4 + i * 4.5, 268 + j * 2.5, 3.5, 1.5, "#c9c6d2");
+    rr(DOOR_L - 4, top - 4, 48, 56, 4, "#b9bfcc"); rr(DOOR_L, top, 40, 51, 2, "#3a3d4e");
+    rr(744, top - 18, 24, 11, 5.5, INK); rr(722, fy - 32, 7, 9, 2, "#c3c8d4");
   }
 
-
-  g.restore();
-  g.restore();
-
-  // ================= LOUNGE
-  g.save(); g.translate(0, 50);
-  clipRoom(22, 296, 374, 136);
-  ceilingLight(110, 300); ceilingLight(300, 300);
-
-  g.save(); g.translate(0, -16); winBox(126, 330, 44, 34, sky, { curtain: "#5aa0a8" }); g.restore();
-
-  // sofa with cushions, side lamp and coffee table
-  sh(30, 378, 110, 20, "#3f9aa0"); for (let i = 0; i < 3; i++) { sh(34 + i * 34, 380, 32, 16, "#4fb0b6"); hl(36 + i * 34, 382, 28, "#7ad0d4"); }
-  sh(26, 394, 118, 18, "#3f8a90"); R(28, 396, 114, 3, "#5aaab0"); sh(24, 386, 10, 26, "#358086"); sh(136, 386, 10, 26, "#358086");
-  ob(40, 384, 12, 10, "#e0b04a", 0.5); ob(118, 385, 11, 9, "#e07a4a", 0.5); R(30, 412, 3, 6, "#3a2a20"); R(137, 412, 3, 6, "#3a2a20");
-  sh(148, 398, 18, 3, "#a0704a"); R(155.5, 401, 1.5, 17, "#6b4226"); R(150, 417, 14, 1.5, "#6b4226"); R(156, 384, 1, 14, "#3a3448"); ob(150, 376, 13, 9, "#f4dcaa", 0.5);
-  sh(56, 408, 64, 4, "#8a5a36"); R(60, 412, 2, 7, "#5a3a22"); R(114, 412, 2, 7, "#5a3a22");
-  R(40, 422.5, 110, 2.5, "#c75b4a");
-  // coffee bar
-  g.save(); g.translate(0, -16); ob(262, 328, 40, 22, "#5a3a24"); R(264, 330, 36, 18, "#2a3a32"); txt("COFFEE", 264.5, 332, "#f4ecd8"); hl(268, 342, 28, "#9ac0a8"); hl(268, 345, 20, "#9ac0a8"); g.restore();
-  sh(224, 390, 84, 30, "#a06c42"); R(222, 388, 88, 3, "#e8e2d4"); hl(222, 388, 88, "#ffffff"); hl(222, 390.5, 88, "#b8b0a0");
-  for (let i = 0; i < 3; i++) { ob(228 + i * 27, 394, 24, 22, "#8a5a36", 0.5); R(238 + i * 27, 404, 4, 1.5, "#e0c070"); }
-  sh(230, 362, 28, 26, "#4a4e5a"); R(232, 364, 24, 6, "#2a2d36"); R(251, 365.5, 2, 2, "#ef4f4f"); R(246, 365.5, 2, 2, "#6fd08c"); ob(238, 372, 12, 4, "#22262f", 0.5); R(243, 376, 2, 3, "#22262f"); R(239, 380, 8, 7, "#ffffff"); hl(239, 381, 8, "#6b4226");
-  sh(262, 368, 12, 20, "#2a2d36"); R(264, 360, 8, 8, "#d8dee8"); R(264, 360, 8, 3, "#6b4226");
-  R(278, 381, 6, 7, "#ffffff"); R(286, 381, 6, 7, "#e07a4a"); R(294, 382, 8, 6, "#d8c098"); hl(294, 382, 8, "#f4e8c8");
-  // arcade cabinet
-  sh(328, 344, 36, 76, "#5e3a96"); R(330, 346, 32, 9, "#f2c14e"); txt("ZAP", 337.5, 347, "#5e3a96"); vl(330, 356, 62, "#8a5cc8"); vl(361.5, 356, 62, "#3f2470");
-  ob(333, 357, 26, 22, "#0b0b16"); sh(328, 380, 36, 10, "#4a2a7a"); R(338, 382, 1.5, 4, "#9aa0ae"); R(337, 381, 3.5, 2, "#ef4f4f"); R(346, 384, 3, 2, "#f2c14e"); R(351, 384, 3, 2, "#6fd08c"); R(356, 384, 3, 2, "#5aa9e6");
-  ob(342, 396, 8, 8, "#2a1a48", 0.5); R(345, 398, 2, 4, "#f2c14e"); for (let y = 408; y < 418; y += 3) hl(332, y, 28, "#7a4cb8");
-  plant(374, 418, 0.9);
-
-  g.restore();
-  g.restore();
-
-  // ================= BEDROOM: one bed per agent
-  clipRoom(404, 346, 312, 136);
-  R(560, 346, 0.5, 14, OUT); ob(552, 360, 17, 5, "#c9a64a"); hl(553, 361, 15, "#e0c070");
-  winBox(578, 368, 40, 32, sky, { curtain: "#7a5aa8" });
-  R(420, 476.5, 270, 2.5, "#9a6ab8");
-  BEDS.forEach((bx, i) => {
-    const col = COLOR[AG[i]];
-    sh(bx, 440, 8, 35, "#8a5a36"); R(bx + 2, 444, 4, 1, "#a87a50");
-    sh(bx + 66, 454, 6, 21, "#8a5a36");
-    R(bx + 6, 465, 61, 6, "#6b4226"); R(bx + 8, 471, 2, 4, "#5a3a22"); R(bx + 63, 471, 2, 4, "#5a3a22");
-    sh(bx + 6, 457, 61, 8, "#f4f0e8");
-    if (i < 2) { sh(bx + 76, 458, 16, 17, "#a0704a"); R(bx + 82, 465, 4, 1, "#e0c070"); R(bx + 83, 450, 2, 8, "#3a3448"); ob(bx + 78, 444, 12, 7, "#f4dcaa", 0.5); }
-  });
-  g.restore();
-  if (night) { g.fillStyle = "rgba(8,6,30,.5)"; g.fillRect(8, 50, 784, 440); }
-  else if (!dayish) { g.fillStyle = "rgba(20,12,40,.2)"; g.fillRect(8, 50, 784, 440); }
+  if (night) { g.fillStyle = "rgba(14,16,46,.42)"; g.fillRect(8, 48, 784, 442); }
+  else if (sky.k !== "day") { g.fillStyle = "rgba(60,40,90,.12)"; g.fillRect(8, 48, 784, 442); }
   g = main;
 }
 
@@ -679,14 +577,15 @@ function heatItems() {
 }
 function drawHeatmap(x, y, w, h, open) {
   const items = heatItems();
-  if (!items.length) { txt("NO HOLDINGS", x + (w - tw("NO HOLDINGS")) / 2, y + h / 2 - 3, "#4a5568"); return; }
+  if (!items.length) { text("No holdings", x + w / 2, y + h / 2, 7, "#6a6f8c", 600, "center"); return; }
   for (const c of squarify(items, x, y, w, h)) {
-    const rx = Math.round(c.x), ry = Math.round(c.y), rw = Math.round(c.x + c.w) - rx, rh = Math.round(c.y + c.h) - ry;
-    R(rx, ry, rw, rh, "#0b0e14"); R(rx + 1, ry + 1, rw - 2, rh - 2, open ? heatColor(c.today) : mix(heatColor(c.today), -0.6));
+    const rw = c.w - 1.2, rh = c.h - 1.2, cx = c.x + c.w / 2, cy = c.y + c.h / 2;
+    rr(c.x + 0.6, c.y + 0.6, rw, rh, 2, open ? heatColor(c.today) : mix(heatColor(c.today), -0.6));
     const p = (c.today >= 0 ? "+" : "") + c.today.toFixed(1) + "%";
-    if (rw >= tw(c.s) + 4 && rh >= 19) { txt(c.s, rx + (rw - tw(c.s)) / 2, ry + rh / 2 - 8, "#ffffff"); if (rw >= tw(p) + 4) txt(p, rx + (rw - tw(p)) / 2, ry + rh / 2 + 1, "#e8e4f0"); else if (rw >= tw(p, 0.5) + 2) txt(p, rx + (rw - tw(p, 0.5)) / 2, ry + rh / 2 + 1, "#e8e4f0", 0.5); }
-    else if (rw >= tw(c.s) + 2 && rh >= 9) txt(c.s, rx + (rw - tw(c.s)) / 2, ry + (rh - 7) / 2, "#ffffff");
-    else if (rw >= tw(c.s, 0.5) + 2 && rh >= 6) txt(c.s, rx + (rw - tw(c.s, 0.5)) / 2, ry + (rh - 3.5) / 2, "#ffffff", 0.5);
+    const size = Math.max(3.5, Math.min(9, rh / 3, rw / (c.s.length * 0.75 + 0.5)));
+    if (size < 3.6 && rw < 10) continue;
+    if (rh >= size * 2.6 && rw >= textW(p, size * 0.8) + 2) { text(c.s, cx, cy - size * 0.55, size, "#ffffff", 800, "center"); text(p, cx, cy + size * 0.6, size * 0.8, "#eef0f6", 600, "center"); }
+    else text(c.s, cx, cy, size, "#ffffff", 800, "center");
   }
 }
 
@@ -763,18 +662,6 @@ function think(instant) {
     else if (a.phase === "wait" && SP[a.want].f === a.floor) { lift.queue = lift.queue.filter((q) => q !== a); route(a); }
   }
 }
-function frameOf(a) {
-  const dir = a.dir > 0 ? "right" : "left";
-  if (WALKING.has(a.phase)) { const k = ((a.walkT / 14) | 0) % 2; return { key: `${dir}-${k ? "walkA" : "stand"}`, bob: k ? -1 : 0 }; }
-  if (a.phase === "wait") return { key: "right-stand", bob: 0 };
-  if (a.phase === "out") return { key: "left-stand", bob: 0 };
-  if (a.phase !== "idle") return { key: "front-stand", bob: 0 };
-  const s = SP[a.at] || {}, act = a.plan.act, body = s.seat ? "sit" : "stand";
-  if (act === "sleep") return { key: `front-${body}-z`, bob: 0 };
-  const busy = act === "type" || act === "trade";
-  return { key: `${dir}-${body}`, bob: busy && ((T / 45) | 0) % 2 ? -1 : 0 };  // a slow, small nod while working
-}
-
 // ================================================================ things that move every frame
 let T = 0, FR = 1;  // T: time in 60ths of a second; FR: length of this frame in the same unit
 function dayPoints(date) {
@@ -783,210 +670,174 @@ function dayPoints(date) {
   return out;
 }
 let ptsCache = { key: "", pts: [] };
+function clipTo(x, y, w, h) { g.save(); g.beginPath(); g.roundRect(x, y, w, h, 2); g.clip(); }
 function live(t) {
-  const sky = skyOf(t), night = sky.k === "night", open = isOpen(t);
-  const A = agents;
+  const sky = skyOf(t), night = sky.k === "night", open = isOpen(t), A = agents, wx = weatherOf();
   // roof sign and antenna light
-  const flick = night && hash(String((T / 9) | 0)) % 23 === 0;
-  if (!flick) { const s = "LARP CAPITAL"; txt(s, 400 - tw(s, 2) / 2, 13, sky.k === "day" ? "#e0b040" : "#f2c14e", 2); if (sky.k !== "day") glow(400, 20, 110, "242,193,78", 0.12); }
-  if (((T / 40) | 0) % 2) { R(762.5, 6.5, 3.5, 2.5, "#ef4f4f"); if (night) glow(764, 8, 8, "239,79,79", 0.5); }
-  for (const [lx, ly] of LAMPS) if (sky.k !== "day") glow(lx, ly, 26, "255,231,160", 0.28);
-  if (night) { glow(170, 88, 40, "255,226,150", 0.22); glow(184, 154, 22, "255,226,150", 0.3); glow(156, 430, 24, "255,226,150", 0.3); glow(500, 446, 16, "255,226,150", 0.35); glow(600, 446, 16, "255,226,150", 0.35); }
-
-  g.save(); g.translate(0, 16);  // top floor furniture sits 16 lower than its drawing coordinates
-
-  const wx = weatherOf();
+  rr(300, 12, 200, 18, 9, INK); text("LARP CAPITAL", 400, 21.5, 10, "#f2c14e", 800, "center");
+  if (sky.k !== "day") glow(400, 21, 110, "242,193,78", 0.1);
+  if (((T / 40) | 0) % 2) { circle(765, 9, 1.8, "#ef4f4f"); if (night) glow(765, 9, 8, "239,79,79", 0.5); }
+  if (sky.k !== "day") for (const [lx, ly] of LAMPS) glow(lx, ly, 28, "255,231,160", 0.3);
+  if (night) { glow(168, 84, 40, "255,226,150", 0.22); glow(184, 142, 22, "255,226,150", 0.3); glow(157, 424, 26, "255,226,150", 0.3); glow(560, 368, 50, "255,226,150", 0.16); for (const bx of BEDS.slice(0, 2)) glow(bx + 85, 443, 14, "255,226,150", 0.35); }
+  // rain and lightning, outside the building and inside the windows
   if (wx === "rain" || wx === "storm") {
-    const n = Math.round((wx === "storm" ? 260 : 150) * (1 + VIEW.ex / 400 + VIEW.ey / 250)), rr = rng(5);
+    const n = Math.round((wx === "storm" ? 220 : 130) * (1 + VIEW.ex / 400 + VIEW.ey / 250)), rr2 = rng(5);
+    g.strokeStyle = "rgba(200,212,236,.6)"; g.lineWidth = 0.8; g.beginPath();
     for (let i = 0; i < n; i++) {
-      const span = W + VIEW.ex * 2 + 40, top = -VIEW.ey - 20, hgt = 508 - top, x0 = rr() * span, sp = 2.5 + rr() * 1.5, y = (rr() * hgt + T * sp) % hgt + top, x = ((x0 - y * 0.25) % span + span) % span - VIEW.ex - 20;
-      if (y > 43 && y < 488 && x > 7 && x < 793) continue;
-      R(x, y, 0.5, 3, "#c8d4ec88");
+      const span = W + VIEW.ex * 2 + 40, top = -VIEW.ey - 20, hgt = 508 - top, x0 = rr2() * span, sp = 2.5 + rr2() * 1.5, y = (rr2() * hgt + T * sp) % hgt + top, x = ((x0 - y * 0.25) % span + span) % span - VIEW.ex - 20;
+      if (y > 42 && y < 488 && x > 7 && x < 793) continue;
+      g.moveTo(x, y); g.lineTo(x - 1, y + 4);
     }
+    g.stroke();
     for (const [x, y, w, h] of WINDOWS) {
-      g.save(); g.beginPath(); g.rect(x, y, w, h); g.clip();
-      for (let k = 0; k < w / 3; k++) { const dx = (k * 37) % w, dy = (k * 53 + T * (2.5 + (k % 3) * 0.5)) % (h + 6) - 4; R(x + dx, y + dy, 0.5, 2.5, "#dfe8ff99"); }
-      if (wx === "storm" && T % 520 < 6) { g.fillStyle = "rgba(255,255,255,.55)"; g.fillRect(x, y, w, h); }
-      g.restore();
+      clipTo(x, y, w, h); g.strokeStyle = "rgba(230,238,255,.75)"; g.beginPath();
+      for (let k = 0; k < w / 3; k++) { const dx = (k * 37) % w, dy = (k * 53 + T * (2.5 + (k % 3) * 0.5)) % (h + 6) - 4; g.moveTo(x + dx, y + dy); g.lineTo(x + dx - 0.6, y + dy + 3); }
+      g.stroke(); if (wx === "storm" && T % 520 < 6) { g.fillStyle = "rgba(255,255,255,.55)"; g.fillRect(x, y, w, h); } g.restore();
     }
-    if (wx === "storm" && T % 520 < 6) { g.fillStyle = "rgba(255,255,255,.35)"; g.fillRect(-VIEW.ex - 1, -VIEW.ey - 1, W + VIEW.ex * 2 + 2, 45 + VIEW.ey); const bx = 120 + (T / 520 | 0) * 173 % 560; line(bx, 0, bx - 6, 14, "#fff8c0", 1); line(bx - 6, 14, bx + 2, 22, "#fff8c0", 1); line(bx + 2, 22, bx - 4, 40, "#fff8c0", 1); }
+    if (wx === "storm" && T % 520 < 6) { g.fillStyle = "rgba(255,255,255,.35)"; g.fillRect(-VIEW.ex - 1, -VIEW.ey - 1, W + VIEW.ex * 2 + 2, 43 + VIEW.ey); const bx = 120 + (T / 520 | 0) * 173 % 560; stroke([[bx, 0], [bx - 6, 14], [bx + 2, 22], [bx - 4, 40]], "#fff8c0", 1.4); }
   }
 
   // Claude's monitor
-  const c = A.claude, atDesk = c.phase === "idle" && c.at === "desk";
-  R(200, 128, 36, 22, "#0e1620");
+  const c = A.claude, atDesk = c.phase === "idle" && c.at === "desk", [sx, sy, sw, sh] = L.claudeScreen;
+  rr(sx, sy, sw, sh, 2, "#1f2a40");
   if (atDesk && c.plan.act !== "sleep") {
-    R(200, 128, 36, 3, "#2a3a5a"); R(202, 128.5, 1, 1, "#ef6f6c"); R(204, 128.5, 1, 1, "#f2c14e");
-    for (let i = 0; i < 8; i++) { const w = c.plan.act === "type" ? ((T / 18 + i * 5) | 0) % 28 + 3 : 8 + (i * 7) % 20; R(202, 133 + i * 2, w, 1, i % 3 ? "#7fb8ff" : "#6fd08c"); }
-    if (night) glow(218, 139, 22, "127,184,255", 0.18);
-  } else if (((T / 50) | 0) % 2) R(233, 147, 1, 1, "#6fd08c");
+    for (let i = 0; i < 6; i++) { const w = c.plan.act === "type" ? ((T / 18 + i * 5) | 0) % 24 + 4 : 8 + (i * 7) % 18; rr(sx + 3, sy + 3 + i * 3.4, w, 1.5, 0.75, i % 3 ? "#8ab8ff" : "#7fd0a0"); }
+    if (night) glow(sx + sw / 2, sy + sh / 2, 22, "127,184,255", 0.16);
+  }
 
-  // Watcher's wall: six holdings and how they move today
-  // pages of six: with 8 holdings, one page of six and one of two; spare screens stay on in standby
+  // Watcher's wall: pages of six holdings, today's move; spare screens and closed hours show standby
   const hs = heatItems(), pages = Math.max(1, Math.ceil(hs.length / 6)), page = Math.floor(T / 300) % pages;
-  if (pages > 1) for (let p = 0; p < pages; p++) R(428 + p * 3, 57.5, 2, 2, p === page ? "#6fd08c" : "#3a4252");
+  if (pages > 1) for (let p = 0; p < pages; p++) circle(430 + p * 4.5, 68, 1.4, p === page ? "#2f9e5e" : "#c3c8d4");
   for (let i = 0; i < 6; i++) {
-    const mx = 299.5 + (i % 3) * 70, my = 65.5 + Math.floor(i / 3) * 38;
-    const h = open ? hs[page * 6 + i] : null;  // screens rest while the market is closed
-    if (!h) { R(mx, my, 63, 31, "#0e1a26"); for (let gx = mx + 2; gx < mx + 62; gx += 8) vl(gx, my + 2, 27, "#132232"); txt("--", mx + 26, my + 12, "#2e4a5e"); continue; }
-    const col = h.today >= 0 ? "#6fd08c" : "#ef6f6c", lbl = (h.today >= 0 ? "+" : "") + h.today.toFixed(1) + "%";
-    txt(h.s, mx + 3, my + 3, "#c9d6e6"); txt(lbl, mx + 60 - tw(lbl), my + 3, col);
-    for (let gx = mx + 2; gx < mx + 62; gx += 8) vl(gx, my + 12, 17, "#142030");
-    const r = rng(hash(h.s + t.date)), tilt = Math.max(-1, Math.min(1, h.today / 2));
-    let y = 0, px = mx + 2, py = my + 21;
-    for (let k = 0; k < 59; k += 0.5) { y += (r() - 0.5) * 1.2 - tilt * 0.06; y = Math.max(-7, Math.min(7, y)); const yy = my + 21 + y; line(px, py, mx + 2 + k, yy, col, 0.5); px = mx + 2 + k; py = yy; }
-    if (night) glow(mx + 32, my + 16, 28, h.today >= 0 ? "111,208,140" : "239,111,108", 0.08);
+    const mx = 288 + (i % 3) * 70, my = 78 + Math.floor(i / 3) * 44, h = open ? hs[page * 6 + i] : null;
+    if (!h) { circle(mx + 33, my + 18, 1.6, "#3a3f58"); continue; }
+    const up = h.today >= 0, col = up ? "#7fd0a0" : "#ff8a8a";
+    text(h.s, mx + 6, my + 8, 7, "#e8ecf6", 700); text((up ? "+" : "") + h.today.toFixed(1) + "%", mx + 60, my + 8, 7, col, 700, "right");
+    const r = rng(hash(h.s + t.date)), tilt = Math.max(-1, Math.min(1, h.today / 2)); let v = 0; const pts = [];
+    for (let k = 0; k <= 14; k++) { v += (r() - 0.5) * 2.4 - tilt * 0.35; v = Math.max(-7, Math.min(7, v)); pts.push([mx + 6 + k * 3.9, my + 24 + v]); }
+    stroke(pts, col, 1.4);
+    if (night) glow(mx + 33, my + 18, 26, up ? "111,208,140" : "239,111,108", 0.07);
   }
-
-
   const on = A.watch.plan.stop && ((T / 8) | 0) % 2;
-  R(411, 46, 8, 2.5, on ? "#ff3b3b" : "#7a2a2a");
-  if (on) { glow(415, 48, 60, "255,40,40", 0.25); g.fillStyle = "rgba(255,40,40,.08)"; g.fillRect(279, 43, 260, 134); }
+  rr(406, 61, 10, 3, 1.5, on ? "#ff3b3b" : "#a55");
+  if (on) { glow(411, 63, 60, "255,40,40", 0.25); g.fillStyle = "rgba(255,40,40,.07)"; g.fillRect(280, 58, 258, 136); }
 
-  // Newsroom TV with the latest News Hunter line
-  g.save(); g.translate(0, -8);
-  const lastNews = lastEvent("news", t, false), head = (lastNews && (lastNews.summary || lastNews.full)) || "MARKETS TODAY";
-  R(664, 72, 50, 34, "#0b0b12");
+  // Newsroom TV with the News Hunter's latest line
+  const [tx, ty, tw2, th] = L.tv, lastNews = lastEvent("news", t, false), head = (lastNews && (lastNews.summary || lastNews.full)) || "Markets today";
+  shadow(true, 6, 2, 0.12); rr(tx, ty, tw2, th, 4, "#1e2235"); shadow(false);
   if (open || !night) {
-    R(664, 72, 50, 34, "#16203a"); R(664, 72, 50, 7, "#c73b3b"); txt("NEWS", 666, 72, "#f4ecd8"); if (((T / 30) | 0) % 2) { ob(706, 73.5, 5, 4, "#ffffff", 0.5); R(707, 74.5, 3, 2, "#ff3b3b"); }
-    ob(668, 82, 10, 11, "#ffffff", 0.5); R(668.5, 82.5, 9, 2, "#2a2a36"); R(670.5, 86, 1, 1.5, OUT); R(674.5, 86, 1, 1.5, OUT); R(667, 93, 12, 3, "#3567a3");
-    R(683, 83, 26, 1.5, "#7fb8ff"); R(683, 87, 20, 1.5, "#7fb8ff"); R(683, 91, 23, 1.5, "#4a6a9a");
-    R(664, 98, 50, 7, "#f2c14e");
-    g.save(); g.beginPath(); g.rect(664, 98, 50, 7); g.clip();
-    const s = head.toUpperCase().replace(/[^A-Z0-9 .,%$&!?'()/+-]/g, ""), len = tw(s) + 50;
-    txt(s, 714 - ((T / 6) % len), 98, OUT); g.restore();
-    if (night) glow(689, 88, 30, "127,160,255", 0.12);
+    rr(tx + 3, ty + 3, tw2 - 6, 7, 2, "#d64545"); text("NEWS", tx + 6, ty + 6.6, 5.5, "#ffffff", 800); if (((T / 30) | 0) % 2) circle(tx + tw2 - 7, ty + 6.5, 1.5, "#ffffff");
+    circle(tx + 11, ty + 17, 4, "#ffffff"); rr(tx + 18, ty + 14, 26, 2, 1, "#8ab8ff"); rr(tx + 18, ty + 18, 18, 2, 1, "#8ab8ff");
+    rr(tx + 3, ty + th - 10, tw2 - 6, 7, 1.5, "#f2c14e"); clipTo(tx + 3, ty + th - 10, tw2 - 6, 7);
+    const len = textW(head, 5) + 40; text(head, tx + tw2 - 3 - ((T / 6) % len), ty + th - 6.4, 5, INK, 600); g.restore();
+    if (night) glow(tx + tw2 / 2, ty + th / 2, 30, "127,160,255", 0.1);
   }
-  g.restore();
   const n = A.news;
-  if (n.phase === "idle" && n.at === "teletype") { const p = (T / 10) % 18; R(681, 139 - p, 16, p + 1, "#ffffff"); for (let i = 1; i < p; i += 2) hl(683, 139 - i, 10 - (i % 3) * 2, "#8a8496"); }
-  if (n.phase === "idle" && n.at === "armchair") {
-    if (n.plan.act === "sleep") { ob(566, 160, 18, 4, "#ffffff", 0.5); hl(568, 161.5, 14, "#8a8496"); }
-    else { const up = (T % 400) > 320 ? 3 : 0; ob(574, 140 + up, 20, 20, "#ffffff", 0.5); R(576, 142 + up, 16, 2, OUT); for (let i = 0; i < 6; i++) hl(576, 146 + up + i * 2, i % 2 ? 7 : 16, "#8a8496"); vl(584, 141 + up, 18, "#d8d0bc"); }
-  }
+  if (n.phase === "idle" && n.at === "teletype") { const p = (T / 10) % 16; rr(684, 141 - p, 14, p + 2, 1, "#ffffff"); for (let i = 2; i < p; i += 3) rr(686, 141 - i, 9 - (i % 4), 0.9, 0.4, "#b8b4c4"); }
 
-  g.restore();
-
-  // Trading room: ticker, chart, heatmap, terminals, bell, coins
-  g.save(); g.translate(0, 32);
+  // Trading room: ticker, chart, heatmap, terminals, coins
   const trades = AG.filter((id) => A[id].phase === "idle" && A[id].at === "term_" + id);
-  let tick = hs.map((h) => `${h.s} ${h.today >= 0 ? "+" : ""}${h.today.toFixed(1)}%`).join("   ");
-  if (trades.length) tick = trades.map((id) => `${NAME[id]}: ${A[id].plan.say}`).join("   ") + "   " + tick;
-  g.save(); g.beginPath(); g.rect(30, 180, 680, 20); g.clip();
-  for (let x = 30; x < 710; x += 1) if (x % 2 === 0) vl(x, 180, 20, "#0b0d12");
-  if (tick) { const len = tw(tick, 2) + 240, off = (T * 0.35) % len; for (let rep = 0; rep < 2; rep++) drawTicker(tick, 708 - off + rep * len, 183, hs, open); }
+  let tick = hs.map((h) => `${h.s} ${h.today >= 0 ? "+" : ""}${h.today.toFixed(1)}%`).join("      ");
+  if (trades.length) tick = trades.map((id) => `${NAME[id]}: ${A[id].plan.say}`).join("      ") + "      " + tick;
+  clipTo(...L.ticker);
+  if (tick) { const len = textW(tick, 10, 700) + 200, off = (T * 0.35) % len; for (let rep = 0; rep < 2; rep++) drawTicker(tick, 706 - off + rep * len, 222, hs, open); }
   g.restore();
   const key = t.date + "|" + (D.intraday.points || []).length;
   if (ptsCache.key !== key) ptsCache = { key, pts: dayPoints(t.date) };
-  const pts = ptsCache.pts.filter((p) => p[0] <= t.min);
-  for (let gx = 34; gx < 208; gx += 12) vl(gx, 220, 66, "#122230");
-  for (let gy = 224; gy < 286; gy += 10) hl(32, gy, 176, "#122230");
+  const pts = ptsCache.pts.filter((p) => p[0] <= t.min), [cx0, cy0, cw0, ch0] = L.chart;
+  for (let gy = cy0 + 20; gy < cy0 + ch0 - 4; gy += 14) R(cx0 + 6, gy, cw0 - 12, 0.5, "#2c3150");
   if (pts.length > 1) {
     const a0 = pts[0][1], s0 = pts[0][2], ai = pts.map((p) => (p[1] / a0 - 1) * 100), sp = pts.map((p) => (p[2] / s0 - 1) * 100);
-    const lo = Math.min(...ai, ...sp, -0.3), hi = Math.max(...ai, ...sp, 0.3);
-    const m0 = pts[0][0], span = Math.max(pts.at(-1)[0] - m0 + 20, 60);
-    const px = (m) => 34 + 170 * (m - m0) / span, py = (v) => 284 - (v - lo) / (hi - lo) * 60;
-    hl(32, py(0), 176, "#2a4a60");
-    for (const [arr, col] of [[sp, "#ef6f6c"], [ai, "#6fd08c"]]) for (let i = 1; i < pts.length; i++) line(px(pts[i - 1][0]), py(arr[i - 1]), px(pts[i][0]), py(arr[i]), col, 1);
+    const lo = Math.min(...ai, ...sp, -0.3), hi = Math.max(...ai, ...sp, 0.3), m0 = pts[0][0], span = Math.max(pts.at(-1)[0] - m0 + 20, 60);
+    const px = (m) => cx0 + 8 + (cw0 - 16) * (m - m0) / span, py = (v) => cy0 + ch0 - 6 - (v - lo) / (hi - lo) * (ch0 - 26);
+    stroke(pts.map((p, i) => [px(p[0]), py(sp[i])]), "#ff8a8a", 1.3); stroke(pts.map((p, i) => [px(p[0]), py(ai[i])]), "#7fd0a0", 1.6);
     const fa = ai.at(-1), fs = sp.at(-1), f = (v) => (v >= 0 ? "+" : "") + v.toFixed(1) + "%";
-    txt("AI " + f(fa), 34, 211, fa >= fs ? "#6fd08c" : "#ef6f6c"); txt("S&P " + f(fs), 94, 211, "#c9c0d8");
-  } else { const m = open ? "LOADING" : "CLOSED"; txt(m, 30 + (180 - tw(m)) / 2, 244, "#4a5568"); }
-  drawHeatmap(221, 207, 288, 80, open);
-  [560, 610, 660].forEach((kx, i) => {
+    text("AI " + f(fa), cx0 + 8, cy0 + 9, 7, fa >= fs ? "#7fd0a0" : "#ff8a8a", 700); text("S&P " + f(fs), cx0 + 70, cy0 + 9, 7, "#c9c6d8", 700);
+  } else text(open ? "Loading…" : "Market closed", cx0 + cw0 / 2, cy0 + ch0 / 2, 7, "#6a6f8c", 600, "center");
+  drawHeatmap(L.heat[0] + 4, L.heat[1] + 4, L.heat[2] - 8, L.heat[3] - 8, open);
+  L.terminals.forEach((kx, i) => {
     const id = ["claude", "news", "watch"][i], busy = trades.includes(id);
-    R(kx + 2, 252, 20, 13, busy ? "#0f2418" : "#0b141c");
-    if (busy) { const p = A[id].plan; if (((T / 10) | 0) % 2) txt(p.side, kx + 12 - tw(p.side, 0.5) / 2, 256.5, p.side === "BUY" ? "#6fd08c" : "#ef6f6c", 0.5); if (night) glow(kx + 12, 258, 18, "111,208,140", 0.2); }
-    else if (open) { hl(kx + 4, 255, 12, "#2f6b45"); hl(kx + 4, 258, 8, "#2f6b45"); hl(kx + 4, 261, 10, "#2f6b45"); }
+    if (busy) { const p = A[id].plan; if (((T / 10) | 0) % 2) text(p.side, kx + 12, 289, 6, p.side === "BUY" ? "#7fd0a0" : "#ff8a8a", 800, "center"); if (night) glow(kx + 12, 289, 18, "111,208,140", 0.2); }
+    else if (open) { rr(kx + 5, 286, 10, 1.4, 0.7, "#3f7a58"); rr(kx + 5, 290, 7, 1.4, 0.7, "#3f7a58"); }
   });
-  for (const id of trades) { const kx = { claude: 560, news: 610, watch: 660 }[id]; for (let k = 0; k < 7; k++) { const ph = (T * 0.4 + k * 9) % 44; ob(kx + 3 + ((k * 5) % 18), 246 - ph, 2.5, 2.5, ph < 32 ? "#f2c14e" : "#b8923a", 0.5); } }
+  for (const id of trades) { const kx = { claude: 560, news: 610, watch: 660 }[id]; for (let k = 0; k < 7; k++) { const ph = (T * 0.4 + k * 9) % 44; circle(kx + 4 + ((k * 5) % 16), 276 - ph, 1.6, ph < 32 ? "#f2c14e" : "#d9b04a"); } }
 
-  g.restore();
+  // Lounge: employee of the month, steam, arcade, ceiling fan
+  topAgentFrame(...L.frame);
+  if (AG.some((id) => A[id].phase === "idle" && A[id].at === "coffee_" + id)) for (let k = 0; k < 3; k++) { const p = (T / 18 + k * 3) % 10; circle(244 + k * 2.5, 416 - p, 1.2, `rgba(255,255,255,${0.8 - p / 12})`); }
+  const playing = A.watch.phase === "idle" && A.watch.at === "arcade", [ax, ay, aw, ah] = L.arcadeScreen;
+  rr(ax, ay, aw, ah, 2, playing ? "#141838" : "#1e1e33");
+  if (playing) { circle(ax + 3 + ((T / 10) | 0) % 18, ay + 10, 1.4, "#7fd0a0"); circle(ax + 12, ay + 3 + ((T / 18) | 0) % 13, 1.4, "#ff8a8a"); text(String((T / 20 | 0) % 1000).padStart(3, "0"), ax + aw - 2, ay + 3.5, 4, "#f2c14e", 700, "right"); if (night) glow(ax + aw / 2, ay + ah / 2, 22, "127,184,255", 0.2); }
+  for (let k = 0; k < 3; k++) { const l = 14 * Math.cos(T / 14 + k * 2.094); rr(Math.min(210, 210 + l), 353.6, Math.abs(l), 1.8, 0.9, "#b07f56"); } rr(206, 350.5, 8, 4.5, 2, "#8a6a4a");  // ceiling fan seen from the side
 
-  // Lounge: steam, arcade, ceiling fan, employee of the month
-  g.save(); g.translate(0, 50);
-  g.save(); g.translate(0, -16); topAgentFrame(24, 318, 96, 70); g.restore();
-  if (AG.some((id) => A[id].phase === "idle" && A[id].at === "coffee_" + id)) for (let k = 0; k < 4; k++) R(240 + k * 2, 376 - ((T / 18 + k * 3) % 10), 1, 2, "#ffffff");
-  const playing = A.watch.phase === "idle" && A.watch.at === "arcade";
-  R(334, 358, 24, 20, playing ? "#101028" : "#0b0b16");
-  if (playing) { R(336 + ((T / 10) | 0) % 20, 366, 2, 2, "#6fd08c"); R(344, 360 + ((T / 18) | 0) % 14, 2, 2, "#ef6f6c"); hl(336, 375, 20, "#7fb8ff"); txt(String((T / 20 | 0) % 1000).padStart(3, "0"), 349, 359.5, "#f2c14e", 0.5); if (night) glow(346, 368, 22, "127,184,255", 0.2); }
-  else if (((T / 60) | 0) % 2) txt("ZAP", 337.5, 364, "#3a2a5a");
-  R(210, 296, 1, 25, OUT); ob(206, 320, 9, 3, "#5a3a24", 0.5);
-  const fa = (T / 14) % Math.PI; for (const dx of [-1, 1]) R(210.5 + (dx < 0 ? -18 * Math.abs(Math.cos(fa)) : 0), 322, 18 * Math.abs(Math.cos(fa)), 1, "#8a5a36");
-  g.restore();
-
-  // beds: pillow always, blanket on empty beds (a sleeper gets theirs drawn over them)
+  // beds: pillow always, a made blanket on empty beds (a sleeper gets theirs drawn over them)
   BEDS.forEach((bx, i) => {
-    ob(bx + 7, 451, 14, 6, "#ffffff", 0.5); hl(bx + 8, 455, 12, "#d8d4e0");
+    rr(bx + 8, 448, 16, 8, 4, "#ffffff", "#e2ddeb", 0.8);
     const a = agents[AG[i]];
-    if (!(a.phase === "idle" && a.at === "bed_" + AG[i])) blanket(bx, COLOR[AG[i]], true);
+    if (!(a.phase === "idle" && a.at === "bed_" + AG[i])) blanket(bx, AC[AG[i]], true);
   });
 }
 function blanket(bx, col, made) {
-  const x = made ? bx + 24 : bx + 19, w = made ? 43 : 48, y = made ? 452 : 448;
-  ob(x, y, w, 461 - y, col, 0.5); R(x + 0.5, y + 0.5, 3, 461 - y - 1, mix(col, 0.2)); R(x + 0.5, y + 0.5, w - 1, 2, mix(col, 0.35)); for (let k = x + 6; k < x + w - 2; k += 8) vl(k, y + 3, 458 - y, mix(col, -0.15));
+  const x = made ? bx + 26 : bx + 20, w = made ? 42 : 48, y = made ? 453 : 449;
+  rr(x, y, w, 464 - y, 3, col); rr(x, y, w, 3, 1.5, mix(col, 0.35));
+}
+function topAgentFrame(x, y, w, h) {  // "employee of the month": gold frame, red ribbon, the agent, its result
+  const star = bestAgent(), cx = x + w / 2;
+  shadow(true, 6, 2, 0.15); rr(x, y, w, h, 4, "#d9a441"); shadow(false); rr(x + 3, y + 3, w - 6, h - 6, 2.5, "#2a2440");
+  rr(x + 14, y + 7, w - 28, 10, 5, "#d64545"); text("TOP AGENT", cx, y + 12.3, 6, "#ffffff", 800, "center");
+  if (!star) { text("Nobody yet", cx, y + h / 2 + 4, 7, "#8a84a8", 600, "center"); return; }
+  g.save(); g.translate(cx, y + 50); g.scale(0.62, 0.62); figure(star.id, 0, 0, { front: true }); g.restore();
+  rr(cx - 10, y + 50, 20, 2, 1, "#d9a441");
+  text(NAME[star.id], cx, y + 57, 5.5, COLOR[star.id], 700, "center");
+  text(`${star.v >= 0 ? "+" : ""}${star.v.toFixed(1)}% vs S&P`, cx, y + 64.5, 6.5, star.v >= 0 ? "#7fd0a0" : "#ff8a8a", 800, "center");
 }
 // the agent beating the S&P by the most on its buys (avg return vs the S&P over the same days)
-function topAgentFrame(x, y, w, h) {  // "employee of the month": gold frame, red ribbon, the agent on a little stand
-  const star = bestAgent(), cx = x + w / 2;
-  ob(x, y, w, h, "#b8892e"); R(x + 1, y + 1, w - 2, 1, "#f2d27a"); R(x + 1, y + h - 2, w - 2, 1, "#7a5a1e"); vl(x + 1, y + 1, h - 2, "#f2d27a");
-  ob(x + 3, y + 3, w - 6, h - 6, "#2a1f3a", 0.5); R(x + 3.5, y + 3.5, w - 7, 1, "#3a2c50");
-  for (const [dx, dy] of [[5, 5], [w - 7, 5], [5, h - 7], [w - 7, h - 7]]) R(x + dx, y + dy, 2, 2, "#f2d27a");
-  R(x + 14, y + 8, w - 28, 8, "#c73b3b"); R(x + 14, y + 8, w - 28, 0.5, "#e05a5a"); R(x + 11, y + 9.5, 3, 5, "#9a2a2a"); R(x + w - 14, y + 9.5, 3, 5, "#9a2a2a");
-  txt("TOP AGENT", cx - tw("TOP AGENT", 0.5) / 2, y + 10.5, "#fff4d0", 0.5);
-  if (!star) { txt("NOBODY YET", cx - tw("NOBODY YET") / 2, y + h / 2, "#8a8494"); return; }
-  const sparkle = ((T / 20) | 0) % 2;
-  for (const [sx, sy, on] of [[cx - 18, y + 26, sparkle], [cx + 17, y + 29, !sparkle], [cx - 14, y + 35, !sparkle]]) if (on) { R(sx, sy - 1.5, 0.5, 3.5, "#f2d27a"); R(sx - 1.5, sy, 3.5, 0.5, "#f2d27a"); }
-  main.drawImage(SPR[star.id]["front-stand"], cx - 7, y + 19, 14, 19);
-  ob(cx - 8, y + 38, 16, 2, "#c9a64a", 0.5);
-  txt(NAME[star.id], cx - tw(NAME[star.id], 0.5) / 2, y + 44, COLOR[star.id], 0.5);
-  const v = `${star.v >= 0 ? "+" : ""}${star.v.toFixed(1)}% VS S&P`;
-  txt(v, cx - tw(v) / 2, y + 52, star.v >= 0 ? "#6fd08c" : "#ef6f6c");
-}
 function bestAgent() {
   let best = null;
   for (const id of AG) { const s = (D.status.scorecard || {})[id]; if (s && s.buys && (!best || s.avg_vs_spy_pct > best.v)) best = { id, v: s.avg_vs_spy_pct, beat: s.beat_spy, buys: s.buys }; }
   return best;
 }
-function clock(x, y, t) {
-  for (let yy = -11; yy <= 11; yy++) for (let xx = -11; xx <= 11; xx++) { const d = xx * xx + yy * yy; if (d <= 121) R(x + xx, y + yy, 1, 1, d > 90 ? OUT : "#ffffff"); }
-  const ha = ((t.min / 60) % 12) / 12 * Math.PI * 2 - Math.PI / 2, ma = (t.min % 60) / 60 * Math.PI * 2 - Math.PI / 2;
-  line(x, y, x + Math.cos(ha) * 5, y + Math.sin(ha) * 5, OUT); line(x, y, x + Math.cos(ma) * 8, y + Math.sin(ma) * 8, "#e05a4a");
-  txt("NY", x - 3, y + 14, OUT);
-}
 function drawTicker(s, x, y, hs, open = true) {
   let cx = x;
-  for (const part of s.split("   ")) {
+  for (const part of s.split("      ")) {
     const h = hs.find((q) => part.startsWith(q.s + " "));
-    let col = h ? (h.today >= 0 ? "#6fd08c" : "#ef6f6c") : "#f2c14e";
-    if (!open) col = mix(col, -0.55);
-    if (cx < 712 && cx + tw(part, 2) > 28) txt(part, cx, y, col, 2);
-    cx += tw(part, 2) + 70;
+    let col = h ? (h.today >= 0 ? "#7fd0a0" : "#ff8a8a") : "#f2c14e";
+    if (!open) col = mix(col, -0.5);
+    const w = textW(part, 10, 700);
+    if (cx < 712 && cx + w > 28) text(part, cx, y, 10, col, 700);
+    cx += w + 46;
   }
+}
+// things in front of the agents: the armchair's near armrest and the paper the News Hunter holds
+function foreground() {
+  const n = agents.news, inChair = n.phase === "idle" && n.at === "armchair";
+  if (inChair && n.plan.act !== "sleep") { const up = (T % 400) > 320 ? 3 : 0; rr(574, 144 + up, 20, 24, 2, "#ffffff", "#d7d2c8", 0.8); rr(577, 147 + up, 14, 2, 1, INK); for (let k = 0; k < 5; k++) rr(577, 152 + up + k * 3, k % 2 ? 8 : 14, 1.2, 0.6, "#b8b4c4"); }
+  rr(552, 166, 40, 6.5, 3.2, "#7a4cb8");   // near armrest of the armchair
 }
 
 // ================================================================ speech bubbles and sleep Zs
-function bubble(a, text) {
-  const words = text.toUpperCase().split(" "), lines = [""];
-  for (const w of words) { if ((lines.at(-1) + " " + w).trim().length > 18) lines.push(w); else lines[lines.length - 1] = (lines.at(-1) + " " + w).trim(); }
-  const bw = Math.max(...lines.map((l) => tw(l))) + 8, bh = lines.length * 9 + 5;
-  const cx = Math.round(a.x + 10);
-  const bx = Math.round(Math.min(Math.max(cx - bw / 2, 14), W - 14 - bw)), by = Math.round(a.y - 36 - bh);
-  R(bx - 1, by, bw + 2, bh, OUT); R(bx, by - 1, bw, bh + 2, OUT); R(bx, by, bw, bh, "#ffffff");
-  R(cx - 1, by + bh, 3, 1, "#ffffff"); R(cx - 2, by + bh, 1, 2, OUT); R(cx + 2, by + bh, 1, 2, OUT); R(cx - 1, by + bh + 1, 3, 1, OUT); R(cx, by + bh + 1, 1, 1, "#ffffff"); R(cx, by + bh + 2, 1, 1, OUT);
-  const col = { claude: "#b8582e", watch: "#2a6bb0", news: "#5e3a96" }[a.id];
-  lines.forEach((l, i) => txt(l, bx + 4, by + 3 + i * 9, i === 0 ? col : OUT));
+function bubble(a, s) {
+  const size = 6.5, w = textW(s, size, 600) + 12, cx = a.x + 10, bx = Math.min(Math.max(cx - w / 2, 14), W - 14 - w), sitting = (SP[a.at] || {}).seat;
+  const by = a.y - (sitting ? 56 : 62) - (a.id === "news" ? 9 : 0);
+  shadow(true, 6, 2, 0.16); rr(bx, by, w, 12, 6, "#ffffff"); shadow(false);
+  poly([[cx - 3, by + 11.5], [cx, by + 15], [cx + 3, by + 11.5]], "#ffffff");
+  text(s, bx + w / 2, by + 6.2, size, { claude: "#b8582e", watch: "#2a6bb0", news: "#5e3a96" }[a.id], 600, "center");
 }
 let selected = null;
 function overlays() {
   AG.forEach((id, i) => {
     const a = agents[id];
     if (lift.rider === a) return;
-    if (a.plan.act === "sleep" && a.phase === "idle") { const z = ((T / 50) | 0) % 3; txt("Z", a.x + 14 + z * 2, a.y - 31 - z * 4, "#e8e4ff"); if (z) txt("Z", a.x + 18, a.y - 38 - z * 2, "#a49cc0"); return; }
+    if (a.plan.act === "sleep" && a.phase === "idle") {
+      const s = SP[a.at] || {}, zx = s.bed != null ? s.bed + 26 : a.x + 18, zy = s.bed != null ? 438 : a.y - 46, p = (T / 50) % 3;
+      for (let k = 0; k < 3; k++) { const q = (p + k) % 3; text("z", zx + q * 4, zy - q * 6, 5 + q * 1.5, `rgba(120,116,160,${0.9 - q * 0.25})`, 700, "center"); }
+      return;
+    }
     if (!a.plan.say || a.phase !== "idle") return;
     const cycle = (T / 60 + i * 10) % 30;  // each agent speaks for 5 s every 30 s, staggered
     if (a.plan.loud || selected === id || cycle < 5) bubble(a, a.plan.say);
   });
-  if (selected) { const a = agents[selected]; if (lift.rider !== a) { const b = ((T / 15) | 0) % 2; R(a.x + 3, a.y + 0.5 + b * 0.5, 14, 1, "#f2c14e"); } }
+  if (selected) { const a = agents[selected]; if (lift.rider !== a) ellipse(a.x + 10, a.y + 1.5, 9, 2, 0, "rgba(242,193,78,.8)"); }
 }
 
 // ================================================================ main loop
@@ -1003,6 +854,7 @@ function frame(ts) {
   main.drawImage(bg, -VIEW.ex, -VIEW.ey, VIEW.w, VIEW.h);
   live(t);
   for (const id of AG) if (lift.rider !== agents[id]) drawAgent(agents[id]);
+  foreground();
   drawLift();
   overlays();
   soundTriggers();
@@ -1010,37 +862,30 @@ function frame(ts) {
   if (tick !== lastHud) { lastHud = tick; hud(t); }
   requestAnimationFrame(frame);
 }
-
-function drawAgent(a) {  // sprites are 14×19, drawn at 1.5 units (3 pixels) per sprite pixel
-  const s = SP[a.at];
-  if (a.phase === "idle" && s && s.bed != null) { main.drawImage(SPR[a.id].lying, s.bed + 3, 441.5, 28.5, 21); blanket(s.bed, COLOR[a.id], false); return; }
-  const f = frameOf(a);
-  main.drawImage(SPR[a.id][f.key], Math.round((a.x - 0.5) * 2) / 2, Math.round((a.y - 28.5 + f.bob * 0.75) * 2) / 2, 21, 28.5);
+function drawAgent(a) {
+  const s = SP[a.at], x = a.x + 10;
+  if (a.phase === "idle" && s && s.bed != null) { sleeper(a.id, s.bed + 16, 450); blanket(s.bed, AC[a.id], false); return; }
+  if (WALKING.has(a.phase)) return figure(a.id, x, a.y, { dir: a.dir, walk: (a.walkT || 0) * 0.22, bob: Math.abs(Math.sin((a.walkT || 0) * 0.22)) * 0.8 });
+  if (a.phase === "wait") return figure(a.id, x, a.y, { dir: 1 });
+  if (a.phase === "out") return figure(a.id, x, a.y, { dir: -1 });
+  if (a.phase !== "idle") return figure(a.id, x, a.y, { front: true });
+  const act = a.plan.act, busy = act === "type" || act === "trade", nod = busy && ((T / 45) | 0) % 2 ? 0.8 : 0;
+  if (s && s.seat) return figure(a.id, x, a.y, { dir: s.dir, pose: "sit", eyes: act === "sleep" ? "closed" : "open" });
+  figure(a.id, x, a.y, { dir: a.dir, bob: nod });
 }
 function drawLift() {
-  const L = lift;
+  const Lf = lift, nt = skyOf(now()).k === "night", panel = nt ? "#8a90a3" : "#c8cfdb", seam = nt ? "#6c7286" : "#a9b2c2";
   FEET.forEach((fy, f) => {
-    const top = fy - 50, here = L.floor === f && L.state !== "moving", open = here ? L.door : 0;
-    if (open > 0) {  // the lit cabin behind the doors
-      R(DOOR_L, top, 40, 51, "#efe2c4"); for (let x = DOOR_L + 4; x < DOOR_R; x += 8) R(x, top + 4, 1, 40, "#e0d0ae");
-      R(DOOR_L, top, 40, 3, "#fff1b0"); R(DOOR_L + 2, fy - 24, 36, 2, "#c9a64a"); R(DOOR_L, fy - 3, 40, 4, "#9a8a76");
-    } else R(DOOR_L, top, 40, 51, "#2a2438");
-    const a = L.rider;
+    const top = fy - 50, here = Lf.floor === f && Lf.state !== "moving", open = here ? Lf.door : 0;
+    if (open > 0) { rr(DOOR_L, top, 40, 51, 2, "#fbf1d8"); R(DOOR_L + 4, top + 2, 32, 2, "#fff6c8"); rr(DOOR_L + 3, fy - 24, 34, 2, 1, "#d9b04a"); }
+    const a = Lf.rider;
     if (a && a.floor === f && here && (open > 0 || a.phase === "out")) drawAgent(a);
-    const pw = Math.round(20 * (1 - open));  // two panels sliding apart from the middle
-    if (pw > 0) {
-      R(DOOR_L, top, pw, 51, "#a8b0c0"); R(DOOR_R - pw, top, pw, 51, "#a8b0c0");
-      R(DOOR_L + pw - 1, top, 1, 51, "#6a7286"); R(DOOR_R - pw, top, 1, 51, "#6a7286");
-      R(DOOR_L, top, pw, 2, "#c8d0de"); R(DOOR_R - pw, top, pw, 2, "#c8d0de");
-    }
-    // floor display: where the cabin is, and which way it is going
-    ob(740, top - 18, 24, 12, "#16131f");
-    const here2 = Math.abs(L.pos - f) < 0.05, col = here2 ? "#6fd08c" : "#4a5060";
-    txt(String(3 - f), 752, top - 15.5, col);
-    if (L.state === "moving") { const up = L.target < L.pos; R(745, top - 13 + (up ? 0 : 1), 3, 1, "#f2c14e"); R(746, top - 14 + (up ? 0 : 3), 1, 1, "#f2c14e"); R(746, top - 12 + (up ? 0 : -1), 1, 1, "#f2c14e"); }
-    // call button: lights up while someone waits on this floor
-    const calling = L.queue.some((q) => q.floor === f);
-    ob(722, fy - 32, 8, 10, "#6a6476"); R(724, fy - 30, 4, 4, calling ? "#f2c14e" : "#3a3448");
+    const pw = 20 * (1 - open);  // two panels sliding apart from the middle
+    if (pw > 0.3) { rr(DOOR_L, top, pw, 51, 1.5, panel); rr(DOOR_R - pw, top, pw, 51, 1.5, panel); R(DOOR_L + pw - 0.6, top, 1.2, 51, seam); R(DOOR_R - pw - 0.6, top, 1.2, 51, seam); }
+    const here2 = Math.abs(Lf.pos - f) < 0.05;
+    text(String(3 - f), 756, top - 12.3, 7, here2 ? "#7fd0a0" : "#6a6f8c", 800, "center");
+    if (Lf.state === "moving") text(Lf.target < Lf.pos ? "▲" : "▼", 748, top - 12.3, 5, "#f2c14e", 800, "center");
+    circle(725.5, fy - 27.5, 1.8, Lf.queue.some((q) => q.floor === f) ? "#f2c14e" : "#8a8fa6");
   });
 }
 
@@ -1441,18 +1286,18 @@ function heatPanel() {
 function toggleHeat(show) { $("heat").hidden = !show; $("heatbtn").setAttribute("aria-pressed", show); if (show) heatPanel(); }
 const hitAgent = (x, y) => AG.find((id) => { const a = agents[id]; return a && lift.rider !== a && x >= a.x - 2 && x <= a.x + 22 && y >= a.y - 31 && y <= a.y + 2; });
 const toWorld = (e) => [e.clientX / innerWidth * VIEW.w - VIEW.ex, e.clientY / innerHeight * VIEW.h - VIEW.ey];
-const onHeatScreen = (x, y) => x >= 220 && x <= 510 && y >= 238 && y <= 322;
+const onHeatScreen = (x, y) => x >= 218 && x <= 512 && y >= 236 && y <= 324;
 const DOING = { type: "working", read: "reading", sleep: "asleep", trade: "trading", stand: "on a break" };
 // things you can point at; each has a short label and, where useful, a click action
 const SPOTS = [
-  { r: [220, 238, 290, 84], label: () => "Holdings heatmap (today) · click to enlarge", click: () => toggleHeat(true) },
-  { r: [298, 80, 210, 72], label: () => "Holdings: value, share and gains · click to open", click: () => panelHoldings() },
-  { r: [30, 238, 180, 84], label: () => "AI vs S&P 500 · click for the full chart", click: () => panelChart() },
-  { r: [504, 140, 30, 48], label: () => "Trades: closed trades and partial sales · click to open", click: () => panelTrades() },
-  { r: [228, 156, 26, 18], label: () => "Claude's diary: the daily log · click to open", click: () => panelDiary() },
+  { r: [218, 236, 294, 88], label: () => "Holdings heatmap (today) · click to enlarge", click: () => toggleHeat(true) },
+  { r: [288, 78, 206, 80], label: () => "Holdings: value, share and gains · click to open", click: () => panelHoldings() },
+  { r: [28, 238, 184, 84], label: () => "AI vs S&P 500 · click for the full chart", click: () => panelChart() },
+  { r: [500, 125, 30, 62], label: () => "Trades: closed trades and partial sales · click to open", click: () => panelTrades() },
+  { r: [230, 150, 24, 14], label: () => "Claude's diary: the daily log · click to open", click: () => panelDiary() },
 
-  { r: [662, 78, 54, 38], label: () => "News Hunter's latest note · click to read", click: () => newsCard() },
-  { r: [24, 352, 96, 70], label: () => "Who's earning: all three agents vs the S&P · click to open", click: () => panelAgents() },
+  { r: [662, 72, 52, 36], label: () => "News Hunter's latest note · click to read", click: () => newsCard() },
+  { r: [26, 356, 98, 72], label: () => "Who's earning: all three agents vs the S&P · click to open", click: () => panelAgents() },
   { r: [-1e4, -1e4, 2e4, 1e4 + 44], label: () => `Market mood: ${MOOD_TEXT[weatherOf()].toLowerCase()} · click for the gauges`, click: () => panelMood() },
 ];
 const spotAt = (x, y) => SPOTS.find(({ r }) => x >= r[0] && x <= r[0] + r[2] && y >= r[1] && y <= r[1] + r[3]);
@@ -1499,8 +1344,10 @@ addEventListener("keydown", (e) => { if (e.key === "Escape") toggleHeat(false); 
 function fit() {
   const a = innerWidth / innerHeight, vw = Math.max(W, H * a), vh = Math.max(H, W / a);
   Object.assign(VIEW, { w: vw, h: vh, ex: (vw - W) / 2, ey: (vh - H) / 2 });
-  for (const c of [cv, bg]) { c.width = Math.round(vw * 2); c.height = Math.round(vh * 2); }
-  main.setTransform(2, 0, 0, 2, VIEW.ex * 2, VIEW.ey * 2); main.imageSmoothingEnabled = false;
+  const k = Math.min(4, Math.max(2, (innerWidth * (devicePixelRatio || 1)) / vw));  // sharp on every screen
+  VIEW.k = k;
+  for (const c of [cv, bg]) { c.width = Math.round(vw * k); c.height = Math.round(vh * k); }
+  main.setTransform(k, 0, 0, k, VIEW.ex * k, VIEW.ey * k);
   bgKey = ""; if (!$("heat").hidden) heatPanel();
   $("hint").hidden = !(innerHeight > innerWidth * 1.15 && innerWidth < 700);
 }
@@ -1541,7 +1388,7 @@ async function refreshLive() {
   lastHud = -1;
 }
 (async () => {
-  fit(); buildSprites(); paintButtons();
+  fit(); paintButtons();
   await refreshAll();
   think(true);
   requestAnimationFrame((ts) => { lastTs = ts; frame(ts); });
