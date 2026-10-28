@@ -3804,5 +3804,15 @@
    "PG": 0.0382,
    "SSO": 0.0541
   }
+ },
+ {
+  "date": "2026-10-28",
+  "time": "10:30",
+  "source": "news",
+  "dry_run": false,
+  "orders": [],
+  "notes": [],
+  "plain_summary": "I checked today's biggest drops, and almost all of them came from earnings reports or outlook updates, which our tests say not to buy, so I'm not buying anything this hour.",
+  "ideas": []
  }
 ]
