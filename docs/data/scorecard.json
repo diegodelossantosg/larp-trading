@@ -6,8 +6,8 @@
   "amount": 148.5,
   "entry": 66.0807,
   "spy_entry": 778.1,
-  "last": 68.305,
-  "spy_last": 769.04,
+  "last": 68.35,
+  "spy_last": 769.32,
   "open": true,
   "approx": true
  },
@@ -31,8 +31,8 @@
   "amount": 99.0,
   "entry": 227.54,
   "spy_entry": 778.1,
-  "last": 224.51,
-  "spy_last": 769.04,
+  "last": 224.61,
+  "spy_last": 769.32,
   "open": true,
   "approx": true
  },
@@ -43,8 +43,8 @@
   "amount": 99.0,
   "entry": 171.7012,
   "spy_entry": 778.1,
-  "last": 183.41,
-  "spy_last": 769.04,
+  "last": 183.45,
+  "spy_last": 769.32,
   "open": true,
   "approx": true
  },
@@ -55,8 +55,8 @@
   "amount": 79.2,
   "entry": 194.316,
   "spy_entry": 778.1,
-  "last": 198.935,
-  "spy_last": 769.04,
+  "last": 198.87,
+  "spy_last": 769.32,
   "open": true,
   "approx": true
  },
@@ -67,8 +67,8 @@
   "amount": 80.0,
   "entry": 66.0807,
   "spy_entry": 778.1,
-  "last": 68.305,
-  "spy_last": 769.04,
+  "last": 68.35,
+  "spy_last": 769.32,
   "open": true,
   "approx": true
  },
@@ -79,8 +79,8 @@
   "amount": 79.94,
   "entry": 171.7012,
   "spy_entry": 778.1,
-  "last": 183.41,
-  "spy_last": 769.04,
+  "last": 183.45,
+  "spy_last": 769.32,
   "open": true,
   "approx": true
  },
@@ -91,8 +91,8 @@
   "amount": 80.01,
   "entry": 87.775,
   "spy_entry": 772.33,
-  "last": 88.53,
-  "spy_last": 769.04,
+  "last": 88.445,
+  "spy_last": 769.32,
   "open": true
  },
  {
@@ -102,8 +102,8 @@
   "amount": 50.11,
   "entry": 535.93,
   "spy_entry": 768.73,
-  "last": 565.79,
-  "spy_last": 769.04,
+  "last": 565.72,
+  "spy_last": 769.32,
   "open": true
  },
  {
@@ -113,8 +113,8 @@
   "amount": 50.17,
   "entry": 171.15,
   "spy_entry": 769.67,
-  "last": 176.22,
-  "spy_last": 769.04,
+  "last": 176.14,
+  "spy_last": 769.32,
   "open": true
  },
  {
@@ -124,8 +124,8 @@
   "amount": 50.23,
   "entry": 590.21,
   "spy_entry": 765.64,
-  "last": 645.08,
-  "spy_last": 769.04,
+  "last": 647.14,
+  "spy_last": 769.32,
   "open": true
  },
  {
@@ -135,8 +135,8 @@
   "amount": 40.03,
   "entry": 165.235,
   "spy_entry": 765.64,
-  "last": 159.04,
-  "spy_last": 769.04,
+  "last": 159.115,
+  "spy_last": 769.32,
   "open": true
  }
 ]
