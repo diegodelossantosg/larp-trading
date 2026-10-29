@@ -3854,5 +3854,27 @@
   "notes": [],
   "plain_summary": "I found nothing to buy this hour. Almost every big drop today follows an earnings report or comes just before one, and our tests say not to buy those.",
   "ideas": []
+ },
+ {
+  "date": "2026-10-29",
+  "time": "10:30",
+  "source": "news",
+  "dry_run": false,
+  "orders": [],
+  "notes": [
+   "earnings dates checked on Nasdaq's calendar",
+   "skipped CRM: already at its size limit"
+  ],
+  "plain_summary": "Most of today's big drops came from the companies' own earnings, so I skipped them; I picked one buy, Salesforce, which fell only because a rival had a bad report.",
+  "ideas": [
+   {
+    "symbol": "CRM",
+    "headline": "2026-10-29 morning: Salesforce down about 4-6% (about 4% worse than the S&P 500) as software stocks sell off after ServiceNow's weak Q3 contract growth and Fortinet's miss (24/7 Wall St., Globe and Mail)",
+    "why_not_priced_in": "Salesforce had no news of its own today. Nothing changed in its sales, guidance or management, and it is a big, profitable company. The drop comes from other companies' results (ServiceNow down 24%, Fortinet down 20%) and the broad fear that AI will hurt software companies. That is the kind of sector-wide scare that has tended to bounce back over the next 10 days. The Braze deal (about $5.7B, announced Oct 20) is small next to Salesforce's size. Its next earnings date has not been officially announced. Most sources expect around Dec 2, well beyond the 3-trading-day limit. I skipped the other big drops: NOW, FTNT, GOOGL, CAT and HLN fell on their own earnings or a guidance cut, and MRVL fell on a possible ~$80B share-diluting purchase of Lumentum.",
+    "plain_reason": "A rival had a bad report; Salesforce's own business didn't change.",
+    "next_earnings": "2026-12-02",
+    "idea_type": "overreaction"
+   }
+  ]
  }
 ]
