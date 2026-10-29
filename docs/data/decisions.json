@@ -4119,5 +4119,36 @@
    "PG": 0.0373,
    "SSO": 0.055
   }
+ },
+ {
+  "date": "2026-10-29",
+  "time": "11:22",
+  "source": "news",
+  "dry_run": false,
+  "orders": [],
+  "notes": [
+   "earnings dates checked on Nasdaq's calendar",
+   "skipped PANW: already at its size limit",
+   "skipped CRM: already at its size limit"
+  ],
+  "plain_summary": "Big tech and software stocks fell on their own weak reports, so I skipped those; I picked two strong companies that fell only because similar companies disappointed.",
+  "ideas": [
+   {
+    "symbol": "PANW",
+    "headline": "2026-10-29 premarket/morning: Palo Alto Networks falls ~5-6.5% in sympathy after Fortinet plunges 20-26% on a cut to its service-revenue forecast",
+    "why_not_priced_in": "PANW reported nothing new today. It fell only because a competitor cut its forecast, and Jim Cramer says Fortinet's hardware business is losing ground to Palo Alto, so Fortinet's weakness may partly be PANW's gain. PANW raised its own FY27 forecast in August. Drop is about 4.7% vs the S&P 500, a sector-wide scare that fits our rebound pattern. Next earnings Nov 19 (two data sites; matches last year's date; not yet announced by the company).",
+    "plain_reason": "Rival's weak report dragged it down; its own business is still growing well.",
+    "next_earnings": "2026-11-19",
+    "idea_type": "overreaction"
+   },
+   {
+    "symbol": "CRM",
+    "headline": "2026-10-29 morning: Salesforce falls ~5% in sympathy after ServiceNow plunges 24% on its earnings, reviving fears that AI will hurt software companies",
+    "why_not_priced_in": "Salesforce reported no news of its own today. The drop (about 4.9% vs the S&P 500) is a sector-wide scare caused by a peer's results. Salesforce is large and very profitable, and its own last report in August was strong. Next earnings is listed for about Dec 1 by one data site, well beyond 3 trading days; the company usually confirms the date in early November.",
+    "plain_reason": "Fell because a similar company disappointed, not because of its own problems.",
+    "next_earnings": "2026-12-01",
+    "idea_type": "overreaction"
+   }
+  ]
  }
 ]
