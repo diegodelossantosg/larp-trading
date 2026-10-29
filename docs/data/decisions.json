@@ -4150,5 +4150,27 @@
     "idea_type": "overreaction"
    }
   ]
+ },
+ {
+  "date": "2026-10-29",
+  "time": "13:20",
+  "source": "news",
+  "dry_run": false,
+  "orders": [],
+  "notes": [
+   "earnings dates checked on Nasdaq's calendar",
+   "skipped WDAY: already at its size limit"
+  ],
+  "plain_summary": "Most of today's big drops (Alphabet, ServiceNow, Fortinet, Caterpillar, Cognizant) came from the companies' own earnings reports, so I skipped them. Marvell is down 12% because it might pay a lot to buy Lumentum, which is a real cost to its shareholders, so I skipped it too. I picked one buy: Workday, which fell about 5% only because a rival had bad results.",
+  "ideas": [
+   {
+    "symbol": "WDAY",
+    "headline": "2026-10-29 midday: Workday is down about 5% (-4.8% vs the S&P 500) along with Salesforce and Adobe, after ServiceNow's weak Q3 contract growth set off a software selloff. Workday itself had no news.",
+    "why_not_priced_in": "The drop is a reaction to a rival's report, not to Workday's own results. Workday has released no news, changed no guidance and lost no customers. It is a big, profitable company that trades far more than $300M a day, and this is a sector scare of the kind our test found tends to bounce back over about 10 days. The drop is about 5%, inside our preferred 3-10% range. Next earnings are not officially confirmed. Its calendar points to about 2026-11-25 (last quarter it reported on Aug 27, and last year's date was announced in early November), which is well past the 3-trading-day limit. Risk: fears that AI will hurt software companies have come back several times this year, so the weakness could last longer.",
+    "plain_reason": "A rival had bad results; Workday's own business hasn't changed.",
+    "next_earnings": "unknown",
+    "idea_type": "overreaction"
+   }
+  ]
  }
 ]
