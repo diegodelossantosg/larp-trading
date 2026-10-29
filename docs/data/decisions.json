@@ -4172,5 +4172,27 @@
     "idea_type": "overreaction"
    }
   ]
+ },
+ {
+  "date": "2026-10-29",
+  "time": "14:20",
+  "source": "news",
+  "dry_run": false,
+  "orders": [],
+  "notes": [
+   "earnings dates checked on Nasdaq's calendar",
+   "skipped MU: already at its size limit"
+  ],
+  "plain_summary": "Most of today's big drops (Alphabet, ServiceNow, Fortinet, Caterpillar) came from their own earnings reports, so I skipped them; I picked one buy, Micron, which fell with other memory-chip stocks after a rival's report.",
+  "ideas": [
+   {
+    "symbol": "MU",
+    "headline": "2026-10-29 morning: Micron falls ~4% (\u22124.5% vs S&P) as Samsung's slight profit miss and lighter Microsoft/Alphabet capex spark a memory/chip sector selloff",
+    "why_not_priced_in": "Micron has no news of its own. It fell because Samsung's record quarter still missed estimates and Microsoft/Alphabet spent less on AI than expected. Micron's own Sept 30 results set a record and it guided to ~$61.5B revenue next quarter with tight supply. The drop also gives back Wednesday's 5.9% rally. This fits the sector-scare pattern that bounced back in our tests. Its next earnings are about 7 weeks away (Dec 16 is an estimate, not confirmed). Risks: the stock is down about 17% over the past month and less AI spending is a real concern, so use a wide trailing stop.",
+    "plain_reason": "Fell because a competitor disappointed; Micron's own business still looks strong.",
+    "next_earnings": "2026-12-16",
+    "idea_type": "overreaction"
+   }
+  ]
  }
 ]
