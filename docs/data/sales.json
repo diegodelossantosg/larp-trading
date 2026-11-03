@@ -1,18 +1,37 @@
 {
- "updated": "2026-10-22T10:21-04:00",
- "fills_seen": 28,
+ "updated": "2026-11-03T09:38-05:00",
+ "fills_seen": 29,
  "summary": {
-  "sales": 10,
+  "sales": 11,
   "won": 4,
-  "lost": 6,
-  "total_pnl": -7.98,
-  "win_rate": 0.4,
+  "lost": 7,
+  "total_pnl": -8.28,
+  "win_rate": 0.36,
   "avg_win_pct": 1.41,
-  "avg_loss_pct": -2.15,
+  "avg_loss_pct": -1.9,
   "best": "XLE",
   "worst": "IGV"
  },
  "rows": [
+  {
+   "order_id": "1f26c568-f9a9-4c3a-9a3e-236b0ab62cbb",
+   "date": "2026-11-03",
+   "symbol": "XOP",
+   "name": "Oil & gas exploration",
+   "bought": "2026-10-12",
+   "bought_by": "claude",
+   "sold_by": "watch",
+   "days": 22,
+   "shares": 0.4075,
+   "avg_buy_price": 194.32,
+   "sell_price": 193.58,
+   "cost": 79.19,
+   "proceeds": 78.89,
+   "pnl": -0.3,
+   "pnl_pct": -0.38,
+   "full": true,
+   "vs_spy_pct": 2.75
+  },
   {
    "order_id": "6ace2d3b-b96b-40ee-a539-3d5db98228e7",
    "date": "2026-10-22",
@@ -20,7 +39,7 @@
    "name": "2x S&P 500",
    "bought": "2026-10-13",
    "bought_by": "claude",
-   "sold_by": "claude",
+   "sold_by": "news",
    "days": 9,
    "shares": 1.2977,
    "avg_buy_price": 71.76,
@@ -30,7 +49,7 @@
    "pnl": -2.86,
    "pnl_pct": -3.07,
    "full": false,
-   "vs_spy_pct": -1.44
+   "vs_spy_pct": -1.26
   },
   {
    "order_id": "4e3d7c21-fad8-40bd-9e97-5ebd0f7396fe",
