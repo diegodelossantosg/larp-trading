@@ -1,6 +1,6 @@
 {
- "updated": "2026-11-03T09:38-05:00",
- "fills_seen": 29,
+ "updated": "2026-11-03T10:09-05:00",
+ "fills_seen": 30,
  "summary": {
   "sales": 11,
   "won": 4,
@@ -30,7 +30,7 @@
    "pnl": -0.3,
    "pnl_pct": -0.38,
    "full": true,
-   "vs_spy_pct": 2.75
+   "vs_spy_pct": 2.7
   },
   {
    "order_id": "6ace2d3b-b96b-40ee-a539-3d5db98228e7",
