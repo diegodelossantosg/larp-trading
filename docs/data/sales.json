@@ -1,18 +1,37 @@
 {
- "updated": "2026-11-03T10:09-05:00",
- "fills_seen": 30,
+ "updated": "2026-11-04T09:37-05:00",
+ "fills_seen": 31,
  "summary": {
-  "sales": 11,
+  "sales": 12,
   "won": 4,
-  "lost": 7,
-  "total_pnl": -8.28,
-  "win_rate": 0.36,
+  "lost": 8,
+  "total_pnl": -11.81,
+  "win_rate": 0.33,
   "avg_win_pct": 1.41,
-  "avg_loss_pct": -1.9,
+  "avg_loss_pct": -1.99,
   "best": "XLE",
   "worst": "IGV"
  },
  "rows": [
+  {
+   "order_id": "957d63d8-af08-43e8-8a86-5de705f6510b",
+   "date": "2026-11-04",
+   "symbol": "XLE",
+   "name": "Energy",
+   "bought": "2026-10-12",
+   "bought_by": "claude",
+   "sold_by": "watch",
+   "days": 23,
+   "shares": 2.0618,
+   "avg_buy_price": 66.08,
+   "sell_price": 64.37,
+   "cost": 136.24,
+   "proceeds": 132.71,
+   "pnl": -3.53,
+   "pnl_pct": -2.59,
+   "full": true,
+   "vs_spy_pct": -0.85
+  },
   {
    "order_id": "1f26c568-f9a9-4c3a-9a3e-236b0ab62cbb",
    "date": "2026-11-03",
@@ -30,7 +49,7 @@
    "pnl": -0.3,
    "pnl_pct": -0.38,
    "full": true,
-   "vs_spy_pct": 2.7
+   "vs_spy_pct": 2.67
   },
   {
    "order_id": "6ace2d3b-b96b-40ee-a539-3d5db98228e7",
