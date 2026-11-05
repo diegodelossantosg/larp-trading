@@ -45,8 +45,8 @@
   "amount": 99.0,
   "entry": 171.7012,
   "spy_entry": 778.1,
-  "last": 191.91,
-  "spy_last": 752.62,
+  "last": 191.57,
+  "spy_last": 749.84,
   "open": true,
   "approx": true
  },
@@ -83,8 +83,8 @@
   "amount": 79.94,
   "entry": 171.7012,
   "spy_entry": 778.1,
-  "last": 191.91,
-  "spy_last": 752.62,
+  "last": 191.57,
+  "spy_last": 749.84,
   "open": true,
   "approx": true
  },
@@ -95,8 +95,8 @@
   "amount": 80.01,
   "entry": 87.775,
   "spy_entry": 772.33,
-  "last": 92.93,
-  "spy_last": 752.62,
+  "last": 92.46,
+  "spy_last": 749.84,
   "open": true
  },
  {
@@ -106,8 +106,8 @@
   "amount": 50.11,
   "entry": 535.93,
   "spy_entry": 768.73,
-  "last": 533.46,
-  "spy_last": 752.62,
+  "last": 537.9,
+  "spy_last": 749.84,
   "open": true
  },
  {
@@ -117,8 +117,8 @@
   "amount": 50.17,
   "entry": 171.15,
   "spy_entry": 769.67,
-  "last": 193.34,
-  "spy_last": 752.62,
+  "last": 193.305,
+  "spy_last": 749.84,
   "open": true
  },
  {
@@ -128,8 +128,8 @@
   "amount": 50.23,
   "entry": 590.21,
   "spy_entry": 765.64,
-  "last": 599.0,
-  "spy_last": 752.62,
+  "last": 602.54,
+  "spy_last": 749.84,
   "open": true
  },
  {
@@ -139,19 +139,8 @@
   "amount": 40.03,
   "entry": 165.235,
   "spy_entry": 765.64,
-  "last": 169.5,
-  "spy_last": 752.62,
-  "open": true
- },
- {
-  "date": "2026-11-05",
-  "source": "claude",
-  "symbol": "IEF",
-  "amount": 57.02,
-  "entry": 91.76,
-  "spy_entry": 752.62,
-  "last": 91.76,
-  "spy_last": 752.62,
+  "last": 169.23,
+  "spy_last": 749.84,
   "open": true
  }
 ]

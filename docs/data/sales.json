@@ -1,13 +1,13 @@
 {
- "updated": "2026-11-05T09:37-05:00",
- "fills_seen": 33,
+ "updated": "2026-11-05T10:10-05:00",
+ "fills_seen": 36,
  "summary": {
-  "sales": 13,
-  "won": 4,
+  "sales": 14,
+  "won": 5,
   "lost": 9,
-  "total_pnl": -86.12,
-  "win_rate": 0.31,
-  "avg_win_pct": 1.41,
+  "total_pnl": -85.64,
+  "win_rate": 0.36,
+  "avg_win_pct": 1.36,
   "avg_loss_pct": -10.11,
   "best": "XLE",
   "worst": "QUAL"
@@ -30,7 +30,26 @@
    "pnl": -74.31,
    "pnl_pct": -75.07,
    "full": true,
-   "vs_spy_pct": -72.96
+   "vs_spy_pct": -71.76
+  },
+  {
+   "order_id": "3dd12773-dc91-40f7-a73c-26750055bf02",
+   "date": "2026-11-05",
+   "symbol": "AAPL",
+   "name": "Apple",
+   "bought": "2026-10-16",
+   "bought_by": "claude",
+   "sold_by": "claude",
+   "days": 20,
+   "shares": 0.1201,
+   "avg_buy_price": 344.45,
+   "sell_price": 348.44,
+   "cost": 41.35,
+   "proceeds": 41.83,
+   "pnl": 0.48,
+   "pnl_pct": 1.16,
+   "full": false,
+   "vs_spy_pct": 2.59
   },
   {
    "order_id": "957d63d8-af08-43e8-8a86-5de705f6510b",
