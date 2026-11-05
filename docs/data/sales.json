@@ -1,18 +1,37 @@
 {
- "updated": "2026-11-04T10:10-05:00",
- "fills_seen": 32,
+ "updated": "2026-11-05T09:37-05:00",
+ "fills_seen": 33,
  "summary": {
-  "sales": 12,
+  "sales": 13,
   "won": 4,
-  "lost": 8,
-  "total_pnl": -11.81,
-  "win_rate": 0.33,
+  "lost": 9,
+  "total_pnl": -86.12,
+  "win_rate": 0.31,
   "avg_win_pct": 1.41,
-  "avg_loss_pct": -1.99,
+  "avg_loss_pct": -10.11,
   "best": "XLE",
-  "worst": "IGV"
+  "worst": "QUAL"
  },
  "rows": [
+  {
+   "order_id": "aa158b38-504c-4b7b-a1d3-46e4db7d8819",
+   "date": "2026-11-05",
+   "symbol": "QUAL",
+   "name": "US quality",
+   "bought": "2026-10-12",
+   "bought_by": "claude",
+   "sold_by": "watch",
+   "days": 24,
+   "shares": 0.435,
+   "avg_buy_price": 227.54,
+   "sell_price": 56.74,
+   "cost": 98.99,
+   "proceeds": 24.68,
+   "pnl": -74.31,
+   "pnl_pct": -75.07,
+   "full": true,
+   "vs_spy_pct": -72.96
+  },
   {
    "order_id": "957d63d8-af08-43e8-8a86-5de705f6510b",
    "date": "2026-11-04",
@@ -30,7 +49,7 @@
    "pnl": -3.53,
    "pnl_pct": -2.59,
    "full": true,
-   "vs_spy_pct": -1.27
+   "vs_spy_pct": -1.14
   },
   {
    "order_id": "1f26c568-f9a9-4c3a-9a3e-236b0ab62cbb",

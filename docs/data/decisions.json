@@ -4825,5 +4825,24 @@
   "notes": [],
   "plain_summary": "Data-center and AI-hardware stocks dropped after the Democrats' midterm win, but the portfolio is already at its 40% stock limit and no ETF fell much, so I bought nothing.",
   "ideas": []
+ },
+ {
+  "date": "2026-11-05",
+  "time": "09:37",
+  "source": "watch",
+  "dry_run": false,
+  "orders": [
+   {
+    "symbol": "QUAL",
+    "side": "sell",
+    "notional": 24.7,
+    "reason": "trailing stop: 75.1% below its high of $228.13",
+    "status": "pending_new",
+    "order_id": "aa158b38-504c-4b7b-a1d3-46e4db7d8819"
+   }
+  ],
+  "notes": [
+   "sell QUAL: trailing stop: 75.1% below its high of $228.13"
+  ]
  }
 ]
