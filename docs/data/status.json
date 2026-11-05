@@ -1,11 +1,11 @@
 {
- "updated": "2026-11-05T15:12-05:00",
+ "updated": "2026-11-05T15:31-05:00",
  "mode": "paper",
  "capital": 1000.0,
  "spy_start": 779.38,
  "idle_asset": "SSO",
  "model": "opus",
- "equity": 920.09,
+ "equity": 917.86,
  "cash": 0.02,
  "performance": {
   "since": "2026-10-12",
@@ -17,27 +17,27 @@
  "scorecard": {
   "claude": {
    "buys": 5,
-   "avg_return_pct": -14.96,
-   "avg_vs_spy_pct": -12.3,
+   "avg_return_pct": -15.01,
+   "avg_vs_spy_pct": -12.31,
    "beat_spy": 2,
-   "dollars": -76.22,
-   "dollars_vs_spy": -62.66
+   "dollars": -76.48,
+   "dollars_vs_spy": -62.73
   },
   "watch": {
    "buys": 3,
-   "avg_return_pct": 2.77,
-   "avg_vs_spy_pct": 6.76,
+   "avg_return_pct": 2.68,
+   "avg_vs_spy_pct": 6.8,
    "beat_spy": 2,
-   "dollars": 6.64,
-   "dollars_vs_spy": 16.22
+   "dollars": 6.42,
+   "dollars_vs_spy": 16.31
   },
   "news": {
    "buys": 4,
-   "avg_return_pct": 1.61,
-   "avg_vs_spy_pct": 5.82,
+   "avg_return_pct": 1.58,
+   "avg_vs_spy_pct": 5.99,
    "beat_spy": 4,
-   "dollars": 3.15,
-   "dollars_vs_spy": 11.19
+   "dollars": 3.09,
+   "dollars_vs_spy": 11.52
   }
  },
  "health": {
@@ -79,134 +79,134 @@
   {
    "symbol": "SSO",
    "qty": 3.9977,
-   "market_value": 255.2921,
+   "market_value": 254.0728,
    "avg_entry_price": 69.2459,
-   "current_price": 63.86,
-   "unrealized_pl": -21.5311,
-   "unrealized_plpc": -0.0778,
-   "change_today_usd": -23.0267,
+   "current_price": 63.555,
+   "unrealized_pl": -22.7503,
+   "unrealized_plpc": -0.0822,
+   "change_today_usd": -24.246,
    "name": "2x S&P 500",
-   "weight": 0.2775
+   "weight": 0.2768
   },
   {
    "symbol": "XLV",
    "qty": 0.837,
-   "market_value": 155.1628,
+   "market_value": 154.7946,
    "avg_entry_price": 171.7475,
-   "current_price": 185.39,
-   "unrealized_pl": 11.4181,
-   "unrealized_plpc": 0.0794,
-   "change_today_usd": -3.5738,
+   "current_price": 184.95,
+   "unrealized_pl": 11.0499,
+   "unrealized_plpc": 0.0769,
+   "change_today_usd": -3.9421,
    "name": "Health care",
    "weight": 0.1686
   },
   {
    "symbol": "XRT",
    "qty": 0.9113,
-   "market_value": 82.5625,
+   "market_value": 82.517,
    "avg_entry_price": 87.788,
-   "current_price": 90.6,
-   "unrealized_pl": 2.5625,
-   "unrealized_plpc": 0.032,
-   "change_today_usd": -2.8432,
+   "current_price": 90.55,
+   "unrealized_pl": 2.517,
+   "unrealized_plpc": 0.0315,
+   "change_today_usd": -2.8888,
    "name": "Retail",
-   "weight": 0.0897
+   "weight": 0.0899
   },
   {
    "symbol": "LLY",
    "qty": 0.0544,
-   "market_value": 75.0679,
+   "market_value": 74.6968,
    "avg_entry_price": 1267.296,
-   "current_price": 1378.9425,
-   "unrealized_pl": 6.0779,
-   "unrealized_plpc": 0.0881,
-   "change_today_usd": -2.1257,
+   "current_price": 1372.125,
+   "unrealized_pl": 5.7068,
+   "unrealized_plpc": 0.0827,
+   "change_today_usd": -2.4968,
    "name": "Eli Lilly",
-   "weight": 0.0816
+   "weight": 0.0814
   },
   {
    "symbol": "WMT",
    "qty": 0.4957,
-   "market_value": 63.6284,
+   "market_value": 63.4475,
    "avg_entry_price": 119.296,
-   "current_price": 128.35,
-   "unrealized_pl": 4.4884,
-   "unrealized_plpc": 0.0759,
-   "change_today_usd": -0.4065,
+   "current_price": 127.985,
+   "unrealized_pl": 4.3075,
+   "unrealized_plpc": 0.0728,
+   "change_today_usd": -0.5875,
    "name": "Walmart",
-   "weight": 0.0692
+   "weight": 0.0691
   },
   {
    "symbol": "IEF",
    "qty": 0.6212,
-   "market_value": 57.1603,
+   "market_value": 57.2007,
    "avg_entry_price": 91.768,
-   "current_price": 92.01,
-   "unrealized_pl": 0.1503,
-   "unrealized_plpc": 0.0026,
-   "change_today_usd": 0.1503,
+   "current_price": 92.075,
+   "unrealized_pl": 0.1907,
+   "unrealized_plpc": 0.0034,
+   "change_today_usd": 0.1907,
    "name": "7-10y Treasuries",
-   "weight": 0.0621
+   "weight": 0.0623
   },
   {
    "symbol": "MMM",
    "qty": 0.2932,
-   "market_value": 55.149,
+   "market_value": 55.0522,
    "avg_entry_price": 171.102,
-   "current_price": 188.12,
-   "unrealized_pl": 4.989,
-   "unrealized_plpc": 0.0995,
-   "change_today_usd": -1.7091,
+   "current_price": 187.79,
+   "unrealized_pl": 4.8922,
+   "unrealized_plpc": 0.0975,
+   "change_today_usd": -1.8059,
    "name": "",
-   "weight": 0.0599
+   "weight": 0.06
   },
   {
    "symbol": "LMT",
    "qty": 0.0851,
-   "market_value": 49.2296,
+   "market_value": 49.1947,
    "avg_entry_price": 589.888,
-   "current_price": 578.255,
-   "unrealized_pl": -0.9904,
-   "unrealized_plpc": -0.0197,
-   "change_today_usd": -1.429,
+   "current_price": 577.845,
+   "unrealized_pl": -1.0253,
+   "unrealized_plpc": -0.0204,
+   "change_today_usd": -1.4639,
    "name": "Lockheed Martin",
-   "weight": 0.0535
+   "weight": 0.0536
   },
   {
    "symbol": "NOC",
    "qty": 0.0934,
-   "market_value": 48.9214,
+   "market_value": 49.0102,
    "avg_entry_price": 536.25,
-   "current_price": 523.635,
-   "unrealized_pl": -1.1786,
-   "unrealized_plpc": -0.0235,
-   "change_today_usd": -0.1602,
+   "current_price": 524.585,
+   "unrealized_pl": -1.0898,
+   "unrealized_plpc": -0.0217,
+   "change_today_usd": -0.0715,
    "name": "",
-   "weight": 0.0532
+   "weight": 0.0534
   },
   {
    "symbol": "PG",
    "qty": 0.242,
-   "market_value": 40.3293,
+   "market_value": 40.3124,
    "avg_entry_price": 165.342,
-   "current_price": 166.62,
-   "unrealized_pl": 0.3093,
-   "unrealized_plpc": 0.0077,
-   "change_today_usd": -0.1694,
+   "current_price": 166.55,
+   "unrealized_pl": 0.2924,
+   "unrealized_plpc": 0.0073,
+   "change_today_usd": -0.1864,
    "name": "Procter & Gamble",
-   "weight": 0.0438
+   "weight": 0.0439
   },
   {
    "symbol": "AAPL",
    "qty": 0.1089,
-   "market_value": 37.5635,
+   "market_value": 37.5444,
    "avg_entry_price": 344.454,
-   "current_price": 345.055,
-   "unrealized_pl": 0.0654,
-   "unrealized_plpc": 0.0017,
-   "change_today_usd": -0.485,
+   "current_price": 344.88,
+   "unrealized_pl": 0.0464,
+   "unrealized_plpc": 0.0012,
+   "change_today_usd": -0.504,
    "name": "Apple",
-   "weight": 0.0408
+   "weight": 0.0409
   }
  ]
 }
