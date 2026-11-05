@@ -55,3 +55,14 @@ def test_buys_funded_from_spy():
     orders = buy_orders([("SMH", 6, ["x"])], equity=1000, cash=10, idle_value=500, idle_asset="SPY",
                         held={"SPY", "XLE"}, max_positions=8, size=0.08, slots=4)
     assert [(o.symbol, o.side, o.notional) for o in orders] == [("SPY", "sell", 70.0), ("SMH", "buy", 80.0)]
+
+
+def test_stock_split_is_not_a_crash():
+    from trader.watch import split_factor, update_highs, stop_orders, Quote
+    assert split_factor(228.13, 56.74) == 4 and split_factor(100, 49.5) == 2
+    assert split_factor(100, 70) == 1 and split_factor(100, 30) == 1      # real big drops stay real
+    pos = {"QUAL": {"qty": 0.435, "market_value": 24.7, "avg_entry_price": 227.54, "current_price": 56.74}}
+    q = {"QUAL": Quote(56.74, 56.9, 0, 1)}
+    highs = update_highs({"QUAL": 228.13}, pos, q)
+    assert abs(highs["QUAL"] - 57.03) < 0.01
+    assert stop_orders(pos, highs, q, "SSO", 0.06) == []

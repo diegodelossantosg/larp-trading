@@ -40,13 +40,31 @@ class Quote:
     bars_today: int = 0  # completed 15-minute bars so far today
 
 
+def split_factor(high: float, price: float) -> int:
+    """k if the price looks k-for-1 split since `high` (it fell to ~1/k of it, k = 2..20), else 1.
+
+    A real one-day fall of 45%+ that lands within 3% of an exact 1/2, 1/3, 1/4... of the old price is
+    far less likely than a stock split (QUAL's 4-for-1 on 2026-11-05 was sold as a "75% drop").
+    """
+    if price <= 0 or high <= 0 or price > high * 0.55:
+        return 1
+    k = round(high / price)
+    return k if 2 <= k <= 20 and abs(high / price - k) <= 0.03 * k else 1
+
+
 def update_highs(highs: dict[str, float], positions: dict[str, dict], quotes: dict[str, Quote]) -> dict[str, float]:
-    """Highest price seen since each position was opened (positions no longer held are dropped)."""
+    """Highest price seen since each position was opened (positions no longer held are dropped).
+
+    After a stock split the old high (and Alpaca's entry price, until it catches up) is divided by
+    the split ratio, so the trailing stop compares like with like.
+    """
     out = {}
     for sym, p in positions.items():
         q = quotes.get(sym)
         price = q.price if q else p["current_price"]
-        out[sym] = max(highs.get(sym, 0.0), p["avg_entry_price"], price)
+        high = max(highs.get(sym, 0.0), p["avg_entry_price"])
+        k = split_factor(high, price)
+        out[sym] = max(high / k, price)
     return out
 
 
