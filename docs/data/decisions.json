@@ -5103,5 +5103,27 @@
   "notes": [],
   "plain_summary": "Chip and AI stocks are crashing over fears about future rules after the elections, but the drop is still speeding up, so I'm buying nothing and will check again next hour.",
   "ideas": []
+ },
+ {
+  "date": "2026-11-05",
+  "time": "14:19",
+  "source": "news",
+  "dry_run": false,
+  "orders": [],
+  "notes": [
+   "earnings dates checked on Nasdaq's calendar",
+   "skipped NVDA: already at its size limit"
+  ],
+  "plain_summary": "Chip and AI stocks fell sharply on fears that the midterm results will slow data-center building; I picked one buy, Nvidia, whose drop looks driven by fear rather than by any damage to its business.",
+  "ideas": [
+   {
+    "symbol": "NVDA",
+    "headline": "2026-11-05 ~19:00 UTC: AI/chip selloff after midterms (Democrats win Congress) on fears of data-center delays; NVDA -8% vs SPY -3.7% (Benzinga 'SanDisk Leads Memory Stocks Lower', MarketWatch 'As Nvidia's stock heads for a bear market...')",
+    "why_not_priced_in": "Sector-wide political scare, not company news: no order cancellations or guidance change. Data-center rules would be slow, mostly state-level and uncertain, while Nvidia's demand is global and backlogged. Truist calls it a knee-jerk reaction. NVDA is down about 4.3% vs SPY, within our 3-10% band, and has come back from its -9% intraday low, so it isn't still falling fast. Earnings on Nov 17 are 8 trading days away. Note: the 10-day hold will run past that report.",
+    "plain_reason": "Election fears hit all chip stocks; Nvidia's actual sales and customers haven't changed.",
+    "next_earnings": "2026-11-17",
+    "idea_type": "overreaction"
+   }
+  ]
  }
 ]
