@@ -52,7 +52,8 @@ def split_factor(high: float, price: float) -> int:
     return k if 2 <= k <= 20 and abs(high / price - k) <= 0.03 * k else 1
 
 
-def update_highs(highs: dict[str, float], positions: dict[str, dict], quotes: dict[str, Quote]) -> dict[str, float]:
+def update_highs(highs: dict[str, float], positions: dict[str, dict], quotes: dict[str, Quote],
+                 splits: dict[str, float] | None = None) -> dict[str, float]:
     """Highest price seen since each position was opened (positions no longer held are dropped).
 
     After a stock split the old high (and Alpaca's entry price, until it catches up) is divided by
@@ -62,7 +63,10 @@ def update_highs(highs: dict[str, float], positions: dict[str, dict], quotes: di
     for sym, p in positions.items():
         q = quotes.get(sym)
         price = q.price if q else p["current_price"]
-        high = max(highs.get(sym, 0.0), p["avg_entry_price"])
+        entry = p["avg_entry_price"]
+        if splits and sym in splits and entry > price * 1.8:   # Alpaca hasn't adjusted the entry price yet
+            entry /= splits[sym]
+        high = max(highs.get(sym, 0.0), entry)
         k = split_factor(high, price)
         out[sym] = max(high / k, price)
     return out

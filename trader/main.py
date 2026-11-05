@@ -26,7 +26,7 @@ from .risk import Order, apply_limits, drawdown, earnings_blackout, plan_orders
 from .liquid import LIQUID_MIN_DOLLAR_VOLUME_M, LIQUID_STOCKS
 from .universe import BIG_STOCKS, CORE_ETFS, LEVERAGED, NAMES
 from . import health as market_health
-from . import earnings_calendar, feeds, ledger, report_card, scorecard
+from . import corp_actions, earnings_calendar, feeds, ledger, report_card, scorecard
 from . import watch as rules
 
 log = logging.getLogger("trader")
@@ -311,6 +311,7 @@ def trade(cfg, broker: Broker, market: Market, dry_run: bool, force: bool) -> in
         "previous_decisions": previous,
         "watcher_actions_recent": watcher,
         "your_track_record": journal.read("report_card.json", None),
+        "corporate_actions_for_holdings": corp_actions.for_holdings(cfg, [s for s in positions if s.isalpha()], _today()),
         "protected_recent_watcher_buys": sorted(_recent_watch_buys(cfg.min_hold_days, cfg.news_min_hold_days) & set(positions)),
         "headlines": market.news(hours=36, limit=50),
         "holding_headlines": market.news(hours=72, symbols=list(positions), limit=20) if positions else [],
@@ -432,7 +433,16 @@ def watch(cfg, broker: Broker, market: Market, dry_run: bool, force: bool = Fals
     today = _today()
     state = journal.read("watch.json", {"highs": {}, "breakouts": {}})
     quotes = market.quotes(sorted(set(CORE_ETFS) | set(positions)))
-    highs = rules.update_highs(state.get("highs", {}), positions, quotes)
+    # Splits announced for today (Alpaca's corporate actions): rescale the stored high once, so a
+    # 4-for-1 split isn't sold as a 75% drop. update_highs also has a price-based guard as backup.
+    splits = corp_actions.splits_today(corp_actions.for_holdings(cfg, list(positions), today), today)
+    done = state.setdefault("splits_done", {})
+    for sym, ratio in splits.items():
+        if done.get(sym) != today and sym in state.get("highs", {}):
+            state["highs"][sym] /= ratio
+            done[sym] = today
+            log.info("%s splits %.4g-for-1 today: high rescaled", sym, ratio)
+    highs = rules.update_highs(state.get("highs", {}), positions, quotes, splits)
     stocks = set(BIG_STOCKS) | {s for s in set(positions) - set(CORE_ETFS) - set(BIG_STOCKS)
                                 if broker.vet(s)[2] in ("big", "small")}
 
@@ -467,9 +477,10 @@ def watch(cfg, broker: Broker, market: Market, dry_run: bool, force: bool = Fals
         notes += review_notes
 
     new_buys = sum(1 for o in orders if o.side == "buy")
-    state = {"highs": highs, "buys": {today: used + new_buys}, "last_check": datetime.now(ET).isoformat(timespec="minutes")}
+    state = {"highs": highs, "buys": {today: used + new_buys}, "last_check": datetime.now(ET).isoformat(timespec="minutes"),
+             "splits_done": {s: d for s, d in done.items() if d == today}}
     if not orders:
-        if highs != journal.read("watch.json", {}).get("highs"):
+        if highs != journal.read("watch.json", {}).get("highs") or done:
             journal.write("watch.json", state)
         scorecard.update({s: q.price for s, q in quotes.items()}, quotes["SPY"].price if "SPY" in quotes else None, set(positions), _today())
         _write_intraday(cfg, broker, market)
@@ -569,14 +580,16 @@ def news(cfg, broker: Broker, market: Market, dry_run: bool, force: bool = False
     today = _today()
     state = journal.read("news.json", {})
     used = state.get("buys", {}).get(today, 0)
-    if used >= NEWS_MAX_BUYS_PER_DAY:
-        log.info("News Hunter already made %d buys today", used)
-        return 0
     headlines = market.news(hours=2, limit=50)
     extra, sources = feeds.fetch_all(hours=2)
     log.info("news sources: Alpaca/Benzinga %d, %s", len(headlines), sources)
     headlines += extra
-    if not headlines:
+    held = sorted(s for s in positions if s.isalpha())
+    # Also read everything about what we already own (even with no buys left today): splits,
+    # mergers, lawsuits... and Alpaca's official list of corporate actions for those holdings.
+    holdings_news = market.news(hours=48, symbols=held, limit=50) if held else []
+    holdings_actions = corp_actions.for_holdings(cfg, held, today)
+    if not headlines and not holdings_news and not holdings_actions:
         log.info("no fresh headlines")
         return 0
 
@@ -599,8 +612,10 @@ def news(cfg, broker: Broker, market: Market, dry_run: bool, force: bool = False
         "big_company_moves_today": {s: {"name": BIG_STOCKS.get(s, ""), "vs_spy_today_pct": round(vs_spy[s] * 100, 2)}
                                     for s in big_moves},
         "holdings": {s: round(w, 3) for s, w in weights.items()},
+        "news_about_our_holdings_48h": holdings_news,
+        "corporate_actions_for_our_holdings": holdings_actions,
         "todays_market_view": last.get("market_view"),
-        "buys_left_today": NEWS_MAX_BUYS_PER_DAY - used,
+        "buys_left_today": max(0, NEWS_MAX_BUYS_PER_DAY - used),
     }
     data, error = hunt_news(cfg, context)
     record = {"date": today, "time": datetime.now(ET).strftime("%H:%M"), "source": "news", "dry_run": dry_run,
@@ -609,7 +624,9 @@ def news(cfg, broker: Broker, market: Market, dry_run: bool, force: bool = False
         log.error("News Hunter failed: %s", error)
         return 1
     record["plain_summary"] = data.get("summary", "")
-    record["ideas"] = data.get("ideas", [])
+    record["ideas"] = data.get("ideas", []) if used < NEWS_MAX_BUYS_PER_DAY else []
+    record["holdings_alerts"] = data.get("holdings_alerts", [])
+    record["notes"] += [f"⚠️ {a}" for a in record["holdings_alerts"]]
 
     size = NEWS_BUY_SIZE * equity
     stocks_total = sum(w for s, w in weights.items() if s in BIG_STOCKS or (s not in CORE_ETFS and broker.vet(s)[2] in ("big", "small")))

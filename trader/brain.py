@@ -472,9 +472,18 @@ What our own test of two years of real headlines showed (buying one hour after t
 - Analyst upgrades, new Buy ratings and raised price targets were WORSE than random days afterwards
   (they come after the price has already moved): never a reason to buy on their own.
 
-So you have one job.
+So you have two jobs.
 
-OVERREACTIONS (idea_type "overreaction"): a big, profitable, well-known company that has dropped
+JOB 1, GUARD WHAT WE ALREADY OWN (every hour, even when you buy nothing): read
+news_about_our_holdings_48h and corporate_actions_for_our_holdings, and list in holdings_alerts
+anything an owner must know, in one plain sentence each (max 25 words): stock splits (say the ratio and
+date; a split changes the price but not the value), mergers or takeovers, spin-offs, delistings,
+trading halts, fraud or regulator probes, big lawsuits, guidance cuts, a CEO leaving, a dividend cut,
+or a fund closing or changing what it holds. Use web search to check anything unclear. Leave
+holdings_alerts empty when nothing important happened (most hours). Don't repeat an alert you
+would have given in the last day unless something changed.
+
+JOB 2, OVERREACTIONS (idea_type "overreaction"): a big, profitable, well-known company that has dropped
 hard today on news that does not really damage its business for years (a lawsuit or fine that is
 small for its size, an official's comment or threat, an analyst downgrade, a sector-wide scare, a
 short-seller report with weak evidence, a product delay, a temporary outage). Check with web search
@@ -513,6 +522,8 @@ NEWS_SCHEMA = {
     "type": "object",
     "properties": {
         "summary": {"type": "string", "description": "One short sentence for a beginner: what you saw and what you did."},
+        "holdings_alerts": {"type": "array", "items": {"type": "string"},
+                            "description": "Important news about what we already own; usually empty."},
         "ideas": {
             "type": "array",
             "items": {
@@ -530,7 +541,7 @@ NEWS_SCHEMA = {
             },
         },
     },
-    "required": ["summary", "ideas"],
+    "required": ["summary", "holdings_alerts", "ideas"],
     "additionalProperties": False,
 }
 

@@ -79,3 +79,32 @@ def test_thinly_traded_companies_are_skipped(tmp_path, monkeypatch):
     broker, rec = run(tmp_path, monkeypatch, [idea("TINY")])      # ~$120M a day: below the $300M line
     assert not [o for o in broker.sent if o.side == "buy"]
     assert any("TINY" in n and "$300M" in n for n in rec["notes"])
+
+
+def test_holdings_alerts_are_journaled_even_without_buys(tmp_path, monkeypatch):
+    monkeypatch.setattr(journal, "DATA_DIR", tmp_path)
+    monkeypatch.setattr(main, "_today", lambda: "2026-10-15")
+    monkeypatch.setattr(main, "claude_available", lambda cfg: True)
+    seen = {}
+
+    def fake_hunt(cfg, ctx):
+        seen.update(ctx)
+        return {"summary": "Nothing to buy.", "holdings_alerts": ["QUAL splits 4-for-1 today: price drops, value doesn't."],
+                "ideas": []}, None
+    monkeypatch.setattr(main, "hunt_news", fake_hunt)
+    monkeypatch.setattr(main.corp_actions, "for_holdings", lambda cfg, syms, today: [
+        {"type": "forward_split", "symbols": ["QUAL"], "ex_date": "2026-10-15", "ratio": 4.0}])
+    assert main.news(cfg(idle_asset="SSO"), HeldBroker(), NewsMarket(), dry_run=False, force=True) == 0
+    rec = journal.read("decisions.json", [])[-1]
+    assert rec["holdings_alerts"] and any("QUAL" in n for n in rec["notes"])
+    assert "news_about_our_holdings_48h" in seen and seen["corporate_actions_for_our_holdings"][0]["ratio"] == 4.0
+
+
+def test_corporate_actions_parse_and_split_today():
+    from trader import corp_actions
+    raw = {"corporate_actions": {"forward_splits": [{"symbol": "QUAL", "new_rate": 4, "old_rate": 1, "ex_date": "2026-11-05"}],
+                                 "cash_mergers": [{"acquirer_symbol": "BIG", "target_symbol": "SMOL", "effective_date": "2026-11-20"}]}}
+    rows = corp_actions.parse(raw)
+    assert {"type": "forward_split", "symbols": ["QUAL"], "ex_date": "2026-11-05", "ratio": 4.0} in rows
+    assert corp_actions.splits_today(rows, "2026-11-05") == {"QUAL": 4.0}
+    assert corp_actions.splits_today(rows, "2026-11-06") == {}

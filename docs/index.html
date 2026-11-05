@@ -1187,7 +1187,7 @@ function panelTrades(tab = "closed") {
 // --- Claude's diary: every run, newest first, with the reason for each move
 function panelDiary() {
   panelState = null;
-  const real = D.decisions.filter((d) => !d.dry_run && (d.market_view || d.error || (d.orders || []).length));
+  const real = D.decisions.filter((d) => !d.dry_run && (d.market_view || d.error || (d.orders || []).length || (d.holdings_alerts || []).length));
   if (!real.length) return openPanel("DAILY LOG", `<p class="small">Nothing yet.</p>`);
   const idle = D.status.idle_asset || "SSO";
   const entry = (d) => {
@@ -1197,7 +1197,8 @@ function panelDiary() {
     if (d.error) rows = `<div class="move"><span class="tag sell">Error</span><span>Something went wrong, so nothing was traded.</span></div>`;
     else if (d.trade_today === false || !orders.length) rows = `<div class="move"><span class="tag">No changes</span><span>${esc(d.plain_summary || "Nothing worth changing today.")}</span></div>`;
     else rows = orders.map((o) => { const k = moveKind(d, o, idle); return `<div class="move"><span class="tag ${k.cls}">${k.label} ${esc(o.symbol)} ${usd(o.notional, 0)}</span><span>${esc(k.reason || plainReason(d, o, idle))}</span></div>`; }).join("");
-    return `<div class="entry"><div><b>${esc(d.date)}</b> <span class="small">${esc(d.time || "")} · ${who}</span></div>${rows}</div>`;
+    const alerts = (d.holdings_alerts || []).map((a) => `<div class="move"><span class="tag sell">⚠️ Alert</span><span>${esc(a)}</span></div>`).join("");
+    return `<div class="entry"><div><b>${esc(d.date)}</b> <span class="small">${esc(d.time || "")} · ${who}</span></div>${alerts}${rows}</div>`;
   };
   const cutoff = ny(Date.now() - 864e5).date, newest = real.slice().reverse();
   const recent = newest.filter((d) => d.date >= cutoff), old = newest.filter((d) => d.date < cutoff).slice(0, 60);
