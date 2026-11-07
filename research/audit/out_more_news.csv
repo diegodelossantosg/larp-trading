@@ -1,0 +1,35 @@
+test,variant,set,trades_yr,alpha_yr,avg_trade_pct,t
+which candidate first,biggest drop (current),dev,39.0,2.67,0.69,1.1
+which candidate first,most liquid,dev,39.0,2.73,0.7,1.1
+which candidate first,most volatile,dev,39.0,2.08,0.53,0.8
+which candidate first,weakest before (20d fall),dev,39.0,1.57,0.4,0.6
+which candidate first,random (average of 1 draw),dev,39.0,1.61,0.41,0.6
+hold length,hold 5 days,dev,48.9,2.34,0.48,1.1
+hold length,hold 10 days,dev,39.0,2.67,0.69,1.1
+hold length,hold 20 days,dev,26.1,1.56,0.6,0.6
+early exit,"hold 10, but sell at day 5 if already +2%",dev,39.0,2.3,0.59,1.0
+early exit,"hold 10, but sell at day 5 if already +3%",dev,39.0,2.13,0.55,1.0
+early exit,"hold 10, but sell at day 5 if already +5%",dev,39.0,2.35,0.6,1.0
+early exit,"sell at day 5 if +3%, else hold 20",dev,26.1,2.25,0.86,0.9
+market filter,all days,dev,39.0,2.67,0.69,1.1
+market filter,market above 200d avg,dev,35.7,1.65,0.46,0.7
+market filter,market below 200d avg,dev,4.2,1.0,2.38,1.1
+market filter,market fell >5% in 20d,dev,3.3,2.34,7.09,3.1
+market filter,market not falling (20d > -3%),dev,34.5,1.45,0.42,0.6
+which candidate first,biggest drop (current),holdout,46.2,5.72,1.24,1.8
+which candidate first,most liquid,holdout,46.2,6.13,1.33,2.0
+which candidate first,most volatile,holdout,46.2,6.79,1.47,2.2
+which candidate first,weakest before (20d fall),holdout,46.2,4.93,1.07,1.6
+which candidate first,random (average of 1 draw),holdout,46.2,5.19,1.12,1.6
+hold length,hold 5 days,holdout,62.1,5.28,0.85,2.1
+hold length,hold 10 days,holdout,46.2,5.72,1.24,1.8
+hold length,hold 20 days,holdout,28.8,0.79,0.27,0.2
+early exit,"hold 10, but sell at day 5 if already +2%",holdout,46.2,4.05,0.88,1.6
+early exit,"hold 10, but sell at day 5 if already +3%",holdout,46.2,5.36,1.16,2.0
+early exit,"hold 10, but sell at day 5 if already +5%",holdout,46.2,5.32,1.15,1.8
+early exit,"sell at day 5 if +3%, else hold 20",holdout,28.8,-1.93,-0.67,-0.7
+market filter,all days,holdout,46.2,5.72,1.24,1.8
+market filter,market above 200d avg,holdout,42.3,4.67,1.1,1.6
+market filter,market below 200d avg,holdout,4.5,1.59,3.53,1.3
+market filter,market fell >5% in 20d,holdout,3.3,-0.09,-0.26,-0.1
+market filter,market not falling (20d > -3%),holdout,41.7,4.49,1.08,1.6
