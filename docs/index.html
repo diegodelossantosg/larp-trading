@@ -1024,6 +1024,18 @@ function portfolioNumbers() {
   const bench = capital && spyNow && spyStart ? (capital * spyNow) / spyStart : null;
   return { now, capital, bench, ai: now != null && capital ? (now / capital - 1) * 100 : null, spy: bench != null ? (bench / capital - 1) * 100 : null };
 }
+// --- rough Spanish tax if everything were sold today: 19% of the gain (first 6,000 EUR of gains; a loss pays nothing).
+// It ignores the dollar/euro rate, losses carried over and dividend withholding: an estimate, not tax advice.
+const TAX_RATE = 0.19;
+const afterTax = (value, capital) => value - TAX_RATE * Math.max(0, value - capital);
+function taxBlock(now, bench, capital) {
+  if (bench == null) return "";
+  const a = afterTax(now, capital), b = afterTax(bench, capital), gap = a - b;
+  return `<div class="versus" style="margin-top:10px"><div class="side"><span class="small">AI after tax (estimate)</span><b class="big">${usd(a)}</b><span class="${cls(a - capital)}">${signedUsd(a - capital)}</span></div>
+    <div class="vs">${Math.abs(gap) < 0.005 ? "Tied" : `After tax the AI is ${gap > 0 ? "ahead" : "behind"} by <b class="${cls(gap)}">${usd(Math.abs(gap))}</b>`}</div>
+    <div class="side"><span class="small">S&amp;P 500 after tax (estimate)</span><b class="big">${usd(b)}</b><span class="${cls(b - capital)}">${signedUsd(b - capital)}</span></div></div>
+    <p class="small">If everything were sold today and ${Math.round(TAX_RATE * 100)}% tax paid on the gain (Spain's lowest band). Estimate only: it ignores the euro rate and dividend withholding, and a buy-and-hold S&amp;P would also delay its tax for years while the AI pays on each sale. Not tax advice.</p>`;
+}
 function panelPortfolio() {
   panelState = null;
   const s = D.status, eq = D.equity || [], capital = s.capital || eq[0]?.equity, now = s.equity ?? eq.at(-1)?.equity;
@@ -1042,6 +1054,7 @@ function panelPortfolio() {
   const verdict = gap == null ? "" : Math.abs(gap) < 0.005 ? "Tied" : `AI is ${gap > 0 ? "ahead" : "behind"} by <b class="${cls(gap)}">${usd(Math.abs(gap))}</b>`;
   openPanel("YOUR PORTFOLIO", `<div class="versus">${side("AI portfolio", now, prevRow?.equity ?? capital)}<div class="vs">${verdict}</div>${bench != null ? side("All in the S&amp;P 500 since day one", bench, benchPrev) : ""}</div>
     <p class="small">The right side is what the same starting ${usd(capital, 0)} would be worth if it had all gone into the S&amp;P 500 (SPY) on day one.</p>
+    ${taxBlock(now, bench, capital)}
     <p class="small">Prefer the old page? <a href="classic.html" style="color:var(--gold)">Open the classic dashboard</a>.</p>`);
 }
 
@@ -1136,13 +1149,13 @@ function plainReason(d, o, idle) {
   if (d.source === "news" && o.side === "buy") return r || "Breaking news that should push it up.";
   if (r.startsWith("funding")) return `Sold a little to pay for ${buys.join(" and ")}.`;
   if (d.source === "watch" && o.side === "buy") { const c = r.split(" · Claude: ")[1], n = (r.match(/^(\d)\/6/) || [])[1]; return c || `Rising strongly today with lots of buyers${n ? ` (${n} of 6 buy signals)` : ""}.`; }
-  if (o.symbol === idle) return o.side === "buy" ? "Spare money goes to the S&P 500 ×2." : "Took money from the S&P 500 ×2 for stronger ideas.";
+  if (o.symbol === idle) return o.side === "buy" ? `Spare money goes to ${o.symbol}, which copies the S&P 500.` : `Took money from ${o.symbol} for stronger ideas.`;
   if (o.side === "buy") { const p = (d.positions || []).find((x) => x.symbol === o.symbol); return p ? p.plain_reason || firstSentence(p.thesis) : "Claude expects it to beat the market."; }
   const e = (d.exits || []).find((x) => x.symbol === o.symbol);
   return e ? e.plain_reason : "Claude sees better places for this money.";
 }
 function saleReason(r) {
-  const idle = D.status.idle_asset || "SSO";
+  const idle = D.status.idle_asset || "SPY";
   for (const d of D.decisions) {
     const o = (d.orders || []).find((x) => x.order_id === r.order_id);
     if (!o) continue;
@@ -1189,7 +1202,7 @@ function panelDiary() {
   panelState = null;
   const real = D.decisions.filter((d) => !d.dry_run && (d.market_view || d.error || (d.orders || []).length || (d.holdings_alerts || []).length));
   if (!real.length) return openPanel("DAILY LOG", `<p class="small">Nothing yet.</p>`);
-  const idle = D.status.idle_asset || "SSO";
+  const idle = D.status.idle_asset || "SPY";
   const entry = (d) => {
     const who = d.source === "watch" ? "⚡ Watcher" : d.source === "news" ? "📰 News Hunter" : "🧠 Claude";
     const orders = (d.orders || []).filter((o) => !["error", "skipped"].includes(o.status));
