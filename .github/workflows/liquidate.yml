@@ -1,0 +1,48 @@
+name: Sell everything once (fresh start)
+
+# When docs/data/liquidate.json says {"pending": true}, sells every position in the PAPER account at
+# the next market open, then sets pending to false so it never runs again. Paper trading only.
+# Start times are right after the open (9:32 New York in summer = 13:32 UTC, in winter = 14:32 UTC);
+# a start while the market is closed does nothing.
+on:
+  schedule:
+    - cron: "32 13 * * 1-5"
+    - cron: "32 14 * * 1-5"
+    - cron: "2 15 * * 1-5"
+  workflow_dispatch:
+
+concurrency:
+  group: liquidate
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  sell:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      ALPACA_API_KEY: ${{ secrets.ALPACA_API_KEY }}
+      ALPACA_SECRET_KEY: ${{ secrets.ALPACA_SECRET_KEY }}
+      ALPACA_PAPER: ${{ vars.ALPACA_PAPER || 'true' }}
+      LIVE_TRADING_CONFIRMED: ${{ vars.LIVE_TRADING_CONFIRMED || 'no' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: ./setup.sh
+      - run: python -m trader.reset on-open
+      - name: Save the result
+        if: always()
+        run: |
+          git config user.name "trading-agent"
+          git config user.email "trading-agent@users.noreply.github.com"
+          git add docs/data/liquidate.json
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -q -m "Fresh start: all positions sold"
+          for i in 1 2 3; do git pull -q --rebase -X theirs origin main && git push -q origin HEAD:main && exit 0; sleep 5; done
+          exit 1
