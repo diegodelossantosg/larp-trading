@@ -53,7 +53,7 @@ def idea(sym, earnings="2026-12-01"):
 def test_news_buys_are_sized_funded_and_journaled(tmp_path, monkeypatch):
     broker, rec = run(tmp_path, monkeypatch, [idea("NVDA"), idea("DASH")])
     sent = {(o.symbol, o.side): o.notional for o in broker.sent}
-    assert sent[("NVDA", "buy")] == 500 and sent[("DASH", "buy")] == 500   # 5% each
+    assert sent[("NVDA", "buy")] == 750 and sent[("DASH", "buy")] == 750   # 7.5% each
     assert sent[("SSO", "sell")] > 0                                        # paid for by selling SSO
     assert rec["source"] == "news" and rec["plain_summary"] == "One real opportunity."
     assert journal.read("news.json", {})["buys"]["2026-10-15"] == 2
