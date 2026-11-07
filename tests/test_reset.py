@@ -53,7 +53,9 @@ def test_on_open_runs_once(tmp_path, monkeypatch):
     assert reset.on_open(FakeBroker(open_=False), cfg) == 0           # closed: wait, stay pending
     assert journal.read("liquidate.json", {})["pending"] is True
     b = FakeBroker()
+    journal.write("capital.json", {"capital": 1000, "baseline_equity": 99913.4})
     assert reset.on_open(b, cfg) == 0 and b.client.closed
+    assert not (tmp_path / "capital.json").exists()                  # the next run restarts from the cash
     assert journal.read("liquidate.json", {})["pending"] is False
     b2 = FakeBroker()
     reset.on_open(b2, cfg)

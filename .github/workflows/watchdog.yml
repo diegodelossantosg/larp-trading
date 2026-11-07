@@ -46,6 +46,7 @@ jobs:
               trade) wf=trade.yml ;;
               watch) wf=watch.yml ;;
               news) wf=hunter.yml ;;
+              liquidate) wf=liquidate.yml ;;
             esac
             echo "starting $agent ($wf)"
             gh workflow run "$wf" --ref main && failed=1

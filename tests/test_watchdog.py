@@ -72,3 +72,17 @@ def test_trade_runs_once_per_day(tmp_path, monkeypatch):
     assert len(calls) == 1                                                          # second start did nothing
     main.trade(cfg(), FakeBroker(), FakeMarket(), dry_run=False, force=True)
     assert len(calls) == 2                                                          # --force runs it again
+
+
+def test_pending_sale_comes_first():
+    assert missing_agents(at(11), True, [], False, None, liquidate_pending=True) == ["liquidate", "watch"]
+    assert missing_agents(at(9, 35), True, [], True, None, liquidate_pending=True) == []
+
+
+def test_trade_waits_for_the_pending_sale(tmp_path, monkeypatch):
+    monkeypatch.setattr(journal, "DATA_DIR", tmp_path)
+    journal.write("liquidate.json", {"pending": True})
+    calls = []
+    monkeypatch.setattr(main, "decide", lambda c, b: calls.append(1))
+    assert main.trade(cfg(), FakeBroker(), FakeMarket(), dry_run=False, force=False) == 0
+    assert not calls
