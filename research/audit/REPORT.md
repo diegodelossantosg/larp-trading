@@ -83,3 +83,10 @@ Estimación 2017-2026 con 30 % en ideas sin habilidad: ≈ +2,8 puntos/año sobr
 - El «stop por oscilación» usa una aproximación (no hay máximos diarios en los datos).
 - Muchas combinaciones probadas: el mejor número de una tabla casi siempre está inflado.
 - Sin impuestos, sin comisiones de cambio euro/dólar.
+
+## Segunda tabla: sin SSO (dinero parado en SPY, 1×)
+
+SSO es el S&P con el doble de fuerza: gana más cuando el S&P sube sin que haya habilidad. Para medir solo lo que aportan las ideas, las noticias y los stops, se repitió la tabla con el dinero parado en SPY (`run_table_spy.py`, `out_table_spy.csv`, ventana 2023-07 a 2026-10; S&P: +19,3 %/año, caída −18,8 %).
+
+Con ideas de Claude sin habilidad: HOY = +1,7 puntos sobre el S&P; 30 % ideas = +3,3; **0 % ideas + News Hunter = +5,8** (caída −18,6 %, 4 de 4 años ganando); 80 % ideas = −0,7; sin News Hunter = −3,9. Con +5 %/año de habilidad en las ideas: HOY +4,2; 30 % +4,9; 0 % ideas +5,8.
+La única fuente de ventaja con respaldo en datos es el **News Hunter** (t ≈ 2,3 con 410 compras; intervalo aproximado del 95 %: de +1 a +9 puntos/año). Las ideas al azar pierden contra el S&P.
