@@ -1,0 +1,64 @@
+name: News Hunter (hourly)
+
+# Every hour while the market is open, Opus reads the latest news and may buy an exaggerated drop
+# (python -m trader.main news). Scheduled runs only happen when the repository variable
+# AGENTS_ON_GITHUB is "true" (see trade.yml). Hours outside the market session exit at once.
+on:
+  schedule:
+    - cron: "5 13-21 * * 1-5"   # UTC; covers New York summer and winter hours
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Decide but do not place orders"
+        default: false
+        type: boolean
+
+concurrency:
+  group: hunter
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  news:
+    if: github.event_name != 'schedule' || vars.AGENTS_ON_GITHUB == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      CLAUDE_MODEL: ${{ vars.CLAUDE_MODEL }}
+      ALPACA_API_KEY: ${{ secrets.ALPACA_API_KEY }}
+      ALPACA_SECRET_KEY: ${{ secrets.ALPACA_SECRET_KEY }}
+      ALPACA_PAPER: ${{ vars.ALPACA_PAPER || 'true' }}
+      LIVE_TRADING_CONFIRMED: ${{ vars.LIVE_TRADING_CONFIRMED || 'no' }}
+      TRADING_ENABLED: ${{ vars.TRADING_ENABLED || 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: ./setup.sh
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install Claude Code
+        run: npm install -g @anthropic-ai/claude-code@2.1.296
+      - name: Run News Hunter
+        run: |
+          args=""
+          [ "${{ inputs.dry_run }}" = "true" ] && args="--dry-run"
+          python -m trader.main news $args
+      - name: Save journal for the dashboard
+        if: always()
+        run: |
+          git config user.name "trading-agent"
+          git config user.email "trading-agent@users.noreply.github.com"
+          git add docs/data
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -q -m "News Hunter: $(date -u +%Y-%m-%dT%H:%MZ)"
+          for i in 1 2 3; do git pull -q --rebase -X theirs origin main && git push -q origin HEAD:main && exit 0; sleep 5; done
+          exit 1
