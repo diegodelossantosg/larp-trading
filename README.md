@@ -21,7 +21,7 @@ and updates the dashboard. It used to also buy ETFs on intraday signals; 8 years
 those buys lose to the S&P 500, so that is off (`WATCH_MAX_BUYS_PER_DAY=0`).
 
 Every hour, the **News Hunter** (`python -m trader.main news`, Opus with web search) reads the latest
-headlines and may buy big companies that overreacted to news (at most 2 buys a day, 7.5% each).
+headlines and may buy big companies that overreacted to news (at most 2 buys a day, 10% each, only stocks whose normal daily swing is 3% or more).
 
 After the close, a second job records portfolio value against SPY so the dashboard can compare them.
 
@@ -163,5 +163,5 @@ Not financial advice.
 
 - The 2x fund (SSO) beats the S&P 500 only by leverage when the market rises, so the idle money now sits in plain SPY.
 - Claude's ideas are tracked on paper (`IDEAS_SHARE=0`) until they show about +5% a year over SPY; ideas no better than chance lose to the S&P 500.
-- The News Hunter is the only part with a measured edge (about +2 to +3 points a year over the S&P 500, up to +5.7 in the best case).
+- The News Hunter is the only part with a measured edge (about +3 to +4 points a year over the S&P 500 on the most cautious reading). It buys only volatile stocks (daily swing 3%+), where the rebound after a news drop was found in both company groups.
 - Tight stops cost 1-2.5 points a year, so stops are wide (20%).

@@ -1,0 +1,29 @@
+slice,n_dev,edge_dev,t_dev,n_holdout,edge_holdout,t_holdout,agree
+ALL (current rule),376,0.5,1.5,451,0.54,1.6,True
+topic analyst,174,0.87,1.7,188,0.08,0.1,True
+topic deal,5,,,7,,,False
+topic guidance,2,,,1,,,False
+topic health,4,,,3,,,False
+topic legal,2,,,4,,,False
+topic people,7,,,6,,,False
+topic policy,5,,,2,,,False
+topic probe,4,,,1,,,False
+topic product,2,,,0,,,False
+topic short_report,0,,,1,,,False
+no topic tag,176,0.19,0.4,238,0.97,2.1,True
+market above 200d avg,340,0.49,1.4,406,0.61,1.7,True
+market below 200d avg,36,0.68,0.5,45,-0.05,-0.0,False
+stock above 200d avg,235,0.32,0.7,291,0.3,0.7,True
+stock below 200d avg,141,0.82,1.4,160,0.99,2.0,True
+stock above 50d avg,206,0.08,0.2,252,0.22,0.4,True
+stock below 50d avg,170,1.02,1.9,199,0.96,2.1,True
+drop 2-3%,223,0.02,0.1,242,0.82,1.9,True
+drop 3-5%,125,0.8,1.2,153,-0.2,-0.3,False
+drop 5-8%,22,2.8,2.0,45,0.43,0.3,True
+drop 8-+%,6,,,11,,,False
+volume surge (>2x normal),38,2.63,2.5,47,0.52,0.6,True
+normal volume (<=2x),338,0.27,0.7,404,0.55,1.5,True
+falling for 20d before (<-5%),113,1.04,1.6,117,1.37,2.1,True
+rising for 20d before (>+5%),122,0.33,0.5,149,0.3,0.5,True
+calm stock (atr<2.5%),96,-0.18,-0.4,92,-0.63,-1.2,True
+wild stock (atr>=4%),112,1.35,1.8,138,1.77,2.3,True

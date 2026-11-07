@@ -591,7 +591,8 @@ def _review(cfg, orders, quotes, positions, acct, candidates):
     return stops + funding + approved, notes
 
 
-NEWS_BUY_SIZE = 0.075  # share of the agent's money per News Hunter buy (audit: more size = more edge, if real)
+NEWS_BUY_SIZE = 0.10  # share of the agent's money per News Hunter buy (audit: more size = more edge, if real)
+NEWS_MIN_ATR_PCT = 3.0  # only stocks whose normal daily swing is at least this: the rebound is in the volatile ones (audit)
 NEWS_MAX_BUYS_PER_DAY = 2
 
 
@@ -686,6 +687,9 @@ def news(cfg, broker: Broker, market: Market, dry_run: bool, force: bool = False
                 ok, why = False, f"price ${t['price']} is too low (penny stock)"
             elif t["avg_dollar_vol_m"] < (MIN_SMALL_STOCK_DOLLAR_VOLUME_M if kind == "small" else MIN_DOLLAR_VOLUME_M):
                 ok, why = False, f"too illiquid (${t['avg_dollar_vol_m']}M/day)"
+            elif kind != "etf" and (t.get("atr_pct") or 0) < NEWS_MIN_ATR_PCT:
+                ok, why = False, (f"too calm (normal daily swing {t.get('atr_pct')}%, under {NEWS_MIN_ATR_PCT:g}%): "
+                                  "the rebound after news drops was only in the more volatile stocks in our tests")
             elif kind != "etf" and sym not in BIG_STOCKS and t["avg_dollar_vol_m"] < LIQUID_MIN_DOLLAR_VOLUME_M:
                 ok, why = False, (f"trades ${t['avg_dollar_vol_m']}M/day; drops on news only beat chance above "
                                   f"${LIQUID_MIN_DOLLAR_VOLUME_M:.0f}M/day in our test")

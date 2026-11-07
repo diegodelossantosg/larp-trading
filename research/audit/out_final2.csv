@@ -1,0 +1,33 @@
+variante,prueba,vs_SP500,peor_caida,compras
+"ACTUAL: sin filtro, 7,5%, stop",todas,5.7,-18.1,290
+"ACTUAL: sin filtro, 7,5%, stop",solo dev,1.0,-20.4,232
+"ACTUAL: sin filtro, 7,5%, stop",solo holdout,2.7,-19.6,243
+"ACTUAL: sin filtro, 7,5%, stop",ventaja a la mitad,2.9,-18.0,290
+"sin filtro, 7,5%, sin stop",todas,5.9,-18.1,290
+"sin filtro, 7,5%, sin stop",solo dev,1.8,-20.6,232
+"sin filtro, 7,5%, sin stop",solo holdout,2.5,-19.9,243
+"sin filtro, 7,5%, sin stop",ventaja a la mitad,2.9,-17.9,290
+"acciones movidas (ATR>=3%), 7,5%",todas,6.0,-19.0,235
+"acciones movidas (ATR>=3%), 7,5%",solo dev,3.1,-20.2,150
+"acciones movidas (ATR>=3%), 7,5%",solo holdout,4.4,-19.4,184
+"acciones movidas (ATR>=3%), 7,5%",ventaja a la mitad,3.0,-18.9,235
+"acciones movidas, 10%",todas,7.6,-20.2,191
+"acciones movidas, 10%",solo dev,3.1,-20.9,130
+"acciones movidas, 10%",solo holdout,6.8,-17.9,154
+"acciones movidas, 10%",ventaja a la mitad,3.8,-19.5,191
+"movidas y bajo su media 50d, 10%",todas,4.9,-19.6,130
+"movidas y bajo su media 50d, 10%",solo dev,2.0,-22.2,76
+"movidas y bajo su media 50d, 10%",solo holdout,5.3,-17.4,88
+"movidas y bajo su media 50d, 10%",ventaja a la mitad,2.5,-19.2,130
+"movidas y bajo su media 50d, 15%",todas,4.9,-20.6,102
+"movidas y bajo su media 50d, 15%",solo dev,1.3,-23.6,62
+"movidas y bajo su media 50d, 15%",solo holdout,6.4,-16.9,71
+"movidas y bajo su media 50d, 15%",ventaja a la mitad,2.5,-19.5,102
+"bajo su media de 50d, 10%",todas,3.6,-21.5,177
+"bajo su media de 50d, 10%",solo dev,0.4,-21.7,110
+"bajo su media de 50d, 10%",solo holdout,3.7,-18.8,131
+"bajo su media de 50d, 10%",ventaja a la mitad,1.8,-19.7,177
+"movidas, 10%, 3 compras/dia",todas,7.3,-21.3,191
+"movidas, 10%, 3 compras/dia",solo dev,3.1,-20.9,130
+"movidas, 10%, 3 compras/dia",solo holdout,6.8,-17.9,154
+"movidas, 10%, 3 compras/dia",ventaja a la mitad,3.6,-20.0,191
