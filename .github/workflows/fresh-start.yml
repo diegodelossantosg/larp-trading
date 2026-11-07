@@ -1,0 +1,58 @@
+name: Fresh start (empty the dashboard)
+
+# Manual. Empties the dashboard history, sets the S&P 500 benchmark to start now with the same
+# capital, and republishes the live chart data. Refuses to run if there is history already.
+on:
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Erase existing history too"
+        default: false
+        type: boolean
+
+concurrency:
+  group: fresh-start
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  reset:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      ALPACA_API_KEY: ${{ secrets.ALPACA_API_KEY }}
+      ALPACA_SECRET_KEY: ${{ secrets.ALPACA_SECRET_KEY }}
+      ALPACA_PAPER: ${{ vars.ALPACA_PAPER || 'true' }}
+      LIVE_TRADING_CONFIRMED: ${{ vars.LIVE_TRADING_CONFIRMED || 'no' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: ./setup.sh
+      - name: Empty the history
+        run: |
+          flag=""
+          [ "${{ inputs.force }}" = "true" ] && flag="--force"
+          python -m trader.reset data $flag
+      - name: Save and publish
+        run: |
+          git config user.name "trading-agent"
+          git config user.email "trading-agent@users.noreply.github.com"
+          git add docs/data
+          if ! git diff --cached --quiet; then
+            git commit -q -m "Fresh start: empty history, S&P 500 benchmark starts now"
+            for i in 1 2 3; do git pull -q --rebase -X theirs origin main && git push -q origin HEAD:main && break; sleep 5; done
+          fi
+          # the live chart data (live branch) still holds the old numbers: replace it
+          python -m trader.live > /tmp/live.json
+          mkdir -p /tmp/livem && cp /tmp/live.json "/tmp/livem/m-$(date -u +%H%M).json"
+          tree=$( { printf "100644 blob %s\tlive.json\n" "$(git hash-object -w /tmp/live.json)"
+                    for f in /tmp/livem/*.json; do printf "100644 blob %s\t%s\n" "$(git hash-object -w "$f")" "$(basename "$f")"; done
+                  } | git mktree)
+          commit=$(git commit-tree "$tree" -m "live reset")
+          git push -q -f origin "$commit:refs/heads/live"

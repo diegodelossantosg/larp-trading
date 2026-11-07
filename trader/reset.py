@@ -22,26 +22,28 @@ log = logging.getLogger("trader.reset")
 ET = ZoneInfo("America/New_York")
 
 
-def empty_files(now: str, capital: float) -> dict:
+def empty_files(now: str, capital: float, spy: float | None = None) -> dict:
     """What each history file looks like with nothing in it. capital.json is removed on purpose:
     the next daily run writes it again, with the account's value at that moment as the start."""
     return {
         "equity.json": [],
         "decisions.json": [],
         "scorecard.json": [],
-        "intraday.json": {"points": []},
+        # one starting point, so the chart and the S&P 500 card both start at the capital
+        "intraday.json": {"points": [[now, capital, spy]] if spy else []},
         "watch.json": {"highs": {}, "breakouts": {}},
         "news.json": {},
         "sales.json": {"updated": now, "fills_seen": 0, "summary": ledger.summary([]), "rows": []},
         "report_card.json": {"all": {"picks": 0}, "by_trade_type": {}, "by_kind": {}, "recent": [], "updated": now[:10]},
-        "status.json": {"updated": now, "mode": "paper", "capital": capital, "spy_start": None, "equity": capital,
+        "status.json": {"updated": now, "mode": "paper", "capital": capital, "spy_start": spy, "equity": capital,
                         "cash": capital, "performance": {"days_tracked": 0}, "positions": []},
     }
 
 
-def reset_data(capital: float = 1000.0) -> list[str]:
+def reset_data(capital: float = 1000.0, spy: float | None = None) -> list[str]:
+    """`spy` is the S&P 500's price now: the benchmark starts as if the same capital were put in SPY now."""
     now = datetime.now(ET).isoformat(timespec="minutes")
-    files = empty_files(now, capital)
+    files = empty_files(now, capital, spy)
     for name, content in files.items():
         journal.write(name, content)
     cap = journal._path("capital.json")
@@ -85,13 +87,22 @@ def on_open(broker, cfg) -> int:
 def main(argv: list[str] | None = None) -> int:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     cmd = (argv or sys.argv[1:] or [""])[0]
-    if cmd == "data":
-        from .config import load_config
-        print("\n".join(reset_data(load_config().capital_usd or 1000.0)))
-        return 0
     from .broker import Broker
     from .config import load_config
     cfg = load_config()
+    if cmd == "data":
+        args = argv or sys.argv[1:]
+        if journal.read("decisions.json", []) and "--force" not in args:
+            log.error("there is history already; this would erase it (add --force if you mean it)")
+            return 1
+        try:
+            from .market import Market
+            spy = round(float(Market(cfg).daily_bars(["SPY"], days=10)["SPY"]["close"].iloc[-1]), 2)
+        except Exception as e:   # the benchmark falls back to the first minute the watcher records
+            log.warning("SPY price unavailable (%s); the S&P line will start at the first live price", e)
+            spy = None
+        print("\n".join(reset_data(cfg.capital_usd or 1000.0, spy)))
+        return 0
     if cmd == "liquidate":
         if not cfg.paper:
             log.error("refusing to sell everything outside paper trading")
