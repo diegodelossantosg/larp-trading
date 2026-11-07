@@ -117,3 +117,17 @@ def test_default_run_puts_the_money_in_spy_and_only_records_ideas(tmp_path, monk
     rec = journal.read("decisions.json", [])[-1]
     assert rec["ideas_paper_only"] is True and rec["positions"][0]["symbol"] == "XLE"   # the idea is on record...
     assert {o.symbol for o in broker.sent} == {"SPY"}                                    # ...but only SPY is bought
+
+
+def test_idle_choice_is_redone_when_the_setting_changes(tmp_path, monkeypatch):
+    monkeypatch.setattr(journal, "DATA_DIR", tmp_path)
+    monkeypatch.setattr(main, "_today", lambda: TODAY)
+    journal.write("idle.json", {"date": TODAY, "asset": "SSO", "why": "old"})            # chosen today under the old settings
+
+    class M:
+        def daily_bars(self, symbols, days=400):
+            raise RuntimeError("no data")
+
+    c = main._with_todays_idle(cfg(idle_asset="SPY"), M())
+    assert c.idle_asset == "SPY"                                                           # not the stale SSO
+    assert journal.read("idle.json", {})["setting"] == "SPY/SPY"

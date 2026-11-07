@@ -209,6 +209,9 @@ def _with_todays_idle(cfg, market: Market):
     """Pick today's idle asset once a day (from closes before today) and remember it in idle.json."""
     today = _today()
     state = journal.read("idle.json", {})
+    setting = f"{cfg.idle_asset}/{cfg.idle_asset_bear}"
+    if state.get("setting") != setting:     # the choice was made under other settings (e.g. SSO): start again
+        state = {}
     if state.get("date") != today:
         try:
             spy = market.daily_bars(["SPY"], days=420).get("SPY")
@@ -218,7 +221,7 @@ def _with_todays_idle(cfg, market: Market):
             asset, why = idle_for(closes, cfg.idle_asset, cfg.idle_asset_bear)
         except Exception as e:   # no data: keep yesterday's choice (or the usual one)
             asset, why = state.get("asset", cfg.idle_asset), f"SPY prices unavailable ({e}); kept the previous choice"
-        state = {"date": today, "asset": asset, "why": why}
+        state = {"date": today, "asset": asset, "why": why, "setting": setting}
         journal.write("idle.json", state)
         log.info("idle asset: %s", why)
     return dataclasses.replace(cfg, idle_asset=state["asset"])
