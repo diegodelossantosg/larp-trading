@@ -170,6 +170,25 @@ def _account(cfg, broker: Broker, positions: dict) -> dict:
     return {"equity": equity, "cash": equity - invested, "buying_power": equity - invested}
 
 
+def ideas_to_real_money(proposed: dict[str, float], idle_asset: str, share: float) -> tuple[dict[str, float], str]:
+    """Claude's ideas may use at most `share` of the money; the rest of what he proposed is tracked on paper.
+
+    The 2016-2026 audit found ideas that are no better than chance lose to the S&P 500, so by default
+    (share 0) his picks are only recorded and measured (report card), and the money sits in the idle
+    asset (SPY) and in the News Hunter's buys. Raise IDEAS_SHARE once his paper picks have earned it.
+    """
+    ideas = {s: w for s, w in proposed.items() if s != idle_asset and w > 0}
+    total = sum(ideas.values())
+    if total <= share + 1e-9:
+        return proposed, ""
+    factor = share / total if total else 0.0
+    out = {s: w for s, w in proposed.items() if s == idle_asset}
+    out.update({s: round(w * factor, 4) for s, w in ideas.items()} if factor > 0 else {})
+    if share <= 0:
+        return out, "Claude's ideas are tracked on paper only (IDEAS_SHARE=0): no real money in them, the money stays in the idle asset."
+    return out, f"Claude's ideas scaled to {share:.0%} of the money (IDEAS_SHARE); the rest is tracked on paper."
+
+
 def idle_for(spy_closes: pd.Series, bull: str, bear: str) -> tuple[str, str]:
     """The 2x fund while SPY's last close is above its 200-day average, else the plain one.
 
@@ -302,6 +321,8 @@ def trade(cfg, broker: Broker, market: Market, dry_run: bool, force: bool) -> in
                          "unrealized_pl_pct": round(p["unrealized_plpc"] * 100, 2)} for s, p in positions.items()},
         "risk_limits": {
             "idle_asset": cfg.idle_asset,
+            "ideas_paper_only": cfg.ideas_share == 0,
+            "ideas_share_of_real_money": cfg.ideas_share,
             "max_weight_in_idle_asset": cfg.max_idle_weight,
             "max_weight_per_etf": cfg.max_position_weight,
             "max_positions": cfg.max_positions,
@@ -342,6 +363,10 @@ def trade(cfg, broker: Broker, market: Market, dry_run: bool, force: bool) -> in
         record["notes"].append("Claude chose to hold its picks; only rule-based adjustments are made.")
 
     proposed = {p["symbol"].upper(): float(p["weight"]) for p in decision.data["positions"]}
+    proposed, paper_note = ideas_to_real_money(proposed, cfg.idle_asset, cfg.ideas_share)
+    if paper_note:
+        record["notes"].append(paper_note)
+        record["ideas_paper_only"] = cfg.ideas_share == 0
     allowed = set(technicals)
     leveraged = set(LEVERAGED)
     stocks = {s: "big" for s in BIG_STOCKS}
@@ -563,7 +588,7 @@ def _review(cfg, orders, quotes, positions, acct, candidates):
     return stops + funding + approved, notes
 
 
-NEWS_BUY_SIZE = 0.05  # share of the agent's money per News Hunter buy
+NEWS_BUY_SIZE = 0.075  # share of the agent's money per News Hunter buy (audit: more size = more edge, if real)
 NEWS_MAX_BUYS_PER_DAY = 2
 
 

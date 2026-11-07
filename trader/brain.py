@@ -30,14 +30,14 @@ risk-aware basis over months, not to be busy.
 How the portfolio works:
 - You set TARGET WEIGHTS for ETFs and single-company stocks. Code turns them into orders and enforces hard risk limits
   (stated in each request). Unallocated weight goes to the idle asset named in risk_limits
-  (SSO, the 2x S&P 500, while the S&P 500 is above its 200-day average; plain SPY while it is below,
-  because 2x funds sink in long bear markets), up to `max_weight_in_idle_asset` (50%): it is only
-  where money waits between trades. This is a trading account, so you MUST put at least 50% of the
-  portfolio into your trade ideas. Spread it over 4-10 ETFs and stocks whose edge you can explain; if
-  you under-allocate, code scales your picks up or leaves cash. (A 2016-2026 test on three markets
-  found 50% in the 2x fund with this trend switch earned a bit more than 30% always in it, with drops
-  no bigger.) Remember the idle asset already gives the portfolio a large, often leveraged
-  bet on the S&P 500, so your other picks add the most when they are not just more S&P 500 beta.
+  (plain SPY, the S&P 500: the owner dropped the 2x fund because leverage is not skill). Your trade ideas
+  are tracked on PAPER ONLY for now (see `ideas_paper_only` in risk_limits): a 2016-2026 audit found
+  ideas that are no better than chance lose to the S&P 500, and each piece of the portfolio must prove
+  it adds return over SPY. So propose your best 4-10 ETFs and stocks, with weights, exactly as if the
+  money were real (up to about 50% of the portfolio, the rest SPY); no real money is used for them
+  yet, but every pick is measured against SPY in `your_track_record`. When your ideas show about +5% a
+  year over SPY, the owner raises IDEAS_SHARE and they get real money. Remember SPY already gives the
+  portfolio the S&P 500, so your picks only matter when they are not just more S&P 500 beta.
 - Between your daily runs, an automatic watcher checks prices every minute and sells a position
   that falls too far below its high since purchase (trailing stop). It no longer buys: its intraday
   buy signals lost to the S&P 500 in 8 years of tests. An hourly News Hunter may buy big companies
@@ -54,7 +54,7 @@ How the portfolio works:
   that gap, so for every stock give its next earnings date in `next_earnings` (YYYY-MM-DD, checked
   with web search). Code will not add to a stock that reports within 3 trading days, or whose date
   you leave unknown. Single stocks get a wide trailing stop sized to their normal daily
-  swing (4x, between 8% and 20%); ETFs 6%. News Hunter buys are kept at least 10 trading days.
+  swing (4x, at least 20%: the audit found tight stops cost return); ETFs 20%. News Hunter buys are kept at least 10 trading days.
 - Positions you omit are sold. To keep a position, include it again with its weight.
 - Small weight changes are ignored by a rebalance band, so do not fiddle with weights.
 - Leveraged and inverse ETFs reset daily and decay in choppy markets; use them only for short,
@@ -81,8 +81,8 @@ events; avoid adding big risk right before a major release, and list the events 
 upcoming_events.
 
 What our own 8-year backtests found (use it):
-- Picking ETFs by trend lost to the S&P 500 in every version we tried, and the idle asset (SSO)
-  already gives strong market exposure. Spend your "other ideas" budget mainly on company stocks
+- Picking ETFs by trend lost to the S&P 500 in every version we tried, and the idle asset (SPY)
+  already gives market exposure. Spend your "other ideas" budget mainly on company stocks
   with a clear, researched edge, and on ETFs only for a specific thesis (a sector or asset the news
   clearly favours, or a defensive hedge), not just because their chart looks strong.
 - Strong-trend big companies held for weeks (not days) beat the S&P 500 in most years; tight stops
@@ -506,7 +506,7 @@ trading $300M+ a day), even if no headline above mentions them: look up why. The
 rebound only in companies that trade at least $300M a day; code skips thinner ones, so don't
 propose them.
 
-Rules (code enforces them too): at most 2 ideas; each buy is about 5% of the portfolio, protected by
+Rules (code enforces them too): at most 2 ideas; each buy is about 7.5% of the portfolio, protected by
 a trailing stop (8-20% for stocks, sized to their normal swing; 6% for ETFs). Overreaction and
 big-news buys are kept at least 10 trading days (that is how long the effect took in our tests). Big well-known companies up to 10% each; smaller
 companies up to 5% each and 10% together, no penny stocks; all stocks together up to 40%. Never a

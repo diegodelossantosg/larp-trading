@@ -86,3 +86,34 @@ def test_trade_waits_for_the_pending_sale(tmp_path, monkeypatch):
     monkeypatch.setattr(main, "decide", lambda c, b: calls.append(1))
     assert main.trade(cfg(), FakeBroker(), FakeMarket(), dry_run=False, force=False) == 0
     assert not calls
+
+
+def test_ideas_are_paper_only_by_default():
+    from trader.main import ideas_to_real_money
+    proposed = {"XLV": 0.2, "LLY": 0.1, "SPY": 0.5}
+    out, note = ideas_to_real_money(proposed, "SPY", 0.0)
+    assert out == {"SPY": 0.5} and "paper" in note
+    out, note = ideas_to_real_money(proposed, "SPY", 0.15)          # scaled down to 15% of the money
+    assert abs(out["XLV"] + out["LLY"] - 0.15) < 1e-3 and out["SPY"] == 0.5 and "15%" in note
+    out, note = ideas_to_real_money(proposed, "SPY", 0.5)           # already under the limit: untouched
+    assert out == proposed and note == ""
+
+
+def test_report_card_counts_paper_ideas_as_picks():
+    from trader.report_card import picks
+    d = {"date": "2026-11-09", "market_view": "x", "ideas_paper_only": True, "orders": [],
+         "positions": [{"symbol": "xlv", "trade_type": "macro_theme"}, {"symbol": "SPY"}]}
+    assert [p["symbol"] for p in picks([d], "SPY")] == ["XLV"]
+
+
+def test_default_run_puts_the_money_in_spy_and_only_records_ideas(tmp_path, monkeypatch):
+    monkeypatch.setattr(journal, "DATA_DIR", tmp_path)
+    monkeypatch.setattr(main, "_today", lambda: TODAY)
+    monkeypatch.setattr(main, "decide", fake_decide({
+        "market_view": "x", "key_drivers": [], "trade_today": True, "confidence": "low", "watchlist": [],
+        "positions": [{"symbol": "XLE", "weight": 0.3, "thesis": "", "signals": [], "exit_plan": ""}]}))
+    broker = FakeBroker()
+    main.trade(cfg(ideas_share=0.0, idle_asset="SPY", max_idle_weight=1.0), broker, FakeMarket(), dry_run=False, force=False)
+    rec = journal.read("decisions.json", [])[-1]
+    assert rec["ideas_paper_only"] is True and rec["positions"][0]["symbol"] == "XLE"   # the idea is on record...
+    assert {o.symbol for o in broker.sent} == {"SPY"}                                    # ...but only SPY is bought

@@ -21,7 +21,7 @@ and updates the dashboard. It used to also buy ETFs on intraday signals; 8 years
 those buys lose to the S&P 500, so that is off (`WATCH_MAX_BUYS_PER_DAY=0`).
 
 Every hour, the **News Hunter** (`python -m trader.main news`, Opus with web search) reads the latest
-headlines and may buy big companies that overreacted to news (at most 2 buys a day, 5% each).
+headlines and may buy big companies that overreacted to news (at most 2 buys a day, 7.5% each).
 
 After the close, a second job records portfolio value against SPY so the dashboard can compare them.
 
@@ -39,17 +39,18 @@ After the close, a second job records portfolio value against SPY so the dashboa
 | Rule | Default | Env var |
 |---|---|---|
 | Money the agent may use (rest of the paper account is ignored) | $1,000 | `CAPITAL_USD` (0 = whole account) |
-| Unallocated money goes to | SSO (2x S&P 500) while SPY is above its 200-day average, else SPY | `IDLE_ASSET`, `IDLE_ASSET_BEAR` |
-| Most that may sit in the idle asset | 50% | `MAX_IDLE_WEIGHT` |
-| Watcher: sell a position this far below its high | 6% | `STOP_TRAIL_PCT` |
+| Unallocated money goes to | SPY (plain S&P 500; the 2x fund was dropped: leverage is not skill) | `IDLE_ASSET`, `IDLE_ASSET_BEAR` |
+| Most that may sit in the idle asset | 100% | `MAX_IDLE_WEIGHT` |
+| Share of the money Claude's daily ideas may really use (the rest is tracked on paper and measured vs SPY) | 0% | `IDEAS_SHARE` |
+| Watcher: sell a position this far below its high | 20% | `STOP_TRAIL_PCT` |
 | Watcher: signals that must agree / buy size / max buys per day | 5 of 6 / 8% / 0 (off) | `WATCH_MIN_SCORE` / `WATCH_BUY_SIZE` / `WATCH_MAX_BUYS_PER_DAY` |
 | Max weight in one ETF (other than SPY) | 30% | `MAX_POSITION_WEIGHT` |
 | Max number of positions | 12 | `MAX_POSITIONS` |
 | Max weight in one big, well-known company | 10% | `MAX_STOCK_WEIGHT` |
 | Max weight in one smaller company / all smaller companies | 5% / 10% | `MAX_SMALL_STOCK_WEIGHT` / `MAX_SMALL_STOCKS_TOTAL` |
-| Max total in single-company stocks | 40% | `MAX_STOCKS_TOTAL` |
+| Max total in single-company stocks | 30% | `MAX_STOCKS_TOTAL` |
 | No buying a stock this close to its earnings report (trading days; unknown date = no buy) | 3 | `EARNINGS_BLACKOUT_DAYS` |
-| Watcher: trailing stop for single stocks | 4x daily swing, 8%-20% | `STOP_ATR_MULT_STOCK` / `STOP_STOCK_MIN` / `STOP_STOCK_MAX` |
+| Watcher: trailing stop for single stocks | 4x daily swing, 20%-20% (fixed 20%) | `STOP_ATR_MULT_STOCK` / `STOP_STOCK_MIN` / `STOP_STOCK_MAX` |
 | News Hunter buys kept at least (trading days) | 10 | `NEWS_MIN_HOLD_DAYS` |
 | Max total in leveraged/inverse ETFs | 10% | `MAX_LEVERAGED_WEIGHT` |
 | Max traded per day (one-way) | 50% of equity | `MAX_DAILY_TURNOVER` |
@@ -157,3 +158,10 @@ docs/classic.html  the previous dashboard, kept as a classic view
 ```
 
 Not financial advice.
+
+## Why it is set up this way (2016-2026 audit, `research/audit/REPORT.md`)
+
+- The 2x fund (SSO) beats the S&P 500 only by leverage when the market rises, so the idle money now sits in plain SPY.
+- Claude's ideas are tracked on paper (`IDEAS_SHARE=0`) until they show about +5% a year over SPY; ideas no better than chance lose to the S&P 500.
+- The News Hunter is the only part with a measured edge (about +2 to +3 points a year over the S&P 500, up to +5.7 in the best case).
+- Tight stops cost 1-2.5 points a year, so stops are wide (20%).

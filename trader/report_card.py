@@ -20,15 +20,17 @@ TRADE_TYPES = ["news_catalyst", "earnings", "trend_momentum", "macro_theme", "de
 
 
 def picks(decisions: list[dict], idle_asset: str) -> list[dict]:
-    """Claude's executed buys (not the watcher's, not the News Hunter's), one per symbol per day."""
+    """Claude's buys (not the watcher's, not the News Hunter's), one per symbol per day. When his ideas are paper-only, every idea counts."""
     out, seen = [], set()
     for d in decisions:
         if d.get("source") or d.get("dry_run") or not d.get("market_view"):
             continue
         types = {p["symbol"].upper(): p.get("trade_type", "untagged") for p in d.get("positions", [])}
         reasons = {p["symbol"].upper(): p.get("plain_reason") or p.get("thesis", "")[:100] for p in d.get("positions", [])}
-        for o in d.get("orders", []):
-            sym = o["symbol"]
+        bought = [{"symbol": p["symbol"], "side": "buy"} for p in d.get("positions", [])] if d.get("ideas_paper_only") \
+            else d.get("orders", [])        # paper-only ideas count as if bought, to measure Claude's skill without risk
+        for o in bought:
+            sym = o["symbol"].upper()
             if o["side"] != "buy" or sym == idle_asset or o.get("status") in ("error", "skipped", "not sent"):
                 continue
             if (sym, d["date"]) in seen:
