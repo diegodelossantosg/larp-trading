@@ -257,6 +257,9 @@ def trade(cfg, broker: Broker, market: Market, dry_run: bool, force: bool) -> in
         log.info("market closed; nothing to do")
         return 0
 
+    if not dry_run and journal.read("liquidate.json", {}).get("pending"):
+        log.info("waiting for the one-time sale of old positions; the next start will trade")
+        return 0
     if not force and not dry_run and watchdog.trade_done(journal.read("decisions.json", []), _today()):
         log.info("today's decision is already made; nothing to do (use --force to run it again)")
         return 0
@@ -571,6 +574,9 @@ def news(cfg, broker: Broker, market: Market, dry_run: bool, force: bool = False
         return 0
     if cfg.capital_usd and journal.read("capital.json", None) is None:
         log.info("waiting for the first daily run to set up the agent's capital")
+        return 0
+    if not dry_run and journal.read("liquidate.json", {}).get("pending"):
+        log.info("waiting for the one-time sale of old positions; News Hunter skips")
         return 0
     if not claude_available(cfg):
         log.info("News Hunter needs Claude; skipping")
