@@ -1,9 +1,9 @@
 {
- "updated": "2026-11-07T11:20-05:00",
+ "updated": "2026-11-07T11:24-05:00",
  "mode": "paper",
  "capital": 1000.0,
  "spy_start": null,
- "idle_asset": "SSO",
+ "idle_asset": "SPY",
  "model": "opus",
  "equity": 1000.0,
  "cash": 86.6,
@@ -45,7 +45,7 @@
     "label": "mixed"
    }
   },
-  "checked": "2026-11-07T16:18"
+  "checked": "2026-11-07T16:23"
  },
  "positions": [
   {
