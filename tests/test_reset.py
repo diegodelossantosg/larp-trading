@@ -29,13 +29,15 @@ def test_reset_data_empties_history_and_removes_capital(tmp_path, monkeypatch):
     journal.write("capital.json", {"capital": 1000, "baseline_equity": 100000})
     journal.write("decisions.json", [{"date": "2026-11-05"}])
     journal.write("watch.json", {"highs": {"QUAL": 227}})
-    reset.reset_data(1000.0)
+    reset.reset_data(1000.0, spy=650.25)
     assert not (tmp_path / "capital.json").exists()
     assert journal.read("decisions.json", None) == []
     assert journal.read("equity.json", None) == []
     assert journal.read("watch.json", None)["highs"] == {}
     assert journal.read("sales.json", None)["rows"] == []
     assert journal.read("status.json", None)["equity"] == 1000.0
+    assert journal.read("status.json", None)["spy_start"] == 650.25          # S&P 500 starts now, with the same $1,000
+    assert journal.read("intraday.json", None)["points"][0][1:] == [1000.0, 650.25]
 
 
 def test_liquidate_sells_everything():
