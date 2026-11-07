@@ -26,7 +26,7 @@ from .risk import Order, apply_limits, drawdown, earnings_blackout, plan_orders
 from .liquid import LIQUID_MIN_DOLLAR_VOLUME_M, LIQUID_STOCKS
 from .universe import BIG_STOCKS, CORE_ETFS, LEVERAGED, NAMES
 from . import health as market_health
-from . import corp_actions, earnings_calendar, feeds, ledger, report_card, scorecard
+from . import corp_actions, earnings_calendar, feeds, ledger, report_card, scorecard, watchdog
 from . import watch as rules
 
 log = logging.getLogger("trader")
@@ -255,6 +255,10 @@ def _write_status(cfg, acct: dict, positions: dict, rows: list[dict]) -> None:
 def trade(cfg, broker: Broker, market: Market, dry_run: bool, force: bool) -> int:
     if not force and not broker.market_open():
         log.info("market closed; nothing to do")
+        return 0
+
+    if not force and not dry_run and watchdog.trade_done(journal.read("decisions.json", []), _today()):
+        log.info("today's decision is already made; nothing to do (use --force to run it again)")
         return 0
 
     positions = broker.positions()

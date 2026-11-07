@@ -5,8 +5,10 @@ name: Watcher (every minute)
 # and a live portfolio value for the dashboard.
 #
 # GitHub's own timer is unreliable for every-10-minute jobs, so instead one job per trading day
-# loops: check, save, wait a minute, repeat, and stops when the market closes. The schedule
-# below starts it a few times as a safety net; extra starts just wait in line and exit at once.
+# loops: check, save, wait a minute, repeat, and stops when the market closes. GitHub ends any job
+# after 6 hours, but the session lasts 6.5, so after 5h40 the job starts its own successor
+# (it waits in line until this one ends). The schedule below and the watchdog workflow start it
+# if nothing is running; extra starts just wait in line and exit at once.
 on:
   schedule:
     - cron: "40 13 * * 1-5"
@@ -21,17 +23,19 @@ concurrency:
 
 permissions:
   contents: write
+  actions: write   # to start the next watcher run
 
 jobs:
   watch:
     runs-on: ubuntu-latest
-    timeout-minutes: 420
+    timeout-minutes: 355   # GitHub's own limit is 360
     env:
       ALPACA_API_KEY: ${{ secrets.ALPACA_API_KEY }}
       ALPACA_SECRET_KEY: ${{ secrets.ALPACA_SECRET_KEY }}
       ALPACA_PAPER: ${{ vars.ALPACA_PAPER || 'true' }}
       LIVE_TRADING_CONFIRMED: ${{ vars.LIVE_TRADING_CONFIRMED || 'no' }}
       TRADING_ENABLED: ${{ vars.TRADING_ENABLED || 'true' }}
+      GH_TOKEN: ${{ github.token }}
       # Opus approves every watcher buy. Without this token the watcher still runs its stops,
       # but makes no buys. Create it with `claude setup-token`.
       CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
@@ -94,7 +98,13 @@ jobs:
               sync
             fi
             i=$((i + 1))
+            [ "$SECONDS" -ge 20400 ] && break   # 5h40: hand over before GitHub's 6-hour limit
             sleep 60
           done
           publish
-          echo "market closed; done for today"
+          if python -m trader.main market-open; then
+            echo "market still open: starting the next watcher run"
+            gh workflow run watch.yml --ref main
+          else
+            echo "market closed; done for today"
+          fi

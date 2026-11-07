@@ -80,9 +80,19 @@ $20M per day and $5 a share.
 6. **First run.** *Actions → Trading agent → Run workflow*, choosing `trade` with *dry run* ticked.
    Read the decision on the dashboard, then let the schedule take over.
 
-The schedule runs on weekdays at 15:15 UTC (11:15 New York in summer, 10:15 in winter) and takes a
-snapshot at 21:30 UTC. GitHub may start scheduled jobs a few minutes late. Market holidays are
-skipped automatically.
+GitHub starts every agent by itself (no other chat needed), once the repository variable
+`AGENTS_ON_GITHUB` is `true` (Settings → Secrets and variables → Actions → Variables):
+
+| Agent | Workflow | When |
+|---|---|---|
+| Daily decision | `trade.yml` | 9:36 New York (13:36 and 14:36 UTC cover summer and winter), retries later; once per day |
+| Watcher | `watch.yml` | from the open; hands over to a new run every 5h40 to cover the 6.5-hour session |
+| News Hunter | `hunter.yml` | hourly during market hours |
+| Snapshot | `trade.yml` | 21:30 UTC |
+| Watchdog | `watchdog.yml` | every 10 minutes: restarts any agent that did not run, and marks itself failed so GitHub emails you |
+
+GitHub may start scheduled jobs a few minutes late. Market holidays are skipped automatically.
+Keep the variable off while another system (e.g. Claude Code routines) trades the same account.
 
 > This repository is **public**, so the dashboard and trade journal are visible to anyone.
 > Your API keys are not, because they live in GitHub secrets. To keep results private, make the repo

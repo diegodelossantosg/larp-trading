@@ -1,0 +1,53 @@
+name: Watchdog (are the agents running?)
+
+# Every 10 minutes during market hours: checks that today's daily decision was made, that a watcher
+# is running and that the News Hunter ran in the last 90 minutes, and starts whatever is missing.
+# If it had to start something, this run is marked as failed, so GitHub emails you.
+# Scheduled runs only happen when the repository variable AGENTS_ON_GITHUB is "true" (see trade.yml).
+on:
+  schedule:
+    - cron: "*/10 13-21 * * 1-5"
+  workflow_dispatch:
+
+concurrency:
+  group: watchdog
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  check:
+    if: github.event_name != 'schedule' || vars.AGENTS_ON_GITHUB == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      ALPACA_API_KEY: ${{ secrets.ALPACA_API_KEY }}
+      ALPACA_SECRET_KEY: ${{ secrets.ALPACA_SECRET_KEY }}
+      ALPACA_PAPER: ${{ vars.ALPACA_PAPER || 'true' }}
+      LIVE_TRADING_CONFIRMED: ${{ vars.LIVE_TRADING_CONFIRMED || 'no' }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: ./setup.sh
+      - name: Start whatever is missing
+        run: |
+          missing=$(python -m trader.watchdog | tail -n 1)
+          echo "missing: $missing"
+          failed=0
+          for agent in $(echo "$missing" | python -c "import json,sys; print(' '.join(json.load(sys.stdin)))"); do
+            case "$agent" in
+              trade) wf=trade.yml ;;
+              watch) wf=watch.yml ;;
+              news) wf=hunter.yml ;;
+            esac
+            echo "starting $agent ($wf)"
+            gh workflow run "$wf" --ref main && failed=1
+          done
+          [ "$failed" -eq 0 ] || { echo "::error::an agent had not run and was started again"; exit 1; }

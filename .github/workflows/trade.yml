@@ -1,13 +1,19 @@
 name: Trading agent
 
-# The daily schedule currently runs as Claude Code routines (see README).
-# To run it from GitHub instead, add the CLAUDE_CODE_OAUTH_TOKEN secret and uncomment:
+# Daily decision (Claude + web search) and the after-close snapshot, started by GitHub itself.
+# Scheduled runs only happen when the repository variable AGENTS_ON_GITHUB is "true", so the old
+# routines and this schedule never trade the same account at once. Switch it on when moving over.
 on:
-  # schedule:
-  #   # GitHub cron is UTC. 15:15 UTC = 11:15 New York in summer, 10:15 in winter.
-  #   - cron: "15 15 * * 1-5"
-  #   # 21:30 UTC is after the 16:00 New York close all year: record equity vs SPY.
-  #   - cron: "30 21 * * 1-5"
+  schedule:
+    # GitHub cron is UTC. 9:36 New York is 13:36 UTC in summer and 14:36 in winter: both are listed,
+    # and whichever falls while the market is closed exits at once. The later times are retries if
+    # GitHub starts a job late or it fails; they do nothing once today's decision exists.
+    - cron: "36 13 * * 1-5"
+    - cron: "36 14 * * 1-5"
+    - cron: "6 15 * * 1-5"
+    - cron: "6 16 * * 1-5"
+    # 21:30 UTC is after the 16:00 New York close all year: record equity vs SPY.
+    - cron: "30 21 * * 1-5"
   workflow_dispatch:
     inputs:
       command:
@@ -17,6 +23,10 @@ on:
         options: [trade, snapshot]
       dry_run:
         description: "Decide but do not place orders"
+        default: false
+        type: boolean
+      force:
+        description: "Run even if today's decision exists or the market is closed"
         default: false
         type: boolean
 
@@ -29,6 +39,7 @@ permissions:
 
 jobs:
   run:
+    if: github.event_name != 'schedule' || vars.AGENTS_ON_GITHUB == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
@@ -61,6 +72,7 @@ jobs:
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             cmd="${{ inputs.command }}"
             [ "${{ inputs.dry_run }}" = "true" ] && cmd="$cmd --dry-run"
+            [ "${{ inputs.force }}" = "true" ] && cmd="$cmd --force"
           elif [ "${{ github.event.schedule }}" = "30 21 * * 1-5" ]; then
             cmd="snapshot"
           else
