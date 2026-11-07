@@ -127,7 +127,7 @@ Regla de esta ronda: elegir en el grupo de diseño y juzgar en los otros, o la m
 | T13 | Cartera con suelos 300/600/1.000 M$ y tamaños 10/15/20 % | 600 M$ es el mejor: 10 % → +9,3 (todas), +4,4 dev, +5,0 holdout, +4,6 mitad; 15 % → +12,2 / +10,1 / +8,2 / +6,0. 1.000 M$ deja pocas compras y baja a +2 a +4. Es una zona con forma de «U invertida», pero se vio con los dos grupos a la vez: queda pendiente la comprobación con años nuevos |
 | T14 | Dinero real en España (aritmética) | Con ventaja de 6 puntos antes de impuestos queda +0,7 a +3 puntos después de impuestos y estructura; con 3 puntos queda en cero o negativa |
 
-Conclusión provisional: **el News Hunter sobre acciones movidas (y probablemente con suelo de 600 M$) es lo único con una señal medida, pero débil y no confirmada**. Todo lo demás probado (timing, factores, capitulación, ETFs, noticias positivas, salidas anticipadas) no mejora al S&P.
+Conclusión provisional: **el News Hunter sobre acciones movidas (el suelo de 600 M$ se descartó en la cuarta ronda) es lo único con una señal medida, pero débil y no confirmada**. Todo lo demás probado (timing, factores, capitulación, ETFs, noticias positivas, salidas anticipadas) no mejora al S&P.
 
 ## Cuarta ronda: las descargas grandes (T15)
 
