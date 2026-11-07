@@ -1,12 +1,184 @@
 {
- "updated": "2026-11-07T08:15-05:00",
+ "updated": "2026-11-07T08:27-05:00",
  "mode": "paper",
  "capital": 1000.0,
- "spy_start": 735.29,
+ "spy_start": null,
+ "idle_asset": "SSO",
+ "model": "opus",
  "equity": 1000.0,
- "cash": 1000.0,
+ "cash": 86.6,
  "performance": {
   "days_tracked": 0
  },
- "positions": []
+ "scorecard": {},
+ "health": {
+  "mood": "stressed",
+  "stress_points": 2,
+  "gauges": {
+   "fear": {
+    "title": "Fear (VIX)",
+    "display": "25.6",
+    "value": 25.64,
+    "change_5d": 6.22,
+    "label": "nervous",
+    "source": "Cboe VIX"
+   },
+   "rates": {
+    "title": "Bonds (rates)",
+    "display": "+3.1%",
+    "ief_return_20d_pct": 3.1,
+    "label": "yields falling",
+    "source": "IEF 7-10y Treasury ETF, 20-day change"
+   },
+   "credit": {
+    "title": "Credit stress",
+    "display": "-2.6%",
+    "hyg_vs_ief_20d_pct": -2.58,
+    "label": "stressed",
+    "source": "high-yield (HYG) vs Treasuries (IEF), 20 days"
+   },
+   "breadth": {
+    "title": "ETFs in uptrend",
+    "display": "42%",
+    "above_200d_pct": 42,
+    "above_50d_pct": 39,
+    "label": "mixed"
+   }
+  },
+  "checked": "2026-11-07T13:26"
+ },
+ "positions": [
+  {
+   "symbol": "SSO",
+   "qty": 3.9977,
+   "market_value": 255.2521,
+   "avg_entry_price": 69.2459,
+   "current_price": 63.85,
+   "unrealized_pl": -21.571,
+   "unrealized_plpc": -0.0779,
+   "change_today_usd": 0.0,
+   "name": "2x S&P 500",
+   "weight": 0.2553
+  },
+  {
+   "symbol": "XLV",
+   "qty": 0.837,
+   "market_value": 154.669,
+   "avg_entry_price": 171.7475,
+   "current_price": 184.8,
+   "unrealized_pl": 10.9243,
+   "unrealized_plpc": 0.076,
+   "change_today_usd": 0.0,
+   "name": "Health care",
+   "weight": 0.1547
+  },
+  {
+   "symbol": "XRT",
+   "qty": 0.9113,
+   "market_value": 81.5601,
+   "avg_entry_price": 87.788,
+   "current_price": 89.5,
+   "unrealized_pl": 1.5601,
+   "unrealized_plpc": 0.0195,
+   "change_today_usd": 0.0,
+   "name": "Retail",
+   "weight": 0.0816
+  },
+  {
+   "symbol": "LLY",
+   "qty": 0.0544,
+   "market_value": 73.7101,
+   "avg_entry_price": 1267.296,
+   "current_price": 1354.0,
+   "unrealized_pl": 4.7201,
+   "unrealized_plpc": 0.0684,
+   "change_today_usd": 0.0,
+   "name": "Eli Lilly",
+   "weight": 0.0737
+  },
+  {
+   "symbol": "WMT",
+   "qty": 0.4957,
+   "market_value": 62.2255,
+   "avg_entry_price": 119.296,
+   "current_price": 125.52,
+   "unrealized_pl": 3.0855,
+   "unrealized_plpc": 0.0522,
+   "change_today_usd": 0.0,
+   "name": "Walmart",
+   "weight": 0.0622
+  },
+  {
+   "symbol": "IEF",
+   "qty": 0.6212,
+   "market_value": 57.0672,
+   "avg_entry_price": 91.768,
+   "current_price": 91.86,
+   "unrealized_pl": 0.0572,
+   "unrealized_plpc": 0.001,
+   "change_today_usd": 0.0,
+   "name": "7-10y Treasuries",
+   "weight": 0.0571
+  },
+  {
+   "symbol": "MMM",
+   "qty": 0.2932,
+   "market_value": 54.2783,
+   "avg_entry_price": 171.102,
+   "current_price": 185.15,
+   "unrealized_pl": 4.1183,
+   "unrealized_plpc": 0.0821,
+   "change_today_usd": 0.0,
+   "name": "",
+   "weight": 0.0543
+  },
+  {
+   "symbol": "NOC",
+   "qty": 0.0934,
+   "market_value": 49.0499,
+   "avg_entry_price": 536.25,
+   "current_price": 525.01,
+   "unrealized_pl": -1.0501,
+   "unrealized_plpc": -0.021,
+   "change_today_usd": 0.0,
+   "name": "",
+   "weight": 0.049
+  },
+  {
+   "symbol": "LMT",
+   "qty": 0.0851,
+   "market_value": 48.2782,
+   "avg_entry_price": 589.888,
+   "current_price": 567.08,
+   "unrealized_pl": -1.9418,
+   "unrealized_plpc": -0.0387,
+   "change_today_usd": 0.0,
+   "name": "Lockheed Martin",
+   "weight": 0.0483
+  },
+  {
+   "symbol": "PG",
+   "qty": 0.242,
+   "market_value": 40.034,
+   "avg_entry_price": 165.342,
+   "current_price": 165.4,
+   "unrealized_pl": 0.014,
+   "unrealized_plpc": 0.0003,
+   "change_today_usd": 0.0,
+   "name": "Procter & Gamble",
+   "weight": 0.04
+  },
+  {
+   "symbol": "AAPL",
+   "qty": 0.1089,
+   "market_value": 37.2712,
+   "avg_entry_price": 344.454,
+   "current_price": 342.37,
+   "unrealized_pl": -0.2269,
+   "unrealized_plpc": -0.006,
+   "change_today_usd": 0.0,
+   "name": "Apple",
+   "weight": 0.0373
+  }
+ ]
 }
