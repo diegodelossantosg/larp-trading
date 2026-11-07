@@ -1,0 +1,18 @@
+rule,yearly_%,S&P_%,worst_drop_%,years_beating
+SPY buy and hold,15.1,15.1,-33.8,0/10
+"SPY above 50d avg, else cash",6.0,15.1,-25.2,1/10
+"SPY above 50d avg, else IEF bonds",6.8,15.1,-33.5,2/10
+"SPY above 50d avg, else SHY short bonds",6.7,15.1,-27.0,2/10
+"SPY above 100d avg, else cash",9.5,15.1,-21.5,2/10
+"SPY above 100d avg, else IEF bonds",9.8,15.1,-27.8,2/10
+"SPY above 100d avg, else SHY short bonds",10.1,15.1,-21.4,2/10
+"SPY above 200d avg, else cash",10.4,15.1,-23.3,2/10
+"SPY above 200d avg, else IEF bonds",10.4,15.1,-28.8,1/10
+"SPY above 200d avg, else SHY short bonds",10.7,15.1,-24.3,1/10
+"SPY when 20d vol < 15%, else IEF",7.5,15.1,-24.4,2/10
+"SPY when 20d vol < 20%, else IEF",10.2,15.1,-21.5,2/10
+"SPY when 20d vol < 25%, else IEF",13.3,15.1,-20.9,1/10
+"SPY when 20d vol < 30%, else IEF",13.8,15.1,-24.1,2/10
+SPY only around the turn of the month,1.1,15.1,-18.5,1/10
+SPY overnight only (close->open),4.9,15.1,-33.0,2/10
+SPY intraday only (open->close),-0.9,15.1,-28.3,1/10

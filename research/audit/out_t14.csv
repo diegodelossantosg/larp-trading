@@ -1,0 +1,28 @@
+market,pre_tax_edge,structure,after_tax_edge_vs_untaxed_SPY
+2023-26 (SPY +19.3%/yr),3.0,A: sell SPY to fund (half the SPY gain realised yearly),0.34
+2023-26 (SPY +19.3%/yr),3.0,A: sell SPY to fund (all of the SPY gain realised yearly),-1.68
+2023-26 (SPY +19.3%/yr),3.0,B: 75% SPY untouched + 25% cash pot,-1.14
+2023-26 (SPY +19.3%/yr),6.0,A: sell SPY to fund (half the SPY gain realised yearly),2.71
+2023-26 (SPY +19.3%/yr),6.0,A: sell SPY to fund (all of the SPY gain realised yearly),0.69
+2023-26 (SPY +19.3%/yr),6.0,B: 75% SPY untouched + 25% cash pot,1.23
+2023-26 (SPY +19.3%/yr),9.0,A: sell SPY to fund (half the SPY gain realised yearly),5.08
+2023-26 (SPY +19.3%/yr),9.0,A: sell SPY to fund (all of the SPY gain realised yearly),3.06
+2023-26 (SPY +19.3%/yr),9.0,B: 75% SPY untouched + 25% cash pot,3.6
+2017-26 (SPY +15.1%/yr),3.0,A: sell SPY to fund (half the SPY gain realised yearly),0.78
+2017-26 (SPY +15.1%/yr),3.0,A: sell SPY to fund (all of the SPY gain realised yearly),-0.8
+2017-26 (SPY +15.1%/yr),3.0,B: 75% SPY untouched + 25% cash pot,-0.25
+2017-26 (SPY +15.1%/yr),6.0,A: sell SPY to fund (half the SPY gain realised yearly),3.15
+2017-26 (SPY +15.1%/yr),6.0,A: sell SPY to fund (all of the SPY gain realised yearly),1.57
+2017-26 (SPY +15.1%/yr),6.0,B: 75% SPY untouched + 25% cash pot,2.12
+2017-26 (SPY +15.1%/yr),9.0,A: sell SPY to fund (half the SPY gain realised yearly),5.52
+2017-26 (SPY +15.1%/yr),9.0,A: sell SPY to fund (all of the SPY gain realised yearly),3.94
+2017-26 (SPY +15.1%/yr),9.0,B: 75% SPY untouched + 25% cash pot,4.49
+a weak market (SPY +7%/yr),3.0,A: sell SPY to fund (half the SPY gain realised yearly),1.64
+a weak market (SPY +7%/yr),3.0,A: sell SPY to fund (all of the SPY gain realised yearly),0.9
+a weak market (SPY +7%/yr),3.0,B: 75% SPY untouched + 25% cash pot,1.47
+a weak market (SPY +7%/yr),6.0,A: sell SPY to fund (half the SPY gain realised yearly),4.0
+a weak market (SPY +7%/yr),6.0,A: sell SPY to fund (all of the SPY gain realised yearly),3.27
+a weak market (SPY +7%/yr),6.0,B: 75% SPY untouched + 25% cash pot,3.84
+a weak market (SPY +7%/yr),9.0,A: sell SPY to fund (half the SPY gain realised yearly),6.38
+a weak market (SPY +7%/yr),9.0,A: sell SPY to fund (all of the SPY gain realised yearly),5.64
+a weak market (SPY +7%/yr),9.0,B: 75% SPY untouched + 25% cash pot,6.21
