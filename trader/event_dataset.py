@@ -327,9 +327,11 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--months", type=int, default=40)
     ap.add_argument("--out", default="research/events.csv.gz")
+    ap.add_argument("--top", type=int, default=300, help="companies ranked 101..top by 2018 dollar volume")
+    ap.add_argument("--no-big", action="store_true", help="leave out the ~65 big companies (biased upwards)")
     args = ap.parse_args()
-    big = sorted(BIG_STOCKS)
-    fresh = [s for s in universe_2018(top=300)[100:] if s not in BIG_STOCKS]
+    big = [] if args.no_big else sorted(BIG_STOCKS)
+    fresh = [s for s in universe_2018(top=args.top)[100:] if s not in BIG_STOCKS]
     sets = {**{s: "big" for s in big}, **{s: split_of(s) for s in fresh}}
     symbols = sorted(sets)
     years = args.months / 12 + 1.0
