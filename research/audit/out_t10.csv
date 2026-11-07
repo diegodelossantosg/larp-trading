@@ -1,0 +1,27 @@
+family,n_dev,edge_dev,t_dev,n_holdout,edge_holdout,t_holdout,both_positive
+ALL drops (current rule),376,0.5,1.5,451,0.54,1.6,True
+headline: downgrade,13,,,16,,,False
+headline: upgrade,1,,,4,,,False
+headline: lawsuit/probe,5,,,6,,,False
+headline: FDA/trial,3,,,1,,,False
+headline: guidance cut,0,,,0,,,False
+headline: recall/safety,0,,,0,,,False
+headline: CEO/exec,5,,,5,,,False
+headline: deal/merger,6,,,6,,,False
+headline: contract,2,,,0,,,False
+headline: short report,0,,,1,,,False
+headline: price target,170,0.9,1.7,185,0.34,0.6,True
+headline: offering,0,,,1,,,False
+headline: tariff/policy,13,,,17,,,False
+headline: none of the keywords,181,0.16,0.3,242,0.69,1.5,True
+time of day: pre-market (4:00-9:30),0,,,0,,,False
+time of day: first 90 min,126,0.42,0.7,154,1.24,2.0,True
+time of day: midday,250,0.55,1.3,297,0.18,0.5,True
+time of day: 14:00-15:00,0,,,0,,,False
+POSITIVE news (+2% or more),445,-0.02,-0.0,510,-0.12,-0.3,False
+"positive news, volatile (ATR>=3%)",232,0.1,0.2,272,-0.06,-0.1,False
+positive news with volume surge (>2x),24,,,28,0.1,0.1,False
+EARNINGS day move <= -5%,81,0.17,0.2,94,2.04,2.6,True
+EARNINGS miss tag,80,0.3,0.5,66,0.45,0.6,True
+EARNINGS beat tag,419,-0.56,-1.9,451,0.41,1.3,False
+"EARNINGS drop, volatile",89,0.49,0.7,113,1.96,2.5,True

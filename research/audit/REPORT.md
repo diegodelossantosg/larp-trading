@@ -106,3 +106,25 @@ La única fuente de ventaja con respaldo en datos es el **News Hunter** (t ≈ 2
 | Bajo media 50d, 10 % | +3,6 | +0,4 | +3,7 | +1,8 | −21,5 % |
 
 Se aplicó «acciones movidas + 10 %». Ojo: se probaron 8 variantes y 26 cortes, así que parte de la mejora puede ser suerte; por eso se exige que se repita en dev y holdout por separado. Combinar «movidas» y «debajo de la media» dobla la ventaja por compra pero reduce las compras a la mitad y no mejora la cartera.
+
+
+## Tercera ronda: pruebas exhaustivas (T1-T14), con protocolo estricto
+
+Regla de esta ronda: elegir en el grupo de diseño y juzgar en los otros, o la mitad `dev` frente a `holdout`. Todos los scripts: `research/audit/t*.py`.
+
+| Prueba | Qué se probó | Resultado |
+|---|---|---|
+| T1 | Comprar más tarde que lo ideal; costes de 0,1 % a 1 % | La ventaja se concentra en la **primera hora** tras la noticia (+0,9/+0,5 % a la hora; +0,3/+0,2 % al cierre). Aguanta hasta ~0,3 % de coste por operación; con 1 % desaparece |
+| T2 | Prueba de suerte (20.000 sorteos de días al azar) | Regla actual p = 0,03; movidas p = 0,04; movidas + bajo su media de 50 d p = 0,008. **Ninguna llega a p < 0,0015** que pediría haber probado ~34 reglas: sugerente, **no probada** |
+| T3-T5 | Compra de «capitulación» sin noticias (caída + volumen disparado + muy líquida), 10 años | Con todo el análisis hecho solo con datos del día anterior y 3 grupos, aparentemente +1 a +6 puntos/año |
+| T7-T8 | Misma regla, sin fuga de información y con el protocolo estricto (elegir en A, juzgar en B y C) | **No generaliza**: la mejor en A (+8,4) da −1,7 en B y −0,6 en C; solo el 20 % de las combinaciones gana en los 3 grupos. **Descartada** |
+| T6 | Plazos, stops, tamaños y universo de esa regla | Sin ventaja robusta; los stops vuelven a restar |
+| T9 | Timing del S&P sin apalancamiento (medias de 50/100/200 días, volatilidad, calendario, noche/día) | **Ninguna** gana al S&P comprado y mantenido; solo reducen la caída a costa de rendimiento |
+| T9 | 10 factores de selección de acciones, elegidos en A y juzgados en B y C | Ninguno aguanta (los 5 mejores de A: +1,3 en B, −4,1 en C) |
+| T10 | Tipos de titular, hora del día, noticias positivas, caídas tras resultados (dev → holdout) | **Comprar subidas no da ventaja** (−0,02/−0,12). Lo demás: escaso o inconsistente |
+| T11 | Inclinaciones a otros ETFs frente a SPY | SMH, XLK, QQQ ganaron, pero con caídas de −45/−34/−35 % y peores años de −15 puntos: apuestas de estilo, no habilidad |
+| T12 | Suelo de liquidez con acciones movidas; años necesarios para confirmar la ventaja | Más liquidez → más ventaja por compra en ambos grupos (dev +0,9 → +2,1 → +3,2; holdout +0,5 → +1,5 → +1,4 con 300 → 600 → 1.000 M$). **Con dinero de práctica harían falta ~5 años (≈ 60 compras/año) o ~20 si la ventaja real es la mitad**: la confirmación tiene que venir de datos históricos |
+| T13 | Cartera con suelos 300/600/1.000 M$ y tamaños 10/15/20 % | 600 M$ es el mejor: 10 % → +9,3 (todas), +4,4 dev, +5,0 holdout, +4,6 mitad; 15 % → +12,2 / +10,1 / +8,2 / +6,0. 1.000 M$ deja pocas compras y baja a +2 a +4. Es una zona con forma de «U invertida», pero se vio con los dos grupos a la vez: queda pendiente la comprobación con años nuevos |
+| T14 | Dinero real en España (aritmética) | Con ventaja de 6 puntos antes de impuestos queda +0,7 a +3 puntos después de impuestos y estructura; con 3 puntos queda en cero o negativa |
+
+Conclusión provisional: **el News Hunter sobre acciones movidas (y probablemente con suelo de 600 M$) es lo único con una señal medida, pero débil y no confirmada**. Todo lo demás probado (timing, factores, capitulación, ETFs, noticias positivas, salidas anticipadas) no mejora al S&P.
