@@ -127,4 +127,19 @@ Regla de esta ronda: elegir en el grupo de diseño y juzgar en los otros, o la m
 | T13 | Cartera con suelos 300/600/1.000 M$ y tamaños 10/15/20 % | 600 M$ es el mejor: 10 % → +9,3 (todas), +4,4 dev, +5,0 holdout, +4,6 mitad; 15 % → +12,2 / +10,1 / +8,2 / +6,0. 1.000 M$ deja pocas compras y baja a +2 a +4. Es una zona con forma de «U invertida», pero se vio con los dos grupos a la vez: queda pendiente la comprobación con años nuevos |
 | T14 | Dinero real en España (aritmética) | Con ventaja de 6 puntos antes de impuestos queda +0,7 a +3 puntos después de impuestos y estructura; con 3 puntos queda en cero o negativa |
 
-Conclusión provisional: **el News Hunter sobre acciones movidas (y probablemente con suelo de 600 M$) es lo único con una señal medida, pero débil y no confirmada**. Todo lo demás probado (timing, factores, capitulación, ETFs, noticias positivas, salidas anticipadas) no mejora al S&P.
+Conclusión provisional: **el News Hunter sobre acciones movidas (el suelo de 600 M$ se descartó en la cuarta ronda) es lo único con una señal medida, pero débil y no confirmada**. Todo lo demás probado (timing, factores, capitulación, ETFs, noticias positivas, salidas anticipadas) no mejora al S&P.
+
+## Cuarta ronda: las descargas grandes (T15)
+
+Dos ficheros nuevos de noticias, con el dinero parado en SPY (así no hay apalancamiento que ayude):
+`events_long` (2018-2026, ~190 empresas) y `events_wide` (2023-2026, ~530 empresas). Script: `t15_long_wide.py`, salida `out_t15.csv`.
+
+| Regla actual (volátiles ATR 3%+, 10% por compra, 2 al día) | Ganancia extra sobre el S&P por año | ¿Es suerte? (t) |
+|---|---|---|
+| Larga, antes de jul-2022 (días nuevos, incluye crash 2020 y 2022) | +2,4 a +3,5 puntos | t 0,4 a 0,8 (no se distingue de la suerte) |
+| Larga, después de jul-2022 | +1,4 a +2,9 puntos | t 0,2 a 0,5 |
+| Ancha, 2023-2026 (más empresas) | +6,7 a +7,7 puntos | t 1,3 a 1,8 |
+
+- La regla actual sale positiva en los tres cortes, pero ninguno es estadísticamente sólido. Mejor estimación honesta: +2 a +4 puntos al año, con mucho margen de error.
+- El suelo de liquidez de 600 M NO aguanta: en los días nuevos (antes de jul-2022) sale -0,4 a -0,9 puntos. Solo funcionaba en los años que ya habíamos mirado. Descartado, no se aplica.
+- Conclusión: se dejan los ajustes actuales. No hay evidencia nueva para cambiar tamaño ni suelo.
