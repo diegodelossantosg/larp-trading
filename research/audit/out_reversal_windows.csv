@@ -1,0 +1,31 @@
+group,rule,window,trades,avg_net_%,edge_%,t
+A,drop2% dv300 any,2017-2023H1,632,1.03,1.2,1.1
+A,drop2% dv300 any,2023H2-2026 (news window),332,-1.33,-1.14,-1.9
+A,drop2% dv300 weak,2017-2023H1,603,0.1,0.27,0.6
+A,drop2% dv300 weak,2023H2-2026 (news window),330,0.13,0.32,0.6
+A,drop2% dv300 wild,2017-2023H1,527,-0.25,-0.08,-0.1
+A,drop2% dv300 wild,2023H2-2026 (news window),330,-0.78,-0.59,-0.8
+A,drop3% dv300 any,2017-2023H1,597,1.28,1.45,1.3
+A,drop3% dv300 any,2023H2-2026 (news window),332,0.07,0.26,0.3
+A,drop2% dv1000 any,2017-2023H1,440,-0.05,0.12,0.2
+A,drop2% dv1000 any,2023H2-2026 (news window),306,-0.18,0.01,0.0
+B,drop2% dv300 any,2017-2023H1,637,-0.3,-0.22,-0.5
+B,drop2% dv300 any,2023H2-2026 (news window),332,0.08,0.21,0.3
+B,drop2% dv300 weak,2017-2023H1,606,0.29,0.37,0.9
+B,drop2% dv300 weak,2023H2-2026 (news window),328,0.15,0.28,0.5
+B,drop2% dv300 wild,2017-2023H1,549,0.25,0.33,0.6
+B,drop2% dv300 wild,2023H2-2026 (news window),328,0.48,0.6,0.8
+B,drop3% dv300 any,2017-2023H1,589,-0.54,-0.46,-0.9
+B,drop3% dv300 any,2023H2-2026 (news window),329,-0.46,-0.33,-0.5
+B,drop2% dv1000 any,2017-2023H1,492,-0.1,-0.02,-0.0
+B,drop2% dv1000 any,2023H2-2026 (news window),318,0.91,1.04,1.6
+C,drop2% dv300 any,2017-2023H1,618,-0.27,-0.16,-0.4
+C,drop2% dv300 any,2023H2-2026 (news window),332,-0.24,-0.04,-0.1
+C,drop2% dv300 weak,2017-2023H1,589,0.26,0.36,0.8
+C,drop2% dv300 weak,2023H2-2026 (news window),330,0.12,0.33,0.5
+C,drop2% dv300 wild,2017-2023H1,495,-0.44,-0.34,-0.6
+C,drop2% dv300 wild,2023H2-2026 (news window),331,0.12,0.32,0.4
+C,drop3% dv300 any,2017-2023H1,576,-0.17,-0.07,-0.1
+C,drop3% dv300 any,2023H2-2026 (news window),331,-0.5,-0.3,-0.4
+C,drop2% dv1000 any,2017-2023H1,421,-0.91,-0.8,-1.3
+C,drop2% dv1000 any,2023H2-2026 (news window),320,0.09,0.29,0.4

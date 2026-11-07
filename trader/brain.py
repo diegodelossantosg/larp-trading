@@ -502,14 +502,16 @@ wires (PR Newswire, Business Wire), fresh SEC 8-K filings (official notices of m
 events; they name the company, not the ticker), market news (CNBC, MarketWatch, Seeking Alpha) and
 policy news (Federal Reserve, White House). big_company_moves_today lists the companies moving most
 against the S&P 500 today among the ~65 big names and ~290 other heavily traded US companies (all
-trading $300M+ a day), even if no headline above mentions them: look up why. The test found the drop
+trading $300M+ a day), even if no headline above mentions them: look up why. Prefer volatile
+stocks: code skips companies whose normal daily swing is under 3% (our tests found the rebound
+only in the volatile ones, and in stocks already below their 50-day average). The test found the drop
 rebound only in companies that trade at least $300M a day; code skips thinner ones, so don't
 propose them.
 
-Rules (code enforces them too): at most 2 ideas; each buy is about 7.5% of the portfolio, protected by
-a trailing stop (8-20% for stocks, sized to their normal swing; 6% for ETFs). Overreaction and
+Rules (code enforces them too): at most 2 ideas; each buy is about 10% of the portfolio, protected by
+a wide trailing stop (20%). Overreaction and
 big-news buys are kept at least 10 trading days (that is how long the effect took in our tests). Big well-known companies up to 10% each; smaller
-companies up to 5% each and 10% together, no penny stocks; all stocks together up to 40%. Never a
+companies up to 5% each and 10% together, no penny stocks; all stocks together up to 30%. Never a
 stock that reports earnings within the next 3 trading days: give its NEXT earnings date (YYYY-MM-DD,
 verified) or
 'unknown', and 'n/a' for ETFs. No leveraged or inverse ETFs.

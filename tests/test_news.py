@@ -40,6 +40,7 @@ def run(tmp_path, monkeypatch, ideas):
     monkeypatch.setattr(main, "_today", lambda: "2026-10-15")
     monkeypatch.setattr(main, "claude_available", lambda cfg: True)
     monkeypatch.setattr(main, "hunt_news", lambda cfg, ctx: ({"summary": "One real opportunity.", "ideas": ideas}, None))
+    monkeypatch.setattr(main, "NEWS_MIN_ATR_PCT", 0.0)    # the fake price history is calm; the ATR rule has its own test
     broker = HeldBroker()
     assert main.news(cfg(idle_asset="SSO"), broker, NewsMarket(), dry_run=False, force=True) == 0
     return broker, journal.read("decisions.json", [])[-1]
@@ -53,7 +54,7 @@ def idea(sym, earnings="2026-12-01"):
 def test_news_buys_are_sized_funded_and_journaled(tmp_path, monkeypatch):
     broker, rec = run(tmp_path, monkeypatch, [idea("NVDA"), idea("DASH")])
     sent = {(o.symbol, o.side): o.notional for o in broker.sent}
-    assert sent[("NVDA", "buy")] == 750 and sent[("DASH", "buy")] == 750   # 7.5% each
+    assert sent[("NVDA", "buy")] == 1000 and sent[("DASH", "buy")] == 1000   # 10% each
     assert sent[("SSO", "sell")] > 0                                        # paid for by selling SSO
     assert rec["source"] == "news" and rec["plain_summary"] == "One real opportunity."
     assert journal.read("news.json", {})["buys"]["2026-10-15"] == 2
@@ -108,3 +109,15 @@ def test_corporate_actions_parse_and_split_today():
     assert {"type": "forward_split", "symbols": ["QUAL"], "ex_date": "2026-11-05", "ratio": 4.0} in rows
     assert corp_actions.splits_today(rows, "2026-11-05") == {"QUAL": 4.0}
     assert corp_actions.splits_today(rows, "2026-11-06") == {}
+
+
+def test_news_buys_skip_calm_stocks(tmp_path, monkeypatch):
+    monkeypatch.setattr(journal, "DATA_DIR", tmp_path)
+    monkeypatch.setattr(main, "_today", lambda: "2026-10-15")
+    monkeypatch.setattr(main, "claude_available", lambda cfg: True)
+    monkeypatch.setattr(main, "hunt_news", lambda cfg, ctx: ({"summary": "x", "ideas": [idea("NVDA")]}, None))
+    broker = HeldBroker()
+    main.news(cfg(idle_asset="SSO"), broker, NewsMarket(), dry_run=False, force=True)    # the fake NVDA swings ~1% a day
+    rec = journal.read("decisions.json", [])[-1]
+    assert not [o for o in broker.sent if o.side == "buy"]
+    assert any("too calm" in n for n in rec["notes"])

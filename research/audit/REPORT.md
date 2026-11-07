@@ -90,3 +90,19 @@ SSO es el S&P con el doble de fuerza: gana más cuando el S&P sube sin que haya 
 
 Con ideas de Claude sin habilidad: HOY = +1,7 puntos sobre el S&P; 30 % ideas = +3,3; **0 % ideas + News Hunter = +5,8** (caída −18,6 %, 4 de 4 años ganando); 80 % ideas = −0,7; sin News Hunter = −3,9. Con +5 %/año de habilidad en las ideas: HOY +4,2; 30 % +4,9; 0 % ideas +5,8.
 La única fuente de ventaja con respaldo en datos es el **News Hunter** (t ≈ 2,3 con 410 compras; intervalo aproximado del 95 %: de +1 a +9 puntos/año). Las ideas al azar pierden contra el S&P.
+
+
+## Pruebas adicionales (segunda ronda)
+
+1. **¿Funciona comprar grandes caídas sin mirar las noticias?** (`run_reversal.py`, 10 años, grupos A/B/C, 1.080 combinaciones por grupo). **No**: ventaja ≈ 0 o negativa (−0,1 a −0,3 % por compra). Solo la variante «la acción ya está por debajo de su media de 50 días» sale positiva en los 3 grupos y en las 2 ventanas (+0,3 % por compra, 6 de 6); y con acciones muy líquidas (≥ 1.000 M$/día) y espera de 5 días, las 12 celdas son positivas (+0,13 a +0,85 %). Conclusión: la ventaja del News Hunter viene de la **noticia**, y la «debilidad previa» la refuerza.
+2. **Qué noticias rinden más** (`slices_news.py`; dev y holdout por separado, 26 cortes): consistente en ambos grupos: acciones **movidas** (ATR ≥ 4 %: +1,35 y +1,77 %), **debajo de su media de 50 días** (+1,0 y +1,0), **cayendo en los 20 días previos** (+1,0 y +1,4); acciones **tranquilas** (ATR < 2,5 %): negativas (−0,2 y −0,6). Los avisos tipo «analista» o la caída entre 3 y 5 % no se repiten entre grupos.
+3. **Cartera con esos filtros** (`run_final2.py`, dinero parado en SPY). El filtro «acciones movidas (ATR ≥ 3 %)» con 10 % por compra sale mejor que la regla anterior en las 4 pruebas:
+
+| Variante | Todas | Solo dev | Solo holdout | Ventaja a la mitad | Peor caída |
+|---|---|---|---|---|---|
+| Anterior (sin filtro, 7,5 %) | +5,7 | +1,0 | +2,7 | +2,9 | −18,1 % |
+| **Acciones movidas, 10 %** | **+7,6** | **+3,1** | **+6,8** | **+3,8** | −20,2 % |
+| Movidas y bajo media 50d, 10 % | +4,9 | +2,0 | +5,3 | +2,5 | −19,6 % |
+| Bajo media 50d, 10 % | +3,6 | +0,4 | +3,7 | +1,8 | −21,5 % |
+
+Se aplicó «acciones movidas + 10 %». Ojo: se probaron 8 variantes y 26 cortes, así que parte de la mejora puede ser suerte; por eso se exige que se repita en dev y holdout por separado. Combinar «movidas» y «debajo de la media» dobla la ventaja por compra pero reduce las compras a la mitad y no mejora la cartera.
