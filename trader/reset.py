@@ -79,6 +79,9 @@ def on_open(broker, cfg) -> int:
     if left:
         log.error("%d positions still unsold; will try again", left)
         return 1
+    cap = journal._path("capital.json")
+    if cap.exists():
+        cap.unlink()   # the next daily run starts the $1,000 from the account's value right now (all cash)
     journal.write("liquidate.json", {"pending": False, "done": now})
     log.info("all positions sold")
     return 0

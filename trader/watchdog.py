@@ -38,12 +38,18 @@ def trade_done(decisions: list[dict], today: str) -> bool:
 
 
 def missing_agents(now: datetime, market_open: bool, decisions: list[dict],
-                   watch_active: bool, news_age_min: float | None) -> list[str]:
+                   watch_active: bool, news_age_min: float | None, liquidate_pending: bool = False) -> list[str]:
     """Which agents should be running by now but aren't. Nothing is missing while the market is closed."""
     if not market_open:
         return []
     now = now.astimezone(ET)
     t, out = now.time(), []
+    if liquidate_pending:      # the one-time sale comes first; trade and news wait for it
+        if t >= WATCH_DUE:
+            out.append("liquidate")
+        if t >= WATCH_DUE and not watch_active:
+            out.append("watch")
+        return out
     if t >= TRADE_DUE and not trade_done(decisions, now.strftime("%Y-%m-%d")):
         out.append("trade")
     if t >= WATCH_DUE and not watch_active:
@@ -79,7 +85,8 @@ def main() -> int:
     now = datetime.now(ET)
     is_open = Broker(load_config()).market_open()
     missing = missing_agents(now, is_open, journal.read("decisions.json", []),
-                             watch_active(_runs("watch.yml")), news_age_min(_runs("hunter.yml"), now))
+                             watch_active(_runs("watch.yml")), news_age_min(_runs("hunter.yml"), now),
+                             bool(journal.read("liquidate.json", {}).get("pending")))
     logging.info("market open: %s; missing: %s", is_open, missing or "nothing")
     print(json.dumps(missing))
     return 0
