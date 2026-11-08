@@ -169,35 +169,58 @@ details.sold-day > summary .small { font-weight: 400; }
 details.sold-day > summary b { margin-left: auto; }
 details.old-logs { margin-top: 12px; border-top: 1px solid var(--line, #e5e5e5); padding-top: 8px; }
 details.old-logs > summary { cursor: pointer; font-weight: 600; color: var(--ink-2); padding: 6px 0; }
+/* --- clearer layout */
+.hero { padding: 22px 26px; }
+.hero .foot { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px 22px; align-items: center; border-top: 1px solid rgba(255,255,255,.22); padding-top: 12px; font-size: 14px; font-weight: 500; }
+.hero .foot .sep { opacity: .5; }
+.hero .foot b { font-weight: 700; }
+.hero .versus .small { margin-top: 6px; }
+.note { display: flex; gap: 10px; align-items: flex-start; background: var(--note); border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px; margin-top: 14px; font-size: 14px; color: var(--ink-2); }
+.note b { color: var(--ink); }
+.card.compact { padding: 12px 18px; }
+.card.compact h2 { font-size: 16px; margin-bottom: 0; }
+.card.compact .empty { padding: 6px 0 0; font-size: 14px; }
+.holdings-wrap { align-items: flex-start; }
+.donut { width: 190px; height: 190px; position: sticky; top: 12px; }
+.holdings-wrap td:first-child { white-space: nowrap; }
+.holdings-wrap td .nm { display: block; margin-left: 18px; font-size: 12px; color: var(--ink-2); max-width: 150px; overflow: hidden; text-overflow: ellipsis; }
+.holdings-wrap tr.cashrow td { color: var(--ink-2); }
+.holdings-wrap td { vertical-align: middle; padding: 9px 8px; }
+@media (max-width: 700px) { .holdings-wrap th:nth-child(2), .holdings-wrap td:nth-child(2), .holdings-wrap th:nth-child(4), .holdings-wrap td:nth-child(4), .holdings-wrap th:nth-child(5), .holdings-wrap td:nth-child(5) { display: none; } .donut { position: static; margin: 0 auto; } }
+@media (max-width: 700px) { .hero .foot .sep { display: none; } }
+.bottom-grid > .card:first-child, #log-card { grid-column: 1 / -1; }
+.hero .versus:empty { display: none; }
+.bar { display: inline-block; height: 6px; border-radius: 3px; background: var(--c, var(--series-1)); vertical-align: middle; margin-right: 6px; opacity: .85; }
 h2::before { content: ""; width: 4px; height: 18px; border-radius: 2px; background: var(--h, var(--series-1)); }
 </style>
 </head>
 <body>
 <main>
-  <p class="small" style="margin:0 0 8px">This is the classic view. <a href="./">Back to the Trading Floor</a>.</p>
+  <p class="small" style="margin:0 0 8px">This is the simple view. <a href="./">Open the animated office</a>.</p>
   <div class="banner live" id="mode" hidden></div>
 
   <section class="card hero" id="hero"></section>
+  <div id="note"></div>
 
   <div class="top-grid">
     <section class="card">
       <div class="toolbar">
-        <h2 style="--h: var(--series-1)">AI vs S&amp;P 500</h2>
+        <h2 style="--h: var(--series-1)">My AI vs the stock market</h2>
         <div class="intervals" id="intervals">
           <button data-iv="1m">1m</button><button data-iv="5m">5m</button><button data-iv="15m">15m</button><button data-iv="1H">1H</button><button data-iv="1D">1D</button>
         </div>
         <button class="link" id="toggle-table">Table</button>
       </div>
       <div class="legend">
-        <span style="--c: var(--series-1)">AI portfolio</span>
-        <span class="dash" style="--c: var(--series-2)">S&amp;P 500</span>
+        <span style="--c: var(--series-1)">My AI's money</span>
+        <span class="dash" style="--c: var(--series-2)">Same money left in the S&amp;P 500 (no trading)</span>
       </div>
       <div class="chart-wrap" id="chart"></div>
       <div class="table-scroll" id="chart-table" hidden></div>
     </section>
 
     <section class="card">
-      <h2 style="--h: var(--c6)">Closed trades</h2>
+      <h2 style="--h: var(--c6)">Finished trades <span class="small">(sold completely)</span></h2>
       <div id="closed-summary"></div>
       <div class="table-scroll" id="closed"></div>
     </section>
@@ -205,23 +228,23 @@ h2::before { content: ""; width: 4px; height: 18px; border-radius: 2px; backgrou
 
   <div class="bottom-grid">
     <section class="card">
-      <h2 style="--h: var(--c3)">Holdings</h2>
+      <h2 style="--h: var(--c3)">What I own now</h2>
       <div class="table-scroll" id="holdings"></div>
     </section>
 
     <section class="card" id="sold-card">
-      <h2 style="--h: var(--c5)">Sold</h2>
+      <h2 style="--h: var(--c5)">Partial sales <span class="small">(sold some, kept the rest)</span></h2>
       <div id="sold-summary"></div>
       <div class="table-scroll" id="sold"></div>
     </section>
 
     <section class="card">
-      <h2 style="--h: var(--c4)">Who's earning</h2>
+      <h2 style="--h: var(--c4)">Which part of the AI earns money?</h2>
       <div class="table-scroll" id="scorecard"></div>
     </section>
 
     <details class="card log" id="log-card" open>
-      <summary><h2 style="--h: var(--c7)">Daily log</h2></summary>
+      <summary><h2 style="--h: var(--c7)">What the AI did, day by day</h2></summary>
       <div id="decisions"></div>
     </details>
   </div>
@@ -275,12 +298,31 @@ function hero(status, equity) {
     </div>`;
   };
   const gap = bench != null ? now - bench : null;
-  const verdict = gap == null ? "" : Math.abs(gap) < 0.005 ? "Tied" : `AI is ${gap > 0 ? "ahead" : "behind"} by<b>${usd(Math.abs(gap))}</b>`;
+  const verdict = gap == null ? "" : Math.abs(gap) < 0.005 ? "Same as the S&amp;P 500" : `The AI is ${gap > 0 ? "beating" : "losing to"} the S&amp;P 500 by<b>${usd(Math.abs(gap))}</b>`;
   const updated = status.updated ? new Date(status.updated).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false }) : "";
   $("hero").innerHTML = `
-    ${col("AI portfolio", now, prevRow?.equity ?? start)}
-    <div class="versus ${gap == null ? "" : cls(gap)}">${verdict}${updated ? `<div class="small">Updated ${updated}</div>` : ""}</div>
-    ${bench != null ? col("All in the S&amp;P 500", bench, benchPrev) : `<div class="side"></div>`}`;
+    ${col("My AI's money", now, prevRow?.equity ?? start)}
+    <div class="versus ${gap == null ? "" : cls(gap)}">${verdict}</div>
+    ${bench != null ? col("Same money in the S&amp;P 500", bench, benchPrev) : `<div class="side"></div>`}
+    ${footLine(now, bench, start, updated)}`;
+}
+
+// Rough Spanish tax if everything were sold today: 19% of the gain (a loss pays nothing). An estimate, not tax advice:
+// it ignores the euro rate, losses carried over and dividend withholding.
+const TAX_RATE = 0.19;
+const afterTax = (value, start) => value - TAX_RATE * Math.max(0, value - start);
+function footLine(now, bench, start, updated) {
+  const bits = [];
+  if (bench != null) bits.push(`<span title="If everything were sold today and ${Math.round(TAX_RATE * 100)}% tax paid on the gain (Spain's lowest rate). Estimate only, not tax advice.">After estimated tax (${Math.round(TAX_RATE * 100)}% on gains): AI <b>${usd(afterTax(now, start))}</b> · S&amp;P 500 <b>${usd(afterTax(bench, start))}</b></span>`);
+  if (updated) bits.push(`<span>Updated ${updated}</span>`);
+  return bits.length ? `<div class="foot">${bits.join('<span class="sep">|</span>')}</div>` : "";
+}
+
+// While there are only a few days of results, say so: a short lead or lag is mostly luck.
+function earlyNote(equity) {
+  const days = equity.length;
+  if (days >= 60) { $("note").innerHTML = ""; return; }
+  $("note").innerHTML = `<div class="note"><span>⏳</span><span><b>Too early to judge.</b> ${days < 2 ? "Only the first day so far" : `Only ${days} days of results`}. Beating or trailing the S&amp;P 500 over a few days is mostly luck; it takes a few months of results to say whether the AI really does better.</span></div>`;
 }
 
 const DATA = { status: {}, equity: [], intraday: {} };
@@ -294,7 +336,7 @@ function seriesFor(iv, equity, intraday, status) {
     const today = new Date().toLocaleDateString("en-CA", { timeZone: "America/New_York" });
     if (pts.length && status.equity != null && !rows.some((r) => r.date === today))
       rows.push({ date: today, equity: status.equity, spy_close: pts.at(-1)[2] });
-    return { rows, empty: "Starts after day 2." };
+    return { rows, empty: "The chart appears after the second day." };
   }
   const [mins, sessions] = INTERVALS[iv];
   const pts = (intraday.points || []).filter((p) => p[1] != null && p[2] != null);
@@ -350,7 +392,7 @@ function chart(equity, emptyMsg = "Starts after day 2.") {
   let ya = ys(last.agent), yb = ys(last.spy);
   if (Math.abs(ya - yb) < 14) { const mid = (ya + yb) / 2, up = ya <= yb; ya = mid + (up ? -7 : 7); yb = mid + (up ? 7 : -7); }
   el.innerHTML = `
-  <svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="AI portfolio value compared with the S&P 500">
+  <svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="My AI's money compared with the same money in the S&P 500">
     ${ticks.map((t) => `<line x1="${m.l}" x2="${W - m.r}" y1="${ys(t)}" y2="${ys(t)}" stroke="var(--grid)"/>
       <text x="${m.l - 8}" y="${ys(t) + 4}" text-anchor="end" font-size="11" fill="var(--muted)">${usd(t, 0)}</text>`).join("")}
     ${base >= lo && base <= hi ? `<line x1="${m.l}" x2="${W - m.r}" y1="${ys(base)}" y2="${ys(base)}" stroke="var(--axis)" stroke-dasharray="2 3"/>` : ""}
@@ -400,7 +442,7 @@ function niceTicks(lo, hi, n) {
 
 function holdings(status) {
   const ps = status.positions || [];
-  if (!ps.length) { $("holdings").innerHTML = `<div class="empty">Nothing yet.</div>`; return; }
+  if (!ps.length) { $("holdings").innerHTML = `<div class="empty">Nothing owned right now. Everything is in cash.</div>`; return; }
   const cash = status.cash;
   const colors = ["var(--series-1)", "var(--series-2)", "var(--c3)", "var(--c4)", "var(--c5)", "var(--c6)", "var(--c7)", "var(--c8)"];
   const col = (i) => colors[i % colors.length];
@@ -418,28 +460,14 @@ function holdings(status) {
     a0 = a1 + 0.012;
     return `<path d="${d}" fill="${x.c}"><title>${esc(x.label)} ${(x.v / total * 100).toFixed(1)}% · ${usd(x.v)}</title></path>`;
   }).join("");
-  const donut = `<svg class="donut" viewBox="0 0 160 160" width="160" height="160" role="img" aria-label="Holdings split">${arcs}
-    <text x="80" y="76" text-anchor="middle" font-size="11" fill="var(--ink-2)">Total</text>
+  const donut = `<svg class="donut" viewBox="0 0 160 160" width="160" height="160" role="img" aria-label="How the money is split">${arcs}
+    <text x="80" y="76" text-anchor="middle" font-size="11" fill="var(--ink-2)">In total</text>
     <text x="80" y="94" text-anchor="middle" font-size="15" font-weight="700" fill="var(--ink)">${usd(total, 0)}</text></svg>`;
-  $("holdings").innerHTML = `<div class="holdings-wrap">${donut}<table><thead><tr><th>ETF</th><th class="num">Share</th><th class="num">Value</th><th class="num">Change today</th><th class="num">Total gain $</th><th class="num">Total gain %</th></tr></thead><tbody>
-  ${ps.map((p, i) => `<tr><td><span class="dot" style="background:${col(i)}"></span><b>${esc(p.symbol)}</b> <span class="small">${esc(p.name || "")}</span></td><td class="num">${(p.weight * 100).toFixed(0)}%</td>
+  $("holdings").innerHTML = `<div class="holdings-wrap">${donut}<table><thead><tr><th>What</th><th class="num">% of my money</th><th class="num">Worth now</th><th class="num">Today</th><th class="num">Gain / loss since bought</th><th class="num">Gain / loss %</th></tr></thead><tbody>
+  ${ps.map((p, i) => `<tr><td><span class="dot" style="background:${col(i)}"></span><b>${esc(p.symbol)}</b><span class="nm" title="${esc(p.name || "")}">${esc(p.name || "")}</span></td><td class="num">${(p.weight * 100).toFixed(0)}%</td>
     <td class="num">${usd(p.market_value)}</td><td class="num ${p.change_today_usd != null ? cls(p.change_today_usd) : ""}">${p.change_today_usd != null ? signedUsd(p.change_today_usd) : "–"}</td><td class="num ${cls(p.unrealized_pl)}">${signedUsd(p.unrealized_pl)}</td><td class="num ${cls(p.unrealized_pl)}">${pct((p.unrealized_plpc || 0) * 100)}</td></tr>`).join("")}
-  ${cash != null && Math.abs(cash) >= 0.5 ? `<tr><td><span class="dot" style="background:var(--axis)"></span><b>Cash</b></td><td class="num">${(cash / status.equity * 100).toFixed(0)}%</td><td class="num">${usd(cash)}</td><td class="num">–</td><td class="num">–</td><td class="num">–</td></tr>` : ""}
+  ${cash != null && Math.abs(cash) >= 0.5 ? `<tr class="cashrow"><td><span class="dot" style="background:var(--axis)"></span><b>Cash</b><span class="nm">not invested</span></td><td class="num">${(cash / status.equity * 100).toFixed(0)}%</td><td class="num">${usd(cash)}</td><td class="num">–</td><td class="num">–</td><td class="num">–</td></tr>` : ""}
   </tbody></table></div>`;
-}
-
-function moodView(status, decisions) {
-  const h = status.health;
-  if (!h || !h.gauges || !Object.keys(h.gauges).length) {
-    $("mood").innerHTML = `<div class="empty">Appears after the next daily decision.</div>`;
-    return;
-  }
-  const icon = { healthy: "🟢 Healthy", cautious: "🟡 Cautious", stressed: "🔴 Stressed" }[h.mood] || h.mood;
-  const items = Object.values(h.gauges).filter((g) => g.title).map((g) => [g.title, g.display, g.label]);
-  const last = decisions.slice().reverse().find((d) => (d.upcoming_events || []).length);
-  $("mood").innerHTML = `<span class="mood-badge mood-${esc(h.mood)}">${esc(icon)}</span>
-    <div class="gauges">${items.map(([l, v, t]) => `<div class="gauge"><div class="label">${l}</div><div class="value">${esc(v)}</div><div class="label">${esc(t)}</div></div>`).join("")}</div>
-    ${last ? `<details><summary>Coming up</summary><ul class="events">${last.upcoming_events.map((e) => `<li>${esc(e)}</li>`).join("")}</ul></details>` : ""}`;
 }
 
 function exitReason(t, decisions) {
@@ -448,7 +476,7 @@ function exitReason(t, decisions) {
     if (d.date !== t.closed_date) continue;
     const o = (d.orders || []).find((o) => o.symbol === t.symbol && o.side === "sell");
     if (!o) continue;
-    if ((o.reason || "").startsWith("trailing stop")) return "🛑 Stop";
+    if ((o.reason || "").startsWith("trailing stop")) return "🛑 Safety stop";
     return d.source === "watch" ? "⚡ Watcher" : d.source === "news" ? "📰 News Hunter" : "🧠 Claude's decision";
   }
   return "–";
@@ -459,12 +487,12 @@ const SOURCE_ICON = { claude: "🧠", watch: "⚡", news: "📰" };
 const WHO_ICON = { claude: "🧠", watch: "⚡", news: "📰" };
 
 function saleReason(r, decisions) {
-  const idle = DATA.status.idle_asset || "SSO";
+  const idle = DATA.status.idle_asset || "SPY";
   for (const d of decisions) {
     const o = (d.orders || []).find((x) => x.order_id === r.order_id);
     if (!o) continue;
     const k = moveKind(d, o, idle);
-    return (o.reason || "").startsWith("trailing stop") ? "🛑 Stop: dropped too far from its best price."
+    return (o.reason || "").startsWith("trailing stop") ? "🛑 Safety stop: it fell too far from its best price."
       : (k.reason || plainReason(d, o, idle));
   }
   return "";
@@ -480,11 +508,11 @@ function salesSummary(rows) {
 function statTiles(s, countLabel) {
   const tile = (label, value, c = "") => `<div class="stat"><div class="small">${label}</div><b class="${c}">${value}</b></div>`;
   return `<div class="stats">
-    ${tile("Total made", signedUsd(s.total_pnl), cls(s.total_pnl))}
-    ${tile(countLabel, `${s.sales} <span class="small">(<span class="up">${s.won} won</span> · <span class="down">${s.lost} lost</span>)</span>`)}
-    ${tile("Win rate", Math.round(s.win_rate * 100) + "%")}
-    ${tile("Avg win", s.avg_win_pct != null ? pct(s.avg_win_pct) : "–", "up")}
-    ${tile("Avg loss", s.avg_loss_pct != null ? pct(s.avg_loss_pct) : "–", "down")}
+    ${tile("Total gain / loss", signedUsd(s.total_pnl), cls(s.total_pnl))}
+    ${tile(countLabel, `${s.sales} <span class="small">(<span class="up">${s.won} gained</span> · <span class="down">${s.lost} lost</span>)</span>`)}
+    ${tile("Made money", Math.round(s.win_rate * 100) + "% of them")}
+    ${tile("Average gain", s.avg_win_pct != null ? pct(s.avg_win_pct) : "–", "up")}
+    ${tile("Average loss", s.avg_loss_pct != null ? pct(s.avg_loss_pct) : "–", "down")}
   </div>`;
 }
 
@@ -492,16 +520,16 @@ function soldView(data, decisions) {
   const rows = ((data && data.rows) || []).filter((r) => !r.full);
   if (!rows.length) {
     $("sold-summary").innerHTML = "";
-    $("sold").innerHTML = `<div class="empty">No trims yet. When part of a holding is sold, it shows here with what it earned.</div>`;
+    $("sold").innerHTML = `<div class="empty">Nothing yet. When the AI sells only part of something it owns, it appears here with what it earned.</div>`;
     return;
   }
-  $("sold-summary").innerHTML = statTiles(salesSummary(rows), "Trims");
+  $("sold-summary").innerHTML = statTiles(salesSummary(rows), "Partial sales");
   const days = [...new Set(rows.map((r) => r.date))].sort().reverse();
   const nice = (d) => new Date(d + "T12:00:00Z").toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" });
   $("sold").innerHTML = days.map((day, i) => {
     const dr = rows.filter((r) => r.date === day), tot = dr.reduce((t, r) => t + r.pnl, 0);
     return `<details class="sold-day"${i === 0 ? " open" : ""}><summary>${nice(day)}<b class="${cls(tot)}">${signedUsd(tot)}</b></summary>
-    <table class="sold"><thead><tr><th>What</th><th>Comment</th><th class="num">Made</th><th class="num">%</th><th class="num">vs S&amp;P</th></tr></thead><tbody>
+    <table class="sold"><thead><tr><th>What</th><th>Why it was sold</th><th class="num">Gain / loss</th><th class="num">%</th><th class="num">Compared with the S&amp;P</th></tr></thead><tbody>
     ${dr.map((r) => `<tr>
       <td>${WHO_ICON[r.bought_by] || "🧠"} <b>${esc(r.symbol)}</b><div class="small">${esc(r.name || "")}</div></td>
       <td class="comment">${esc(saleReason(r, decisions))}</td>
@@ -513,8 +541,16 @@ function soldView(data, decisions) {
 }
 
 // Sold card as tall as Holdings (when side by side); the rest scrolls inside it.
+function markCompact() {
+  for (const id of ["closed", "sold"]) {
+    const card = $(id).closest(".card"), only = $(id).firstElementChild;
+    card.classList.toggle("compact", !!only && only.classList.contains("empty") && $(id).children.length === 1);
+  }
+}
 function syncSoldHeight() {
   const h = $("holdings").closest(".card"), sold = $("sold-card");
+  markCompact();
+  if (sold.classList.contains("compact")) { sold.style.height = ""; $("sold").style.maxHeight = ""; return; }
   const side = h.getBoundingClientRect().top === sold.getBoundingClientRect().top;
   sold.style.height = side ? h.offsetHeight + "px" : "";
   $("sold").style.maxHeight = side ? "none" : "";
@@ -524,11 +560,11 @@ function closedFromSales(data) {
   const rows = ((data && data.rows) || []).filter((r) => r.full);
   if (!rows.length) {
     $("closed-summary").textContent = "";
-    $("closed").innerHTML = `<div class="empty">No closed trades yet. A trade appears here once something is fully sold.</div>`;
+    $("closed").innerHTML = `<div class="empty">Nothing yet. A trade appears here once the AI has sold all of it.</div>`;
     return;
   }
   $("closed-summary").innerHTML = statTiles(salesSummary(rows), "Trades");
-  $("closed").innerHTML = `<table><thead><tr><th>What</th><th>Sold</th><th class="num">Made</th><th class="num">%</th><th class="num">vs S&amp;P</th></tr></thead><tbody>
+  $("closed").innerHTML = `<table><thead><tr><th>What</th><th>Sold on</th><th class="num">Gain / loss</th><th class="num">%</th><th class="num">Compared with the S&amp;P</th></tr></thead><tbody>
   ${rows.slice(0, 12).map((r) => `<tr><td>${WHO_ICON[r.bought_by] || "🧠"} <b>${esc(r.symbol)}</b></td>
     <td>${esc(r.date)}</td><td class="num ${cls(r.pnl)}">${signedUsd(r.pnl)}</td><td class="num ${cls(r.pnl_pct)}">${pct(r.pnl_pct)}</td>
     <td class="num ${r.vs_spy_pct != null ? cls(r.vs_spy_pct) : ""}">${r.vs_spy_pct != null ? pct(r.vs_spy_pct) : "–"}</td></tr>`).join("")}
@@ -539,7 +575,7 @@ function closedView(trades, decisions) {
   const closed = trades.filter((t) => !t.open).sort((a, b) => (b.closed_date || "").localeCompare(a.closed_date || ""));
   if (!closed.length) {
     $("closed-summary").textContent = "";
-    $("closed").innerHTML = `<div class="empty">No closed trades yet. A trade appears here once something is fully sold.</div>`;
+    $("closed").innerHTML = `<div class="empty">Nothing yet. A trade appears here once the AI has sold all of it.</div>`;
     return;
   }
   const rows = closed.map((t) => {
@@ -548,8 +584,8 @@ function closedView(trades, decisions) {
     return { ...t, ret, vs, days, usdRes: t.amount * ret };
   });
   const won = rows.filter((r) => r.usdRes > 0).length, total = rows.reduce((a, r) => a + r.usdRes, 0);
-  $("closed-summary").innerHTML = `${rows.length} closed · <b class="up">${won} won</b> · <b class="down">${rows.length - won} lost</b> · total <b class="${cls(total)}">${signedUsd(total)}</b>`;
-  $("closed").innerHTML = `<table><thead><tr><th>What</th><th>Bought → Sold</th><th class="num">Days</th><th class="num">Invested</th><th class="num">Result $</th><th class="num">Result %</th><th class="num">vs S&amp;P</th><th>Why sold</th></tr></thead><tbody>
+  $("closed-summary").innerHTML = `${rows.length} finished · <b class="up">${won} gained</b> · <b class="down">${rows.length - won} lost</b> · total <b class="${cls(total)}">${signedUsd(total)}</b>`;
+  $("closed").innerHTML = `<table><thead><tr><th>What</th><th>Bought → sold</th><th class="num">Days held</th><th class="num">Money in</th><th class="num">Gain / loss $</th><th class="num">Gain / loss %</th><th class="num">Compared with the S&amp;P</th><th>Why it was sold</th></tr></thead><tbody>
   ${rows.map((r) => `<tr><td>${SOURCE_ICON[r.source] || "🧠"} <b>${esc(r.symbol)}</b></td><td>${esc(r.date)} → ${esc(r.closed_date || "?")}</td>
     <td class="num">${r.days ?? "–"}</td><td class="num">${usd(r.amount)}</td>
     <td class="num ${cls(r.usdRes)}">${signedUsd(r.usdRes)}</td><td class="num ${cls(r.ret)}">${pct(r.ret * 100)}</td>
@@ -559,9 +595,9 @@ function closedView(trades, decisions) {
 
 function scorecardView(status) {
   const sc = status.scorecard || {};
-  const rows = [["claude", "🧠 Claude's daily picks"], ["watch", "⚡ Watcher buys"], ["news", "📰 News Hunter buys"]];
-  if (!Object.keys(sc).length) { $("scorecard").innerHTML = `<div class="empty">Starts with the next buy.</div>`; return; }
-  $("scorecard").innerHTML = `<table><thead><tr><th>Source</th><th class="num">Buys</th><th class="num">Avg return</th><th class="num">vs S&amp;P 500</th><th class="num">Beat S&amp;P</th><th class="num">$ vs S&amp;P</th></tr></thead><tbody>
+  const rows = [["claude", "🧠 Claude's daily ideas"], ["watch", "⚡ Watcher (safety stops and sells)"], ["news", "📰 News Hunter (buys after bad news)"]];
+  if (!Object.keys(sc).length) { $("scorecard").innerHTML = `<div class="empty">Nothing yet. This fills in after the first buys, and shows who does better: Claude, the Watcher or the News Hunter.</div>`; return; }
+  $("scorecard").innerHTML = `<table><thead><tr><th>Who decided</th><th class="num">Buys</th><th class="num">Average gain</th><th class="num">Better / worse than S&amp;P</th><th class="num">Times it beat the S&amp;P</th><th class="num">$ more / less than S&amp;P</th></tr></thead><tbody>
   ${rows.map(([k, label]) => { const r = sc[k];
     if (!r) return `<tr><td><b>${label}</b></td><td class="num">0</td><td colspan="4" class="small">No buys yet</td></tr>`;
     return `<tr><td><b>${label}</b></td><td class="num">${r.buys}</td>
@@ -572,11 +608,9 @@ function scorecardView(status) {
 
 function describeOrders(orders) {
   const ok = (orders || []).filter((o) => !["error", "skipped"].includes(o.status));
-  if (!ok.length) return `<span class="tag hold">No changes</span>`;
+  if (!ok.length) return `<span class="tag hold">Nothing done</span>`;
   return ok.map((o) => `<span class="tag ${o.side}">${o.side === "buy" ? "Buy" : "Sell"} ${esc(o.symbol)} ${usd(o.notional, 0)}</span>`).join("");
 }
-
-const NAMES = {};  // filled from holdings: symbol -> short description
 
 function firstSentence(t, max = 110) {
   const f = (t || "").split(/(?<=[.!?])\s/)[0];
@@ -586,7 +620,7 @@ function firstSentence(t, max = 110) {
 function plainReason(d, o, idle) {
   const r = o.reason || "";
   const buys = (d.orders || []).filter((x) => x.side === "buy").map((x) => x.symbol);
-  if (r.startsWith("trailing stop")) return `Sold to limit the loss: it dropped ${(r.match(/([\d.]+)% below/) || [])[1] || "6"}% from its best price.`;
+  if (r.startsWith("trailing stop")) return `Sold to limit the loss: it dropped ${(r.match(/([\d.]+)% below/) || [])[1] || "20"}% from its best price.`;
   if (d.source === "news" && o.side === "buy") return r || "Breaking news that should push it up.";
   if (r.startsWith("funding")) return `Sold a little to pay for ${buys.join(" and ")}.`;
   if (d.source === "watch" && o.side === "buy") {
@@ -594,7 +628,7 @@ function plainReason(d, o, idle) {
     const n = (r.match(/^(\d)\/6/) || [])[1];
     return claude || `Rising strongly today with lots of buyers${n ? ` (${n} of 6 buy signals)` : ""}.`;
   }
-  if (o.symbol === idle) return o.side === "buy" ? "Spare money goes to the S&P 500 ×2." : "Took money from the S&P 500 ×2 for stronger ideas.";
+  if (o.symbol === idle) return o.side === "buy" ? `Spare money goes to ${o.symbol}, which follows the S&P 500.` : `Took money from ${o.symbol} for stronger ideas.`;
   if (o.side === "buy") {
     const p = (d.positions || []).find((x) => x.symbol === o.symbol);
     return p ? p.plain_reason || firstSentence(p.thesis) : "Claude expects it to beat the market.";
@@ -611,8 +645,8 @@ function moveKind(d, o, idle) {
     const buys = (d.orders || []).filter((x) => x.side === "buy" && x.symbol !== idle).map((x) => x.symbol);
     const p = (d.positions || []).find((x) => x.symbol === o.symbol);
     const why = buys.length ? `to make room for ${buys.join(", ")}` : "to rebalance";
-    return { cls: "trim", label: "Trim",
-             reason: `Still holding it, just less: cut to ${Math.round(keep * 100)}% of the portfolio ${why}.` + (p && p.plain_reason ? ` ${p.plain_reason}` : "") };
+    return { cls: "trim", label: "Sell part",
+             reason: `Still owned, just less: reduced to ${Math.round(keep * 100)}% of the portfolio ${why}.` + (p && p.plain_reason ? ` ${p.plain_reason}` : "") };
   }
   return { cls: "sell", label: "Sell" };
 }
@@ -620,15 +654,15 @@ function moveKind(d, o, idle) {
 function decisionsView(decisions) {
   const real = decisions.filter((d) => !d.dry_run && (d.market_view || d.error || (d.orders || []).length));
   if (!real.length) { $("decisions").innerHTML = `<div class="empty">Nothing yet.</div>`; return; }
-  const idle = DATA.status.idle_asset || "SSO";
+  const idle = DATA.status.idle_asset || "SPY";
   const entry = (d) => {
-    const who = d.source === "watch" ? `<span class="chip auto">⚡ watcher</span>`
+    const who = d.source === "watch" ? `<span class="chip auto">⚡ Watcher</span>`
       : d.source === "news" ? `<span class="chip news">📰 News Hunter</span>` : `<span class="chip">🧠 Claude</span>`;
     const orders = (d.orders || []).filter((o) => !["error", "skipped"].includes(o.status));
     let rows;
-    if (d.error) rows = `<div class="move"><span class="tag sell">Error</span><span>Something went wrong, so nothing was traded.</span></div>`;
+    if (d.error) rows = `<div class="move"><span class="tag sell">Error</span><span>Something went wrong, so nothing was bought or sold.</span></div>`;
     else if (d.trade_today === false || !orders.length)
-      rows = `<div class="move"><span class="tag hold">No changes</span><span>${esc(d.plain_summary || "Nothing worth changing today.")}</span></div>`;
+      rows = `<div class="move"><span class="tag hold">Nothing done</span><span>${esc(d.plain_summary || "Nothing worth changing today.")}</span></div>`;
     else rows = orders.map((o) => {
       const kind = moveKind(d, o, idle);
       return `<div class="move"><span class="tag ${kind.cls}">${kind.label} ${esc(o.symbol)} ${usd(o.notional, 0)}</span><span>${esc(kind.reason || plainReason(d, o, idle))}</span></div>`;
@@ -643,8 +677,8 @@ function decisionsView(decisions) {
   const cutoff = nyDay(1);
   const newest = real.slice().reverse();
   const recent = newest.filter((d) => d.date >= cutoff), old = newest.filter((d) => d.date < cutoff).slice(0, 60);
-  $("decisions").innerHTML = (recent.length ? recent.map(entry).join("") : `<div class="empty">No moves today or yesterday.</div>`)
-    + (old.length ? `<details class="old-logs"><summary>Old daily logs (${old.length})</summary>${old.map(entry).join("")}</details>` : "");
+  $("decisions").innerHTML = (recent.length ? recent.map(entry).join("") : `<div class="empty">Nothing done today or yesterday.</div>`)
+    + (old.length ? `<details class="old-logs"><summary>Earlier days (${old.length})</summary>${old.map(entry).join("")}</details>` : "");
   try {
     const card = $("log-card");
     if (localStorage.getItem("log-open") === "0") card.open = false;
@@ -705,6 +739,7 @@ setTimeout(() => location.reload(), 15 * 60000);  // full reload now and then fo
   }));
   if (status.mode === "LIVE") { $("mode").hidden = false; $("mode").textContent = "💵 Real money"; }
   hero(status, equity);
+  earlyNote(equity);
   renderChart();
   let lastW = $("chart").clientWidth;
   window.addEventListener("resize", () => { const w = $("chart").clientWidth; if (w !== lastW) { lastW = w; renderChart(); } });
