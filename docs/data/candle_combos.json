@@ -1,0 +1,3941 @@
+{
+ "cost_round_trip_pct": 0.1,
+ "design_years": [
+  2016,
+  2017,
+  2018,
+  2019,
+  2020
+ ],
+ "validation_years": [
+  2021,
+  2022,
+  2023,
+  2024,
+  2025,
+  2026
+ ],
+ "combinations_judged": 345,
+ "top_by_design": [
+  {
+   "pattern": "bullish_harami",
+   "condition": "fell 10%+ in 5 days",
+   "hold_days": 20,
+   "design": {
+    "n": 485,
+    "excess_pct": 3.0085951850913193,
+    "plain_pct": 6.766405147994931,
+    "win_vs_spy": 0.534020618556701,
+    "edge_vs_condition_pct": 1.813476282349221,
+    "t_excess": 2.8991006014881786,
+    "t_edge": 1.7462179287980042,
+    "years_judged": 5,
+    "years_beating_spy": 5,
+    "years_beating_condition": 5
+   },
+   "validation": {
+    "n": 892,
+    "excess_pct": 1.7842769616368315,
+    "plain_pct": 3.200869198027038,
+    "win_vs_spy": 0.45739910313901344,
+    "edge_vs_condition_pct": 1.74468041707122,
+    "t_excess": 1.8221743685878107,
+    "t_edge": 1.7806336537777703,
+    "years_judged": 6,
+    "years_beating_spy": 6,
+    "years_beating_condition": 5
+   }
+  },
+  {
+   "pattern": "inverted_hammer",
+   "condition": "fell 10%+ in 5 days",
+   "hold_days": 20,
+   "design": {
+    "n": 397,
+    "excess_pct": 2.238676367411998,
+    "plain_pct": 6.6797042450092645,
+    "win_vs_spy": 0.5617128463476071,
+    "edge_vs_condition_pct": 0.9432196631624361,
+    "t_excess": 2.430803824274793,
+    "t_edge": 1.0297291831434523,
+    "years_judged": 5,
+    "years_beating_spy": 3,
+    "years_beating_condition": 4
+   },
+   "validation": {
+    "n": 556,
+    "excess_pct": -1.3866964959111978,
+    "plain_pct": -0.526722233238633,
+    "win_vs_spy": 0.4262589928057554,
+    "edge_vs_condition_pct": -1.427419748195331,
+    "t_excess": -1.4622581752968473,
+    "t_edge": -1.5088399187150678,
+    "years_judged": 6,
+    "years_beating_spy": 1,
+    "years_beating_condition": 1
+   }
+  },
+  {
+   "pattern": "morning_star",
+   "condition": "market bear (SPY<200d)",
+   "hold_days": 20,
+   "design": {
+    "n": 1649,
+    "excess_pct": 1.2958535625984577,
+    "plain_pct": 4.5596947278708795,
+    "win_vs_spy": 0.5433596118859915,
+    "edge_vs_condition_pct": 0.7372961775487815,
+    "t_excess": 4.546408217795567,
+    "t_edge": 2.5921173186903483,
+    "years_judged": 4,
+    "years_beating_spy": 4,
+    "years_beating_condition": 3
+   },
+   "validation": {
+    "n": 1806,
+    "excess_pct": -0.10292881637268608,
+    "plain_pct": 1.0878027287986067,
+    "win_vs_spy": 0.49280177187153934,
+    "edge_vs_condition_pct": -0.3278156407676332,
+    "t_excess": -0.34807833497722135,
+    "t_edge": -1.1121691257921023,
+    "years_judged": 4,
+    "years_beating_spy": 2,
+    "years_beating_condition": 1
+   }
+  },
+  {
+   "pattern": "morning_star",
+   "condition": "below 50-day avg + high volume",
+   "hold_days": 20,
+   "design": {
+    "n": 345,
+    "excess_pct": 1.1885254960025742,
+    "plain_pct": 2.3767515366062746,
+    "win_vs_spy": 0.527536231884058,
+    "edge_vs_condition_pct": 1.3552427985468287,
+    "t_excess": 1.6407288168039469,
+    "t_edge": 1.8648951862748555,
+    "years_judged": 5,
+    "years_beating_spy": 5,
+    "years_beating_condition": 4
+   },
+   "validation": {
+    "n": 554,
+    "excess_pct": -0.5422734397157678,
+    "plain_pct": 0.9833501099955778,
+    "win_vs_spy": 0.44765342960288806,
+    "edge_vs_condition_pct": -0.42920551493611725,
+    "t_excess": -1.121151110939875,
+    "t_edge": -0.8902895243354039,
+    "years_judged": 6,
+    "years_beating_spy": 2,
+    "years_beating_condition": 3
+   }
+  },
+  {
+   "pattern": "three_white_soldiers",
+   "condition": "below 50-day avg",
+   "hold_days": 20,
+   "design": {
+    "n": 170,
+    "excess_pct": 1.1729174287490403,
+    "plain_pct": 2.619507618069677,
+    "win_vs_spy": 0.49411764705882355,
+    "edge_vs_condition_pct": 1.198147779160599,
+    "t_excess": 1.5983658440791413,
+    "t_edge": 1.632376973937444,
+    "years_judged": 5,
+    "years_beating_spy": 5,
+    "years_beating_condition": 4
+   },
+   "validation": {
+    "n": 420,
+    "excess_pct": -0.6576032175130895,
+    "plain_pct": -0.3174536803075555,
+    "win_vs_spy": 0.4357142857142857,
+    "edge_vs_condition_pct": -0.5283894754331021,
+    "t_excess": -1.2683029434063373,
+    "t_edge": -1.0143425380506443,
+    "years_judged": 6,
+    "years_beating_spy": 3,
+    "years_beating_condition": 4
+   }
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "fell 10%+ + market bull",
+   "hold_days": 20,
+   "design": {
+    "n": 254,
+    "excess_pct": 1.160684247637083,
+    "plain_pct": 2.410627799080701,
+    "win_vs_spy": 0.5078740157480315,
+    "edge_vs_condition_pct": 1.7998198523154998,
+    "t_excess": 1.4177530577037205,
+    "t_edge": 2.195030378754098,
+    "years_judged": 5,
+    "years_beating_spy": 4,
+    "years_beating_condition": 4
+   },
+   "validation": {
+    "n": 617,
+    "excess_pct": 1.1211522884156984,
+    "plain_pct": 2.1511252780547045,
+    "win_vs_spy": 0.4327390599675851,
+    "edge_vs_condition_pct": 1.7223410139570787,
+    "t_excess": 0.845970895072896,
+    "t_edge": 1.2997333473651886,
+    "years_judged": 6,
+    "years_beating_spy": 4,
+    "years_beating_condition": 6
+   }
+  },
+  {
+   "pattern": "inverted_hammer",
+   "condition": "fell 5%+ in 5 days",
+   "hold_days": 20,
+   "design": {
+    "n": 1263,
+    "excess_pct": 1.1113947241407245,
+    "plain_pct": 3.5523839574387392,
+    "win_vs_spy": 0.5376088677751386,
+    "edge_vs_condition_pct": 0.44138608821301906,
+    "t_excess": 2.919982486691641,
+    "t_edge": 1.1653900694567223,
+    "years_judged": 5,
+    "years_beating_spy": 4,
+    "years_beating_condition": 4
+   },
+   "validation": {
+    "n": 1875,
+    "excess_pct": -0.70827330480801,
+    "plain_pct": 0.4021036488314589,
+    "win_vs_spy": 0.45226666666666665,
+    "edge_vs_condition_pct": -0.5489088730027167,
+    "t_excess": -1.7635510039747164,
+    "t_edge": -1.3669465780315633,
+    "years_judged": 6,
+    "years_beating_spy": 1,
+    "years_beating_condition": 1
+   }
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "fell 10%+ in 5 days",
+   "hold_days": 10,
+   "design": {
+    "n": 485,
+    "excess_pct": 1.068704294209029,
+    "plain_pct": 2.9263985740131893,
+    "win_vs_spy": 0.51340206185567,
+    "edge_vs_condition_pct": 0.9453791081826893,
+    "t_excess": 1.7238924359646455,
+    "t_edge": 1.5238851476007274,
+    "years_judged": 5,
+    "years_beating_spy": 4,
+    "years_beating_condition": 4
+   },
+   "validation": {
+    "n": 899,
+    "excess_pct": 0.49148679473630197,
+    "plain_pct": 1.5028457519687768,
+    "win_vs_spy": 0.4582869855394883,
+    "edge_vs_condition_pct": 0.4982732938778739,
+    "t_excess": 0.9701829353885923,
+    "t_edge": 0.9850147574657723,
+    "years_judged": 6,
+    "years_beating_spy": 3,
+    "years_beating_condition": 4
+   }
+  },
+  {
+   "pattern": "2+ patterns the same day",
+   "condition": "market bear (SPY<200d)",
+   "hold_days": 20,
+   "design": {
+    "n": 567,
+    "excess_pct": 1.0249474401692211,
+    "plain_pct": 3.218739307932584,
+    "win_vs_spy": 0.5396825396825397,
+    "edge_vs_condition_pct": 0.49886061345746663,
+    "t_excess": 2.1092828973961733,
+    "t_edge": 1.0277816944809588,
+    "years_judged": 4,
+    "years_beating_spy": 3,
+    "years_beating_condition": 3
+   },
+   "validation": {
+    "n": 502,
+    "excess_pct": -0.5739245981220091,
+    "plain_pct": -0.4710780559731197,
+    "win_vs_spy": 0.46215139442231074,
+    "edge_vs_condition_pct": -0.8172732403221368,
+    "t_excess": -0.9767305398123542,
+    "t_edge": -1.3887172614084997,
+    "years_judged": 4,
+    "years_beating_spy": 2,
+    "years_beating_condition": 2
+   }
+  },
+  {
+   "pattern": "piercing_line",
+   "condition": "fell 5%+ in 5 days",
+   "hold_days": 20,
+   "design": {
+    "n": 465,
+    "excess_pct": 1.0021027449669988,
+    "plain_pct": 3.6507235901557973,
+    "win_vs_spy": 0.5204301075268817,
+    "edge_vs_condition_pct": 0.3406040161055755,
+    "t_excess": 1.438358393777363,
+    "t_edge": 0.49288798464878514,
+    "years_judged": 5,
+    "years_beating_spy": 2,
+    "years_beating_condition": 2
+   },
+   "validation": {
+    "n": 909,
+    "excess_pct": -0.4585783347505636,
+    "plain_pct": 0.6541902498209625,
+    "win_vs_spy": 0.47854785478547857,
+    "edge_vs_condition_pct": -0.3420304413887535,
+    "t_excess": -0.910012894700222,
+    "t_edge": -0.6787875030164373,
+    "years_judged": 6,
+    "years_beating_spy": 2,
+    "years_beating_condition": 3
+   }
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "fell 5%+ in 5 days",
+   "hold_days": 20,
+   "design": {
+    "n": 2047,
+    "excess_pct": 0.9887496825485382,
+    "plain_pct": 3.1008535459281434,
+    "win_vs_spy": 0.5134342940889106,
+    "edge_vs_condition_pct": 0.4678717057209616,
+    "t_excess": 2.987123528650131,
+    "t_edge": 1.4134136136273563,
+    "years_judged": 5,
+    "years_beating_spy": 5,
+    "years_beating_condition": 4
+   },
+   "validation": {
+    "n": 3076,
+    "excess_pct": 0.6524416190710844,
+    "plain_pct": 2.0755417564383407,
+    "win_vs_spy": 0.4743172951885566,
+    "edge_vs_condition_pct": 0.8440010786627483,
+    "t_excess": 1.8292595798313118,
+    "t_edge": 2.366713897189788,
+    "years_judged": 6,
+    "years_beating_spy": 5,
+    "years_beating_condition": 5
+   }
+  },
+  {
+   "pattern": "bullish_engulfing",
+   "condition": "fell 10%+ in 5 days",
+   "hold_days": 5,
+   "design": {
+    "n": 235,
+    "excess_pct": 0.9843473583876624,
+    "plain_pct": 2.9085185242071416,
+    "win_vs_spy": 0.4723404255319149,
+    "edge_vs_condition_pct": 0.6230636169405104,
+    "t_excess": 1.5579473544605402,
+    "t_edge": 0.9957545931882597,
+    "years_judged": 5,
+    "years_beating_spy": 3,
+    "years_beating_condition": 3
+   },
+   "validation": {
+    "n": 517,
+    "excess_pct": -0.18058589334284159,
+    "plain_pct": -0.13511179957355202,
+    "win_vs_spy": 0.4526112185686654,
+    "edge_vs_condition_pct": -0.45607557000353693,
+    "t_excess": -0.43906725873394736,
+    "t_edge": -1.110305703951749,
+    "years_judged": 6,
+    "years_beating_spy": 3,
+    "years_beating_condition": 1
+   }
+  },
+  {
+   "pattern": "piercing_line",
+   "condition": "RSI under 30",
+   "hold_days": 5,
+   "design": {
+    "n": 163,
+    "excess_pct": 0.8364292962684708,
+    "plain_pct": 1.937301181149301,
+    "win_vs_spy": 0.49079754601226994,
+    "edge_vs_condition_pct": 1.099596947043771,
+    "t_excess": 1.4186270587634549,
+    "t_edge": 1.8676866546848796,
+    "years_judged": 5,
+    "years_beating_spy": 4,
+    "years_beating_condition": 4
+   },
+   "validation": {
+    "n": 167,
+    "excess_pct": -0.27422500315579024,
+    "plain_pct": 0.3001714795429743,
+    "win_vs_spy": 0.49101796407185627,
+    "edge_vs_condition_pct": -0.40461207873062977,
+    "t_excess": -0.6236689278204882,
+    "t_edge": -0.9294639050315558,
+    "years_judged": 6,
+    "years_beating_spy": 1,
+    "years_beating_condition": 1
+   }
+  },
+  {
+   "pattern": "any bullish pattern",
+   "condition": "fell 10%+ in 5 days",
+   "hold_days": 20,
+   "design": {
+    "n": 1779,
+    "excess_pct": 0.827685878834915,
+    "plain_pct": 5.106532985668942,
+    "win_vs_spy": 0.5160202360876898,
+    "edge_vs_condition_pct": -0.4560394287956162,
+    "t_excess": 1.7001289462383335,
+    "t_edge": -0.9377220812050359,
+    "years_judged": 5,
+    "years_beating_spy": 4,
+    "years_beating_condition": 3
+   },
+   "validation": {
+    "n": 3075,
+    "excess_pct": -0.16387097433501924,
+    "plain_pct": 1.1211973299966345,
+    "win_vs_spy": 0.4445528455284553,
+    "edge_vs_condition_pct": -0.2450864462253555,
+    "t_excess": -0.400054475879958,
+    "t_edge": -0.599793900886989,
+    "years_judged": 6,
+    "years_beating_spy": 3,
+    "years_beating_condition": 4
+   }
+  },
+  {
+   "pattern": "hammer",
+   "condition": "market bear (SPY<200d)",
+   "hold_days": 20,
+   "design": {
+    "n": 2059,
+    "excess_pct": 0.817341733131406,
+    "plain_pct": 3.3261365652656463,
+    "win_vs_spy": 0.5434677027683341,
+    "edge_vs_condition_pct": 0.18655820850895324,
+    "t_excess": 3.2245598684426975,
+    "t_edge": 0.7352402583555616,
+    "years_judged": 4,
+    "years_beating_spy": 3,
+    "years_beating_condition": 2
+   },
+   "validation": {
+    "n": 1723,
+    "excess_pct": 0.6622549303261357,
+    "plain_pct": 1.5658311233268305,
+    "win_vs_spy": 0.5084155542658154,
+    "edge_vs_condition_pct": 0.372814099601562,
+    "t_excess": 2.361311932765451,
+    "t_edge": 1.330680908529864,
+    "years_judged": 4,
+    "years_beating_spy": 2,
+    "years_beating_condition": 2
+   }
+  }
+ ],
+ "passing_validation": [
+  {
+   "pattern": "bullish_harami",
+   "condition": "market bear (SPY<200d)",
+   "hold_days": 5,
+   "design": {
+    "n": 2790,
+    "excess_pct": 0.133135916868254,
+    "plain_pct": 0.5985540725106254,
+    "win_vs_spy": 0.4827956989247312,
+    "edge_vs_condition_pct": 0.14166032676620482,
+    "t_excess": 1.071067677012359,
+    "t_edge": 1.1397626171867936,
+    "years_judged": 4,
+    "years_beating_spy": 2,
+    "years_beating_condition": 3
+   },
+   "validation": {
+    "n": 2316,
+    "excess_pct": 0.5949908677935446,
+    "plain_pct": 1.2814124902693045,
+    "win_vs_spy": 0.5237478411053541,
+    "edge_vs_condition_pct": 0.61670666577605,
+    "t_excess": 4.526600276312696,
+    "t_edge": 4.689917043722999,
+    "years_judged": 4,
+    "years_beating_spy": 4,
+    "years_beating_condition": 4
+   }
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "market bear (SPY<200d)",
+   "hold_days": 10,
+   "design": {
+    "n": 2790,
+    "excess_pct": 0.3126582712321328,
+    "plain_pct": 1.3878990617099842,
+    "win_vs_spy": 0.5132616487455197,
+    "edge_vs_condition_pct": 0.20361021143083075,
+    "t_excess": 2.0127859099519263,
+    "t_edge": 1.3103626926012657,
+    "years_judged": 4,
+    "years_beating_spy": 4,
+    "years_beating_condition": 3
+   },
+   "validation": {
+    "n": 2315,
+    "excess_pct": 0.6719316076408713,
+    "plain_pct": 1.7589317249304164,
+    "win_vs_spy": 0.5118790496760259,
+    "edge_vs_condition_pct": 0.5930978924491358,
+    "t_excess": 3.5782985770113327,
+    "t_edge": 3.1564611006431793,
+    "years_judged": 4,
+    "years_beating_spy": 3,
+    "years_beating_condition": 3
+   }
+  }
+ ],
+ "condition_alone_validation": [
+  {
+   "condition": "none",
+   "hold_days": 5,
+   "n": 724606,
+   "excess_pct": -0.1305893031284141,
+   "plain_pct": 0.12325301586249304
+  },
+  {
+   "condition": "none",
+   "hold_days": 10,
+   "n": 722036,
+   "excess_pct": -0.17812606368496378,
+   "plain_pct": 0.36462422319278587
+  },
+  {
+   "condition": "none",
+   "hold_days": 20,
+   "n": 716896,
+   "excess_pct": -0.35866962310273176,
+   "plain_pct": 0.7711206157103895
+  },
+  {
+   "condition": "high volume",
+   "hold_days": 5,
+   "n": 77244,
+   "excess_pct": -0.07250786241370336,
+   "plain_pct": 0.32418361772729887
+  },
+  {
+   "condition": "high volume",
+   "hold_days": 10,
+   "n": 76843,
+   "excess_pct": -0.06938477186423865,
+   "plain_pct": 0.5945544148392278
+  },
+  {
+   "condition": "high volume",
+   "hold_days": 20,
+   "n": 76316,
+   "excess_pct": -0.14779719142872091,
+   "plain_pct": 1.1642373582296823
+  },
+  {
+   "condition": "fell 5%+ in 5 days",
+   "hold_days": 5,
+   "n": 96701,
+   "excess_pct": 0.02886736555579527,
+   "plain_pct": 0.4797583077868712
+  },
+  {
+   "condition": "fell 5%+ in 5 days",
+   "hold_days": 10,
+   "n": 96339,
+   "excess_pct": -0.07241243150600228,
+   "plain_pct": 0.6926627918828907
+  },
+  {
+   "condition": "fell 5%+ in 5 days",
+   "hold_days": 20,
+   "n": 95304,
+   "excess_pct": -0.15120259543510284,
+   "plain_pct": 1.2607495137222924
+  },
+  {
+   "condition": "fell 10%+ in 5 days",
+   "hold_days": 5,
+   "n": 30305,
+   "excess_pct": 0.21875765365503108,
+   "plain_pct": 0.8542575112687787
+  },
+  {
+   "condition": "fell 10%+ in 5 days",
+   "hold_days": 10,
+   "n": 30166,
+   "excess_pct": -0.017619037752048892,
+   "plain_pct": 0.8965204939543278
+  },
+  {
+   "condition": "fell 10%+ in 5 days",
+   "hold_days": 20,
+   "n": 29695,
+   "excess_pct": 0.03651304194975794,
+   "plain_pct": 1.6891196294468498
+  },
+  {
+   "condition": "near 52-week low",
+   "hold_days": 5,
+   "n": 95739,
+   "excess_pct": -0.05681979923945922,
+   "plain_pct": 0.3295307753374522
+  },
+  {
+   "condition": "near 52-week low",
+   "hold_days": 10,
+   "n": 95408,
+   "excess_pct": -0.16325264576224843,
+   "plain_pct": 0.565880367953619
+  },
+  {
+   "condition": "near 52-week low",
+   "hold_days": 20,
+   "n": 94515,
+   "excess_pct": -0.23338501681635812,
+   "plain_pct": 1.1788805617568014
+  },
+  {
+   "condition": "RSI under 30",
+   "hold_days": 5,
+   "n": 26637,
+   "excess_pct": 0.10974933270813743,
+   "plain_pct": 0.7945588373460974
+  },
+  {
+   "condition": "RSI under 30",
+   "hold_days": 10,
+   "n": 26521,
+   "excess_pct": 0.13858683029664096,
+   "plain_pct": 1.2198788416116997
+  },
+  {
+   "condition": "RSI under 30",
+   "hold_days": 20,
+   "n": 26180,
+   "excess_pct": 0.2739971714572983,
+   "plain_pct": 2.057155557223918
+  },
+  {
+   "condition": "below 50-day avg",
+   "hold_days": 5,
+   "n": 337469,
+   "excess_pct": -0.16116348136992023,
+   "plain_pct": 0.16786950159312172
+  },
+  {
+   "condition": "below 50-day avg",
+   "hold_days": 10,
+   "n": 336270,
+   "excess_pct": -0.2150917975578846,
+   "plain_pct": 0.4652433246666682
+  },
+  {
+   "condition": "below 50-day avg",
+   "hold_days": 20,
+   "n": 333409,
+   "excess_pct": -0.2659468795375008,
+   "plain_pct": 1.1309753908229019
+  },
+  {
+   "condition": "above 50-day avg",
+   "hold_days": 5,
+   "n": 386719,
+   "excess_pct": -0.1034138688474237,
+   "plain_pct": 0.08481769439491224
+  },
+  {
+   "condition": "above 50-day avg",
+   "hold_days": 10,
+   "n": 385348,
+   "excess_pct": -0.1437956483834154,
+   "plain_pct": 0.27885527133406185
+  },
+  {
+   "condition": "above 50-day avg",
+   "hold_days": 20,
+   "n": 383069,
+   "excess_pct": -0.433456731639053,
+   "plain_pct": 0.46353834305575825
+  },
+  {
+   "condition": "market bull (SPY>200d)",
+   "hold_days": 5,
+   "n": 589926,
+   "excess_pct": -0.1582367611234976,
+   "plain_pct": 0.060750848986147375
+  },
+  {
+   "condition": "market bull (SPY>200d)",
+   "hold_days": 10,
+   "n": 587383,
+   "excess_pct": -0.23830401586948996,
+   "plain_pct": 0.24151710185308287
+  },
+  {
+   "condition": "market bull (SPY>200d)",
+   "hold_days": 20,
+   "n": 582293,
+   "excess_pct": -0.506017763435434,
+   "plain_pct": 0.547118237114365
+  },
+  {
+   "condition": "market bear (SPY<200d)",
+   "hold_days": 5,
+   "n": 134680,
+   "excess_pct": -0.009487771310715584,
+   "plain_pct": 0.39702531536275354
+  },
+  {
+   "condition": "market bear (SPY<200d)",
+   "hold_days": 10,
+   "n": 134653,
+   "excess_pct": 0.08438205784224714,
+   "plain_pct": 0.9016418184478385
+  },
+  {
+   "condition": "market bear (SPY<200d)",
+   "hold_days": 20,
+   "n": 134603,
+   "excess_pct": 0.2787588939344073,
+   "plain_pct": 1.7401556077968574
+  },
+  {
+   "condition": "high volume + fell 5%+",
+   "hold_days": 5,
+   "n": 19617,
+   "excess_pct": 0.08642047014957854,
+   "plain_pct": 0.753902498410367
+  },
+  {
+   "condition": "high volume + fell 5%+",
+   "hold_days": 10,
+   "n": 19519,
+   "excess_pct": -0.05261619817070422,
+   "plain_pct": 0.8477595293898934
+  },
+  {
+   "condition": "high volume + fell 5%+",
+   "hold_days": 20,
+   "n": 19353,
+   "excess_pct": 0.16057638905488392,
+   "plain_pct": 1.8960126045128127
+  },
+  {
+   "condition": "high volume + near 52-week low",
+   "hold_days": 5,
+   "n": 12278,
+   "excess_pct": -0.10126070246027066,
+   "plain_pct": 0.4965730593323181
+  },
+  {
+   "condition": "high volume + near 52-week low",
+   "hold_days": 10,
+   "n": 12226,
+   "excess_pct": -0.26885484797347015,
+   "plain_pct": 0.45347515476411276
+  },
+  {
+   "condition": "high volume + near 52-week low",
+   "hold_days": 20,
+   "n": 12148,
+   "excess_pct": -0.08048706037468338,
+   "plain_pct": 1.5975480892553198
+  },
+  {
+   "condition": "RSI under 30 + near 52-week low",
+   "hold_days": 5,
+   "n": 14679,
+   "excess_pct": 0.019254275456170106,
+   "plain_pct": 0.7456317841857211
+  },
+  {
+   "condition": "RSI under 30 + near 52-week low",
+   "hold_days": 10,
+   "n": 14606,
+   "excess_pct": -0.07392465866908578,
+   "plain_pct": 0.9696949158120052
+  },
+  {
+   "condition": "RSI under 30 + near 52-week low",
+   "hold_days": 20,
+   "n": 14405,
+   "excess_pct": 0.3057188377325922,
+   "plain_pct": 2.2432866814977386
+  },
+  {
+   "condition": "below 50-day avg + high volume",
+   "hold_days": 5,
+   "n": 39651,
+   "excess_pct": -0.1333995951331293,
+   "plain_pct": 0.3743978291394337
+  },
+  {
+   "condition": "below 50-day avg + high volume",
+   "hold_days": 10,
+   "n": 39457,
+   "excess_pct": -0.202402587317938,
+   "plain_pct": 0.5530130168662065
+  },
+  {
+   "condition": "below 50-day avg + high volume",
+   "hold_days": 20,
+   "n": 39131,
+   "excess_pct": -0.10225040952682254,
+   "plain_pct": 1.4574758260880722
+  },
+  {
+   "condition": "fell 10%+ + market bull",
+   "hold_days": 5,
+   "n": 20417,
+   "excess_pct": -0.16387667850149085,
+   "plain_pct": 0.17802207049957222
+  },
+  {
+   "condition": "fell 10%+ + market bull",
+   "hold_days": 10,
+   "n": 20278,
+   "excess_pct": -0.5035329206758081,
+   "plain_pct": 0.08112380387235686
+  },
+  {
+   "condition": "fell 10%+ + market bull",
+   "hold_days": 20,
+   "n": 19807,
+   "excess_pct": -0.6620194447061702,
+   "plain_pct": 0.552381239536513
+  }
+ ],
+ "all": [
+  {
+   "pattern": "hammer",
+   "condition": "none",
+   "hold_days": 5,
+   "design_excess_pct": -0.17962216756527108,
+   "validation_excess_pct": -0.06345422768901655,
+   "validation_n": 8912,
+   "validation_edge_pct": 0.06614501485129239
+  },
+  {
+   "pattern": "hammer",
+   "condition": "none",
+   "hold_days": 10,
+   "design_excess_pct": -0.12402627965221034,
+   "validation_excess_pct": -0.2489423526054197,
+   "validation_n": 8883,
+   "validation_edge_pct": -0.07407050460155044
+  },
+  {
+   "pattern": "hammer",
+   "condition": "none",
+   "hold_days": 20,
+   "design_excess_pct": 0.0021218432282291665,
+   "validation_excess_pct": -0.08915508800335621,
+   "validation_n": 8829,
+   "validation_edge_pct": 0.2546366954400283
+  },
+  {
+   "pattern": "hammer",
+   "condition": "high volume",
+   "hold_days": 5,
+   "design_excess_pct": -0.5210899972661783,
+   "validation_excess_pct": 0.15267585225050895,
+   "validation_n": 1161,
+   "validation_edge_pct": 0.22266113844988444
+  },
+  {
+   "pattern": "hammer",
+   "condition": "high volume",
+   "hold_days": 10,
+   "design_excess_pct": -0.5563635537836333,
+   "validation_excess_pct": -0.05408146586639843,
+   "validation_n": 1158,
+   "validation_edge_pct": 0.012822569680596358
+  },
+  {
+   "pattern": "hammer",
+   "condition": "high volume",
+   "hold_days": 20,
+   "design_excess_pct": -0.5038039534409077,
+   "validation_excess_pct": 0.06694394795494535,
+   "validation_n": 1148,
+   "validation_edge_pct": 0.1769752044553423
+  },
+  {
+   "pattern": "hammer",
+   "condition": "fell 5%+ in 5 days",
+   "hold_days": 5,
+   "design_excess_pct": -0.807338533484454,
+   "validation_excess_pct": 0.07225754164454579,
+   "validation_n": 2189,
+   "validation_edge_pct": 0.03819122681963312
+  },
+  {
+   "pattern": "hammer",
+   "condition": "fell 5%+ in 5 days",
+   "hold_days": 10,
+   "design_excess_pct": -0.5110469699126081,
+   "validation_excess_pct": -0.2837809274573887,
+   "validation_n": 2181,
+   "validation_edge_pct": -0.2212682100920431
+  },
+  {
+   "pattern": "hammer",
+   "condition": "fell 5%+ in 5 days",
+   "hold_days": 20,
+   "design_excess_pct": -0.18925383683383254,
+   "validation_excess_pct": -0.29700170709773055,
+   "validation_n": 2165,
+   "validation_edge_pct": -0.12206545342576776
+  },
+  {
+   "pattern": "hammer",
+   "condition": "fell 10%+ in 5 days",
+   "hold_days": 5,
+   "design_excess_pct": -1.401505385113162,
+   "validation_excess_pct": 0.6809781819343501,
+   "validation_n": 647,
+   "validation_edge_pct": 0.47198776907452145
+  },
+  {
+   "pattern": "hammer",
+   "condition": "fell 10%+ in 5 days",
+   "hold_days": 10,
+   "design_excess_pct": -0.6421791254683947,
+   "validation_excess_pct": -0.0330055659655713,
+   "validation_n": 643,
+   "validation_edge_pct": -0.037323603835851905
+  },
+  {
+   "pattern": "hammer",
+   "condition": "fell 10%+ in 5 days",
+   "hold_days": 20,
+   "design_excess_pct": -0.07985791573323998,
+   "validation_excess_pct": -0.28851122185290096,
+   "validation_n": 637,
+   "validation_edge_pct": -0.2631394418108566
+  },
+  {
+   "pattern": "hammer",
+   "condition": "near 52-week low",
+   "hold_days": 5,
+   "design_excess_pct": -0.6176175661600287,
+   "validation_excess_pct": 0.1143622248879576,
+   "validation_n": 1464,
+   "validation_edge_pct": 0.16369596707350353
+  },
+  {
+   "pattern": "hammer",
+   "condition": "near 52-week low",
+   "hold_days": 10,
+   "design_excess_pct": -0.6842964293379099,
+   "validation_excess_pct": -0.043277374794047196,
+   "validation_n": 1458,
+   "validation_edge_pct": 0.1090578497118095
+  },
+  {
+   "pattern": "hammer",
+   "condition": "near 52-week low",
+   "hold_days": 20,
+   "design_excess_pct": -0.9442519679370842,
+   "validation_excess_pct": 0.38980040179532827,
+   "validation_n": 1447,
+   "validation_edge_pct": 0.6131160567072497
+  },
+  {
+   "pattern": "hammer",
+   "condition": "RSI under 30",
+   "hold_days": 5,
+   "design_excess_pct": -0.8814781972129759,
+   "validation_excess_pct": 0.35151464701333446,
+   "validation_n": 550,
+   "validation_edge_pct": 0.20593793936015165
+  },
+  {
+   "pattern": "hammer",
+   "condition": "RSI under 30",
+   "hold_days": 10,
+   "design_excess_pct": -0.8044981212007057,
+   "validation_excess_pct": 0.11490075670595383,
+   "validation_n": 546,
+   "validation_edge_pct": -0.08365079313141195
+  },
+  {
+   "pattern": "hammer",
+   "condition": "RSI under 30",
+   "hold_days": 20,
+   "design_excess_pct": -0.41970318833907394,
+   "validation_excess_pct": 0.5394016037662076,
+   "validation_n": 543,
+   "validation_edge_pct": 0.22008235173015772
+  },
+  {
+   "pattern": "hammer",
+   "condition": "below 50-day avg",
+   "hold_days": 5,
+   "design_excess_pct": -0.37845097863260796,
+   "validation_excess_pct": 0.04217350940315085,
+   "validation_n": 5486,
+   "validation_edge_pct": 0.20269057592160936
+  },
+  {
+   "pattern": "hammer",
+   "condition": "below 50-day avg",
+   "hold_days": 10,
+   "design_excess_pct": -0.29298076416659957,
+   "validation_excess_pct": -0.21716792649656858,
+   "validation_n": 5465,
+   "validation_edge_pct": -0.004384457385598272
+  },
+  {
+   "pattern": "hammer",
+   "condition": "below 50-day avg",
+   "hold_days": 20,
+   "design_excess_pct": -0.1987612256945154,
+   "validation_excess_pct": -0.021550023412426383,
+   "validation_n": 5421,
+   "validation_edge_pct": 0.2461703700442755
+  },
+  {
+   "pattern": "hammer",
+   "condition": "above 50-day avg",
+   "hold_days": 5,
+   "design_excess_pct": -0.018440808287255677,
+   "validation_excess_pct": -0.23805364858497827,
+   "validation_n": 3420,
+   "validation_edge_pct": -0.12946867439441692
+  },
+  {
+   "pattern": "hammer",
+   "condition": "above 50-day avg",
+   "hold_days": 10,
+   "design_excess_pct": -0.021081172272631187,
+   "validation_excess_pct": -0.2963677655800135,
+   "validation_n": 3412,
+   "validation_edge_pct": -0.14880935527362757
+  },
+  {
+   "pattern": "hammer",
+   "condition": "above 50-day avg",
+   "hold_days": 20,
+   "design_excess_pct": 0.07193272418910666,
+   "validation_excess_pct": -0.17863976112304814,
+   "validation_n": 3402,
+   "validation_edge_pct": 0.23679596254519147
+  },
+  {
+   "pattern": "hammer",
+   "condition": "market bull (SPY>200d)",
+   "hold_days": 5,
+   "design_excess_pct": -0.2707139037637996,
+   "validation_excess_pct": -0.16708404386086456,
+   "validation_n": 7188,
+   "validation_edge_pct": -0.0084058194986625
+  },
+  {
+   "pattern": "hammer",
+   "condition": "market bull (SPY>200d)",
+   "hold_days": 10,
+   "design_excess_pct": -0.36849587072282103,
+   "validation_excess_pct": -0.3705923172991654,
+   "validation_n": 7160,
+   "validation_edge_pct": -0.1323010877145326
+  },
+  {
+   "pattern": "hammer",
+   "condition": "market bull (SPY>200d)",
+   "hold_days": 20,
+   "design_excess_pct": -0.31644671879694464,
+   "validation_excess_pct": -0.2713503401257478,
+   "validation_n": 7106,
+   "validation_edge_pct": 0.2245443784115325
+  },
+  {
+   "pattern": "hammer",
+   "condition": "market bear (SPY<200d)",
+   "hold_days": 5,
+   "design_excess_pct": 0.053615148237857624,
+   "validation_excess_pct": 0.3686171868372268,
+   "validation_n": 1724,
+   "validation_edge_pct": 0.37964587229488245
+  },
+  {
+   "pattern": "hammer",
+   "condition": "market bear (SPY<200d)",
+   "hold_days": 10,
+   "design_excess_pct": 0.5016923920049623,
+   "validation_excess_pct": 0.25657926504241524,
+   "validation_n": 1723,
+   "validation_edge_pct": 0.1734875949104562
+  },
+  {
+   "pattern": "hammer",
+   "condition": "market bear (SPY<200d)",
+   "hold_days": 20,
+   "design_excess_pct": 0.817341733131406,
+   "validation_excess_pct": 0.6622549303261357,
+   "validation_n": 1723,
+   "validation_edge_pct": 0.372814099601562
+  },
+  {
+   "pattern": "hammer",
+   "condition": "high volume + fell 5%+",
+   "hold_days": 5,
+   "design_excess_pct": -0.7775489229684001,
+   "validation_excess_pct": 0.4400769353030614,
+   "validation_n": 556,
+   "validation_edge_pct": 0.3339705632067973
+  },
+  {
+   "pattern": "hammer",
+   "condition": "high volume + fell 5%+",
+   "hold_days": 10,
+   "design_excess_pct": -0.8473633968312123,
+   "validation_excess_pct": 0.17335604102992158,
+   "validation_n": 555,
+   "validation_edge_pct": 0.23169354812150386
+  },
+  {
+   "pattern": "hammer",
+   "condition": "high volume + fell 5%+",
+   "hold_days": 20,
+   "design_excess_pct": -0.311615916983334,
+   "validation_excess_pct": -0.19641607903679914,
+   "validation_n": 549,
+   "validation_edge_pct": -0.3301023822108101
+  },
+  {
+   "pattern": "hammer",
+   "condition": "high volume + near 52-week low",
+   "hold_days": 5,
+   "design_excess_pct": -1.3643772924149182,
+   "validation_excess_pct": -0.2837245191585679,
+   "validation_n": 246,
+   "validation_edge_pct": -0.2064827119646367
+  },
+  {
+   "pattern": "hammer",
+   "condition": "high volume + near 52-week low",
+   "hold_days": 10,
+   "design_excess_pct": -2.7654963466278737,
+   "validation_excess_pct": -0.4364517611313495,
+   "validation_n": 245,
+   "validation_edge_pct": -0.1992233168968371
+  },
+  {
+   "pattern": "hammer",
+   "condition": "high volume + near 52-week low",
+   "hold_days": 20,
+   "design_excess_pct": -3.385508749626548,
+   "validation_excess_pct": 0.5560160260926723,
+   "validation_n": 245,
+   "validation_edge_pct": 0.5923696580717208
+  },
+  {
+   "pattern": "hammer",
+   "condition": "RSI under 30 + near 52-week low",
+   "hold_days": 5,
+   "design_excess_pct": -1.5557076487058459,
+   "validation_excess_pct": -0.06623950579365066,
+   "validation_n": 282,
+   "validation_edge_pct": -0.1082215355741437
+  },
+  {
+   "pattern": "hammer",
+   "condition": "RSI under 30 + near 52-week low",
+   "hold_days": 10,
+   "design_excess_pct": -1.8347476165579704,
+   "validation_excess_pct": -0.4774172146866751,
+   "validation_n": 279,
+   "validation_edge_pct": -0.3840343563166552
+  },
+  {
+   "pattern": "hammer",
+   "condition": "RSI under 30 + near 52-week low",
+   "hold_days": 20,
+   "design_excess_pct": -2.4522589935290435,
+   "validation_excess_pct": 0.9970123526269301,
+   "validation_n": 278,
+   "validation_edge_pct": 0.7896876846035507
+  },
+  {
+   "pattern": "hammer",
+   "condition": "below 50-day avg + high volume",
+   "hold_days": 5,
+   "design_excess_pct": -0.6760331368109235,
+   "validation_excess_pct": 0.2208722168770213,
+   "validation_n": 879,
+   "validation_edge_pct": 0.3472124717443345
+  },
+  {
+   "pattern": "hammer",
+   "condition": "below 50-day avg + high volume",
+   "hold_days": 10,
+   "design_excess_pct": -0.8863957215914,
+   "validation_excess_pct": 0.08800913042028884,
+   "validation_n": 876,
+   "validation_edge_pct": 0.2699353769619974
+  },
+  {
+   "pattern": "hammer",
+   "condition": "below 50-day avg + high volume",
+   "hold_days": 20,
+   "design_excess_pct": -0.8952662634371354,
+   "validation_excess_pct": 0.19608794484597533,
+   "validation_n": 867,
+   "validation_edge_pct": 0.27217310045771825
+  },
+  {
+   "pattern": "hammer",
+   "condition": "fell 10%+ + market bull",
+   "hold_days": 5,
+   "design_excess_pct": -2.825287562238379,
+   "validation_excess_pct": 0.5165187465698886,
+   "validation_n": 478,
+   "validation_edge_pct": 0.7911198448025073
+  },
+  {
+   "pattern": "hammer",
+   "condition": "fell 10%+ + market bull",
+   "hold_days": 10,
+   "design_excess_pct": -4.222796891230696,
+   "validation_excess_pct": -0.324849282392038,
+   "validation_n": 474,
+   "validation_edge_pct": 0.3156590541107161
+  },
+  {
+   "pattern": "hammer",
+   "condition": "fell 10%+ + market bull",
+   "hold_days": 20,
+   "design_excess_pct": -4.312278475639713,
+   "validation_excess_pct": -1.026121736284315,
+   "validation_n": 468,
+   "validation_edge_pct": -0.20545331678762208
+  },
+  {
+   "pattern": "inverted_hammer",
+   "condition": "none",
+   "hold_days": 5,
+   "design_excess_pct": -0.20681049561743223,
+   "validation_excess_pct": -0.11771254476514167,
+   "validation_n": 8067,
+   "validation_edge_pct": 0.014850246944574631
+  },
+  {
+   "pattern": "inverted_hammer",
+   "condition": "none",
+   "hold_days": 10,
+   "design_excess_pct": -0.24487280779119056,
+   "validation_excess_pct": -0.31297091806527677,
+   "validation_n": 8041,
+   "validation_edge_pct": -0.13007998605171908
+  },
+  {
+   "pattern": "inverted_hammer",
+   "condition": "none",
+   "hold_days": 20,
+   "design_excess_pct": 0.22075221006694432,
+   "validation_excess_pct": -0.49136615286319124,
+   "validation_n": 8005,
+   "validation_edge_pct": -0.12035020552667088
+  },
+  {
+   "pattern": "inverted_hammer",
+   "condition": "high volume",
+   "hold_days": 5,
+   "design_excess_pct": -0.5673781379182605,
+   "validation_excess_pct": 0.3131167526664403,
+   "validation_n": 746,
+   "validation_edge_pct": 0.39326768207110413
+  },
+  {
+   "pattern": "inverted_hammer",
+   "condition": "high volume",
+   "hold_days": 10,
+   "design_excess_pct": -0.772250920424841,
+   "validation_excess_pct": 0.16797691595119837,
+   "validation_n": 742,
+   "validation_edge_pct": 0.26117707718768307
+  },
+  {
+   "pattern": "inverted_hammer",
+   "condition": "high volume",
+   "hold_days": 20,
+   "design_excess_pct": -0.28117926150702616,
+   "validation_excess_pct": -0.10242963031285653,
+   "validation_n": 738,
+   "validation_edge_pct": 0.05957257279966665
+  },
+  {
+   "pattern": "inverted_hammer",
+   "condition": "fell 5%+ in 5 days",
+   "hold_days": 5,
+   "design_excess_pct": -0.34237772150355844,
+   "validation_excess_pct": -0.009075096208059432,
+   "validation_n": 1898,
+   "validation_edge_pct": -0.0484833314552602
+  },
+  {
+   "pattern": "inverted_hammer",
+   "condition": "fell 5%+ in 5 days",
+   "hold_days": 10,
+   "design_excess_pct": -0.621926842338358,
+   "validation_excess_pct": -0.5166426990987062,
+   "validation_n": 1889,
+   "validation_edge_pct": -0.43492912266677963
+  },
+  {
+   "pattern": "inverted_hammer",
+   "condition": "fell 5%+ in 5 days",
+   "hold_days": 20,
+   "design_excess_pct": 1.1113947241407245,
+   "validation_excess_pct": -0.70827330480801,
+   "validation_n": 1875,
+   "validation_edge_pct": -0.5489088730027167
+  },
+  {
+   "pattern": "inverted_hammer",
+   "condition": "fell 10%+ in 5 days",
+   "hold_days": 5,
+   "design_excess_pct": -0.6775300988953549,
+   "validation_excess_pct": 0.12178915958831717,
+   "validation_n": 562,
+   "validation_edge_pct": -0.128463293737759
+  },
+  {
+   "pattern": "inverted_hammer",
+   "condition": "fell 10%+ in 5 days",
+   "hold_days": 10,
+   "design_excess_pct": -0.43516469129475654,
+   "validation_excess_pct": -1.297092473514814,
+   "validation_n": 558,
+   "validation_edge_pct": -1.2283874749249315
+  },
+  {
+   "pattern": "inverted_hammer",
+   "condition": "fell 10%+ in 5 days",
+   "hold_days": 20,
+   "design_excess_pct": 2.238676367411998,
+   "validation_excess_pct": -1.3866964959111978,
+   "validation_n": 556,
+   "validation_edge_pct": -1.427419748195331
+  },
+  {
+   "pattern": "inverted_hammer",
+   "condition": "near 52-week low",
+   "hold_days": 5,
+   "design_excess_pct": -0.6932070111299056,
+   "validation_excess_pct": -0.0637028108398674,
+   "validation_n": 1693,
+   "validation_edge_pct": 0.0008829187944269638
+  },
+  {
+   "pattern": "inverted_hammer",
+   "condition": "near 52-week low",
+   "hold_days": 10,
+   "design_excess_pct": -0.6234047981286904,
+   "validation_excess_pct": -0.45626364637388683,
+   "validation_n": 1686,
+   "validation_edge_pct": -0.27097991739410526
+  },
+  {
+   "pattern": "inverted_hammer",
+   "condition": "near 52-week low",
+   "hold_days": 20,
+   "design_excess_pct": -0.052525238815728875,
+   "validation_excess_pct": -0.413216256212785,
+   "validation_n": 1677,
+   "validation_edge_pct": -0.14189951161205905
+  },
+  {
+   "pattern": "inverted_hammer",
+   "condition": "RSI under 30",
+   "hold_days": 5,
+   "design_excess_pct": -0.8150202649794683,
+   "validation_excess_pct": -0.2886988938863393,
+   "validation_n": 526,
+   "validation_edge_pct": -0.42696806446202057
+  },
+  {
+   "pattern": "inverted_hammer",
+   "condition": "RSI under 30",
+   "hold_days": 10,
+   "design_excess_pct": -0.46094355584877666,
+   "validation_excess_pct": -0.7399488952632279,
+   "validation_n": 523,
+   "validation_edge_pct": -0.8800629356380892
+  },
+  {
+   "pattern": "inverted_hammer",
+   "condition": "RSI under 30",
+   "hold_days": 20,
+   "design_excess_pct": 0.7802276832527971,
+   "validation_excess_pct": -0.7166207459342092,
+   "validation_n": 520,
+   "validation_edge_pct": -1.0653651118787082
+  },
+  {
+   "pattern": "inverted_hammer",
+   "condition": "below 50-day avg",
+   "hold_days": 5,
+   "design_excess_pct": -0.2653927865910068,
+   "validation_excess_pct": -0.26258912656897765,
+   "validation_n": 5217,
+   "validation_edge_pct": -0.0929152943287653
+  },
+  {
+   "pattern": "inverted_hammer",
+   "condition": "below 50-day avg",
+   "hold_days": 10,
+   "design_excess_pct": -0.37709579493395695,
+   "validation_excess_pct": -0.5879322727549494,
+   "validation_n": 5201,
+   "validation_edge_pct": -0.3555133693313243
+  },
+  {
+   "pattern": "inverted_hammer",
+   "condition": "below 50-day avg",
+   "hold_days": 20,
+   "design_excess_pct": 0.17764961776280688,
+   "validation_excess_pct": -0.5960018637047101,
+   "validation_n": 5172,
+   "validation_edge_pct": -0.2958086950706332
+  },
+  {
+   "pattern": "inverted_hammer",
+   "condition": "above 50-day avg",
+   "hold_days": 5,
+   "design_excess_pct": -0.150349940168153,
+   "validation_excess_pct": 0.15637142121666406,
+   "validation_n": 2845,
+   "validation_edge_pct": 0.26151087091917047
+  },
+  {
+   "pattern": "inverted_hammer",
+   "condition": "above 50-day avg",
+   "hold_days": 10,
+   "design_excess_pct": -0.09915946840936699,
+   "validation_excess_pct": 0.20671690866550355,
+   "validation_n": 2835,
+   "validation_edge_pct": 0.3550818513084977
+  },
+  {
+   "pattern": "inverted_hammer",
+   "condition": "above 50-day avg",
+   "hold_days": 20,
+   "design_excess_pct": 0.25242600015647343,
+   "validation_excess_pct": -0.2694737928827596,
+   "validation_n": 2828,
+   "validation_edge_pct": 0.1764001992017562
+  },
+  {
+   "pattern": "inverted_hammer",
+   "condition": "market bull (SPY>200d)",
+   "hold_days": 5,
+   "design_excess_pct": -0.19357092482158886,
+   "validation_excess_pct": -0.1920525362098368,
+   "validation_n": 6509,
+   "validation_edge_pct": -0.03346786656868996
+  },
+  {
+   "pattern": "inverted_hammer",
+   "condition": "market bull (SPY>200d)",
+   "hold_days": 10,
+   "design_excess_pct": -0.23272013697551308,
+   "validation_excess_pct": -0.34665713025224454,
+   "validation_n": 6483,
+   "validation_edge_pct": -0.10581892202542267
+  },
+  {
+   "pattern": "inverted_hammer",
+   "condition": "market bull (SPY>200d)",
+   "hold_days": 20,
+   "design_excess_pct": 0.06030803202148029,
+   "validation_excess_pct": -0.683148814014344,
+   "validation_n": 6448,
+   "validation_edge_pct": -0.16919116527731443
+  },
+  {
+   "pattern": "inverted_hammer",
+   "condition": "market bear (SPY<200d)",
+   "hold_days": 5,
+   "design_excess_pct": -0.23848189297156486,
+   "validation_excess_pct": 0.19286447982633492,
+   "validation_n": 1558,
+   "validation_edge_pct": 0.2334548238653273
+  },
+  {
+   "pattern": "inverted_hammer",
+   "condition": "market bear (SPY<200d)",
+   "hold_days": 10,
+   "design_excess_pct": -0.2739378933704253,
+   "validation_excess_pct": -0.17279908648112277,
+   "validation_n": 1558,
+   "validation_edge_pct": -0.2133041240950751
+  },
+  {
+   "pattern": "inverted_hammer",
+   "condition": "market bear (SPY<200d)",
+   "hold_days": 20,
+   "design_excess_pct": 0.6055034785342547,
+   "validation_excess_pct": 0.30286287674672097,
+   "validation_n": 1557,
+   "validation_edge_pct": 0.10926633935640165
+  },
+  {
+   "pattern": "inverted_hammer",
+   "condition": "high volume + fell 5%+",
+   "hold_days": 5,
+   "design_excess_pct": -0.6348028091026603,
+   "validation_excess_pct": 0.4297917067641784,
+   "validation_n": 251,
+   "validation_edge_pct": 0.34114441889604374
+  },
+  {
+   "pattern": "inverted_hammer",
+   "condition": "high volume + fell 5%+",
+   "hold_days": 10,
+   "design_excess_pct": -0.750071894528494,
+   "validation_excess_pct": -0.11850157322402866,
+   "validation_n": 249,
+   "validation_edge_pct": -0.04632681251768987
+  },
+  {
+   "pattern": "inverted_hammer",
+   "condition": "high volume + fell 5%+",
+   "hold_days": 20,
+   "design_excess_pct": 0.7057263145675358,
+   "validation_excess_pct": -1.2116083091672567,
+   "validation_n": 246,
+   "validation_edge_pct": -1.370323373778025
+  },
+  {
+   "pattern": "inverted_hammer",
+   "condition": "high volume + near 52-week low",
+   "hold_days": 5,
+   "design_excess_pct": -2.1181540976535724,
+   "validation_excess_pct": 0.28541872681563873,
+   "validation_n": 179,
+   "validation_edge_pct": 0.38462571161016534
+  },
+  {
+   "pattern": "inverted_hammer",
+   "condition": "high volume + near 52-week low",
+   "hold_days": 10,
+   "design_excess_pct": -1.66437656311363,
+   "validation_excess_pct": -0.848037286057563,
+   "validation_n": 177,
+   "validation_edge_pct": -0.5247496735133641
+  },
+  {
+   "pattern": "inverted_hammer",
+   "condition": "high volume + near 52-week low",
+   "hold_days": 20,
+   "design_excess_pct": -1.291380604253045,
+   "validation_excess_pct": -1.6521116129578204,
+   "validation_n": 174,
+   "validation_edge_pct": -1.4519904614451544
+  },
+  {
+   "pattern": "inverted_hammer",
+   "condition": "RSI under 30 + near 52-week low",
+   "hold_days": 5,
+   "design_excess_pct": -1.6044511081358144,
+   "validation_excess_pct": -0.26957342199784506,
+   "validation_n": 308,
+   "validation_edge_pct": -0.3456612222318082
+  },
+  {
+   "pattern": "inverted_hammer",
+   "condition": "RSI under 30 + near 52-week low",
+   "hold_days": 10,
+   "design_excess_pct": -0.27501012354188387,
+   "validation_excess_pct": -0.9251611902909453,
+   "validation_n": 307,
+   "validation_edge_pct": -0.8441283025551388
+  },
+  {
+   "pattern": "inverted_hammer",
+   "condition": "RSI under 30 + near 52-week low",
+   "hold_days": 20,
+   "design_excess_pct": 0.744800086673746,
+   "validation_excess_pct": -1.2720168219272707,
+   "validation_n": 306,
+   "validation_edge_pct": -1.5942833885955476
+  },
+  {
+   "pattern": "inverted_hammer",
+   "condition": "below 50-day avg + high volume",
+   "hold_days": 5,
+   "design_excess_pct": -0.8689400239167224,
+   "validation_excess_pct": 0.057007711780565164,
+   "validation_n": 502,
+   "validation_edge_pct": 0.19546975181691778
+  },
+  {
+   "pattern": "inverted_hammer",
+   "condition": "below 50-day avg + high volume",
+   "hold_days": 10,
+   "design_excess_pct": -1.1161287478872484,
+   "validation_excess_pct": -0.3523215625741149,
+   "validation_n": 500,
+   "validation_edge_pct": -0.13527383157008663
+  },
+  {
+   "pattern": "inverted_hammer",
+   "condition": "below 50-day avg + high volume",
+   "hold_days": 20,
+   "design_excess_pct": -0.5417165420299151,
+   "validation_excess_pct": -0.6224380297430783,
+   "validation_n": 496,
+   "validation_edge_pct": -0.4974881210009125
+  },
+  {
+   "pattern": "dragonfly_doji",
+   "condition": "none",
+   "hold_days": 5,
+   "design_excess_pct": -0.4324744313167139,
+   "validation_excess_pct": 0.04672273531266532,
+   "validation_n": 1821,
+   "validation_edge_pct": 0.17307608672211544
+  },
+  {
+   "pattern": "dragonfly_doji",
+   "condition": "none",
+   "hold_days": 10,
+   "design_excess_pct": -0.008684864460322435,
+   "validation_excess_pct": -0.18500665851675055,
+   "validation_n": 1812,
+   "validation_edge_pct": -0.016879471869870183
+  },
+  {
+   "pattern": "dragonfly_doji",
+   "condition": "none",
+   "hold_days": 20,
+   "design_excess_pct": -0.06822305025589136,
+   "validation_excess_pct": 0.2160096362252236,
+   "validation_n": 1798,
+   "validation_edge_pct": 0.5442400328333691
+  },
+  {
+   "pattern": "dragonfly_doji",
+   "condition": "high volume",
+   "hold_days": 5,
+   "design_excess_pct": -1.4557484098368747,
+   "validation_excess_pct": 0.3526983185566761,
+   "validation_n": 236,
+   "validation_edge_pct": 0.4113809351593164
+  },
+  {
+   "pattern": "dragonfly_doji",
+   "condition": "high volume",
+   "hold_days": 10,
+   "design_excess_pct": -0.8743570400780221,
+   "validation_excess_pct": 0.5131489096846285,
+   "validation_n": 236,
+   "validation_edge_pct": 0.5793252593709602
+  },
+  {
+   "pattern": "dragonfly_doji",
+   "condition": "high volume",
+   "hold_days": 20,
+   "design_excess_pct": -1.3725168437838984,
+   "validation_excess_pct": 0.47118936557451163,
+   "validation_n": 231,
+   "validation_edge_pct": 0.5903864224379466
+  },
+  {
+   "pattern": "dragonfly_doji",
+   "condition": "fell 5%+ in 5 days",
+   "hold_days": 5,
+   "design_excess_pct": -1.9002034181480658,
+   "validation_excess_pct": -0.2279853268857387,
+   "validation_n": 429,
+   "validation_edge_pct": -0.2696729091785443
+  },
+  {
+   "pattern": "dragonfly_doji",
+   "condition": "fell 5%+ in 5 days",
+   "hold_days": 10,
+   "design_excess_pct": -1.1440639290031849,
+   "validation_excess_pct": -0.49005228326380784,
+   "validation_n": 425,
+   "validation_edge_pct": -0.44248478069283287
+  },
+  {
+   "pattern": "dragonfly_doji",
+   "condition": "fell 5%+ in 5 days",
+   "hold_days": 20,
+   "design_excess_pct": -1.4621644506984433,
+   "validation_excess_pct": -0.05377349179540886,
+   "validation_n": 421,
+   "validation_edge_pct": 0.1287093193638141
+  },
+  {
+   "pattern": "dragonfly_doji",
+   "condition": "near 52-week low",
+   "hold_days": 5,
+   "design_excess_pct": -1.6807497067038017,
+   "validation_excess_pct": -0.06618276076079507,
+   "validation_n": 316,
+   "validation_edge_pct": 0.009333308022158381
+  },
+  {
+   "pattern": "dragonfly_doji",
+   "condition": "near 52-week low",
+   "hold_days": 10,
+   "design_excess_pct": -1.2000146372729388,
+   "validation_excess_pct": -0.4830444855133901,
+   "validation_n": 314,
+   "validation_edge_pct": -0.2727001275558136
+  },
+  {
+   "pattern": "dragonfly_doji",
+   "condition": "near 52-week low",
+   "hold_days": 20,
+   "design_excess_pct": -1.7165119688178558,
+   "validation_excess_pct": -0.1573917078610207,
+   "validation_n": 310,
+   "validation_edge_pct": 0.17940517878488088
+  },
+  {
+   "pattern": "dragonfly_doji",
+   "condition": "below 50-day avg",
+   "hold_days": 5,
+   "design_excess_pct": -0.866040716851958,
+   "validation_excess_pct": 0.011933538628353845,
+   "validation_n": 1108,
+   "validation_edge_pct": 0.1693196506892462
+  },
+  {
+   "pattern": "dragonfly_doji",
+   "condition": "below 50-day avg",
+   "hold_days": 10,
+   "design_excess_pct": -0.2572821307369379,
+   "validation_excess_pct": -0.4836291301119581,
+   "validation_n": 1101,
+   "validation_edge_pct": -0.27574272172768205
+  },
+  {
+   "pattern": "dragonfly_doji",
+   "condition": "below 50-day avg",
+   "hold_days": 20,
+   "design_excess_pct": -0.3962875825608981,
+   "validation_excess_pct": -0.2975215745482557,
+   "validation_n": 1090,
+   "validation_edge_pct": -0.034535611844269704
+  },
+  {
+   "pattern": "dragonfly_doji",
+   "condition": "above 50-day avg",
+   "hold_days": 5,
+   "design_excess_pct": -0.04957151686166297,
+   "validation_excess_pct": 0.11298521727444143,
+   "validation_n": 711,
+   "validation_edge_pct": 0.21598205622484273
+  },
+  {
+   "pattern": "dragonfly_doji",
+   "condition": "above 50-day avg",
+   "hold_days": 10,
+   "design_excess_pct": 0.24942978503412488,
+   "validation_excess_pct": 0.2972622435086246,
+   "validation_n": 709,
+   "validation_edge_pct": 0.4344231867902496
+  },
+  {
+   "pattern": "dragonfly_doji",
+   "condition": "above 50-day avg",
+   "hold_days": 20,
+   "design_excess_pct": 0.25982539564759743,
+   "validation_excess_pct": 1.0407741472683496,
+   "validation_n": 706,
+   "validation_edge_pct": 1.4415854121848812
+  },
+  {
+   "pattern": "dragonfly_doji",
+   "condition": "market bull (SPY>200d)",
+   "hold_days": 5,
+   "design_excess_pct": -0.42763253538436663,
+   "validation_excess_pct": 0.03604040255151113,
+   "validation_n": 1467,
+   "validation_edge_pct": 0.19277781694209659
+  },
+  {
+   "pattern": "dragonfly_doji",
+   "condition": "market bull (SPY>200d)",
+   "hold_days": 10,
+   "design_excess_pct": -0.09494030555746766,
+   "validation_excess_pct": -0.29105239495406415,
+   "validation_n": 1458,
+   "validation_edge_pct": -0.05792654233122683
+  },
+  {
+   "pattern": "dragonfly_doji",
+   "condition": "market bull (SPY>200d)",
+   "hold_days": 20,
+   "design_excess_pct": -0.23317446810276693,
+   "validation_excess_pct": 0.17779517973794187,
+   "validation_n": 1444,
+   "validation_edge_pct": 0.6627130148689085
+  },
+  {
+   "pattern": "dragonfly_doji",
+   "condition": "market bear (SPY<200d)",
+   "hold_days": 5,
+   "design_excess_pct": -0.4451725407471345,
+   "validation_excess_pct": 0.09099104650083814,
+   "validation_n": 354,
+   "validation_edge_pct": 0.12274325393334379
+  },
+  {
+   "pattern": "dragonfly_doji",
+   "condition": "market bear (SPY<200d)",
+   "hold_days": 10,
+   "design_excess_pct": 0.21752425802483788,
+   "validation_excess_pct": 0.251757984775914,
+   "validation_n": 354,
+   "validation_edge_pct": 0.21073416484711496
+  },
+  {
+   "pattern": "dragonfly_doji",
+   "condition": "market bear (SPY<200d)",
+   "hold_days": 20,
+   "design_excess_pct": 0.36437012890135584,
+   "validation_excess_pct": 0.3718900745518751,
+   "validation_n": 354,
+   "validation_edge_pct": 0.1855936764422802
+  },
+  {
+   "pattern": "dragonfly_doji",
+   "condition": "below 50-day avg + high volume",
+   "hold_days": 5,
+   "design_excess_pct": -2.3160437042843407,
+   "validation_excess_pct": 0.3136901420980214,
+   "validation_n": 179,
+   "validation_edge_pct": 0.4282079439710847
+  },
+  {
+   "pattern": "dragonfly_doji",
+   "condition": "below 50-day avg + high volume",
+   "hold_days": 10,
+   "design_excess_pct": -1.5354681898300073,
+   "validation_excess_pct": 0.4275389782973509,
+   "validation_n": 179,
+   "validation_edge_pct": 0.607554586400031
+  },
+  {
+   "pattern": "dragonfly_doji",
+   "condition": "below 50-day avg + high volume",
+   "hold_days": 20,
+   "design_excess_pct": -1.9204386312666577,
+   "validation_excess_pct": 0.6291312847971614,
+   "validation_n": 175,
+   "validation_edge_pct": 0.7057433698722373
+  },
+  {
+   "pattern": "bullish_engulfing",
+   "condition": "none",
+   "hold_days": 5,
+   "design_excess_pct": 0.02663365763902903,
+   "validation_excess_pct": -0.1627807659014988,
+   "validation_n": 14917,
+   "validation_edge_pct": -0.0369479756471021
+  },
+  {
+   "pattern": "bullish_engulfing",
+   "condition": "none",
+   "hold_days": 10,
+   "design_excess_pct": -0.10824099456187977,
+   "validation_excess_pct": -0.33877404296451974,
+   "validation_n": 14887,
+   "validation_edge_pct": -0.17028653929811177
+  },
+  {
+   "pattern": "bullish_engulfing",
+   "condition": "none",
+   "hold_days": 20,
+   "design_excess_pct": -0.04162699313160959,
+   "validation_excess_pct": -0.5796570540768312,
+   "validation_n": 14783,
+   "validation_edge_pct": -0.24694026355364587
+  },
+  {
+   "pattern": "bullish_engulfing",
+   "condition": "high volume",
+   "hold_days": 5,
+   "design_excess_pct": -0.2806674733613237,
+   "validation_excess_pct": -0.37618131044062814,
+   "validation_n": 1827,
+   "validation_edge_pct": -0.28246881565521037
+  },
+  {
+   "pattern": "bullish_engulfing",
+   "condition": "high volume",
+   "hold_days": 10,
+   "design_excess_pct": -0.7330150237402726,
+   "validation_excess_pct": -0.24416185143449892,
+   "validation_n": 1824,
+   "validation_edge_pct": -0.19016615282299168
+  },
+  {
+   "pattern": "bullish_engulfing",
+   "condition": "high volume",
+   "hold_days": 20,
+   "design_excess_pct": -0.4949881853825168,
+   "validation_excess_pct": -0.1781564482099601,
+   "validation_n": 1811,
+   "validation_edge_pct": -0.11281713106377608
+  },
+  {
+   "pattern": "bullish_engulfing",
+   "condition": "fell 5%+ in 5 days",
+   "hold_days": 5,
+   "design_excess_pct": 0.6103312879210294,
+   "validation_excess_pct": -0.1546277690426346,
+   "validation_n": 1960,
+   "validation_edge_pct": -0.2176544139661774
+  },
+  {
+   "pattern": "bullish_engulfing",
+   "condition": "fell 5%+ in 5 days",
+   "hold_days": 10,
+   "design_excess_pct": -0.12781151426175033,
+   "validation_excess_pct": -0.5100453929896647,
+   "validation_n": 1960,
+   "validation_edge_pct": -0.502801788995479
+  },
+  {
+   "pattern": "bullish_engulfing",
+   "condition": "fell 5%+ in 5 days",
+   "hold_days": 20,
+   "design_excess_pct": 0.7823821133310864,
+   "validation_excess_pct": -0.3261097182379108,
+   "validation_n": 1938,
+   "validation_edge_pct": -0.30896079436941826
+  },
+  {
+   "pattern": "bullish_engulfing",
+   "condition": "fell 10%+ in 5 days",
+   "hold_days": 5,
+   "design_excess_pct": 0.9843473583876624,
+   "validation_excess_pct": -0.18058589334284159,
+   "validation_n": 517,
+   "validation_edge_pct": -0.45607557000353693
+  },
+  {
+   "pattern": "bullish_engulfing",
+   "condition": "fell 10%+ in 5 days",
+   "hold_days": 10,
+   "design_excess_pct": -3.182329507299649,
+   "validation_excess_pct": -1.0316235439663808,
+   "validation_n": 517,
+   "validation_edge_pct": -1.1246916861872052
+  },
+  {
+   "pattern": "bullish_engulfing",
+   "condition": "fell 10%+ in 5 days",
+   "hold_days": 20,
+   "design_excess_pct": -1.740775931164424,
+   "validation_excess_pct": -0.9615322578525953,
+   "validation_n": 512,
+   "validation_edge_pct": -1.1861263822243888
+  },
+  {
+   "pattern": "bullish_engulfing",
+   "condition": "near 52-week low",
+   "hold_days": 5,
+   "design_excess_pct": -0.340361641098362,
+   "validation_excess_pct": -0.07532958790997552,
+   "validation_n": 2483,
+   "validation_edge_pct": -0.03145617320379421
+  },
+  {
+   "pattern": "bullish_engulfing",
+   "condition": "near 52-week low",
+   "hold_days": 10,
+   "design_excess_pct": -0.7423557511689549,
+   "validation_excess_pct": -0.1877407539937228,
+   "validation_n": 2479,
+   "validation_edge_pct": -0.04779196869957973
+  },
+  {
+   "pattern": "bullish_engulfing",
+   "condition": "near 52-week low",
+   "hold_days": 20,
+   "design_excess_pct": -0.8405109875389225,
+   "validation_excess_pct": -0.1576565648071806,
+   "validation_n": 2464,
+   "validation_edge_pct": 0.033207634263086275
+  },
+  {
+   "pattern": "bullish_engulfing",
+   "condition": "RSI under 30",
+   "hold_days": 5,
+   "design_excess_pct": 0.3545330020857287,
+   "validation_excess_pct": -0.07135476194865258,
+   "validation_n": 390,
+   "validation_edge_pct": -0.14082684010290272
+  },
+  {
+   "pattern": "bullish_engulfing",
+   "condition": "RSI under 30",
+   "hold_days": 10,
+   "design_excess_pct": -1.0233747714339996,
+   "validation_excess_pct": -0.13480156449436115,
+   "validation_n": 389,
+   "validation_edge_pct": -0.22408294581538196
+  },
+  {
+   "pattern": "bullish_engulfing",
+   "condition": "RSI under 30",
+   "hold_days": 20,
+   "design_excess_pct": 0.026848841959300183,
+   "validation_excess_pct": -0.10977676094871898,
+   "validation_n": 385,
+   "validation_edge_pct": -0.291748685073464
+  },
+  {
+   "pattern": "bullish_engulfing",
+   "condition": "below 50-day avg",
+   "hold_days": 5,
+   "design_excess_pct": 0.06466808193991327,
+   "validation_excess_pct": -0.16802553299823025,
+   "validation_n": 8517,
+   "validation_edge_pct": -0.016236701317538193
+  },
+  {
+   "pattern": "bullish_engulfing",
+   "condition": "below 50-day avg",
+   "hold_days": 10,
+   "design_excess_pct": -0.18277529449545316,
+   "validation_excess_pct": -0.3289328687184873,
+   "validation_n": 8506,
+   "validation_edge_pct": -0.13209949156586653
+  },
+  {
+   "pattern": "bullish_engulfing",
+   "condition": "below 50-day avg",
+   "hold_days": 20,
+   "design_excess_pct": -0.08042504370598338,
+   "validation_excess_pct": -0.36485768646702793,
+   "validation_n": 8430,
+   "validation_edge_pct": -0.14021300998861727
+  },
+  {
+   "pattern": "bullish_engulfing",
+   "condition": "above 50-day avg",
+   "hold_days": 5,
+   "design_excess_pct": -0.013791445726814679,
+   "validation_excess_pct": -0.16392011475677307,
+   "validation_n": 6393,
+   "validation_edge_pct": -0.06359114961415384
+  },
+  {
+   "pattern": "bullish_engulfing",
+   "condition": "above 50-day avg",
+   "hold_days": 10,
+   "design_excess_pct": -0.07304180462667863,
+   "validation_excess_pct": -0.3532155077214874,
+   "validation_n": 6374,
+   "validation_edge_pct": -0.21388056218986526
+  },
+  {
+   "pattern": "bullish_engulfing",
+   "condition": "above 50-day avg",
+   "hold_days": 20,
+   "design_excess_pct": -0.056809641579563364,
+   "validation_excess_pct": -0.8622585750618549,
+   "validation_n": 6346,
+   "validation_edge_pct": -0.42884472679829794
+  },
+  {
+   "pattern": "bullish_engulfing",
+   "condition": "market bull (SPY>200d)",
+   "hold_days": 5,
+   "design_excess_pct": -0.08438541046320408,
+   "validation_excess_pct": -0.14774834208177448,
+   "validation_n": 11522,
+   "validation_edge_pct": 0.009116702911842274
+  },
+  {
+   "pattern": "bullish_engulfing",
+   "condition": "market bull (SPY>200d)",
+   "hold_days": 10,
+   "design_excess_pct": -0.18845880021256722,
+   "validation_excess_pct": -0.35196405425809163,
+   "validation_n": 11493,
+   "validation_edge_pct": -0.11392175686925053
+  },
+  {
+   "pattern": "bullish_engulfing",
+   "condition": "market bull (SPY>200d)",
+   "hold_days": 20,
+   "design_excess_pct": -0.19766966754206577,
+   "validation_excess_pct": -0.7273816187999815,
+   "validation_n": 11392,
+   "validation_edge_pct": -0.22184965016333424
+  },
+  {
+   "pattern": "bullish_engulfing",
+   "condition": "market bear (SPY<200d)",
+   "hold_days": 5,
+   "design_excess_pct": 0.3260246899952459,
+   "validation_excess_pct": -0.21379802282369703,
+   "validation_n": 3395,
+   "validation_edge_pct": -0.22509023666370953
+  },
+  {
+   "pattern": "bullish_engulfing",
+   "condition": "market bear (SPY<200d)",
+   "hold_days": 10,
+   "design_excess_pct": 0.10803454378984384,
+   "validation_excess_pct": -0.29410910489822023,
+   "validation_n": 3394,
+   "validation_edge_pct": -0.40314814782385694
+  },
+  {
+   "pattern": "bullish_engulfing",
+   "condition": "market bear (SPY<200d)",
+   "hold_days": 20,
+   "design_excess_pct": 0.3792368856244436,
+   "validation_excess_pct": -0.0833791887491617,
+   "validation_n": 3391,
+   "validation_edge_pct": -0.40152790724211507
+  },
+  {
+   "pattern": "bullish_engulfing",
+   "condition": "high volume + fell 5%+",
+   "hold_days": 5,
+   "design_excess_pct": -0.3717418181567052,
+   "validation_excess_pct": -0.719301719030015,
+   "validation_n": 407,
+   "validation_edge_pct": -0.8398771155333242
+  },
+  {
+   "pattern": "bullish_engulfing",
+   "condition": "high volume + fell 5%+",
+   "hold_days": 10,
+   "design_excess_pct": -3.2501565533382752,
+   "validation_excess_pct": -0.19782180015064313,
+   "validation_n": 407,
+   "validation_edge_pct": -0.3987797817515906
+  },
+  {
+   "pattern": "bullish_engulfing",
+   "condition": "high volume + fell 5%+",
+   "hold_days": 20,
+   "design_excess_pct": -1.511103741404193,
+   "validation_excess_pct": 1.1924320979526095,
+   "validation_n": 402,
+   "validation_edge_pct": 0.7353901579064497
+  },
+  {
+   "pattern": "bullish_engulfing",
+   "condition": "high volume + near 52-week low",
+   "hold_days": 5,
+   "design_excess_pct": -0.9158819286150665,
+   "validation_excess_pct": -0.9264746413680592,
+   "validation_n": 321,
+   "validation_edge_pct": -0.7933170652403928
+  },
+  {
+   "pattern": "bullish_engulfing",
+   "condition": "high volume + near 52-week low",
+   "hold_days": 10,
+   "design_excess_pct": -2.1477622968122185,
+   "validation_excess_pct": -0.9623723840002261,
+   "validation_n": 319,
+   "validation_edge_pct": -0.7232378153439869
+  },
+  {
+   "pattern": "bullish_engulfing",
+   "condition": "high volume + near 52-week low",
+   "hold_days": 20,
+   "design_excess_pct": -1.9741630045414509,
+   "validation_excess_pct": -0.6629411139684931,
+   "validation_n": 319,
+   "validation_edge_pct": -0.5729011836157671
+  },
+  {
+   "pattern": "bullish_engulfing",
+   "condition": "below 50-day avg + high volume",
+   "hold_days": 5,
+   "design_excess_pct": -0.33296646677347275,
+   "validation_excess_pct": -0.3895265026627744,
+   "validation_n": 1202,
+   "validation_edge_pct": -0.24326743717094323
+  },
+  {
+   "pattern": "bullish_engulfing",
+   "condition": "below 50-day avg + high volume",
+   "hold_days": 10,
+   "design_excess_pct": -1.0821603031798381,
+   "validation_excess_pct": -0.08260799841529136,
+   "validation_n": 1200,
+   "validation_edge_pct": 0.03827181007018458
+  },
+  {
+   "pattern": "bullish_engulfing",
+   "condition": "below 50-day avg + high volume",
+   "hold_days": 20,
+   "design_excess_pct": -1.024932902210125,
+   "validation_excess_pct": 0.5675936758412405,
+   "validation_n": 1191,
+   "validation_edge_pct": 0.5508592608029792
+  },
+  {
+   "pattern": "piercing_line",
+   "condition": "none",
+   "hold_days": 5,
+   "design_excess_pct": -0.036523167572299065,
+   "validation_excess_pct": -0.2573894465106241,
+   "validation_n": 4536,
+   "validation_edge_pct": -0.13102585312177367
+  },
+  {
+   "pattern": "piercing_line",
+   "condition": "none",
+   "hold_days": 10,
+   "design_excess_pct": -0.08120152017396295,
+   "validation_excess_pct": -0.343024756878514,
+   "validation_n": 4527,
+   "validation_edge_pct": -0.1722794037523831
+  },
+  {
+   "pattern": "piercing_line",
+   "condition": "none",
+   "hold_days": 20,
+   "design_excess_pct": -0.06006987909101554,
+   "validation_excess_pct": -0.6068686562120809,
+   "validation_n": 4475,
+   "validation_edge_pct": -0.26124506971248
+  },
+  {
+   "pattern": "piercing_line",
+   "condition": "high volume",
+   "hold_days": 5,
+   "design_excess_pct": 0.07296996737515575,
+   "validation_excess_pct": -0.1679627477856714,
+   "validation_n": 518,
+   "validation_edge_pct": -0.08671177647452738
+  },
+  {
+   "pattern": "piercing_line",
+   "condition": "high volume",
+   "hold_days": 10,
+   "design_excess_pct": -0.6425027213927633,
+   "validation_excess_pct": -0.4344915793014689,
+   "validation_n": 517,
+   "validation_edge_pct": -0.37154805150253384
+  },
+  {
+   "pattern": "piercing_line",
+   "condition": "high volume",
+   "hold_days": 20,
+   "design_excess_pct": -0.7627257854135803,
+   "validation_excess_pct": 0.024383567323425885,
+   "validation_n": 511,
+   "validation_edge_pct": 0.10770154895341982
+  },
+  {
+   "pattern": "piercing_line",
+   "condition": "fell 5%+ in 5 days",
+   "hold_days": 5,
+   "design_excess_pct": 0.5454781785167049,
+   "validation_excess_pct": -0.4774937986758236,
+   "validation_n": 939,
+   "validation_edge_pct": -0.5299754233380592
+  },
+  {
+   "pattern": "piercing_line",
+   "condition": "fell 5%+ in 5 days",
+   "hold_days": 10,
+   "design_excess_pct": -0.049513398035508305,
+   "validation_excess_pct": -0.48974501772744583,
+   "validation_n": 935,
+   "validation_edge_pct": -0.44486137295007155
+  },
+  {
+   "pattern": "piercing_line",
+   "condition": "fell 5%+ in 5 days",
+   "hold_days": 20,
+   "design_excess_pct": 1.0021027449669988,
+   "validation_excess_pct": -0.4585783347505636,
+   "validation_n": 909,
+   "validation_edge_pct": -0.3420304413887535
+  },
+  {
+   "pattern": "piercing_line",
+   "condition": "near 52-week low",
+   "hold_days": 5,
+   "design_excess_pct": 0.05492701865690916,
+   "validation_excess_pct": -0.2588103179307137,
+   "validation_n": 866,
+   "validation_edge_pct": -0.21736848442032744
+  },
+  {
+   "pattern": "piercing_line",
+   "condition": "near 52-week low",
+   "hold_days": 10,
+   "design_excess_pct": 0.08925455301398942,
+   "validation_excess_pct": -0.48037526030126154,
+   "validation_n": 862,
+   "validation_edge_pct": -0.33929019506511454
+  },
+  {
+   "pattern": "piercing_line",
+   "condition": "near 52-week low",
+   "hold_days": 20,
+   "design_excess_pct": 0.00011820037476278869,
+   "validation_excess_pct": -0.45515456922661685,
+   "validation_n": 852,
+   "validation_edge_pct": -0.26473394129834876
+  },
+  {
+   "pattern": "piercing_line",
+   "condition": "RSI under 30",
+   "hold_days": 5,
+   "design_excess_pct": 0.8364292962684708,
+   "validation_excess_pct": -0.27422500315579024,
+   "validation_n": 167,
+   "validation_edge_pct": -0.40461207873062977
+  },
+  {
+   "pattern": "piercing_line",
+   "condition": "RSI under 30",
+   "hold_days": 10,
+   "design_excess_pct": -0.9456235532763116,
+   "validation_excess_pct": -0.006043650562149155,
+   "validation_n": 165,
+   "validation_edge_pct": -0.19707941452651026
+  },
+  {
+   "pattern": "piercing_line",
+   "condition": "RSI under 30",
+   "hold_days": 20,
+   "design_excess_pct": -0.6785044214699212,
+   "validation_excess_pct": 0.06313663944411227,
+   "validation_n": 160,
+   "validation_edge_pct": -0.30534091448356304
+  },
+  {
+   "pattern": "piercing_line",
+   "condition": "below 50-day avg",
+   "hold_days": 5,
+   "design_excess_pct": 0.08325862650638974,
+   "validation_excess_pct": -0.3019541360301521,
+   "validation_n": 2846,
+   "validation_edge_pct": -0.1462323433785298
+  },
+  {
+   "pattern": "piercing_line",
+   "condition": "below 50-day avg",
+   "hold_days": 10,
+   "design_excess_pct": 0.06345853997973155,
+   "validation_excess_pct": -0.3547686733939932,
+   "validation_n": 2840,
+   "validation_edge_pct": -0.14878180586550238
+  },
+  {
+   "pattern": "piercing_line",
+   "condition": "below 50-day avg",
+   "hold_days": 20,
+   "design_excess_pct": 0.1051024811864995,
+   "validation_excess_pct": -0.6293189093032138,
+   "validation_n": 2797,
+   "validation_edge_pct": -0.38566779852487687
+  },
+  {
+   "pattern": "piercing_line",
+   "condition": "above 50-day avg",
+   "hold_days": 5,
+   "design_excess_pct": -0.17888785133317545,
+   "validation_excess_pct": -0.18222348818837042,
+   "validation_n": 1687,
+   "validation_edge_pct": -0.08018951882214341
+  },
+  {
+   "pattern": "piercing_line",
+   "condition": "above 50-day avg",
+   "hold_days": 10,
+   "design_excess_pct": -0.19565342998249916,
+   "validation_excess_pct": -0.3211851549870902,
+   "validation_n": 1684,
+   "validation_edge_pct": -0.17845318451369344
+  },
+  {
+   "pattern": "piercing_line",
+   "condition": "above 50-day avg",
+   "hold_days": 20,
+   "design_excess_pct": -0.2651722265476395,
+   "validation_excess_pct": -0.5761673574718115,
+   "validation_n": 1675,
+   "validation_edge_pct": -0.13167637504795596
+  },
+  {
+   "pattern": "piercing_line",
+   "condition": "market bull (SPY>200d)",
+   "hold_days": 5,
+   "design_excess_pct": -0.24269803112068328,
+   "validation_excess_pct": -0.23245373047687343,
+   "validation_n": 3487,
+   "validation_edge_pct": -0.07594910975135818
+  },
+  {
+   "pattern": "piercing_line",
+   "condition": "market bull (SPY>200d)",
+   "hold_days": 10,
+   "design_excess_pct": -0.2432794147876171,
+   "validation_excess_pct": -0.28948665025231723,
+   "validation_n": 3479,
+   "validation_edge_pct": -0.05150177260220413
+  },
+  {
+   "pattern": "piercing_line",
+   "condition": "market bull (SPY>200d)",
+   "hold_days": 20,
+   "design_excess_pct": -0.38405851457406975,
+   "validation_excess_pct": -0.652858523020205,
+   "validation_n": 3427,
+   "validation_edge_pct": -0.1357611502752791
+  },
+  {
+   "pattern": "piercing_line",
+   "condition": "market bear (SPY<200d)",
+   "hold_days": 5,
+   "design_excess_pct": 0.5042071930340694,
+   "validation_excess_pct": -0.34027871420336836,
+   "validation_n": 1049,
+   "validation_edge_pct": -0.3382406952167291
+  },
+  {
+   "pattern": "piercing_line",
+   "condition": "market bear (SPY<200d)",
+   "hold_days": 10,
+   "design_excess_pct": 0.3438766726397558,
+   "validation_excess_pct": -0.5207528799248293,
+   "validation_n": 1048,
+   "validation_edge_pct": -0.6178444044398306
+  },
+  {
+   "pattern": "piercing_line",
+   "condition": "market bear (SPY<200d)",
+   "hold_days": 20,
+   "design_excess_pct": 0.7890147071553858,
+   "validation_excess_pct": -0.45648003641108753,
+   "validation_n": 1048,
+   "validation_edge_pct": -0.7677846445768733
+  },
+  {
+   "pattern": "piercing_line",
+   "condition": "below 50-day avg + high volume",
+   "hold_days": 5,
+   "design_excess_pct": 0.2804734823052425,
+   "validation_excess_pct": -0.22063317247619224,
+   "validation_n": 389,
+   "validation_edge_pct": -0.08867036371303408
+  },
+  {
+   "pattern": "piercing_line",
+   "condition": "below 50-day avg + high volume",
+   "hold_days": 10,
+   "design_excess_pct": -0.9675547842158209,
+   "validation_excess_pct": -0.46627759177019856,
+   "validation_n": 388,
+   "validation_edge_pct": -0.29776214280535385
+  },
+  {
+   "pattern": "piercing_line",
+   "condition": "below 50-day avg + high volume",
+   "hold_days": 20,
+   "design_excess_pct": -1.2676346765257906,
+   "validation_excess_pct": 0.19000008862134093,
+   "validation_n": 383,
+   "validation_edge_pct": 0.20751344178725015
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "none",
+   "hold_days": 5,
+   "design_excess_pct": -0.04875480798493607,
+   "validation_excess_pct": -0.0939233309123705,
+   "validation_n": 13260,
+   "validation_edge_pct": 0.0397016356678853
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "none",
+   "hold_days": 10,
+   "design_excess_pct": -0.06509527416409719,
+   "validation_excess_pct": -0.17465904121613796,
+   "validation_n": 13230,
+   "validation_edge_pct": 0.008658596899158641
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "none",
+   "hold_days": 20,
+   "design_excess_pct": 0.11889978985072958,
+   "validation_excess_pct": -0.27163208097760266,
+   "validation_n": 13176,
+   "validation_edge_pct": 0.09878714949011132
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "high volume",
+   "hold_days": 5,
+   "design_excess_pct": 0.10842591165071622,
+   "validation_excess_pct": 0.06535392543722629,
+   "validation_n": 1156,
+   "validation_edge_pct": 0.13605482860116355
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "high volume",
+   "hold_days": 10,
+   "design_excess_pct": 0.04707759302745846,
+   "validation_excess_pct": -0.22205275110363984,
+   "validation_n": 1152,
+   "validation_edge_pct": -0.15418303122069443
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "high volume",
+   "hold_days": 20,
+   "design_excess_pct": 0.1802264648639669,
+   "validation_excess_pct": -0.2978906123404924,
+   "validation_n": 1150,
+   "validation_edge_pct": -0.15359926292790058
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "fell 5%+ in 5 days",
+   "hold_days": 5,
+   "design_excess_pct": 0.09892786953914182,
+   "validation_excess_pct": 0.09892250688134724,
+   "validation_n": 3106,
+   "validation_edge_pct": 0.08596040577710373
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "fell 5%+ in 5 days",
+   "hold_days": 10,
+   "design_excess_pct": 0.34476146694247956,
+   "validation_excess_pct": 0.24277248456972816,
+   "validation_n": 3095,
+   "validation_edge_pct": 0.31933255442450753
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "fell 5%+ in 5 days",
+   "hold_days": 20,
+   "design_excess_pct": 0.9887496825485382,
+   "validation_excess_pct": 0.6524416190710844,
+   "validation_n": 3076,
+   "validation_edge_pct": 0.8440010786627483
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "fell 10%+ in 5 days",
+   "hold_days": 5,
+   "design_excess_pct": 0.6391691518137008,
+   "validation_excess_pct": 0.42741961064425343,
+   "validation_n": 903,
+   "validation_edge_pct": 0.21127047226391246
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "fell 10%+ in 5 days",
+   "hold_days": 10,
+   "design_excess_pct": 1.068704294209029,
+   "validation_excess_pct": 0.49148679473630197,
+   "validation_n": 899,
+   "validation_edge_pct": 0.4982732938778739
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "fell 10%+ in 5 days",
+   "hold_days": 20,
+   "design_excess_pct": 3.0085951850913193,
+   "validation_excess_pct": 1.7842769616368315,
+   "validation_n": 892,
+   "validation_edge_pct": 1.74468041707122
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "near 52-week low",
+   "hold_days": 5,
+   "design_excess_pct": -0.031677082815271984,
+   "validation_excess_pct": 0.04670738873162591,
+   "validation_n": 2401,
+   "validation_edge_pct": 0.12054233586988135
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "near 52-week low",
+   "hold_days": 10,
+   "design_excess_pct": -0.2414057535401673,
+   "validation_excess_pct": -0.1626373859297714,
+   "validation_n": 2395,
+   "validation_edge_pct": 0.030778931622599585
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "near 52-week low",
+   "hold_days": 20,
+   "design_excess_pct": -0.27647114474252293,
+   "validation_excess_pct": -0.21935568481313075,
+   "validation_n": 2387,
+   "validation_edge_pct": 0.0730428239964083
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "RSI under 30",
+   "hold_days": 5,
+   "design_excess_pct": -0.3270260420745796,
+   "validation_excess_pct": 0.11637257704438586,
+   "validation_n": 707,
+   "validation_edge_pct": 0.012129579243126076
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "RSI under 30",
+   "hold_days": 10,
+   "design_excess_pct": -0.13779576375867422,
+   "validation_excess_pct": 0.09412226858013428,
+   "validation_n": 706,
+   "validation_edge_pct": -0.06053055274061128
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "RSI under 30",
+   "hold_days": 20,
+   "design_excess_pct": 0.5891199943152885,
+   "validation_excess_pct": 0.8082194424072329,
+   "validation_n": 705,
+   "validation_edge_pct": 0.4974917885345163
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "below 50-day avg",
+   "hold_days": 5,
+   "design_excess_pct": 0.009632784031377878,
+   "validation_excess_pct": -0.08736152896665612,
+   "validation_n": 8302,
+   "validation_edge_pct": 0.07812965300875706
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "below 50-day avg",
+   "hold_days": 10,
+   "design_excess_pct": -0.04826790162205345,
+   "validation_excess_pct": -0.18500395785654153,
+   "validation_n": 8284,
+   "validation_edge_pct": 0.03814975044120719
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "below 50-day avg",
+   "hold_days": 20,
+   "design_excess_pct": 0.24798180384285026,
+   "validation_excess_pct": -0.20853867570191303,
+   "validation_n": 8248,
+   "validation_edge_pct": 0.08760314418450076
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "above 50-day avg",
+   "hold_days": 5,
+   "design_excess_pct": -0.1473404891292404,
+   "validation_excess_pct": -0.10668488935968194,
+   "validation_n": 4953,
+   "validation_edge_pct": 0.004977325392854994
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "above 50-day avg",
+   "hold_days": 10,
+   "design_excess_pct": -0.15210818168480325,
+   "validation_excess_pct": -0.1614831290267231,
+   "validation_n": 4941,
+   "validation_edge_pct": -0.005046817299307984
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "above 50-day avg",
+   "hold_days": 20,
+   "design_excess_pct": -0.1269223790061484,
+   "validation_excess_pct": -0.3697023685123514,
+   "validation_n": 4923,
+   "validation_edge_pct": 0.06840538554761921
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "market bull (SPY>200d)",
+   "hold_days": 5,
+   "design_excess_pct": -0.10424082617216548,
+   "validation_excess_pct": -0.23971328743675824,
+   "validation_n": 10944,
+   "validation_edge_pct": -0.07879377874988946
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "market bull (SPY>200d)",
+   "hold_days": 10,
+   "design_excess_pct": -0.18034211852226906,
+   "validation_excess_pct": -0.35421537214641524,
+   "validation_n": 10915,
+   "validation_edge_pct": -0.11458627789636708
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "market bull (SPY>200d)",
+   "hold_days": 20,
+   "design_excess_pct": -0.08282402566686911,
+   "validation_excess_pct": -0.484542428308685,
+   "validation_n": 10861,
+   "validation_edge_pct": 0.021107508909992422
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "market bear (SPY<200d)",
+   "hold_days": 5,
+   "design_excess_pct": 0.133135916868254,
+   "validation_excess_pct": 0.5949908677935446,
+   "validation_n": 2316,
+   "validation_edge_pct": 0.61670666577605
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "market bear (SPY<200d)",
+   "hold_days": 10,
+   "design_excess_pct": 0.3126582712321328,
+   "validation_excess_pct": 0.6719316076408713,
+   "validation_n": 2315,
+   "validation_edge_pct": 0.5930978924491358
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "market bear (SPY<200d)",
+   "hold_days": 20,
+   "design_excess_pct": 0.7799087357149587,
+   "validation_excess_pct": 0.7272531381856303,
+   "validation_n": 2315,
+   "validation_edge_pct": 0.4417688218526888
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "high volume + fell 5%+",
+   "hold_days": 5,
+   "design_excess_pct": 0.1758466888716217,
+   "validation_excess_pct": 0.32041125923589414,
+   "validation_n": 534,
+   "validation_edge_pct": 0.23035746912604899
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "high volume + fell 5%+",
+   "hold_days": 10,
+   "design_excess_pct": 0.5819697733819996,
+   "validation_excess_pct": -0.35148084726952245,
+   "validation_n": 533,
+   "validation_edge_pct": -0.2865845734555898
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "high volume + fell 5%+",
+   "hold_days": 20,
+   "design_excess_pct": 0.590129468925284,
+   "validation_excess_pct": -0.27670577826768156,
+   "validation_n": 532,
+   "validation_edge_pct": -0.39314352602824454
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "high volume + near 52-week low",
+   "hold_days": 5,
+   "design_excess_pct": -0.048263353722065395,
+   "validation_excess_pct": 0.27501132748776774,
+   "validation_n": 294,
+   "validation_edge_pct": 0.3207197503050359
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "high volume + near 52-week low",
+   "hold_days": 10,
+   "design_excess_pct": -0.6699503286127089,
+   "validation_excess_pct": -0.09569911602345675,
+   "validation_n": 294,
+   "validation_edge_pct": 0.15782734800944143
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "high volume + near 52-week low",
+   "hold_days": 20,
+   "design_excess_pct": -1.2185805506995102,
+   "validation_excess_pct": 0.8298299489611176,
+   "validation_n": 294,
+   "validation_edge_pct": 0.8422980513224585
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "RSI under 30 + near 52-week low",
+   "hold_days": 5,
+   "design_excess_pct": -0.34212319620595333,
+   "validation_excess_pct": -0.07446437504744734,
+   "validation_n": 417,
+   "validation_edge_pct": -0.07759633546275328
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "RSI under 30 + near 52-week low",
+   "hold_days": 10,
+   "design_excess_pct": -0.28552400359041696,
+   "validation_excess_pct": 0.057220647241303796,
+   "validation_n": 416,
+   "validation_edge_pct": 0.16934660577612948
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "RSI under 30 + near 52-week low",
+   "hold_days": 20,
+   "design_excess_pct": 0.7573761840789128,
+   "validation_excess_pct": 1.7442866486260558,
+   "validation_n": 416,
+   "validation_edge_pct": 1.4027424549536591
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "below 50-day avg + high volume",
+   "hold_days": 5,
+   "design_excess_pct": 0.021620271955704234,
+   "validation_excess_pct": 0.15992937894183534,
+   "validation_n": 893,
+   "validation_edge_pct": 0.288323148302105
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "below 50-day avg + high volume",
+   "hold_days": 10,
+   "design_excess_pct": -0.08455202797222368,
+   "validation_excess_pct": -0.056913359315503224,
+   "validation_n": 890,
+   "validation_edge_pct": 0.13077858661972966
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "below 50-day avg + high volume",
+   "hold_days": 20,
+   "design_excess_pct": 0.04342254874372436,
+   "validation_excess_pct": 0.08047163129514041,
+   "validation_n": 889,
+   "validation_edge_pct": 0.1826095172304198
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "fell 10%+ + market bull",
+   "hold_days": 5,
+   "design_excess_pct": 0.5226749812045494,
+   "validation_excess_pct": -0.5785789314031226,
+   "validation_n": 628,
+   "validation_edge_pct": -0.4459700512727876
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "fell 10%+ + market bull",
+   "hold_days": 10,
+   "design_excess_pct": 0.4712660512005179,
+   "validation_excess_pct": -0.7281684328872648,
+   "validation_n": 624,
+   "validation_edge_pct": -0.32811178350252
+  },
+  {
+   "pattern": "bullish_harami",
+   "condition": "fell 10%+ + market bull",
+   "hold_days": 20,
+   "design_excess_pct": 1.160684247637083,
+   "validation_excess_pct": 1.1211522884156984,
+   "validation_n": 617,
+   "validation_edge_pct": 1.7223410139570787
+  },
+  {
+   "pattern": "morning_star",
+   "condition": "none",
+   "hold_days": 5,
+   "design_excess_pct": -0.1609561079581036,
+   "validation_excess_pct": -0.2564158571201836,
+   "validation_n": 8978,
+   "validation_edge_pct": -0.1294395013141298
+  },
+  {
+   "pattern": "morning_star",
+   "condition": "none",
+   "hold_days": 10,
+   "design_excess_pct": 0.008120829241893616,
+   "validation_excess_pct": -0.3309279875578721,
+   "validation_n": 8954,
+   "validation_edge_pct": -0.16074155874508866
+  },
+  {
+   "pattern": "morning_star",
+   "condition": "none",
+   "hold_days": 20,
+   "design_excess_pct": 0.13347507377726794,
+   "validation_excess_pct": -0.6194510993189674,
+   "validation_n": 8897,
+   "validation_edge_pct": -0.2821400350359199
+  },
+  {
+   "pattern": "morning_star",
+   "condition": "high volume",
+   "hold_days": 5,
+   "design_excess_pct": -0.5350083565517598,
+   "validation_excess_pct": -0.5346186397257942,
+   "validation_n": 1067,
+   "validation_edge_pct": -0.4388977475887973
+  },
+  {
+   "pattern": "morning_star",
+   "condition": "high volume",
+   "hold_days": 10,
+   "design_excess_pct": -0.1175821581079595,
+   "validation_excess_pct": -0.43413200477435826,
+   "validation_n": 1064,
+   "validation_edge_pct": -0.3566764808674814
+  },
+  {
+   "pattern": "morning_star",
+   "condition": "high volume",
+   "hold_days": 20,
+   "design_excess_pct": -0.04248409059318325,
+   "validation_excess_pct": -0.5524318630648575,
+   "validation_n": 1062,
+   "validation_edge_pct": -0.42552232403390833
+  },
+  {
+   "pattern": "morning_star",
+   "condition": "fell 5%+ in 5 days",
+   "hold_days": 5,
+   "design_excess_pct": -0.4846684417313149,
+   "validation_excess_pct": -0.18165967045321024,
+   "validation_n": 904,
+   "validation_edge_pct": -0.24084199721855182
+  },
+  {
+   "pattern": "morning_star",
+   "condition": "fell 5%+ in 5 days",
+   "hold_days": 10,
+   "design_excess_pct": -0.2605784275378828,
+   "validation_excess_pct": 0.2280422960369299,
+   "validation_n": 901,
+   "validation_edge_pct": 0.2816074832069297
+  },
+  {
+   "pattern": "morning_star",
+   "condition": "fell 5%+ in 5 days",
+   "hold_days": 20,
+   "design_excess_pct": 0.42556725670556944,
+   "validation_excess_pct": -0.16371621516472407,
+   "validation_n": 890,
+   "validation_edge_pct": -0.04863449781197557
+  },
+  {
+   "pattern": "morning_star",
+   "condition": "near 52-week low",
+   "hold_days": 5,
+   "design_excess_pct": 0.11049474163434023,
+   "validation_excess_pct": -0.2333711502658229,
+   "validation_n": 1340,
+   "validation_edge_pct": -0.19748344424515457
+  },
+  {
+   "pattern": "morning_star",
+   "condition": "near 52-week low",
+   "hold_days": 10,
+   "design_excess_pct": 0.5241524444964993,
+   "validation_excess_pct": -0.2975171902220771,
+   "validation_n": 1337,
+   "validation_edge_pct": -0.17382484159837608
+  },
+  {
+   "pattern": "morning_star",
+   "condition": "near 52-week low",
+   "hold_days": 20,
+   "design_excess_pct": 0.5741344496704154,
+   "validation_excess_pct": -0.17237013470634074,
+   "validation_n": 1331,
+   "validation_edge_pct": -0.023354811876195373
+  },
+  {
+   "pattern": "morning_star",
+   "condition": "RSI under 30",
+   "hold_days": 5,
+   "design_excess_pct": 0.31627287731229886,
+   "validation_excess_pct": -0.09805222550678548,
+   "validation_n": 115,
+   "validation_edge_pct": -0.1679566219434181
+  },
+  {
+   "pattern": "morning_star",
+   "condition": "RSI under 30",
+   "hold_days": 10,
+   "design_excess_pct": 0.6738972708935892,
+   "validation_excess_pct": 1.2321615059753532,
+   "validation_n": 114,
+   "validation_edge_pct": 1.090278855819071
+  },
+  {
+   "pattern": "morning_star",
+   "condition": "RSI under 30",
+   "hold_days": 20,
+   "design_excess_pct": 0.7610315907195286,
+   "validation_excess_pct": 1.420397401677963,
+   "validation_n": 114,
+   "validation_edge_pct": 1.0874829959886883
+  },
+  {
+   "pattern": "morning_star",
+   "condition": "below 50-day avg",
+   "hold_days": 5,
+   "design_excess_pct": -0.13364124442945474,
+   "validation_excess_pct": -0.18069957022991695,
+   "validation_n": 4932,
+   "validation_edge_pct": -0.02445224193180895
+  },
+  {
+   "pattern": "morning_star",
+   "condition": "below 50-day avg",
+   "hold_days": 10,
+   "design_excess_pct": 0.08747345126128098,
+   "validation_excess_pct": -0.25488484134917916,
+   "validation_n": 4922,
+   "validation_edge_pct": -0.04885559678439511
+  },
+  {
+   "pattern": "morning_star",
+   "condition": "below 50-day avg",
+   "hold_days": 20,
+   "design_excess_pct": 0.4647216711125649,
+   "validation_excess_pct": -0.35596428120152473,
+   "validation_n": 4880,
+   "validation_edge_pct": -0.1099846830988521
+  },
+  {
+   "pattern": "morning_star",
+   "condition": "above 50-day avg",
+   "hold_days": 5,
+   "design_excess_pct": -0.21767506241689977,
+   "validation_excess_pct": -0.3493068256420074,
+   "validation_n": 4042,
+   "validation_edge_pct": -0.2457102319521237
+  },
+  {
+   "pattern": "morning_star",
+   "condition": "above 50-day avg",
+   "hold_days": 10,
+   "design_excess_pct": -0.1326847040067767,
+   "validation_excess_pct": -0.423639869250428,
+   "validation_n": 4028,
+   "validation_edge_pct": -0.28292837490710504
+  },
+  {
+   "pattern": "morning_star",
+   "condition": "above 50-day avg",
+   "hold_days": 20,
+   "design_excess_pct": -0.24221855621951427,
+   "validation_excess_pct": -0.9229487800443019,
+   "validation_n": 4013,
+   "validation_edge_pct": -0.5049492651200486
+  },
+  {
+   "pattern": "morning_star",
+   "condition": "market bull (SPY>200d)",
+   "hold_days": 5,
+   "design_excess_pct": -0.16960503242785724,
+   "validation_excess_pct": -0.4315652579361091,
+   "validation_n": 7171,
+   "validation_edge_pct": -0.2750201583844546
+  },
+  {
+   "pattern": "morning_star",
+   "condition": "market bull (SPY>200d)",
+   "hold_days": 10,
+   "design_excess_pct": -0.1589824799886845,
+   "validation_excess_pct": -0.4375947192250901,
+   "validation_n": 7147,
+   "validation_edge_pct": -0.20463246327569068
+  },
+  {
+   "pattern": "morning_star",
+   "condition": "market bull (SPY>200d)",
+   "hold_days": 20,
+   "design_excess_pct": -0.20416137647218446,
+   "validation_excess_pct": -0.7510036649657003,
+   "validation_n": 7091,
+   "validation_edge_pct": -0.2623740704383202
+  },
+  {
+   "pattern": "morning_star",
+   "condition": "market bear (SPY<200d)",
+   "hold_days": 5,
+   "design_excess_pct": -0.1311671153753097,
+   "validation_excess_pct": 0.4386568342196069,
+   "validation_n": 1807,
+   "validation_edge_pct": 0.47280257674751663
+  },
+  {
+   "pattern": "morning_star",
+   "condition": "market bear (SPY<200d)",
+   "hold_days": 10,
+   "design_excess_pct": 0.5833613119265504,
+   "validation_excess_pct": 0.09095753055259084,
+   "validation_n": 1807,
+   "validation_edge_pct": 0.038374860108680305
+  },
+  {
+   "pattern": "morning_star",
+   "condition": "market bear (SPY<200d)",
+   "hold_days": 20,
+   "design_excess_pct": 1.2958535625984577,
+   "validation_excess_pct": -0.10292881637268608,
+   "validation_n": 1806,
+   "validation_edge_pct": -0.3278156407676332
+  },
+  {
+   "pattern": "morning_star",
+   "condition": "below 50-day avg + high volume",
+   "hold_days": 5,
+   "design_excess_pct": -0.34560518928222395,
+   "validation_excess_pct": -0.38277586318127355,
+   "validation_n": 557,
+   "validation_edge_pct": -0.22992270463046507
+  },
+  {
+   "pattern": "morning_star",
+   "condition": "below 50-day avg + high volume",
+   "hold_days": 10,
+   "design_excess_pct": 0.6019806010816443,
+   "validation_excess_pct": -0.4741510758317951,
+   "validation_n": 556,
+   "validation_edge_pct": -0.262828365027331
+  },
+  {
+   "pattern": "morning_star",
+   "condition": "below 50-day avg + high volume",
+   "hold_days": 20,
+   "design_excess_pct": 1.1885254960025742,
+   "validation_excess_pct": -0.5422734397157678,
+   "validation_n": 554,
+   "validation_edge_pct": -0.42920551493611725
+  },
+  {
+   "pattern": "three_white_soldiers",
+   "condition": "none",
+   "hold_days": 5,
+   "design_excess_pct": -0.14569079051730463,
+   "validation_excess_pct": -0.15243601317692443,
+   "validation_n": 1741,
+   "validation_edge_pct": -0.031119437230434466
+  },
+  {
+   "pattern": "three_white_soldiers",
+   "condition": "none",
+   "hold_days": 10,
+   "design_excess_pct": 0.04144660148819827,
+   "validation_excess_pct": -0.29337634381233657,
+   "validation_n": 1728,
+   "validation_edge_pct": -0.13493798500871407
+  },
+  {
+   "pattern": "three_white_soldiers",
+   "condition": "none",
+   "hold_days": 20,
+   "design_excess_pct": 0.22828418384412624,
+   "validation_excess_pct": -0.6806804678239399,
+   "validation_n": 1722,
+   "validation_edge_pct": -0.38566312160242605
+  },
+  {
+   "pattern": "three_white_soldiers",
+   "condition": "below 50-day avg",
+   "hold_days": 5,
+   "design_excess_pct": -0.2049873089059893,
+   "validation_excess_pct": -0.8011646071011531,
+   "validation_n": 427,
+   "validation_edge_pct": -0.6669981343269988
+  },
+  {
+   "pattern": "three_white_soldiers",
+   "condition": "below 50-day avg",
+   "hold_days": 10,
+   "design_excess_pct": 0.2932833149333238,
+   "validation_excess_pct": -0.5094914305281951,
+   "validation_n": 422,
+   "validation_edge_pct": -0.3500013441091898
+  },
+  {
+   "pattern": "three_white_soldiers",
+   "condition": "below 50-day avg",
+   "hold_days": 20,
+   "design_excess_pct": 1.1729174287490403,
+   "validation_excess_pct": -0.6576032175130895,
+   "validation_n": 420,
+   "validation_edge_pct": -0.5283894754331021
+  },
+  {
+   "pattern": "three_white_soldiers",
+   "condition": "above 50-day avg",
+   "hold_days": 5,
+   "design_excess_pct": -0.12877849175868109,
+   "validation_excess_pct": 0.05837609458992917,
+   "validation_n": 1314,
+   "validation_edge_pct": 0.15539989074254348
+  },
+  {
+   "pattern": "three_white_soldiers",
+   "condition": "above 50-day avg",
+   "hold_days": 10,
+   "design_excess_pct": -0.07227436591608064,
+   "validation_excess_pct": -0.22354436326555835,
+   "validation_n": 1306,
+   "validation_edge_pct": -0.09015898030424029
+  },
+  {
+   "pattern": "three_white_soldiers",
+   "condition": "above 50-day avg",
+   "hold_days": 20,
+   "design_excess_pct": -0.046256810944234866,
+   "validation_excess_pct": -0.6881247421177628,
+   "validation_n": 1302,
+   "validation_edge_pct": -0.2849299032933784
+  },
+  {
+   "pattern": "three_white_soldiers",
+   "condition": "market bull (SPY>200d)",
+   "hold_days": 5,
+   "design_excess_pct": 0.015227245509815864,
+   "validation_excess_pct": -0.166816286391146,
+   "validation_n": 1448,
+   "validation_edge_pct": -0.016989871367427634
+  },
+  {
+   "pattern": "three_white_soldiers",
+   "condition": "market bull (SPY>200d)",
+   "hold_days": 10,
+   "design_excess_pct": 0.06871411781969837,
+   "validation_excess_pct": -0.24905898174659136,
+   "validation_n": 1436,
+   "validation_edge_pct": -0.019288527790918726
+  },
+  {
+   "pattern": "three_white_soldiers",
+   "condition": "market bull (SPY>200d)",
+   "hold_days": 20,
+   "design_excess_pct": 0.517258892817284,
+   "validation_excess_pct": -0.7003746238891628,
+   "validation_n": 1430,
+   "validation_edge_pct": -0.24829868552463547
+  },
+  {
+   "pattern": "three_white_soldiers",
+   "condition": "market bear (SPY<200d)",
+   "hold_days": 5,
+   "design_excess_pct": -0.5614706322074903,
+   "validation_excess_pct": -0.08136899742882578,
+   "validation_n": 293,
+   "validation_edge_pct": -0.10790905173984178
+  },
+  {
+   "pattern": "three_white_soldiers",
+   "condition": "market bear (SPY<200d)",
+   "hold_days": 10,
+   "design_excess_pct": -0.028854844249160842,
+   "validation_excess_pct": -0.5113206312315492,
+   "validation_n": 292,
+   "validation_edge_pct": -0.6339155959939766
+  },
+  {
+   "pattern": "three_white_soldiers",
+   "condition": "market bear (SPY<200d)",
+   "hold_days": 20,
+   "design_excess_pct": -0.5167539624749368,
+   "validation_excess_pct": -0.5842330596963066,
+   "validation_n": 292,
+   "validation_edge_pct": -0.9182853164092517
+  },
+  {
+   "pattern": "any bullish pattern",
+   "condition": "none",
+   "hold_days": 5,
+   "design_excess_pct": -0.09002858440173267,
+   "validation_excess_pct": -0.15012632613515112,
+   "validation_n": 59323,
+   "validation_edge_pct": -0.02122486214043045
+  },
+  {
+   "pattern": "any bullish pattern",
+   "condition": "none",
+   "hold_days": 10,
+   "design_excess_pct": -0.10344047047725889,
+   "validation_excess_pct": -0.2891693524725881,
+   "validation_n": 59161,
+   "validation_edge_pct": -0.11476728766290599
+  },
+  {
+   "pattern": "any bullish pattern",
+   "condition": "none",
+   "hold_days": 20,
+   "design_excess_pct": 0.057822583514509265,
+   "validation_excess_pct": -0.4534031931060313,
+   "validation_n": 58798,
+   "validation_edge_pct": -0.10575593751818219
+  },
+  {
+   "pattern": "any bullish pattern",
+   "condition": "high volume",
+   "hold_days": 5,
+   "design_excess_pct": -0.3112924927230899,
+   "validation_excess_pct": -0.15394630083988434,
+   "validation_n": 6566,
+   "validation_edge_pct": -0.07238857606343825
+  },
+  {
+   "pattern": "any bullish pattern",
+   "condition": "high volume",
+   "hold_days": 10,
+   "design_excess_pct": -0.4715902092601803,
+   "validation_excess_pct": -0.2563063393562489,
+   "validation_n": 6548,
+   "validation_edge_pct": -0.18874323477423288
+  },
+  {
+   "pattern": "any bullish pattern",
+   "condition": "high volume",
+   "hold_days": 20,
+   "design_excess_pct": -0.2592920158315761,
+   "validation_excess_pct": -0.33359378010968904,
+   "validation_n": 6507,
+   "validation_edge_pct": -0.22629546651842825
+  },
+  {
+   "pattern": "any bullish pattern",
+   "condition": "fell 5%+ in 5 days",
+   "hold_days": 5,
+   "design_excess_pct": -0.1201434190325037,
+   "validation_excess_pct": -0.04272204622601849,
+   "validation_n": 10922,
+   "validation_edge_pct": -0.08169017415221154
+  },
+  {
+   "pattern": "any bullish pattern",
+   "condition": "fell 5%+ in 5 days",
+   "hold_days": 10,
+   "design_excess_pct": -0.17600942843593012,
+   "validation_excess_pct": -0.2106094440555613,
+   "validation_n": 10886,
+   "validation_edge_pct": -0.15492034925159928
+  },
+  {
+   "pattern": "any bullish pattern",
+   "condition": "fell 5%+ in 5 days",
+   "hold_days": 20,
+   "design_excess_pct": 0.6571868891046305,
+   "validation_excess_pct": -0.1715209692368275,
+   "validation_n": 10776,
+   "validation_edge_pct": -0.03513181021651431
+  },
+  {
+   "pattern": "any bullish pattern",
+   "condition": "fell 10%+ in 5 days",
+   "hold_days": 5,
+   "design_excess_pct": -0.17975817625859217,
+   "validation_excess_pct": 0.21013665852538224,
+   "validation_n": 3131,
+   "validation_edge_pct": -0.03166552235407237
+  },
+  {
+   "pattern": "any bullish pattern",
+   "condition": "fell 10%+ in 5 days",
+   "hold_days": 10,
+   "design_excess_pct": -0.6486802248994924,
+   "validation_excess_pct": -0.2580114005926986,
+   "validation_n": 3116,
+   "validation_edge_pct": -0.26653274068505156
+  },
+  {
+   "pattern": "any bullish pattern",
+   "condition": "fell 10%+ in 5 days",
+   "hold_days": 20,
+   "design_excess_pct": 0.827685878834915,
+   "validation_excess_pct": -0.16387097433501924,
+   "validation_n": 3075,
+   "validation_edge_pct": -0.2450864462253555
+  },
+  {
+   "pattern": "any bullish pattern",
+   "condition": "near 52-week low",
+   "hold_days": 5,
+   "design_excess_pct": -0.3130334743152955,
+   "validation_excess_pct": -0.07170102181208918,
+   "validation_n": 10168,
+   "validation_edge_pct": -0.016921197236841806
+  },
+  {
+   "pattern": "any bullish pattern",
+   "condition": "near 52-week low",
+   "hold_days": 10,
+   "design_excess_pct": -0.3856623676018858,
+   "validation_excess_pct": -0.2778491868527538,
+   "validation_n": 10136,
+   "validation_edge_pct": -0.11609708748776487
+  },
+  {
+   "pattern": "any bullish pattern",
+   "condition": "near 52-week low",
+   "hold_days": 20,
+   "design_excess_pct": -0.36745317582513465,
+   "validation_excess_pct": -0.237733846164232,
+   "validation_n": 10074,
+   "validation_edge_pct": -0.0064101551065778965
+  },
+  {
+   "pattern": "any bullish pattern",
+   "condition": "RSI under 30",
+   "hold_days": 5,
+   "design_excess_pct": -0.37534219903177246,
+   "validation_excess_pct": 0.017176228570060653,
+   "validation_n": 2450,
+   "validation_edge_pct": -0.10137220274923564
+  },
+  {
+   "pattern": "any bullish pattern",
+   "condition": "RSI under 30",
+   "hold_days": 10,
+   "design_excess_pct": -0.5367664140983047,
+   "validation_excess_pct": -0.10065830185140584,
+   "validation_n": 2438,
+   "validation_edge_pct": -0.2579610520139267
+  },
+  {
+   "pattern": "any bullish pattern",
+   "condition": "RSI under 30",
+   "hold_days": 20,
+   "design_excess_pct": 0.24971764917746855,
+   "validation_excess_pct": 0.15471669858875392,
+   "validation_n": 2420,
+   "validation_edge_pct": -0.1455886152734328
+  },
+  {
+   "pattern": "any bullish pattern",
+   "condition": "below 50-day avg",
+   "hold_days": 5,
+   "design_excess_pct": -0.10265975449394951,
+   "validation_excess_pct": -0.1516964288217887,
+   "validation_n": 35108,
+   "validation_edge_pct": 0.007731599506606882
+  },
+  {
+   "pattern": "any bullish pattern",
+   "condition": "below 50-day avg",
+   "hold_days": 10,
+   "design_excess_pct": -0.15268187889699722,
+   "validation_excess_pct": -0.3158309331772012,
+   "validation_n": 35018,
+   "validation_edge_pct": -0.10401868179216117
+  },
+  {
+   "pattern": "any bullish pattern",
+   "condition": "below 50-day avg",
+   "hold_days": 20,
+   "design_excess_pct": 0.1113863164104975,
+   "validation_excess_pct": -0.3463289514034683,
+   "validation_n": 34744,
+   "validation_edge_pct": -0.08469392603254836
+  },
+  {
+   "pattern": "any bullish pattern",
+   "condition": "above 50-day avg",
+   "hold_days": 5,
+   "design_excess_pct": -0.10442510589422553,
+   "validation_excess_pct": -0.14887153153095017,
+   "validation_n": 24186,
+   "validation_edge_pct": -0.04415503112213445
+  },
+  {
+   "pattern": "any bullish pattern",
+   "condition": "above 50-day avg",
+   "hold_days": 10,
+   "design_excess_pct": -0.10472163073450638,
+   "validation_excess_pct": -0.24754420943105104,
+   "validation_n": 24114,
+   "validation_edge_pct": -0.10262180651349358
+  },
+  {
+   "pattern": "any bullish pattern",
+   "condition": "above 50-day avg",
+   "hold_days": 20,
+   "design_excess_pct": -0.07385493337278645,
+   "validation_excess_pct": -0.5966515812856895,
+   "validation_n": 24025,
+   "validation_edge_pct": -0.16721213495221574
+  },
+  {
+   "pattern": "any bullish pattern",
+   "condition": "market bull (SPY>200d)",
+   "hold_days": 5,
+   "design_excess_pct": -0.1497882988631245,
+   "validation_excess_pct": -0.22926895863608024,
+   "validation_n": 47335,
+   "validation_edge_pct": -0.07133806961260436
+  },
+  {
+   "pattern": "any bullish pattern",
+   "condition": "market bull (SPY>200d)",
+   "hold_days": 10,
+   "design_excess_pct": -0.21499601797678705,
+   "validation_excess_pct": -0.36990401030256387,
+   "validation_n": 47177,
+   "validation_edge_pct": -0.13217264109119475
+  },
+  {
+   "pattern": "any bullish pattern",
+   "condition": "market bull (SPY>200d)",
+   "hold_days": 20,
+   "design_excess_pct": -0.1576802670850098,
+   "validation_excess_pct": -0.6249837755224892,
+   "validation_n": 46818,
+   "validation_edge_pct": -0.12288018118673191
+  },
+  {
+   "pattern": "any bullish pattern",
+   "condition": "market bear (SPY<200d)",
+   "hold_days": 5,
+   "design_excess_pct": 0.0783565676798282,
+   "validation_excess_pct": 0.16237088019046447,
+   "validation_n": 11988,
+   "validation_edge_pct": 0.17447972948465032
+  },
+  {
+   "pattern": "any bullish pattern",
+   "condition": "market bear (SPY<200d)",
+   "hold_days": 10,
+   "design_excess_pct": 0.21079359765996045,
+   "validation_excess_pct": 0.028655994026474493,
+   "validation_n": 11984,
+   "validation_edge_pct": -0.05288485052300984
+  },
+  {
+   "pattern": "any bullish pattern",
+   "condition": "market bear (SPY<200d)",
+   "hold_days": 20,
+   "design_excess_pct": 0.6650656418615899,
+   "validation_excess_pct": 0.21713601453785158,
+   "validation_n": 11980,
+   "validation_edge_pct": -0.05942655774556814
+  },
+  {
+   "pattern": "any bullish pattern",
+   "condition": "high volume + fell 5%+",
+   "hold_days": 5,
+   "design_excess_pct": -0.4079375756779644,
+   "validation_excess_pct": 0.10602159116694537,
+   "validation_n": 2054,
+   "validation_edge_pct": -9.369853542437919e-05
+  },
+  {
+   "pattern": "any bullish pattern",
+   "condition": "high volume + fell 5%+",
+   "hold_days": 10,
+   "design_excess_pct": -0.807042478318397,
+   "validation_excess_pct": -0.11725489050752055,
+   "validation_n": 2048,
+   "validation_edge_pct": -0.11967105029275782
+  },
+  {
+   "pattern": "any bullish pattern",
+   "condition": "high volume + fell 5%+",
+   "hold_days": 20,
+   "design_excess_pct": -0.06706090552832367,
+   "validation_excess_pct": 0.03383737054693936,
+   "validation_n": 2030,
+   "validation_edge_pct": -0.18022823876047983
+  },
+  {
+   "pattern": "any bullish pattern",
+   "condition": "high volume + near 52-week low",
+   "hold_days": 5,
+   "design_excess_pct": -0.899986383657758,
+   "validation_excess_pct": -0.25184837958173045,
+   "validation_n": 1276,
+   "validation_edge_pct": -0.15683508885520173
+  },
+  {
+   "pattern": "any bullish pattern",
+   "condition": "high volume + near 52-week low",
+   "hold_days": 10,
+   "design_excess_pct": -1.5077034513391325,
+   "validation_excess_pct": -0.5978727131100988,
+   "validation_n": 1271,
+   "validation_edge_pct": -0.3380903911094307
+  },
+  {
+   "pattern": "any bullish pattern",
+   "condition": "high volume + near 52-week low",
+   "hold_days": 20,
+   "design_excess_pct": -1.8023015954855472,
+   "validation_excess_pct": -0.41907110391757657,
+   "validation_n": 1265,
+   "validation_edge_pct": -0.3397334690240458
+  },
+  {
+   "pattern": "any bullish pattern",
+   "condition": "RSI under 30 + near 52-week low",
+   "hold_days": 5,
+   "design_excess_pct": -1.0477521238463663,
+   "validation_excess_pct": -0.1527774588279691,
+   "validation_n": 1408,
+   "validation_edge_pct": -0.17122712700026674
+  },
+  {
+   "pattern": "any bullish pattern",
+   "condition": "RSI under 30 + near 52-week low",
+   "hold_days": 10,
+   "design_excess_pct": -0.8316364063093649,
+   "validation_excess_pct": -0.21642960892994484,
+   "validation_n": 1401,
+   "validation_edge_pct": -0.11696417882562309
+  },
+  {
+   "pattern": "any bullish pattern",
+   "condition": "RSI under 30 + near 52-week low",
+   "hold_days": 20,
+   "design_excess_pct": -0.39584229072132116,
+   "validation_excess_pct": 0.4630371371623888,
+   "validation_n": 1393,
+   "validation_edge_pct": 0.19729737910630726
+  },
+  {
+   "pattern": "any bullish pattern",
+   "condition": "below 50-day avg + high volume",
+   "hold_days": 5,
+   "design_excess_pct": -0.3699806515887179,
+   "validation_excess_pct": -0.10211673372718705,
+   "validation_n": 4414,
+   "validation_edge_pct": 0.03399300800488866
+  },
+  {
+   "pattern": "any bullish pattern",
+   "condition": "below 50-day avg + high volume",
+   "hold_days": 10,
+   "design_excess_pct": -0.651666358463768,
+   "validation_excess_pct": -0.1921074060690707,
+   "validation_n": 4402,
+   "validation_edge_pct": -0.02056421632938046
+  },
+  {
+   "pattern": "any bullish pattern",
+   "condition": "below 50-day avg + high volume",
+   "hold_days": 20,
+   "design_excess_pct": -0.41965346123517094,
+   "validation_excess_pct": 0.01923922092280916,
+   "validation_n": 4369,
+   "validation_edge_pct": 0.07721111226662643
+  },
+  {
+   "pattern": "any bullish pattern",
+   "condition": "fell 10%+ + market bull",
+   "hold_days": 5,
+   "design_excess_pct": -1.2821296652732441,
+   "validation_excess_pct": -0.3663429713102456,
+   "validation_n": 2085,
+   "validation_edge_pct": -0.1356040526551023
+  },
+  {
+   "pattern": "any bullish pattern",
+   "condition": "fell 10%+ + market bull",
+   "hold_days": 10,
+   "design_excess_pct": -1.8032454304418781,
+   "validation_excess_pct": -0.990363200742745,
+   "validation_n": 2070,
+   "validation_edge_pct": -0.4012172638855299
+  },
+  {
+   "pattern": "any bullish pattern",
+   "condition": "fell 10%+ + market bull",
+   "hold_days": 20,
+   "design_excess_pct": -1.1838663415557855,
+   "validation_excess_pct": -1.044852639666031,
+   "validation_n": 2029,
+   "validation_edge_pct": -0.34460087639560844
+  },
+  {
+   "pattern": "2+ patterns the same day",
+   "condition": "none",
+   "hold_days": 5,
+   "design_excess_pct": -0.2994193989214203,
+   "validation_excess_pct": 0.030189321838459075,
+   "validation_n": 2873,
+   "validation_edge_pct": 0.16111152479920995
+  },
+  {
+   "pattern": "2+ patterns the same day",
+   "condition": "none",
+   "hold_days": 10,
+   "design_excess_pct": 0.1070538576646554,
+   "validation_excess_pct": -0.10585807384106057,
+   "validation_n": 2865,
+   "validation_edge_pct": 0.07151015304484842
+  },
+  {
+   "pattern": "2+ patterns the same day",
+   "condition": "none",
+   "hold_days": 20,
+   "design_excess_pct": 0.19816266352606,
+   "validation_excess_pct": 0.2534607008042093,
+   "validation_n": 2851,
+   "validation_edge_pct": 0.602097600708445
+  },
+  {
+   "pattern": "2+ patterns the same day",
+   "condition": "high volume",
+   "hold_days": 5,
+   "design_excess_pct": -1.0486065562322862,
+   "validation_excess_pct": 0.1845700920017022,
+   "validation_n": 333,
+   "validation_edge_pct": 0.2704677222920624
+  },
+  {
+   "pattern": "2+ patterns the same day",
+   "condition": "high volume",
+   "hold_days": 10,
+   "design_excess_pct": -0.2582613317192614,
+   "validation_excess_pct": 0.6301253891487806,
+   "validation_n": 333,
+   "validation_edge_pct": 0.7218164879347309
+  },
+  {
+   "pattern": "2+ patterns the same day",
+   "condition": "high volume",
+   "hold_days": 20,
+   "design_excess_pct": -0.958676838999465,
+   "validation_excess_pct": 0.6990089344876727,
+   "validation_n": 331,
+   "validation_edge_pct": 0.8294537398129218
+  },
+  {
+   "pattern": "2+ patterns the same day",
+   "condition": "fell 5%+ in 5 days",
+   "hold_days": 5,
+   "design_excess_pct": -1.4587383655370005,
+   "validation_excess_pct": -0.02296424446817452,
+   "validation_n": 508,
+   "validation_edge_pct": -0.039978950736016955
+  },
+  {
+   "pattern": "2+ patterns the same day",
+   "condition": "fell 5%+ in 5 days",
+   "hold_days": 10,
+   "design_excess_pct": -0.736826088798993,
+   "validation_excess_pct": 0.13441615684950922,
+   "validation_n": 504,
+   "validation_edge_pct": 0.22829734548986566
+  },
+  {
+   "pattern": "2+ patterns the same day",
+   "condition": "fell 5%+ in 5 days",
+   "hold_days": 20,
+   "design_excess_pct": -0.5580912379680263,
+   "validation_excess_pct": 1.3531510871386911,
+   "validation_n": 502,
+   "validation_edge_pct": 1.5861360487905694
+  },
+  {
+   "pattern": "2+ patterns the same day",
+   "condition": "near 52-week low",
+   "hold_days": 5,
+   "design_excess_pct": -0.5602322877968613,
+   "validation_excess_pct": 0.3796466399118053,
+   "validation_n": 471,
+   "validation_edge_pct": 0.43979247302104163
+  },
+  {
+   "pattern": "2+ patterns the same day",
+   "condition": "near 52-week low",
+   "hold_days": 10,
+   "design_excess_pct": -0.36781963310163945,
+   "validation_excess_pct": 0.3770404003390443,
+   "validation_n": 471,
+   "validation_edge_pct": 0.5424634452872599
+  },
+  {
+   "pattern": "2+ patterns the same day",
+   "condition": "near 52-week low",
+   "hold_days": 20,
+   "design_excess_pct": -0.45963902423052955,
+   "validation_excess_pct": 1.3427371115311906,
+   "validation_n": 470,
+   "validation_edge_pct": 1.5900328001701496
+  },
+  {
+   "pattern": "2+ patterns the same day",
+   "condition": "below 50-day avg",
+   "hold_days": 5,
+   "design_excess_pct": -0.42602120238356367,
+   "validation_excess_pct": -0.017505650893808386,
+   "validation_n": 1705,
+   "validation_edge_pct": 0.1446147395039052
+  },
+  {
+   "pattern": "2+ patterns the same day",
+   "condition": "below 50-day avg",
+   "hold_days": 10,
+   "design_excess_pct": 0.10727506279624846,
+   "validation_excess_pct": -0.2958677284465626,
+   "validation_n": 1701,
+   "validation_edge_pct": -0.08050113082607753
+  },
+  {
+   "pattern": "2+ patterns the same day",
+   "condition": "below 50-day avg",
+   "hold_days": 20,
+   "design_excess_pct": 0.043235104249130324,
+   "validation_excess_pct": -0.06375005022903661,
+   "validation_n": 1692,
+   "validation_edge_pct": 0.21013282628482682
+  },
+  {
+   "pattern": "2+ patterns the same day",
+   "condition": "above 50-day avg",
+   "hold_days": 5,
+   "design_excess_pct": -0.17079702119504675,
+   "validation_excess_pct": 0.0801702907895968,
+   "validation_n": 1165,
+   "validation_edge_pct": 0.18563292442681711
+  },
+  {
+   "pattern": "2+ patterns the same day",
+   "condition": "above 50-day avg",
+   "hold_days": 10,
+   "design_excess_pct": 0.10019651413286444,
+   "validation_excess_pct": 0.14992453846327974,
+   "validation_n": 1161,
+   "validation_edge_pct": 0.29448092405752924
+  },
+  {
+   "pattern": "2+ patterns the same day",
+   "condition": "above 50-day avg",
+   "hold_days": 20,
+   "design_excess_pct": 0.28452541021153427,
+   "validation_excess_pct": 0.7209057523946761,
+   "validation_n": 1156,
+   "validation_edge_pct": 1.1427864332475324
+  },
+  {
+   "pattern": "2+ patterns the same day",
+   "condition": "market bull (SPY>200d)",
+   "hold_days": 5,
+   "design_excess_pct": -0.3282869247854917,
+   "validation_excess_pct": -0.0028508571163993733,
+   "validation_n": 2369,
+   "validation_edge_pct": 0.15585366544902685
+  },
+  {
+   "pattern": "2+ patterns the same day",
+   "condition": "market bull (SPY>200d)",
+   "hold_days": 10,
+   "design_excess_pct": -0.041449081698828244,
+   "validation_excess_pct": -0.10791507503325024,
+   "validation_n": 2362,
+   "validation_edge_pct": 0.1286378347447318
+  },
+  {
+   "pattern": "2+ patterns the same day",
+   "condition": "market bull (SPY>200d)",
+   "hold_days": 20,
+   "design_excess_pct": -0.05814513765309377,
+   "validation_excess_pct": 0.43027952586209006,
+   "validation_n": 2349,
+   "validation_edge_pct": 0.9188334701750782
+  },
+  {
+   "pattern": "2+ patterns the same day",
+   "condition": "market bear (SPY<200d)",
+   "hold_days": 5,
+   "design_excess_pct": -0.20631146338800666,
+   "validation_excess_pct": 0.1854912741084186,
+   "validation_n": 504,
+   "validation_edge_pct": 0.21747274081290258
+  },
+  {
+   "pattern": "2+ patterns the same day",
+   "condition": "market bear (SPY<200d)",
+   "hold_days": 10,
+   "design_excess_pct": 0.5860281268792719,
+   "validation_excess_pct": -0.09619875611550961,
+   "validation_n": 503,
+   "validation_edge_pct": -0.1534259018014746
+  },
+  {
+   "pattern": "2+ patterns the same day",
+   "condition": "market bear (SPY<200d)",
+   "hold_days": 20,
+   "design_excess_pct": 1.0249474401692211,
+   "validation_excess_pct": -0.5739245981220091,
+   "validation_n": 502,
+   "validation_edge_pct": -0.8172732403221368
+  },
+  {
+   "pattern": "2+ patterns the same day",
+   "condition": "below 50-day avg + high volume",
+   "hold_days": 5,
+   "design_excess_pct": -1.895946550772792,
+   "validation_excess_pct": 0.014122090258793756,
+   "validation_n": 229,
+   "validation_edge_pct": 0.1524546191478583
+  },
+  {
+   "pattern": "2+ patterns the same day",
+   "condition": "below 50-day avg + high volume",
+   "hold_days": 10,
+   "design_excess_pct": -0.8094186958637972,
+   "validation_excess_pct": 0.5052850278649376,
+   "validation_n": 229,
+   "validation_edge_pct": 0.7219596866177072
+  },
+  {
+   "pattern": "2+ patterns the same day",
+   "condition": "below 50-day avg + high volume",
+   "hold_days": 20,
+   "design_excess_pct": -1.7948755238477387,
+   "validation_excess_pct": 0.8386653362297085,
+   "validation_n": 228,
+   "validation_edge_pct": 0.9332339017184133
+  }
+ ],
+ "generated": "2026-11-09T19:10+00:00"
+}
