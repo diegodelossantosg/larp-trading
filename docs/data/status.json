@@ -1,11 +1,11 @@
 {
- "updated": "2026-11-09T13:59-05:00",
+ "updated": "2026-11-09T14:18-05:00",
  "mode": "paper",
  "capital": 1000.0,
  "spy_start": 752.668,
  "idle_asset": "SPY",
  "model": "opus",
- "equity": 1000.29,
+ "equity": 999.9,
  "cash": 0.01,
  "performance": {
   "days_tracked": 0
@@ -14,10 +14,10 @@
   "news": {
    "buys": 1,
    "avg_return_pct": 0.24,
-   "avg_vs_spy_pct": 0.16,
+   "avg_vs_spy_pct": 0.2,
    "beat_spy": 1,
    "dollars": 0.24,
-   "dollars_vs_spy": 0.16
+   "dollars_vs_spy": 0.2
   }
  },
  "health": {
@@ -60,26 +60,26 @@
   {
    "symbol": "SPY",
    "qty": 1.1958,
-   "market_value": 900.2172,
+   "market_value": 899.8466,
    "avg_entry_price": 752.668,
-   "current_price": 752.84,
-   "unrealized_pl": 0.2057,
-   "unrealized_plpc": 0.0002,
-   "change_today_usd": 0.2057,
+   "current_price": 752.53,
+   "unrealized_pl": -0.165,
+   "unrealized_plpc": -0.0002,
+   "change_today_usd": -0.165,
    "name": "S&P 500",
-   "weight": 0.9
+   "weight": 0.8999
   },
   {
    "symbol": "FSLR",
    "qty": 0.5222,
-   "market_value": 100.0586,
+   "market_value": 100.0456,
    "avg_entry_price": 191.412,
-   "current_price": 191.62,
-   "unrealized_pl": 0.1086,
-   "unrealized_plpc": 0.0011,
-   "change_today_usd": 0.1086,
+   "current_price": 191.595,
+   "unrealized_pl": 0.0956,
+   "unrealized_plpc": 0.001,
+   "change_today_usd": 0.0956,
    "name": "",
-   "weight": 0.1
+   "weight": 0.1001
   }
  ]
 }
