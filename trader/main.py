@@ -13,7 +13,7 @@ import argparse
 import dataclasses
 import logging
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
 from . import journal
@@ -62,13 +62,34 @@ def _write_intraday(cfg, broker: Broker, market: Market) -> None:
     spy_at = spy.reindex(spy.index.union(ts)).ffill().reindex(ts) if len(spy) else pd.Series(index=ts, dtype=float)
     points = [[t.isoformat(timespec="minutes"), round(e + offset, 2), None if pd.isna(p) else round(float(p), 2)]
               for t, (_, e), p in zip(ts, hist, spy_at.to_numpy())]
+    if state is not None and not state.get("started_at"):
+        # An older capital.json: the agent's money started when its first decision ran, not at the day's first minute.
+        found = _started_at(state, journal.read("decisions.json", []))
+        if found:
+            state = {k: v for k, v in state.items() if k != "spy_start"} | {"started_at": found}
+            journal.write("capital.json", state)
+    started_at = (state or {}).get("started_at")
+    if started_at:
+        points = [p for p in points if p[0] >= started_at]      # nothing before the money was really invested
     days = sorted({p[0][:10] for p in points})[-5:]
     journal.write("intraday.json", {"points": [p for p in points if p[0][:10] in days]})
     if state is not None and "spy_start" not in state:
         # SPY's price when the capital started, so the chart can show what the same money in the S&P 500 is worth.
-        first = next((p for p in points if p[0][:10] >= state.get("started", "") and p[2] is not None), None)
+        first = next((p for p in points if p[0] >= (started_at or state.get("started", "")) and p[2] is not None), None)
         if first:
             journal.write("capital.json", {**state, "spy_start": first[2]})
+
+
+def _started_at(state: dict, decisions: list[dict]) -> str | None:
+    """UTC minute of the first real daily decision on the day the capital started (None if there is none yet)."""
+    for d in decisions:
+        if d.get("date") == state.get("started") and not d.get("dry_run") and not d.get("source") and d.get("time"):
+            try:
+                t = datetime.strptime(f"{d['date']} {d['time']}", "%Y-%m-%d %H:%M").replace(tzinfo=ET)
+            except ValueError:
+                continue
+            return t.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M+00:00")
+    return None
 
 
 def _repair_history(hist: list[tuple[int, float]], equity_now: float) -> list[tuple[int, float]]:
@@ -163,7 +184,8 @@ def _account(cfg, broker: Broker, positions: dict) -> dict:
         return real
     state = journal.read("capital.json", None)
     if state is None or state.get("capital") != cfg.capital_usd:
-        state = {"capital": cfg.capital_usd, "baseline_equity": real["equity"], "started": _today()}
+        state = {"capital": cfg.capital_usd, "baseline_equity": real["equity"], "started": _today(),
+                 "started_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M+00:00")}
         journal.write("capital.json", state)
     equity = cfg.capital_usd + (real["equity"] - state["baseline_equity"])
     invested = sum(p["market_value"] for p in positions.values())

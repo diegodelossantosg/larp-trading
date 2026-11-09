@@ -283,7 +283,7 @@ function hero(status, equity) {
   // The same starting money put in the S&P 500 (SPY) on day one, valued at SPY's latest price.
   const pts = (DATA.intraday.points || []).filter((p) => p[2] != null);
   const spyNow = pts.at(-1)?.[2] ?? equity.at(-1)?.spy_close;
-  const spyStart = status.spy_start ?? equity[0]?.spy_close;
+  const spyStart = status.spy_start ?? pts[0]?.[2] ?? equity[0]?.spy_close;  // before spy_start is recorded, use the day's first S&P price
   const spyPrev = prevRow?.spy_close ?? spyStart;
   const bench = spyNow && spyStart ? start * spyNow / spyStart : null;
   const benchPrev = bench != null ? start * spyPrev / spyStart : null;
