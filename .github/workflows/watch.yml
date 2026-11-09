@@ -5,10 +5,10 @@ name: Watcher (every minute)
 # and a live portfolio value for the dashboard.
 #
 # GitHub's own timer is unreliable for every-10-minute jobs, so instead one job per trading day
-# loops: check, save, wait a minute, repeat, and stops when the market closes. GitHub ends any job
-# after 6 hours, but the session lasts 6.5, so after 5h40 the job starts its own successor
-# (it waits in line until this one ends). The schedule below and the watchdog workflow start it
-# if nothing is running; extra starts just wait in line and exit at once.
+# loops: check, save, wait a minute, repeat. GitHub ends any job after 6 hours, so after 5h40 the job
+# starts its own successor (it waits in line until this one ends), day and night. While it runs it is also
+# the supervisor: it starts the daily decision, the hourly News Hunter and the one-time sale when they are
+# missing. The schedule below and the watchdog workflow are only extra safety nets.
 on:
   schedule:
     - cron: "40 13 * * 1-5"
@@ -36,6 +36,7 @@ jobs:
       LIVE_TRADING_CONFIRMED: ${{ vars.LIVE_TRADING_CONFIRMED || 'no' }}
       TRADING_ENABLED: ${{ vars.TRADING_ENABLED || 'true' }}
       GH_TOKEN: ${{ github.token }}
+      AGENTS_ON: ${{ vars.AGENTS_ON_GITHUB }}
       # Opus approves every watcher buy. Without this token the watcher still runs its stops,
       # but makes no buys. Create it with `claude setup-token`.
       CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
@@ -82,29 +83,55 @@ jobs:
             commit=$(git commit-tree "$tree" -m "live $(date -u +%H:%M)")
             git push -q -f origin "$commit:refs/heads/live" || echo "live push failed"
           }
+          # The supervisor part: every 5 minutes ask the watchdog which agents should be running by now
+          # but aren't (daily decision, News Hunter every hour, the one-time sale) and start them. This
+          # job runs all day and night, so none of it depends on GitHub's unreliable timer.
+          supervise() {
+            missing=$(python -m trader.watchdog | tail -n 1)
+            echo "supervisor: missing $missing"
+            for agent in $(echo "$missing" | python -c "import json,sys; print(' '.join(json.load(sys.stdin)))"); do
+              case "$agent" in
+                trade) wf=trade.yml ;;
+                news) wf=hunter.yml ;;
+                liquidate) wf=liquidate.yml ;;
+                *) continue ;;
+              esac
+              echo "supervisor: starting $agent ($wf)"
+              gh workflow run "$wf" --ref main || echo "could not start $wf"
+            done
+          }
           i=0
-          while python -m trader.main market-open; do
-            before=$(md5sum docs/data/decisions.json 2>/dev/null)
-            python -m trader.main watch || echo "watch run failed"
-            publish_live
-            git add docs/data
-            if ! git diff --cached --quiet; then
-              if [ -n "$(git log origin/main..HEAD --oneline)" ]; then git commit -q --amend --no-edit
-              else git commit -q -m "Watch: $(date -u +%Y-%m-%dT%H:%MZ)"; fi
-            fi
-            if [ $((i % 15)) -eq 0 ] || [ "$before" != "$(md5sum docs/data/decisions.json 2>/dev/null)" ]; then
-              publish
+          while true; do
+            if python -m trader.main market-open; then
+              before=$(md5sum docs/data/decisions.json 2>/dev/null)
+              python -m trader.main watch || echo "watch run failed"
+              publish_live
+              git add docs/data
+              if ! git diff --cached --quiet; then
+                if [ -n "$(git log origin/main..HEAD --oneline)" ]; then git commit -q --amend --no-edit
+                else git commit -q -m "Watch: $(date -u +%Y-%m-%dT%H:%MZ)"; fi
+              fi
+              if [ $((i % 15)) -eq 0 ] || [ "$before" != "$(md5sum docs/data/decisions.json 2>/dev/null)" ]; then
+                publish
+              else
+                sync
+              fi
+              [ $((i % 5)) -eq 2 ] && supervise
             else
-              sync
+              # market closed: only keep the dashboard's repo copy fresh now and then, and check the supervisor list
+              [ $((i % 30)) -eq 0 ] && sync
+              [ $((i % 5)) -eq 2 ] && supervise
             fi
             i=$((i + 1))
             [ "$SECONDS" -ge 20400 ] && break   # 5h40: hand over before GitHub's 6-hour limit
             sleep 60
           done
           publish
-          if python -m trader.main market-open; then
-            echo "market still open: starting the next watcher run"
+          # Always start the successor, so the supervisor never stops (it waits in line until this one ends).
+          # To stop everything on purpose, set the repository variable AGENTS_ON_GITHUB to anything but "true".
+          if [ "$AGENTS_ON" = "true" ] || python -m trader.main market-open; then
+            echo "starting the next watcher run"
             gh workflow run watch.yml --ref main
           else
-            echo "market closed; done for today"
+            echo "agents are switched off and the market is closed; stopping"
           fi

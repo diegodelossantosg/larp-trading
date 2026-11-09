@@ -33,7 +33,7 @@ def test_nothing_missing_when_market_closed():
 
 
 def test_grace_period_after_the_open():
-    assert missing_agents(at(9, 45), True, [], True, None) == []                   # too early for trade and news
+    assert missing_agents(at(9, 34), True, [], True, None) == []                   # too early for trade and news
 
 
 def test_everything_missing_midday():
@@ -46,6 +46,8 @@ def test_nothing_missing_when_all_ran():
 
 def test_news_gap_too_long():
     assert missing_agents(at(13), True, [OK], True, 95) == ["news"]
+    assert missing_agents(at(13), True, [OK], True, 50) == []                      # hourly: 50 minutes ago is fine
+    assert missing_agents(at(13), True, [OK], True, 61) == ["news"]
 
 
 def test_run_lists():

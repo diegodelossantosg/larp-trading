@@ -18,10 +18,10 @@ from zoneinfo import ZoneInfo
 
 ET = ZoneInfo("America/New_York")
 MAX_FAILED_TRIES = 3          # failed daily decisions we retry before giving up for the day
-TRADE_DUE = time(9, 50)       # the decision is planned for 9:36; this much grace before we start it
+TRADE_DUE = time(9, 36)       # the decision is planned for 9:36; the supervisor starts it then if it has not run
 WATCH_DUE = time(9, 40)       # the watcher should be running a few minutes after the open
 NEWS_DUE = time(10, 15)
-NEWS_MAX_GAP_MIN = 90         # the News Hunter runs hourly; older than this = missed
+NEWS_MAX_GAP_MIN = 58         # the News Hunter runs hourly: start it again when the last run is older than this
 ACTIVE = ("queued", "in_progress", "waiting", "pending", "requested")
 
 
