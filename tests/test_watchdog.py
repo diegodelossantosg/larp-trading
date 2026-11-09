@@ -142,3 +142,12 @@ def test_the_benchmark_starts_when_the_money_was_invested():
                  {"date": "2026-11-09", "time": "11:02", "market_view": "x"}]
     assert main._started_at(state, decisions) == "2026-11-09T16:02+00:00"                    # 11:02 New York = 16:02 UTC
     assert main._started_at(state, [{"date": "2026-11-06", "time": "11:02"}]) is None
+
+
+def test_the_benchmark_uses_the_price_the_spy_buy_got():
+    fills = [{"symbol": "SPY", "side": "sell", "price": 740.0, "time": "2026-11-09T16:01:30+00:00"},
+             {"symbol": "XLV", "side": "buy", "price": 150.0, "time": "2026-11-09T16:02:10+00:00"},
+             {"symbol": "SPY", "side": "buy", "price": 750.62, "time": "2026-11-09T16:02:20+00:00"},
+             {"symbol": "SPY", "side": "buy", "price": 755.0, "time": "2026-11-09T18:00:00+00:00"}]
+    assert main._spy_fill_price(fills, "2026-11-09T16:02+00:00") == 750.62
+    assert main._spy_fill_price(fills[:2], "2026-11-09T16:02+00:00") is None
