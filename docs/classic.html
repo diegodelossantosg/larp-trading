@@ -500,8 +500,10 @@ function statTiles(s, countLabel) {
   </div>`;
 }
 
+const isPick = (r) => r.symbol !== (DATA.status.idle_asset || "SPY");   // sales of the idle fund are not trades
+
 function soldView(data, decisions) {
-  const rows = ((data && data.rows) || []).filter((r) => !r.full);
+  const rows = ((data && data.rows) || []).filter((r) => !r.full && isPick(r));
   if (!rows.length) {
     $("sold-summary").innerHTML = "";
     $("sold").innerHTML = `<div class="empty">Nothing yet. When the AI sells only part of something it owns, it appears here with what it earned.</div>`;
@@ -541,7 +543,7 @@ function syncSoldHeight() {
 }
 
 function closedFromSales(data) {
-  const rows = ((data && data.rows) || []).filter((r) => r.full);
+  const rows = ((data && data.rows) || []).filter((r) => r.full && isPick(r));
   if (!rows.length) {
     $("closed-summary").textContent = "";
     $("closed").innerHTML = `<div class="empty">Nothing yet. A trade appears here once the AI has sold all of it.</div>`;
