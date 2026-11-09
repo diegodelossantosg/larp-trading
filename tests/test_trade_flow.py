@@ -15,7 +15,7 @@ def cfg(**kw):
                 max_drawdown_halt=0.25, trading_enabled=True, max_web_searches=5, capital_usd=0,
                 max_idle_weight=1.0, stop_trail_pct=0.06, watch_min_score=5, watch_buy_size=0.08,
                 watch_max_buys_per_day=4, watch_require_claude=True, min_hold_days=3,
-                ideas_share=1.0)   # these tests exercise the ideas with real money; the default is paper only
+                ideas_share=1.0, daily_ideas=True)   # these tests exercise the ideas with real money; the default is no daily ideas
     base.update(kw)
     return Config(**base)
 

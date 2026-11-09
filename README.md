@@ -41,6 +41,7 @@ After the close, a second job records portfolio value against SPY so the dashboa
 | Money the agent may use (rest of the paper account is ignored) | $1,000 | `CAPITAL_USD` (0 = whole account) |
 | Unallocated money goes to | SPY (plain S&P 500; the 2x fund was dropped: leverage is not skill) | `IDLE_ASSET`, `IDLE_ASSET_BEAR` |
 | Most that may sit in the idle asset | 100% | `MAX_IDLE_WEIGHT` |
+| Ask Claude for daily ideas at all (off: the daily run only keeps the money in SPY, with no Claude call) | off | `DAILY_IDEAS` |
 | Share of the money Claude's daily ideas may really use (the rest is tracked on paper and measured vs SPY) | 0% | `IDEAS_SHARE` |
 | Watcher: sell a position this far below its high | 20% | `STOP_TRAIL_PCT` |
 | Watcher: signals that must agree / buy size / max buys per day | 5 of 6 / 8% / 0 (off) | `WATCH_MIN_SCORE` / `WATCH_BUY_SIZE` / `WATCH_MAX_BUYS_PER_DAY` |
@@ -162,6 +163,6 @@ Not financial advice.
 ## Why it is set up this way (2016-2026 audit, `research/audit/REPORT.md`)
 
 - The 2x fund (SSO) beats the S&P 500 only by leverage when the market rises, so the idle money now sits in plain SPY.
-- Claude's ideas are tracked on paper (`IDEAS_SHARE=0`) until they show about +5% a year over SPY; ideas no better than chance lose to the S&P 500.
+- Claude's daily ideas are switched off (`DAILY_IDEAS` unset): the audit found no edge. With `DAILY_IDEAS=true` they are tracked on paper (`IDEAS_SHARE=0`) until they show about +5% a year over SPY; ideas no better than chance lose to the S&P 500.
 - The News Hunter is the only part with a measured edge (about +3 to +4 points a year over the S&P 500 on the most cautious reading). It buys only volatile stocks (daily swing 3%+), where the rebound after a news drop was found in both company groups.
 - Tight stops cost 1-2.5 points a year, so stops are wide (20%).

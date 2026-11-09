@@ -151,3 +151,19 @@ def test_the_benchmark_uses_the_price_the_spy_buy_got():
              {"symbol": "SPY", "side": "buy", "price": 755.0, "time": "2026-11-09T18:00:00+00:00"}]
     assert main._spy_fill_price(fills, "2026-11-09T16:02+00:00") == 750.62
     assert main._spy_fill_price(fills[:2], "2026-11-09T16:02+00:00") is None
+
+
+def test_without_daily_ideas_claude_is_never_called_and_the_money_goes_to_spy(tmp_path, monkeypatch):
+    monkeypatch.setattr(journal, "DATA_DIR", tmp_path)
+    monkeypatch.setattr(main, "_today", lambda: TODAY)
+
+    def boom(c, b):
+        raise AssertionError("Claude must not be called")
+
+    monkeypatch.setattr(main, "decide", boom)
+    broker = FakeBroker()
+    assert main.trade(cfg(daily_ideas=False, ideas_share=0.0), broker, FakeMarket(), dry_run=False, force=False) == 0
+    rec = journal.read("decisions.json", [])[-1]
+    assert rec["no_claude"] is True and "market_view" in rec and rec["positions"] == []
+    assert {o.symbol for o in broker.sent} == {"SPY"}
+    assert watchdog.trade_done(journal.read("decisions.json", []), TODAY)         # counts as today's decision

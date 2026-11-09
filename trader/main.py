@@ -347,68 +347,76 @@ def trade(cfg, broker: Broker, market: Market, dry_run: bool, force: bool) -> in
     bars = market.daily_bars(universe)
     technicals = {s: {"name": NAMES.get(s, ""), **summarize(df)} for s, df in bars.items() if len(df) > 30}
 
-    previous = [
-        {k: d.get(k) for k in ("date", "market_view", "confidence", "trade_today")}
-        | {"positions": [(p["symbol"], p["weight"]) for p in d.get("positions", [])]}
-        for d in journal.read("decisions.json", [])[-5:] if "market_view" in d
-    ]
-    watcher = [
-        {k: d.get(k) for k in ("date", "time", "notes")}
-        | {"orders": [(o["side"], o["symbol"], o["notional"], o.get("status")) for o in d.get("orders", [])]}
-        for d in journal.read("decisions.json", [])[-30:] if d.get("source") == "watch"
-    ][-10:]
     health = market_health.build({s: t for s, t in technicals.items() if s in CORE_ETFS}, bars)  # breadth: ETFs only
     journal.write("health.json", health)
-    briefing = {
-        "date": _today(),
-        "market_health": health,
-        "account": {"equity": equity, "cash": acct["cash"]},
-        "holdings": {s: {"weight": round(p["market_value"] / equity, 4),
-                         "unrealized_pl_pct": round(p["unrealized_plpc"] * 100, 2)} for s, p in positions.items()},
-        "risk_limits": {
-            "idle_asset": cfg.idle_asset,
-            "ideas_paper_only": cfg.ideas_share == 0,
-            "ideas_share_of_real_money": cfg.ideas_share,
-            "max_weight_in_idle_asset": cfg.max_idle_weight,
-            "max_weight_per_etf": cfg.max_position_weight,
-            "max_positions": cfg.max_positions,
-            "max_total_leveraged_or_inverse": cfg.max_leveraged_weight,
-            "max_daily_turnover": cfg.max_daily_turnover,
-            "rebalance_band": cfg.rebalance_band,
-            "max_weight_per_big_company_stock": cfg.max_stock_weight,
-            "max_weight_per_smaller_company_stock": cfg.max_small_stock_weight,
-            "max_total_in_smaller_companies": cfg.max_small_stocks_total,
-            "max_total_in_single_stocks": cfg.max_stocks_total,
-            "no_stock_buys_this_many_trading_days_before_earnings": cfg.earnings_blackout_days,
-        },
-        "performance_vs_spy": _performance(history),
-        "previous_decisions": previous,
-        "watcher_actions_recent": watcher,
-        "your_track_record": journal.read("report_card.json", None),
-        "corporate_actions_for_holdings": corp_actions.for_holdings(cfg, [s for s in positions if s.isalpha()], _today()),
-        "protected_recent_watcher_buys": sorted(_recent_watch_buys(cfg.min_hold_days, cfg.news_min_hold_days) & set(positions)),
-        "headlines": market.news(hours=36, limit=50),
-        "holding_headlines": market.news(hours=72, symbols=list(positions), limit=20) if positions else [],
-        "technicals": technicals,
-    }
+    if cfg.daily_ideas:
+        previous = [
+            {k: d.get(k) for k in ("date", "market_view", "confidence", "trade_today")}
+            | {"positions": [(p["symbol"], p["weight"]) for p in d.get("positions", [])]}
+            for d in journal.read("decisions.json", [])[-5:] if "market_view" in d
+        ]
+        watcher = [
+            {k: d.get(k) for k in ("date", "time", "notes")}
+            | {"orders": [(o["side"], o["symbol"], o["notional"], o.get("status")) for o in d.get("orders", [])]}
+            for d in journal.read("decisions.json", [])[-30:] if d.get("source") == "watch"
+        ][-10:]
+        briefing = {
+            "date": _today(),
+            "market_health": health,
+            "account": {"equity": equity, "cash": acct["cash"]},
+            "holdings": {s: {"weight": round(p["market_value"] / equity, 4),
+                             "unrealized_pl_pct": round(p["unrealized_plpc"] * 100, 2)} for s, p in positions.items()},
+            "risk_limits": {
+                "idle_asset": cfg.idle_asset,
+                "ideas_paper_only": cfg.ideas_share == 0,
+                "ideas_share_of_real_money": cfg.ideas_share,
+                "max_weight_in_idle_asset": cfg.max_idle_weight,
+                "max_weight_per_etf": cfg.max_position_weight,
+                "max_positions": cfg.max_positions,
+                "max_total_leveraged_or_inverse": cfg.max_leveraged_weight,
+                "max_daily_turnover": cfg.max_daily_turnover,
+                "rebalance_band": cfg.rebalance_band,
+                "max_weight_per_big_company_stock": cfg.max_stock_weight,
+                "max_weight_per_smaller_company_stock": cfg.max_small_stock_weight,
+                "max_total_in_smaller_companies": cfg.max_small_stocks_total,
+                "max_total_in_single_stocks": cfg.max_stocks_total,
+                "no_stock_buys_this_many_trading_days_before_earnings": cfg.earnings_blackout_days,
+            },
+            "performance_vs_spy": _performance(history),
+            "previous_decisions": previous,
+            "watcher_actions_recent": watcher,
+            "your_track_record": journal.read("report_card.json", None),
+            "corporate_actions_for_holdings": corp_actions.for_holdings(cfg, [s for s in positions if s.isalpha()], _today()),
+            "protected_recent_watcher_buys": sorted(_recent_watch_buys(cfg.min_hold_days, cfg.news_min_hold_days) & set(positions)),
+            "headlines": market.news(hours=36, limit=50),
+            "holding_headlines": market.news(hours=72, symbols=list(positions), limit=20) if positions else [],
+            "technicals": technicals,
+        }
 
-    decision = decide(cfg, briefing)
-    record["ai_cost_usd"] = decision.usage.cost_usd()
-    record["usage"] = vars(decision.usage)
-    record["sources"] = decision.sources[:30]
-    if decision.data is None:
-        record["error"] = decision.error
-        journal.append_decision(record)
-        log.error("no decision: %s", decision.error)
-        return 1
-    record.update(decision.data)
+        decision = decide(cfg, briefing)
+        record["ai_cost_usd"] = decision.usage.cost_usd()
+        record["usage"] = vars(decision.usage)
+        record["sources"] = decision.sources[:30]
+        if decision.data is None:
+            record["error"] = decision.error
+            journal.append_decision(record)
+            log.error("no decision: %s", decision.error)
+            return 1
+        data = decision.data
+        record.update(data)
+    else:
+        # No daily Claude run: nothing to ask. The money stays in the idle asset (SPY) and the risk rules still apply.
+        data = {"market_view": "Money kept in the S&P 500 index fund; the daily Claude ideas are switched off.",
+                "key_drivers": [], "trade_today": True, "confidence": "low", "watchlist": [], "positions": []}
+        record.update(data)
+        record["no_claude"] = True
 
-    if not decision.data["trade_today"]:
+    if not data["trade_today"]:
         # Holding keeps Claude's picks as they are, but the risk rules still apply (for example
         # moving spare money into a newly chosen idle asset). Small drifts stay inside the band.
         record["notes"].append("Claude chose to hold its picks; only rule-based adjustments are made.")
 
-    proposed = {p["symbol"].upper(): float(p["weight"]) for p in decision.data["positions"]}
+    proposed = {p["symbol"].upper(): float(p["weight"]) for p in data["positions"]}
     proposed, paper_note = ideas_to_real_money(proposed, cfg.idle_asset, cfg.ideas_share)
     if paper_note:
         record["notes"].append(paper_note)
@@ -448,7 +456,7 @@ def trade(cfg, broker: Broker, market: Market, dry_run: bool, force: bool) -> in
     stocks = {s: k for s, k in stocks.items() if s in allowed}
 
     held_weights = {s: p["market_value"] / (equity or 1) for s, p in positions.items()}
-    earnings = {p["symbol"].upper(): p.get("next_earnings", "") for p in decision.data["positions"]}
+    earnings = {p["symbol"].upper(): p.get("next_earnings", "") for p in data["positions"]}
     calendar = None
     if any(s in stocks and w > held_weights.get(s, 0.0) for s, w in proposed.items()):
         calendar = earnings_calendar.upcoming(_today(), cfg.earnings_blackout_days)
