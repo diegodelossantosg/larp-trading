@@ -69,6 +69,7 @@ class Config:
     stop_stock_max: float = 0.20  # ...and at most this
     news_min_hold_days: int = 10  # the daily rebalance won't trim a News Hunter buy younger than this
     news_earnings_hold_days: int = 20  # ...or an earnings-beat buy younger than this (no new ones: switched off)
+    daily_ideas: bool = False  # ask Claude for daily ideas (paper-only unless IDEAS_SHARE>0); off: the daily run only keeps the money in the idle asset, no Claude call
     ideas_share: float = 0.0  # most of the money Claude's daily ideas may really use; the rest of his ideas are tracked on paper
 
 
@@ -126,5 +127,6 @@ def load_config() -> Config:
         stop_stock_max=_float("STOP_STOCK_MAX", 0.20),
         news_min_hold_days=int(_float("NEWS_MIN_HOLD_DAYS", 10)),
         news_earnings_hold_days=int(_float("NEWS_EARNINGS_HOLD_DAYS", 20)),
+        daily_ideas=_bool("DAILY_IDEAS", False),
         ideas_share=_float("IDEAS_SHARE", 0.0),
     )

@@ -184,7 +184,7 @@ details.old-logs > summary { cursor: pointer; font-weight: 600; color: var(--ink
 .holdings-wrap tr.cashrow td { color: var(--ink-2); }
 .holdings-wrap td { vertical-align: middle; padding: 9px 8px; }
 @media (max-width: 700px) { .holdings-wrap th:nth-child(2), .holdings-wrap td:nth-child(2), .holdings-wrap th:nth-child(4), .holdings-wrap td:nth-child(4), .holdings-wrap th:nth-child(5), .holdings-wrap td:nth-child(5) { display: none; } .donut { position: static; margin: 0 auto; } }
-@media (max-width: 700px) { .bottom-grid > .card:first-child, #log-card { grid-column: 1 / -1; }
+.bottom-grid > .card:first-child, #log-card { grid-column: 1 / -1; }
 .hero .versus:empty { display: none; }
 .bar { display: inline-block; height: 6px; border-radius: 3px; background: var(--c, var(--series-1)); vertical-align: middle; margin-right: 6px; opacity: .85; }
 h2::before { content: ""; width: 4px; height: 18px; border-radius: 2px; background: var(--h, var(--series-1)); }
@@ -234,7 +234,7 @@ h2::before { content: ""; width: 4px; height: 18px; border-radius: 2px; backgrou
     </section>
 
     <section class="card">
-      <h2 style="--h: var(--c4)">Which part of the AI earns money?</h2>
+      <h2 style="--h: var(--c4)">How the News Hunter's buys are doing</h2>
       <div class="table-scroll" id="scorecard"></div>
     </section>
 
@@ -578,8 +578,8 @@ function closedView(trades, decisions) {
 
 function scorecardView(status) {
   const sc = status.scorecard || {};
-  const rows = [["claude", "🧠 Claude's daily ideas"], ["watch", "⚡ Watcher (safety stops and sells)"], ["news", "📰 News Hunter (buys after bad news)"]];
-  if (!Object.keys(sc).length) { $("scorecard").innerHTML = `<div class="empty">Nothing yet. This fills in after the first buys, and shows who does better: Claude, the Watcher or the News Hunter.</div>`; return; }
+  const rows = [["news", "📰 News Hunter (buys after bad news)"]];
+  if (!Object.keys(sc).length) { $("scorecard").innerHTML = `<div class="empty">Nothing yet. This fills in after the first buys and shows how the News Hunter's buys do against the S&P.</div>`; return; }
   $("scorecard").innerHTML = `<table><thead><tr><th>Who decided</th><th class="num">Buys</th><th class="num">Average gain</th><th class="num">Better / worse than S&amp;P</th><th class="num">Times it beat the S&amp;P</th><th class="num">$ more / less than S&amp;P</th></tr></thead><tbody>
   ${rows.map(([k, label]) => { const r = sc[k];
     if (!r) return `<tr><td><b>${label}</b></td><td class="num">0</td><td colspan="4" class="small">No buys yet</td></tr>`;
@@ -635,12 +635,13 @@ function moveKind(d, o, idle) {
 }
 
 function decisionsView(decisions) {
-  const real = decisions.filter((d) => !d.dry_run && (d.market_view || d.error || (d.orders || []).length));
+  const did = (d) => (d.orders || []).some((o) => !["error", "skipped", "not sent"].includes(o.status));
+  const real = decisions.filter((d) => !d.dry_run && (d.error || did(d)));
   if (!real.length) { $("decisions").innerHTML = `<div class="empty">Nothing yet.</div>`; return; }
   const idle = DATA.status.idle_asset || "SPY";
   const entry = (d) => {
     const who = d.source === "watch" ? `<span class="chip auto">⚡ Watcher</span>`
-      : d.source === "news" ? `<span class="chip news">📰 News Hunter</span>` : `<span class="chip">🧠 Claude</span>`;
+      : d.source === "news" ? `<span class="chip news">📰 News Hunter</span>` : d.no_claude ? `<span class="chip">🤖 Automatic</span>` : `<span class="chip">🧠 Claude</span>`;
     const orders = (d.orders || []).filter((o) => !["error", "skipped"].includes(o.status));
     let rows;
     if (d.error) rows = `<div class="move"><span class="tag sell">Error</span><span>Something went wrong, so nothing was bought or sold.</span></div>`;
@@ -660,7 +661,7 @@ function decisionsView(decisions) {
   const cutoff = nyDay(1);
   const newest = real.slice().reverse();
   const recent = newest.filter((d) => d.date >= cutoff), old = newest.filter((d) => d.date < cutoff).slice(0, 60);
-  $("decisions").innerHTML = (recent.length ? recent.map(entry).join("") : `<div class="empty">Nothing done today or yesterday.</div>`)
+  $("decisions").innerHTML = (recent.length ? recent.map(entry).join("") : `<div class="empty">Nothing bought or sold today or yesterday.</div>`)
     + (old.length ? `<details class="old-logs"><summary>Earlier days (${old.length})</summary>${old.map(entry).join("")}</details>` : "");
   try {
     const card = $("log-card");
