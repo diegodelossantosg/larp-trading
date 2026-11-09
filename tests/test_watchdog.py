@@ -131,3 +131,12 @@ def test_idle_choice_is_redone_when_the_setting_changes(tmp_path, monkeypatch):
     c = main._with_todays_idle(cfg(idle_asset="SPY"), M())
     assert c.idle_asset == "SPY"                                                           # not the stale SSO
     assert journal.read("idle.json", {})["setting"] == "SPY/SPY"
+
+
+def test_the_benchmark_starts_when_the_money_was_invested():
+    state = {"capital": 1000.0, "baseline_equity": 99933.35, "started": "2026-11-09"}
+    decisions = [{"date": "2026-11-09", "time": "11:02", "source": "news"},                  # not the daily decision
+                 {"date": "2026-11-09", "time": "11:02", "dry_run": True},                   # a dry run doesn't count
+                 {"date": "2026-11-09", "time": "11:02", "market_view": "x"}]
+    assert main._started_at(state, decisions) == "2026-11-09T16:02+00:00"                    # 11:02 New York = 16:02 UTC
+    assert main._started_at(state, [{"date": "2026-11-06", "time": "11:02"}]) is None
