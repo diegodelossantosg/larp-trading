@@ -1,4 +1,10 @@
 {
- "highs": {},
- "breakouts": {}
+ "highs": {
+  "SPY": 750.94
+ },
+ "buys": {
+  "2026-11-09": 0
+ },
+ "last_check": "2026-11-09T11:08-05:00",
+ "splits_done": {}
 }
