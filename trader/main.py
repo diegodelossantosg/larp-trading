@@ -73,11 +73,32 @@ def _write_intraday(cfg, broker: Broker, market: Market) -> None:
         points = [p for p in points if p[0] >= started_at]      # nothing before the money was really invested
     days = sorted({p[0][:10] for p in points})[-5:]
     journal.write("intraday.json", {"points": [p for p in points if p[0][:10] in days]})
+    if state is not None and state.get("spy_start_from") != "fill":
+        # The S&P benchmark starts at the price the agent's own SPY buy really got, so both begin level.
+        try:
+            price = _spy_fill_price(broker.filled_orders(state.get("started", "")), started_at)
+        except Exception as e:
+            log.warning("could not read the SPY fill for the benchmark: %s", e)
+            price = None
+        if price:
+            state = {**state, "spy_start": price, "spy_start_from": "fill"}
+            journal.write("capital.json", state)
     if state is not None and "spy_start" not in state:
         # SPY's price when the capital started, so the chart can show what the same money in the S&P 500 is worth.
         first = next((p for p in points if p[0] >= (started_at or state.get("started", "")) and p[2] is not None), None)
         if first:
             journal.write("capital.json", {**state, "spy_start": first[2]})
+
+
+def _spy_fill_price(fills: list[dict], started_at: str | None) -> float | None:
+    """Price of the first SPY buy filled at or after the money started (None if there is none yet)."""
+    import pandas as pd
+
+    t0 = pd.Timestamp(started_at) if started_at else None
+    for f in fills:
+        if f["symbol"] == "SPY" and f["side"] == "buy" and (t0 is None or pd.Timestamp(f["time"]) >= t0 - pd.Timedelta(minutes=1)):
+            return round(float(f["price"]), 4)
+    return None
 
 
 def _started_at(state: dict, decisions: list[dict]) -> str | None:
