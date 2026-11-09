@@ -51,13 +51,13 @@ main { margin: 0 auto; padding: 16px 24px 48px; }
 @media (max-width: 1100px) { .top-grid, .bottom-grid { grid-template-columns: minmax(0, 1fr); } }
 .hero { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 24px; margin-top: 0; }
 .hero .label { font-size: 13px; font-weight: 600; opacity: .85; text-transform: uppercase; letter-spacing: .04em; }
-.hero .side:last-child { text-align: right; }
+.hero > .side:nth-child(3) { text-align: right; }
 .hero .today-line { margin-top: 10px; font-size: 15px; font-weight: 600; }
 .hero .pill { display: inline-block; font-size: 17px; font-weight: 700; padding: 2px 12px; border-radius: 99px; margin-left: 6px; }
 .hero .versus { text-align: center; font-size: 15px; font-weight: 600; padding: 12px 20px; border-radius: 14px; background: rgba(255,255,255,.14); }
 .hero .versus b { display: block; font-size: 26px; margin: 2px 0; }
 .hero .versus.up b { color: #b8f5b8; } .hero .versus.down b { color: #ffc4c4; }
-@media (max-width: 700px) { .hero { grid-template-columns: 1fr; } .hero .side:last-child { text-align: left; } }
+@media (max-width: 700px) { .hero { grid-template-columns: 1fr; } .hero > .side:nth-child(3) { text-align: left; } }
 .hero .up-bg { background: rgba(12,163,12,.85); } .hero .down-bg { background: rgba(208,59,59,.9); } .hero .flat-bg { background: rgba(255,255,255,.18); }
 h1 { font-size: 24px; margin: 0; }
 h2 { font-size: 18px; margin: 0 0 4px; }
