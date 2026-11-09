@@ -171,9 +171,6 @@ details.old-logs { margin-top: 12px; border-top: 1px solid var(--line, #e5e5e5);
 details.old-logs > summary { cursor: pointer; font-weight: 600; color: var(--ink-2); padding: 6px 0; }
 /* --- clearer layout */
 .hero { padding: 22px 26px; }
-.hero .foot { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px 22px; align-items: center; border-top: 1px solid rgba(255,255,255,.22); padding-top: 12px; font-size: 14px; font-weight: 500; }
-.hero .foot .sep { opacity: .5; }
-.hero .foot b { font-weight: 700; }
 .hero .versus .small { margin-top: 6px; }
 .note { display: flex; gap: 10px; align-items: flex-start; background: var(--note); border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px; margin-top: 14px; font-size: 14px; color: var(--ink-2); }
 .note b { color: var(--ink); }
@@ -187,8 +184,7 @@ details.old-logs > summary { cursor: pointer; font-weight: 600; color: var(--ink
 .holdings-wrap tr.cashrow td { color: var(--ink-2); }
 .holdings-wrap td { vertical-align: middle; padding: 9px 8px; }
 @media (max-width: 700px) { .holdings-wrap th:nth-child(2), .holdings-wrap td:nth-child(2), .holdings-wrap th:nth-child(4), .holdings-wrap td:nth-child(4), .holdings-wrap th:nth-child(5), .holdings-wrap td:nth-child(5) { display: none; } .donut { position: static; margin: 0 auto; } }
-@media (max-width: 700px) { .hero .foot .sep { display: none; } }
-.bottom-grid > .card:first-child, #log-card { grid-column: 1 / -1; }
+@media (max-width: 700px) { .bottom-grid > .card:first-child, #log-card { grid-column: 1 / -1; }
 .hero .versus:empty { display: none; }
 .bar { display: inline-block; height: 6px; border-radius: 3px; background: var(--c, var(--series-1)); vertical-align: middle; margin-right: 6px; opacity: .85; }
 h2::before { content: ""; width: 4px; height: 18px; border-radius: 2px; background: var(--h, var(--series-1)); }
@@ -302,20 +298,8 @@ function hero(status, equity) {
   const updated = status.updated ? new Date(status.updated).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false }) : "";
   $("hero").innerHTML = `
     ${col("My AI's money", now, prevRow?.equity ?? start)}
-    <div class="versus ${gap == null ? "" : cls(gap)}">${verdict}</div>
-    ${bench != null ? col("Same money in the S&amp;P 500", bench, benchPrev) : `<div class="side"></div>`}
-    ${footLine(now, bench, start, updated)}`;
-}
-
-// Rough Spanish tax if everything were sold today: 19% of the gain (a loss pays nothing). An estimate, not tax advice:
-// it ignores the euro rate, losses carried over and dividend withholding.
-const TAX_RATE = 0.19;
-const afterTax = (value, start) => value - TAX_RATE * Math.max(0, value - start);
-function footLine(now, bench, start, updated) {
-  const bits = [];
-  if (bench != null) bits.push(`<span title="If everything were sold today and ${Math.round(TAX_RATE * 100)}% tax paid on the gain (Spain's lowest rate). Estimate only, not tax advice.">After estimated tax (${Math.round(TAX_RATE * 100)}% on gains): AI <b>${usd(afterTax(now, start))}</b> · S&amp;P 500 <b>${usd(afterTax(bench, start))}</b></span>`);
-  if (updated) bits.push(`<span>Updated ${updated}</span>`);
-  return bits.length ? `<div class="foot">${bits.join('<span class="sep">|</span>')}</div>` : "";
+    <div class="versus ${gap == null ? "" : cls(gap)}">${verdict}${updated ? `<div class="small">Updated ${updated}</div>` : ""}</div>
+    ${bench != null ? col("Same money in the S&amp;P 500", bench, benchPrev) : `<div class="side"></div>`}`;
 }
 
 // While there are only a few days of results, say so: a short lead or lag is mostly luck.
