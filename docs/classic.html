@@ -186,6 +186,11 @@ details.old-logs > summary { cursor: pointer; font-weight: 600; color: var(--ink
 @media (max-width: 700px) { .holdings-wrap th:nth-child(2), .holdings-wrap td:nth-child(2), .holdings-wrap th:nth-child(4), .holdings-wrap td:nth-child(4), .holdings-wrap th:nth-child(5), .holdings-wrap td:nth-child(5) { display: none; } .donut { position: static; margin: 0 auto; } }
 .bottom-grid > .card:first-child, #log-card { grid-column: 1 / -1; }
 .hero .versus:empty { display: none; }
+.story { margin: 8px 0 0; font-size: 14px; color: var(--ink); }
+.story.small { color: var(--ink-2); font-size: 13px; }
+details.more { margin-top: 6px; }
+details.more > summary { color: var(--series-1); font-size: 13px; }
+details.more p { margin: 6px 0; font-size: 13px; color: var(--ink-2); }
 .bar { display: inline-block; height: 6px; border-radius: 3px; background: var(--c, var(--series-1)); vertical-align: middle; margin-right: 6px; opacity: .85; }
 h2::before { content: ""; width: 4px; height: 18px; border-radius: 2px; background: var(--h, var(--series-1)); }
 </style>
@@ -639,6 +644,22 @@ function decisionsView(decisions) {
   const real = decisions.filter((d) => !d.dry_run && (d.error || did(d)));
   if (!real.length) { $("decisions").innerHTML = `<div class="empty">Nothing yet.</div>`; return; }
   const idle = DATA.status.idle_asset || "SPY";
+  // A News Hunter buy: say in plain words why it was bought, the plan for it, and keep the full reasoning one click away.
+  const story = (d) => {
+    if (d.source !== "news") return "";
+    const buys = (d.orders || []).filter((o) => o.side === "buy" && !["error", "skipped", "not sent"].includes(o.status));
+    if (!buys.length) return "";
+    const out = [];
+    if (d.plain_summary) out.push(`<p class="story"><b>Why:</b> ${esc(d.plain_summary)}</p>`);
+    for (const o of buys) {
+      const idea = (d.ideas || []).find((i) => i.symbol === o.symbol) || {};
+      out.push(`<p class="story small">${esc(o.symbol)}: kept for up to ${esc(o.hold_days ?? 10)} days, sold earlier if it falls too far from its best price (safety stop).</p>`);
+      if (idea.headline || idea.why_not_priced_in) {
+        out.push(`<details class="more"><summary>Full reasoning for ${esc(o.symbol)}</summary>${idea.headline ? `<p><b>What happened:</b> ${esc(idea.headline)}</p>` : ""}${idea.why_not_priced_in ? `<p><b>Why it may still rise:</b> ${esc(idea.why_not_priced_in)}</p>` : ""}</details>`);
+      }
+    }
+    return out.join("");
+  };
   const entry = (d) => {
     const who = d.source === "watch" ? `<span class="chip auto">⚡ Watcher</span>`
       : d.source === "news" ? `<span class="chip news">📰 News Hunter</span>` : d.no_claude ? `<span class="chip">🤖 Automatic</span>` : `<span class="chip">🧠 Claude</span>`;
@@ -654,6 +675,7 @@ function decisionsView(decisions) {
     return `<div class="entry">
       <div><span class="when">${esc(d.date)}</span> <span class="small">${esc(d.time || "")}</span>${who}</div>
       <div class="moves">${rows}</div>
+      ${story(d)}
     </div>`;
   };
   // Today and yesterday stay on top; anything two or more days old goes under "Old daily logs".
