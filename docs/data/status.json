@@ -1,12 +1,12 @@
 {
- "updated": "2026-11-09T12:27-05:00",
+ "updated": "2026-11-09T12:32-05:00",
  "mode": "paper",
  "capital": 1000.0,
- "spy_start": 752.29,
+ "spy_start": null,
  "idle_asset": "SPY",
  "model": "opus",
- "equity": 999.97,
- "cash": -2.25,
+ "equity": 999.98,
+ "cash": 0.01,
  "performance": {
   "days_tracked": 0
  },
@@ -26,7 +26,7 @@
    "rates": {
     "title": "Bonds (rates)",
     "display": "+2.9%",
-    "ief_return_20d_pct": 2.91,
+    "ief_return_20d_pct": 2.92,
     "label": "yields falling",
     "source": "IEF 7-10y Treasury ETF, 20-day change"
    },
@@ -45,20 +45,20 @@
     "label": "mixed"
    }
   },
-  "checked": "2026-11-09T17:24"
+  "checked": "2026-11-09T17:31"
  },
  "positions": [
   {
    "symbol": "SPY",
-   "qty": 1.3322,
-   "market_value": 1002.2201,
-   "avg_entry_price": 750.626,
-   "current_price": 752.3,
-   "unrealized_pl": 2.2301,
-   "unrealized_plpc": 0.0022,
-   "change_today_usd": 2.2301,
+   "qty": 1.3286,
+   "market_value": 999.9661,
+   "avg_entry_price": 752.668,
+   "current_price": 752.65,
+   "unrealized_pl": -0.0239,
+   "unrealized_plpc": -0.0,
+   "change_today_usd": -0.0239,
    "name": "S&P 500",
-   "weight": 1.0023
+   "weight": 1.0
   }
  ]
 }

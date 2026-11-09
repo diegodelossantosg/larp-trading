@@ -13,7 +13,7 @@
   "rates": {
    "title": "Bonds (rates)",
    "display": "+2.9%",
-   "ief_return_20d_pct": 2.91,
+   "ief_return_20d_pct": 2.92,
    "label": "yields falling",
    "source": "IEF 7-10y Treasury ETF, 20-day change"
   },
@@ -32,5 +32,5 @@
    "label": "mixed"
   }
  },
- "checked": "2026-11-09T17:24"
+ "checked": "2026-11-09T17:31"
 }
