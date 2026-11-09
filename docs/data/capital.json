@@ -2,5 +2,7 @@
  "capital": 1000.0,
  "baseline_equity": 99935.75,
  "started": "2026-11-09",
- "started_at": "2026-11-09T17:30+00:00"
+ "started_at": "2026-11-09T17:30+00:00",
+ "spy_start": 752.668,
+ "spy_start_from": "fill"
 }
