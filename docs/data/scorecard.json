@@ -1,1 +1,13 @@
-[]
+[
+ {
+  "date": "2026-11-09",
+  "source": "news",
+  "symbol": "FSLR",
+  "amount": 99.96,
+  "entry": 191.155,
+  "spy_entry": 752.34,
+  "last": 191.155,
+  "spy_last": 752.34,
+  "open": true
+ }
+]
