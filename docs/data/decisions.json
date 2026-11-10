@@ -461,5 +461,28 @@
   "plain_summary": "Stocks dipped on a hot inflation report; today's big drops were earnings, a real customer pullback or a CEO scandal, so I bought nothing.",
   "ideas": [],
   "holdings_alerts": []
+ },
+ {
+  "date": "2026-11-10",
+  "time": "11:24",
+  "source": "news",
+  "dry_run": false,
+  "orders": [],
+  "notes": [
+   "Nasdaq's earnings calendar was unavailable; used Claude's dates",
+   "skipped GEV: its next earnings date isn't confirmed"
+  ],
+  "plain_summary": "Stocks are down across the board after a hot inflation report. GE Vernova fell about 6% because one customer, SoftBank, scaled back some turbine plans, which looks like an overreaction, so I picked it as one buy idea. I skipped Nvidia because its CEO is under investigation.",
+  "ideas": [
+   {
+    "symbol": "GEV",
+    "headline": "2026-11-10 morning: GE Vernova down about 5-7% (opened -9%) after SoftBank disclosed a $3.7B charge on prepaid US data-center power equipment and revised its Piketon, Ohio project plans; Musk had claimed SoftBank was 'defaulting' on turbine orders.",
+    "why_not_priced_in": "The fear is that AI data centers will cut back on power equipment, but the news is about one customer's own accounting. SoftBank lost its advance payments, and GE Vernova presumably keeps those deposits. SoftBank also says it may get up to $2.1B in rebates on future purchases, which means it plans to keep buying. Even if all 9.2 GW of the Ohio plant were GEV's, that is under a tenth of the roughly 122 GW of gas equipment GEV had under contract at the end of September. Turbines are in short supply, so freed-up slots can be resold. GEV raised its 2026 guidance on Oct 28. The stock is very volatile and already fell about 9% on Nov 4, so it is probably below its 50-day average. It is coming back from its low at the open, not still dropping.",
+    "plain_reason": "One customer scaled back, but turbines are scarce and other buyers will take them.",
+    "next_earnings": "unknown",
+    "idea_type": "overreaction"
+   }
+  ],
+  "holdings_alerts": []
  }
 ]
