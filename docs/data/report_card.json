@@ -1,9 +1,106 @@
 {
  "all": {
-  "picks": 0
+  "picks": 6,
+  "vs_spy_so_far_avg_pct": 0.0,
+  "vs_spy_so_far_beat_rate": 0.0
  },
- "by_trade_type": {},
- "by_kind": {},
- "recent": [],
+ "by_trade_type": {
+  "defensive_hedge": {
+   "picks": 2,
+   "vs_spy_so_far_avg_pct": 0.0,
+   "vs_spy_so_far_beat_rate": 0.0
+  },
+  "trend_momentum": {
+   "picks": 4,
+   "vs_spy_so_far_avg_pct": 0.0,
+   "vs_spy_so_far_beat_rate": 0.0
+  }
+ },
+ "by_kind": {
+  "ETF": {
+   "picks": 1,
+   "vs_spy_so_far_avg_pct": 0.0,
+   "vs_spy_so_far_beat_rate": 0.0
+  },
+  "stock": {
+   "picks": 5,
+   "vs_spy_so_far_avg_pct": 0.0,
+   "vs_spy_so_far_beat_rate": 0.0
+  }
+ },
+ "recent": [
+  {
+   "date": "2026-11-09",
+   "symbol": "XLV",
+   "trade_type": "defensive_hedge",
+   "kind": "ETF",
+   "reason": "Health care companies keep selling when the economy and tech stocks wobble.",
+   "vs_spy_5d_pct": null,
+   "vs_spy_20d_pct": null,
+   "vs_spy_60d_pct": null,
+   "vs_spy_so_far_pct": 0.0,
+   "days_held_so_far": 0
+  },
+  {
+   "date": "2026-11-09",
+   "symbol": "LLY",
+   "trade_type": "trend_momentum",
+   "kind": "stock",
+   "reason": "Its weight-loss drugs are in huge demand and sales keep growing.",
+   "vs_spy_5d_pct": null,
+   "vs_spy_20d_pct": null,
+   "vs_spy_60d_pct": null,
+   "vs_spy_so_far_pct": 0.0,
+   "days_held_so_far": 0
+  },
+  {
+   "date": "2026-11-09",
+   "symbol": "V",
+   "trade_type": "trend_momentum",
+   "kind": "stock",
+   "reason": "It earns a small fee on every card purchase, and higher prices lift that fee.",
+   "vs_spy_5d_pct": null,
+   "vs_spy_20d_pct": null,
+   "vs_spy_60d_pct": null,
+   "vs_spy_so_far_pct": 0.0,
+   "days_held_so_far": 0
+  },
+  {
+   "date": "2026-11-09",
+   "symbol": "MA",
+   "trade_type": "trend_momentum",
+   "kind": "stock",
+   "reason": "Like Visa, it profits from everyday spending even when prices rise.",
+   "vs_spy_5d_pct": null,
+   "vs_spy_20d_pct": null,
+   "vs_spy_60d_pct": null,
+   "vs_spy_so_far_pct": 0.0,
+   "days_held_so_far": 0
+  },
+  {
+   "date": "2026-11-09",
+   "symbol": "JNJ",
+   "trade_type": "defensive_hedge",
+   "kind": "stock",
+   "reason": "A steady medicine and medical-device maker that holds up in rough markets.",
+   "vs_spy_5d_pct": null,
+   "vs_spy_20d_pct": null,
+   "vs_spy_60d_pct": null,
+   "vs_spy_so_far_pct": 0.0,
+   "days_held_so_far": 0
+  },
+  {
+   "date": "2026-11-09",
+   "symbol": "COST",
+   "trade_type": "trend_momentum",
+   "kind": "stock",
+   "reason": "Shoppers flock to its bargains when prices rise, and members pay yearly fees.",
+   "vs_spy_5d_pct": null,
+   "vs_spy_20d_pct": null,
+   "vs_spy_60d_pct": null,
+   "vs_spy_so_far_pct": 0.0,
+   "days_held_so_far": 0
+  }
+ ],
  "updated": "2026-11-09"
 }
