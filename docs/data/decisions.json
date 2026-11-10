@@ -484,5 +484,28 @@
    }
   ],
   "holdings_alerts": []
+ },
+ {
+  "date": "2026-11-10",
+  "time": "12:24",
+  "source": "news",
+  "dry_run": false,
+  "orders": [],
+  "notes": [
+   "Nasdaq's earnings calendar was unavailable; used Claude's dates",
+   "skipped GEV: its next earnings date isn't confirmed"
+  ],
+  "plain_summary": "Stocks fell on a hot inflation report. Our First Solar is down again, but only from analyst target cuts and solar-sector selling, so there's no alert. I picked one buy: GE Vernova, which dropped about 7% after a SoftBank write-down. Nvidia was skipped because its board is investigating the CEO.",
+  "ideas": [
+   {
+    "symbol": "GEV",
+    "headline": "2026-11-10 morning: SoftBank posts a $7B quarterly loss after writing down $3.7B of non-refundable advance payments for US data-center power equipment, including the Pike County, Ohio gas project. GEV fell up to 9% at the open and is now about -7% (-6.6% vs SPY).",
+    "why_not_priced_in": "The money SoftBank wrote off was non-refundable deposits, so GE Vernova likely keeps that cash. SoftBank also expects about $2.1B in rebates on future purchases, which suggests it is reshaping its orders rather than walking away completely. GE Vernova's gas backlog plus reservations rose to 122 GW in Q3. Turbine prices are about 50% higher than in 2025, and delivery slots are sold into 2032. That means any slots SoftBank gives up can likely be resold to other buyers waiting in line. This is one customer's money trouble and a fear spreading across the sector, not a drop in GE Vernova's own sales. The stock is already off its opening low, so it is not still falling fast. Q3 results came out in late October. The next report is estimated for about 2027-01-27 but not confirmed, so the date is listed as unknown. Risk: if more AI builders cancel reserved slots, this becomes real damage to the business.",
+    "plain_reason": "One customer's money trouble; turbine demand still sold out for years.",
+    "next_earnings": "unknown",
+    "idea_type": "overreaction"
+   }
+  ],
+  "holdings_alerts": []
  }
 ]
