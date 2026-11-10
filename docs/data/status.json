@@ -5,7 +5,7 @@
  "spy_start": 752.668,
  "idle_asset": "SPY",
  "model": "opus",
- "equity": 988.44,
+ "equity": 988.31,
  "cash": -0.05,
  "performance": {
   "days_tracked": 1
@@ -14,10 +14,10 @@
   "news": {
    "buys": 1,
    "avg_return_pct": -5.63,
-   "avg_vs_spy_pct": -5.04,
+   "avg_vs_spy_pct": -5.03,
    "beat_spy": 0,
    "dollars": -5.63,
-   "dollars_vs_spy": -5.04
+   "dollars_vs_spy": -5.03
   }
  },
  "health": {
@@ -60,26 +60,26 @@
   {
    "symbol": "SPY",
    "qty": 1.1958,
-   "market_value": 894.1786,
+   "market_value": 894.1547,
    "avg_entry_price": 752.668,
-   "current_price": 747.79,
-   "unrealized_pl": -5.8329,
+   "current_price": 747.77,
+   "unrealized_pl": -5.8568,
    "unrealized_plpc": -0.0065,
-   "change_today_usd": -5.8592,
+   "change_today_usd": -5.8831,
    "name": "S&P 500",
-   "weight": 0.9046
+   "weight": 0.9047
   },
   {
    "symbol": "FSLR",
    "qty": 0.5222,
-   "market_value": 94.3095,
+   "market_value": 94.2051,
    "avg_entry_price": 191.412,
-   "current_price": 180.61,
-   "unrealized_pl": -5.6405,
-   "unrealized_plpc": -0.0564,
-   "change_today_usd": -5.7439,
+   "current_price": 180.4101,
+   "unrealized_pl": -5.7449,
+   "unrealized_plpc": -0.0575,
+   "change_today_usd": -5.8483,
    "name": "",
-   "weight": 0.0954
+   "weight": 0.0953
   }
  ]
 }
