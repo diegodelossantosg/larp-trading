@@ -9,5 +9,16 @@
   "last": 179.73,
   "spy_last": 748.44,
   "open": true
+ },
+ {
+  "date": "2026-11-10",
+  "source": "news",
+  "symbol": "GEV",
+  "amount": 98.98,
+  "entry": 786.03,
+  "spy_entry": 749.35,
+  "last": 786.03,
+  "spy_last": 749.35,
+  "open": true
  }
 ]
