@@ -644,5 +644,28 @@
   "holdings_alerts": [
    "GEV: Ontario Power Generation blames unfinished GE Vernova Hitachi engineering for delays and higher costs at its Darlington small-reactor project; watch for any penalties."
   ]
+ },
+ {
+  "date": "2026-11-11",
+  "time": "12:26",
+  "source": "news",
+  "dry_run": false,
+  "orders": [],
+  "notes": [
+   "Nasdaq's earnings calendar was unavailable; used Claude's dates",
+   "skipped ABNB: its next earnings date isn't confirmed"
+  ],
+  "plain_summary": "Tech rallied after CoreWeave's results while some strong non-tech names slipped; I picked one possible bounce (Airbnb) and saw nothing urgent about what we own.",
+  "ideas": [
+   {
+    "symbol": "ABNB",
+    "headline": "2026-11-10/11: Airbnb, Booking and Expedia fell after reports that OpenAI bought Odessia, a small AI travel-planning startup (no price disclosed). ABNB is down again today, about 4.4% worse than the S&P 500, on a day when money moved from consumer stocks into AI chip stocks.",
+    "why_not_priced_in": "The drop is a fear about AI competition across the whole sector, not a problem inside Airbnb. Airbnb's Q3 (reported Nov 5) was strong: revenue up 19%, bookings value up 21%, full-year outlook raised and a $12B share buyback. OpenAI buying a small planning app does not take away Airbnb's millions of host listings, and OpenAI works with travel sites as partners. That is the kind of headline scare about a strong company that bounced back in our tests. Today's extra fall seems driven by money rotating out of these stocks, not by new news. Next earnings should be around mid-February 2027, far outside the 3-day limit.",
+    "plain_reason": "Fear of an AI rival, but Airbnb just grew sales 19% and raised forecasts.",
+    "next_earnings": "unknown",
+    "idea_type": "overreaction"
+   }
+  ],
+  "holdings_alerts": []
  }
 ]
