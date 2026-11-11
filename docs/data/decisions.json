@@ -682,5 +682,20 @@
   "holdings_alerts": [
    "GEV: Ontario Power Generation blamed unfinished GE Vernova Hitachi engineering for delays and higher costs at its Darlington small nuclear reactor project."
   ]
+ },
+ {
+  "date": "2026-11-11",
+  "time": "14:33",
+  "source": "news",
+  "dry_run": false,
+  "orders": [],
+  "notes": [
+   "\u26a0\ufe0f GE Vernova: SoftBank is paying to cancel some of its big gas turbine order. Separately, Ontario says GE Vernova Hitachi engineering is delaying its Darlington small nuclear reactor project."
+  ],
+  "plain_summary": "Today's drops (Microsoft, Airbnb, defensive stocks, homebuilders) were small, or came from AI-competition and interest-rate worries that may be real, so I bought nothing.",
+  "ideas": [],
+  "holdings_alerts": [
+   "GE Vernova: SoftBank is paying to cancel some of its big gas turbine order. Separately, Ontario says GE Vernova Hitachi engineering is delaying its Darlington small nuclear reactor project."
+  ]
  }
 ]
