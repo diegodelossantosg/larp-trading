@@ -629,5 +629,20 @@
   "holdings_alerts": [
    "GEV: Ontario's power utility says GE Vernova Hitachi's unfinished engineering is the main reason its first Darlington small reactor is late and over its $7.7B budget."
   ]
+ },
+ {
+  "date": "2026-11-11",
+  "time": "11:24",
+  "source": "news",
+  "dry_run": false,
+  "orders": [],
+  "notes": [
+   "\u26a0\ufe0f GEV: Ontario Power Generation blames unfinished GE Vernova Hitachi engineering for delays and higher costs at its Darlington small-reactor project; watch for any penalties."
+  ],
+  "plain_summary": "Tech rallied while consumer and health-care stocks lagged; none of today's drops was a clear overreaction we could confirm, so we bought nothing this hour.",
+  "ideas": [],
+  "holdings_alerts": [
+   "GEV: Ontario Power Generation blames unfinished GE Vernova Hitachi engineering for delays and higher costs at its Darlington small-reactor project; watch for any penalties."
+  ]
  }
 ]
