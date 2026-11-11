@@ -697,5 +697,28 @@
   "holdings_alerts": [
    "GE Vernova: SoftBank is paying to cancel some of its big gas turbine order. Separately, Ontario says GE Vernova Hitachi engineering is delaying its Darlington small nuclear reactor project."
   ]
+ },
+ {
+  "date": "2026-11-11",
+  "time": "15:08",
+  "source": "news",
+  "dry_run": false,
+  "orders": [],
+  "notes": [
+   "Nasdaq's earnings calendar was unavailable; used Claude's dates",
+   "skipped ABNB: its next earnings date isn't confirmed"
+  ],
+  "plain_summary": "Airbnb fell about 4% more than the S&P 500 today because OpenAI bought a tiny AI travel startup, which looks like an overreaction, so I suggest a buy; nothing new needs flagging for FSLR, GEV or SPY.",
+  "ideas": [
+   {
+    "symbol": "ABNB",
+    "headline": "OpenAI buys AI travel agent startup Odessia (reported 2026-11-10/11); online travel stocks slide, ABNB about -2.6% today, about -4% vs SPY (2026-11-11 afternoon)",
+    "why_not_priced_in": "Odessia is a year-old startup with a $6M pre-seed round. OpenAI shut the product down, and the deal looks like a hire of its founder, not a product launch. OpenAI has announced no travel product and works with travel companies as partners. Airbnb is highly profitable: Q3 revenue was $4.9B, up 19% and above guidance, with a new $12B buyback. Nothing in today's news hurts bookings or profits. The drop is a fear-driven sell-off across the travel sector, not company-specific bad news. Earnings came out Nov 5, so today's drop has nothing to do with earnings.",
+    "plain_reason": "A tiny startup purchase scared investors; Airbnb's profitable, growing business hasn't changed.",
+    "next_earnings": "unknown",
+    "idea_type": "overreaction"
+   }
+  ],
+  "holdings_alerts": []
  }
 ]
