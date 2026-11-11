@@ -6,8 +6,8 @@
   "amount": 99.96,
   "entry": 191.155,
   "spy_entry": 752.34,
-  "last": 179.01,
-  "spy_last": 759.645,
+  "last": 179.32,
+  "spy_last": 760.09,
   "open": true
  },
  {
@@ -17,8 +17,8 @@
   "amount": 98.98,
   "entry": 786.03,
   "spy_entry": 749.35,
-  "last": 821.83,
-  "spy_last": 759.645,
+  "last": 819.135,
+  "spy_last": 760.09,
   "open": true
  }
 ]
