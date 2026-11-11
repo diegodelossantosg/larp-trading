@@ -667,5 +667,20 @@
    }
   ],
   "holdings_alerts": []
+ },
+ {
+  "date": "2026-11-11",
+  "time": "13:28",
+  "source": "news",
+  "dry_run": false,
+  "orders": [],
+  "notes": [
+   "\u26a0\ufe0f GEV: Ontario Power Generation blamed unfinished GE Vernova Hitachi engineering for delays and higher costs at its Darlington small nuclear reactor project."
+  ],
+  "plain_summary": "Big AI rally today; the few big names that fell (Microsoft, Airbnb) were either too small a move or not a clear overreaction, so no buys this hour.",
+  "ideas": [],
+  "holdings_alerts": [
+   "GEV: Ontario Power Generation blamed unfinished GE Vernova Hitachi engineering for delays and higher costs at its Darlington small nuclear reactor project."
+  ]
  }
 ]
