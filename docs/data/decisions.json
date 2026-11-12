@@ -775,5 +775,16 @@
   "plain_summary": "The big drops today came from a CEO leaving under a scandal, earnings misses, or calm stocks we skip, so I bought nothing.",
   "ideas": [],
   "holdings_alerts": []
+ },
+ {
+  "date": "2026-11-12",
+  "time": "13:19",
+  "source": "news",
+  "dry_run": false,
+  "orders": [],
+  "notes": [],
+  "plain_summary": "Nvidia's sudden CEO exit dominated the day, but every big drop I checked was either a real business problem, an earnings drop or close to earnings, so I bought nothing.",
+  "ideas": [],
+  "holdings_alerts": []
  }
 ]
