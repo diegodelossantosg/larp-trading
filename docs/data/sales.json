@@ -1,18 +1,37 @@
 {
- "updated": "2026-11-10T15:26-05:00",
- "fills_seen": 18,
+ "updated": "2026-11-13T13:30-05:00",
+ "fills_seen": 20,
  "summary": {
-  "sales": 3,
+  "sales": 4,
   "won": 1,
-  "lost": 2,
-  "total_pnl": 1.92,
-  "win_rate": 0.33,
+  "lost": 3,
+  "total_pnl": 1.87,
+  "win_rate": 0.25,
   "avg_win_pct": 0.24,
-  "avg_loss_pct": -0.24,
+  "avg_loss_pct": -0.18,
   "best": "SPY",
   "worst": "SPY"
  },
  "rows": [
+  {
+   "order_id": "185d7576-c776-408e-a859-0d771cb4f122",
+   "date": "2026-11-13",
+   "symbol": "SPY",
+   "name": "S&P 500",
+   "bought": "2026-11-09",
+   "bought_by": "claude",
+   "sold_by": "claude",
+   "days": 4,
+   "shares": 0.1314,
+   "avg_buy_price": 752.67,
+   "sell_price": 752.28,
+   "cost": 98.92,
+   "proceeds": 98.87,
+   "pnl": -0.05,
+   "pnl_pct": -0.05,
+   "full": false,
+   "vs_spy_pct": 0.0
+  },
   {
    "order_id": "bd89dcce-abf2-457e-a7e5-304df8a0f16c",
    "date": "2026-11-10",
@@ -20,7 +39,7 @@
    "name": "S&P 500",
    "bought": "2026-11-09",
    "bought_by": "claude",
-   "sold_by": "claude",
+   "sold_by": "news",
    "days": 1,
    "shares": 0.1321,
    "avg_buy_price": 752.67,
@@ -30,7 +49,7 @@
    "pnl": -0.45,
    "pnl_pct": -0.45,
    "full": false,
-   "vs_spy_pct": -0.01
+   "vs_spy_pct": -0.08
   },
   {
    "order_id": "ab2c7c90-29ee-4178-a1ff-deff8e40f29c",
