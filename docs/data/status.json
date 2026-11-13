@@ -1,12 +1,12 @@
 {
- "updated": "2026-11-13T14:17-05:00",
+ "updated": "2026-11-13T14:34-05:00",
  "mode": "paper",
  "capital": 1000.0,
  "spy_start": 752.668,
  "idle_asset": "SPY",
  "model": "opus",
- "equity": 991.39,
- "cash": -0.02,
+ "equity": 989.49,
+ "cash": -0.05,
  "performance": {
   "since": "2026-11-09",
   "days_tracked": 4,
@@ -17,11 +17,11 @@
  "scorecard": {
   "news": {
    "buys": 3,
-   "avg_return_pct": -2.9,
-   "avg_vs_spy_pct": -3.19,
-   "beat_spy": 2,
-   "dollars": -8.72,
-   "dollars_vs_spy": -9.57
+   "avg_return_pct": -3.29,
+   "avg_vs_spy_pct": -3.49,
+   "beat_spy": 1,
+   "dollars": -9.89,
+   "dollars_vs_spy": -10.48
   }
  },
  "health": {
@@ -64,50 +64,50 @@
   {
    "symbol": "SPY",
    "qty": 0.9322,
-   "market_value": 702.443,
+   "market_value": 701.8138,
    "avg_entry_price": 752.668,
-   "current_price": 753.505,
-   "unrealized_pl": 0.7803,
-   "unrealized_plpc": 0.0011,
-   "change_today_usd": -3.37,
+   "current_price": 752.83,
+   "unrealized_pl": 0.151,
+   "unrealized_plpc": 0.0002,
+   "change_today_usd": -3.9993,
    "name": "S&P 500",
-   "weight": 0.7085
+   "weight": 0.7093
   },
   {
    "symbol": "GEV",
    "qty": 0.1258,
-   "market_value": 100.0089,
+   "market_value": 99.9951,
    "avg_entry_price": 786.85,
-   "current_price": 795.11,
-   "unrealized_pl": 1.0389,
-   "unrealized_plpc": 0.0105,
-   "change_today_usd": -2.9407,
+   "current_price": 795.0,
+   "unrealized_pl": 1.0251,
+   "unrealized_plpc": 0.0104,
+   "change_today_usd": -2.9546,
    "name": "",
-   "weight": 0.1009
+   "weight": 0.1011
   },
   {
    "symbol": "DELL",
    "qty": 0.2883,
-   "market_value": 99.6493,
+   "market_value": 98.9113,
    "avg_entry_price": 342.932,
-   "current_price": 345.67,
-   "unrealized_pl": 0.7893,
-   "unrealized_plpc": 0.008,
-   "change_today_usd": 0.7893,
+   "current_price": 343.11,
+   "unrealized_pl": 0.0513,
+   "unrealized_plpc": 0.0005,
+   "change_today_usd": 0.0513,
    "name": "",
-   "weight": 0.1005
+   "weight": 0.1
   },
   {
    "symbol": "FSLR",
    "qty": 0.5222,
-   "market_value": 89.3071,
+   "market_value": 88.8162,
    "avg_entry_price": 191.412,
-   "current_price": 171.03,
-   "unrealized_pl": -10.6429,
-   "unrealized_plpc": -0.1065,
-   "change_today_usd": -0.6632,
+   "current_price": 170.09,
+   "unrealized_pl": -11.1338,
+   "unrealized_plpc": -0.1114,
+   "change_today_usd": -1.154,
    "name": "",
-   "weight": 0.0901
+   "weight": 0.0898
   }
  ]
 }
