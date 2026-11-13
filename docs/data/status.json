@@ -5,7 +5,7 @@
  "spy_start": 752.668,
  "idle_asset": "SPY",
  "model": "opus",
- "equity": 991.92,
+ "equity": 991.29,
  "cash": -0.05,
  "performance": {
   "since": "2026-11-09",
@@ -17,11 +17,11 @@
  "scorecard": {
   "news": {
    "buys": 3,
-   "avg_return_pct": -2.73,
-   "avg_vs_spy_pct": -3.02,
+   "avg_return_pct": -2.68,
+   "avg_vs_spy_pct": -2.93,
    "beat_spy": 2,
-   "dollars": -8.2,
-   "dollars_vs_spy": -9.07
+   "dollars": -8.06,
+   "dollars_vs_spy": -8.79
   }
  },
  "health": {
@@ -64,48 +64,48 @@
   {
    "symbol": "SPY",
    "qty": 0.9322,
-   "market_value": 702.485,
+   "market_value": 702.1867,
    "avg_entry_price": 752.668,
-   "current_price": 753.55,
-   "unrealized_pl": 0.8222,
-   "unrealized_plpc": 0.0012,
-   "change_today_usd": -3.3281,
+   "current_price": 753.23,
+   "unrealized_pl": 0.5239,
+   "unrealized_plpc": 0.0008,
+   "change_today_usd": -3.6264,
    "name": "S&P 500",
-   "weight": 0.7082
+   "weight": 0.7084
   },
   {
    "symbol": "GEV",
    "qty": 0.1258,
-   "market_value": 100.2769,
+   "market_value": 100.2026,
    "avg_entry_price": 786.85,
-   "current_price": 797.24,
-   "unrealized_pl": 1.3069,
-   "unrealized_plpc": 0.0132,
-   "change_today_usd": -2.6728,
+   "current_price": 796.65,
+   "unrealized_pl": 1.2326,
+   "unrealized_plpc": 0.0124,
+   "change_today_usd": -2.747,
    "name": "",
    "weight": 0.1011
   },
   {
    "symbol": "DELL",
    "qty": 0.2883,
-   "market_value": 99.779,
+   "market_value": 99.5383,
    "avg_entry_price": 342.932,
-   "current_price": 346.12,
-   "unrealized_pl": 0.919,
-   "unrealized_plpc": 0.0093,
-   "change_today_usd": 0.919,
+   "current_price": 345.285,
+   "unrealized_pl": 0.6783,
+   "unrealized_plpc": 0.0069,
+   "change_today_usd": 0.6783,
    "name": "",
-   "weight": 0.1006
+   "weight": 0.1004
   },
   {
    "symbol": "FSLR",
    "qty": 0.5222,
-   "market_value": 89.4272,
+   "market_value": 89.4141,
    "avg_entry_price": 191.412,
-   "current_price": 171.26,
-   "unrealized_pl": -10.5228,
-   "unrealized_plpc": -0.1053,
-   "change_today_usd": -0.5431,
+   "current_price": 171.235,
+   "unrealized_pl": -10.5359,
+   "unrealized_plpc": -0.1054,
+   "change_today_usd": -0.5561,
    "name": "",
    "weight": 0.0902
   }
