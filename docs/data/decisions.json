@@ -929,5 +929,20 @@
   "holdings_alerts": [
    "Dell fell about 9%: Bloomberg traced 22 Dell servers with banned Nvidia chips to Shanghai; Dell says it cut off the reseller in February 2025."
   ]
+ },
+ {
+  "date": "2026-11-13",
+  "time": "15:26",
+  "source": "news",
+  "dry_run": false,
+  "orders": [],
+  "notes": [
+   "\u26a0\ufe0f DELL fell ~9%: Bloomberg traced 22 Dell servers with banned Nvidia chips to a Shanghai data center; Dell cut off that seller in 2025; no probe yet."
+  ],
+  "plain_summary": "Chip stocks fell as this week's rally reversed and Dell, which we own, dropped on a China chip report; no good bargains, so no buys.",
+  "ideas": [],
+  "holdings_alerts": [
+   "DELL fell ~9%: Bloomberg traced 22 Dell servers with banned Nvidia chips to a Shanghai data center; Dell cut off that seller in 2025; no probe yet."
+  ]
  }
 ]
