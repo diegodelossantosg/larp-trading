@@ -1,11 +1,11 @@
 {
- "updated": "2026-11-13T10:27-05:00",
+ "updated": "2026-11-13T10:45-05:00",
  "mode": "paper",
  "capital": 1000.0,
  "spy_start": 752.668,
  "idle_asset": "SPY",
  "model": "opus",
- "equity": 983.65,
+ "equity": 985.42,
  "cash": -0.06,
  "performance": {
   "since": "2026-11-09",
@@ -17,11 +17,11 @@
  "scorecard": {
   "news": {
    "buys": 2,
-   "avg_return_pct": -5.63,
-   "avg_vs_spy_pct": -5.33,
+   "avg_return_pct": -5.59,
+   "avg_vs_spy_pct": -5.47,
    "beat_spy": 1,
-   "dollars": -11.26,
-   "dollars_vs_spy": -10.67
+   "dollars": -11.19,
+   "dollars_vs_spy": -10.95
   }
  },
  "health": {
@@ -64,38 +64,38 @@
   {
    "symbol": "SPY",
    "qty": 1.0637,
-   "market_value": 796.2461,
+   "market_value": 797.7783,
    "avg_entry_price": 752.668,
-   "current_price": 748.5895,
-   "unrealized_pl": -4.3381,
-   "unrealized_plpc": -0.0054,
-   "change_today_usd": -9.0736,
+   "current_price": 750.03,
+   "unrealized_pl": -2.8059,
+   "unrealized_plpc": -0.0035,
+   "change_today_usd": -7.5414,
    "name": "S&P 500",
-   "weight": 0.8095
+   "weight": 0.8096
   },
   {
    "symbol": "GEV",
    "qty": 0.1258,
-   "market_value": 99.7983,
+   "market_value": 99.6027,
    "avg_entry_price": 786.85,
-   "current_price": 793.435,
-   "unrealized_pl": 0.8283,
-   "unrealized_plpc": 0.0084,
-   "change_today_usd": -3.1514,
+   "current_price": 791.88,
+   "unrealized_pl": 0.6327,
+   "unrealized_plpc": 0.0064,
+   "change_today_usd": -3.347,
    "name": "",
-   "weight": 0.1015
+   "weight": 0.1011
   },
   {
    "symbol": "FSLR",
    "qty": 0.5222,
-   "market_value": 87.6701,
+   "market_value": 88.0957,
    "avg_entry_price": 191.412,
-   "current_price": 167.895,
-   "unrealized_pl": -12.2799,
-   "unrealized_plpc": -0.1229,
-   "change_today_usd": -2.3002,
+   "current_price": 168.71,
+   "unrealized_pl": -11.8544,
+   "unrealized_plpc": -0.1186,
+   "change_today_usd": -1.8746,
    "name": "",
-   "weight": 0.0891
+   "weight": 0.0894
   }
  ]
 }
