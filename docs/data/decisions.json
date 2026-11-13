@@ -874,5 +874,45 @@
   "plain_summary": "Many AI chip and hardware stocks fell today, but AMD is just giving back a 30% weekly jump and Dell faces a possible chip-export probe, so we buy nothing this hour.",
   "ideas": [],
   "holdings_alerts": []
+ },
+ {
+  "date": "2026-11-13",
+  "time": "13:29",
+  "source": "news",
+  "dry_run": false,
+  "orders": [
+   {
+    "symbol": "SPY",
+    "side": "sell",
+    "notional": 98.87,
+    "reason": "funding the buys",
+    "status": "pending_new",
+    "order_id": "185d7576-c776-408e-a859-0d771cb4f122"
+   },
+   {
+    "symbol": "DELL",
+    "side": "buy",
+    "notional": 98.87,
+    "reason": "Only 22 old servers resold by a cut-off dealer; a tiny issue for Dell.",
+    "status": "pending_new",
+    "order_id": "f5179463-bb74-4594-92da-bc7a9b387d94",
+    "hold_days": 10
+   }
+  ],
+  "notes": [
+   "earnings dates checked on Nasdaq's calendar"
+  ],
+  "plain_summary": "Chip and AI-hardware stocks fell hard today because of the Nvidia scandal; we're proposing one buy, Dell, which looks like a scare-driven drop, and nothing important happened to our own holdings.",
+  "ideas": [
+   {
+    "symbol": "DELL",
+    "headline": "2026-11-13 18:27 UTC \u2013 Dell fell nearly 9% after a Bloomberg report linked Dell servers with restricted NVIDIA chips to a Shanghai data center",
+    "why_not_priced_in": "Bloomberg's report covers only 22 Dell servers. A Singapore reseller (Aperia) bought them, and Dell says it cut off all sales and support to Aperia in February 2025 over diversion concerns. Dell sells tens of billions of dollars a year, so this barely matters to its business. No Commerce Department or other official probe of Dell has been reported. The drop is mostly the Nvidia scandal and a sector-wide AI-hardware selloff (FN, COHR, SNDK, CLS are also down 6-7%), on top of profit-taking after this week's rally. The stock has already come back from about -9% to about -7.6%, so it is no longer falling fast. The next earnings date (2026-11-24, from one data site) is 7 trading days away, outside the 3-day limit. Risks: the chip-to-China story is very political and could lead to a probe, and earnings fall inside our 10-day hold.",
+    "plain_reason": "Only 22 old servers resold by a cut-off dealer; a tiny issue for Dell.",
+    "next_earnings": "2026-11-24",
+    "idea_type": "overreaction"
+   }
+  ],
+  "holdings_alerts": []
  }
 ]

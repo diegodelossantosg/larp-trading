@@ -20,5 +20,16 @@
   "last": 793.665,
   "spy_last": 751.52,
   "open": true
+ },
+ {
+  "date": "2026-11-13",
+  "source": "news",
+  "symbol": "DELL",
+  "amount": 98.87,
+  "entry": 343.05,
+  "spy_entry": 752.345,
+  "last": 343.05,
+  "spy_last": 752.345,
+  "open": true
  }
 ]
