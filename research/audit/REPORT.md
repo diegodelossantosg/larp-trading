@@ -163,3 +163,9 @@ Conclusión: ninguna idea mejora de forma clara el modelo. Queda por medir si Cl
 
 | T23 Reglas de salida del News Hunter: tomar ganancias al día 5, cortar pérdidas a los días 1 o 5, alargar a 20 días solo si va ganando o perdiendo | Ninguna mejora de forma consistente. Tomar ganancias gana en el diseño (+0,26 a +0,36) y pierde algo en la validación (−0,04 a −0,08). Aguantar 20 días es mejor en el diseño (+0,74) y peor en la validación (−0,21). La salida actual (10 días, sin stop de tiempo) sigue siendo la mejor. |
 | T24 Esperar confirmación antes de comprar (comprar al cierre solo si ya se recuperó, o solo si sigue cayendo) | Rinde menos que comprar una hora después de la noticia (+0,44 % y +0,38 % frente a +0,53 % en validación). Las filas "solo si luego se recuperó" muestran +1,45 %, pero eso es mirar al futuro y no se puede operar. |
+
+## Sexta ronda (T25): datos nuevos, prueba fuera de muestra
+Regla actual del News Hunter (caída 1h >= 2%, ATR >= 3%, volumen en $ >= 20M), costes 0,1%, ganancia sobre SPY.
+- events_early (2016-2018, ~190 empresas grandes): 105 operaciones, +2,2% de media a 10 días, ventaja sobre control +2,1% (t=2,7), gana los 3 años. Volumen normal +3,5% (n=71) vs volumen alto -0,5% (n=34): confirma la exclusión por volumen. Pocas operaciones; no esperar esa cifra.
+- events_mid (rangos 701-1100, 2022-2026): 835 operaciones, +0,02% a 10 días, ventaja -0,35% (t=0,0). Sin ventaja en empresas pequeñas: mantener el filtro de liquidez.
+Conclusión: la ventaja existe en empresas grandes y líquidas, no más abajo. Sin cambios en el modelo.
