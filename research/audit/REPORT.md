@@ -160,3 +160,6 @@ Todo con el mismo método estricto (diseño 2016-2020 o 2018-2022, validación d
 | T22 Cambiar a SSO tras pánicos de mercado | Tras caídas de −2 % a −4 % en un día, el S&P rinde igual que cualquier día. Tras caer 8 %+ desde máximos sí rebota, pero son 3-4 episodios (2018, 2020, 2022, 2025). Usa apalancamiento. No aplicado. |
 
 Conclusión: ninguna idea mejora de forma clara el modelo. Queda por medir si Claude, al elegir entre las caídas con noticia, añade valor frente a la regla mecánica: solo se sabe con datos reales.
+
+| T23 Reglas de salida del News Hunter: tomar ganancias al día 5, cortar pérdidas a los días 1 o 5, alargar a 20 días solo si va ganando o perdiendo | Ninguna mejora de forma consistente. Tomar ganancias gana en el diseño (+0,26 a +0,36) y pierde algo en la validación (−0,04 a −0,08). Aguantar 20 días es mejor en el diseño (+0,74) y peor en la validación (−0,21). La salida actual (10 días, sin stop de tiempo) sigue siendo la mejor. |
+| T24 Esperar confirmación antes de comprar (comprar al cierre solo si ya se recuperó, o solo si sigue cayendo) | Rinde menos que comprar una hora después de la noticia (+0,44 % y +0,38 % frente a +0,53 % en validación). Las filas "solo si luego se recuperó" muestran +1,45 %, pero eso es mirar al futuro y no se puede operar. |
