@@ -1,31 +1,31 @@
 {
  "all": {
   "picks": 6,
-  "vs_spy_so_far_avg_pct": -0.08,
-  "vs_spy_so_far_beat_rate": 0.33
+  "vs_spy_so_far_avg_pct": 1.37,
+  "vs_spy_so_far_beat_rate": 1.0
  },
  "by_trade_type": {
   "defensive_hedge": {
    "picks": 2,
-   "vs_spy_so_far_avg_pct": -0.47,
-   "vs_spy_so_far_beat_rate": 0.0
+   "vs_spy_so_far_avg_pct": 0.56,
+   "vs_spy_so_far_beat_rate": 1.0
   },
   "trend_momentum": {
    "picks": 4,
-   "vs_spy_so_far_avg_pct": 0.11,
-   "vs_spy_so_far_beat_rate": 0.5
+   "vs_spy_so_far_avg_pct": 1.77,
+   "vs_spy_so_far_beat_rate": 1.0
   }
  },
  "by_kind": {
   "ETF": {
    "picks": 1,
-   "vs_spy_so_far_avg_pct": -0.85,
-   "vs_spy_so_far_beat_rate": 0.0
+   "vs_spy_so_far_avg_pct": 0.05,
+   "vs_spy_so_far_beat_rate": 1.0
   },
   "stock": {
    "picks": 5,
-   "vs_spy_so_far_avg_pct": 0.07,
-   "vs_spy_so_far_beat_rate": 0.4
+   "vs_spy_so_far_avg_pct": 1.63,
+   "vs_spy_so_far_beat_rate": 1.0
   }
  },
  "recent": [
@@ -38,8 +38,8 @@
    "vs_spy_5d_pct": null,
    "vs_spy_20d_pct": null,
    "vs_spy_60d_pct": null,
-   "vs_spy_so_far_pct": -0.85,
-   "days_held_so_far": 3
+   "vs_spy_so_far_pct": 0.05,
+   "days_held_so_far": 4
   },
   {
    "date": "2026-11-09",
@@ -50,8 +50,8 @@
    "vs_spy_5d_pct": null,
    "vs_spy_20d_pct": null,
    "vs_spy_60d_pct": null,
-   "vs_spy_so_far_pct": 0.5,
-   "days_held_so_far": 3
+   "vs_spy_so_far_pct": 2.14,
+   "days_held_so_far": 4
   },
   {
    "date": "2026-11-09",
@@ -62,8 +62,8 @@
    "vs_spy_5d_pct": null,
    "vs_spy_20d_pct": null,
    "vs_spy_60d_pct": null,
-   "vs_spy_so_far_pct": -0.84,
-   "days_held_so_far": 3
+   "vs_spy_so_far_pct": 0.82,
+   "days_held_so_far": 4
   },
   {
    "date": "2026-11-09",
@@ -74,8 +74,8 @@
    "vs_spy_5d_pct": null,
    "vs_spy_20d_pct": null,
    "vs_spy_60d_pct": null,
-   "vs_spy_so_far_pct": -1.08,
-   "days_held_so_far": 3
+   "vs_spy_so_far_pct": 0.6,
+   "days_held_so_far": 4
   },
   {
    "date": "2026-11-09",
@@ -86,8 +86,8 @@
    "vs_spy_5d_pct": null,
    "vs_spy_20d_pct": null,
    "vs_spy_60d_pct": null,
-   "vs_spy_so_far_pct": -0.09,
-   "days_held_so_far": 3
+   "vs_spy_so_far_pct": 1.07,
+   "days_held_so_far": 4
   },
   {
    "date": "2026-11-09",
@@ -98,9 +98,9 @@
    "vs_spy_5d_pct": null,
    "vs_spy_20d_pct": null,
    "vs_spy_60d_pct": null,
-   "vs_spy_so_far_pct": 1.85,
-   "days_held_so_far": 3
+   "vs_spy_so_far_pct": 3.53,
+   "days_held_so_far": 4
   }
  ],
- "updated": "2026-11-12"
+ "updated": "2026-11-13"
 }
