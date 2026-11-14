@@ -290,7 +290,7 @@ class DailyV(eb.Daily):
         self.vol = df["volume"].to_numpy(float)
 
 
-def fetch_hourly(symbols: list[str], years: float) -> dict[str, Hourly]:
+def fetch_hourly(symbols: list[str], years: float, skip_years: float = 0.0) -> dict[str, Hourly]:
     from alpaca.data.enums import Adjustment, DataFeed
     from alpaca.data.historical import StockHistoricalDataClient
     from alpaca.data.requests import StockBarsRequest
@@ -300,7 +300,7 @@ def fetch_hourly(symbols: list[str], years: float) -> dict[str, Hourly]:
 
     cfg = load_config()
     client = StockHistoricalDataClient(cfg.alpaca_api_key, cfg.alpaca_secret_key)
-    end = datetime.now(timezone.utc) - timedelta(minutes=20)
+    end = datetime.now(timezone.utc) - timedelta(minutes=20) - timedelta(days=int(skip_years * 365.25))
     start = end - timedelta(days=int(years * 365.25))
     out = {}
     for k in range(0, len(symbols), 20):
@@ -329,16 +329,18 @@ def main() -> None:
     ap.add_argument("--out", default="research/events.csv.gz")
     ap.add_argument("--top", type=int, default=300, help="companies ranked 101..top by 2018 dollar volume")
     ap.add_argument("--no-big", action="store_true", help="leave out the ~65 big companies (biased upwards)")
+    ap.add_argument("--skip-months", type=float, default=0.0, help="end the window this many months ago (an older period)")
+    ap.add_argument("--first", type=int, default=100, help="skip the first N companies of the 2018 ranking (default 100: the big ones)")
     args = ap.parse_args()
     big = [] if args.no_big else sorted(BIG_STOCKS)
-    fresh = [s for s in universe_2018(top=args.top)[100:] if s not in BIG_STOCKS]
+    fresh = [s for s in universe_2018(top=args.top)[args.first:] if s not in BIG_STOCKS]
     sets = {**{s: "big" for s in big}, **{s: split_of(s) for s in fresh}}
     symbols = sorted(sets)
-    years = args.months / 12 + 1.0
+    years = (args.months + args.skip_months) / 12 + 1.0
     raw = eb.fetch_daily_ohlc(symbols + ["SPY"], years)
     daily = {s: DailyV(df) for s, df in raw.items() if len(df) >= 250}
-    hourly = fetch_hourly([s for s in symbols if s in daily] + ["SPY"], args.months / 12 + 0.1)
-    news = fetch_news(args.months, [s for s in symbols if s in daily])
+    hourly = fetch_hourly([s for s in symbols if s in daily] + ["SPY"], args.months / 12 + 0.1, args.skip_months / 12)
+    news = fetch_news(args.months, [s for s in symbols if s in daily], args.skip_months)
     rows = build(news, daily, hourly, sets)
     cols = sorted({k for r in rows for k in r}, key=lambda k: (not k[0].isalpha(), k))
     import os

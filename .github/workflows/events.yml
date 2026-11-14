@@ -13,6 +13,12 @@ on:
       out:
         description: "Output file"
         default: "research/events.csv.gz"
+      skip_months:
+        description: "End the window this many months ago (an older period)"
+        default: "0"
+      first:
+        description: "Skip the first N companies of the 2018 ranking (100 = the big ones)"
+        default: "100"
       no_big:
         description: "Leave out the big, biased-up companies"
         default: false
@@ -36,7 +42,7 @@ jobs:
         with:
           python-version: "3.13"
       - run: ./setup.sh
-      - run: python -m trader.event_dataset --months ${{ inputs.months }} --top ${{ inputs.top }} --out ${{ inputs.out }} ${{ inputs.no_big && '--no-big' || '' }}
+      - run: python -m trader.event_dataset --months ${{ inputs.months }} --top ${{ inputs.top }} --out ${{ inputs.out }} --skip-months ${{ inputs.skip_months }} --first ${{ inputs.first }} ${{ inputs.no_big && '--no-big' || '' }}
       - name: Save results
         run: |
           git config user.name "trading-agent"

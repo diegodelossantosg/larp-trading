@@ -118,14 +118,14 @@ def summarize(evs: list[dict]) -> dict:
     return report
 
 
-def fetch_news(months: float, symbols: list[str]) -> list[dict]:
-    """Every Alpaca/Benzinga headline about these symbols over the last `months` months."""
+def fetch_news(months: float, symbols: list[str], skip_months: float = 0.0) -> list[dict]:
+    """Every Alpaca/Benzinga headline about these symbols over `months` months, ending `skip_months` months ago."""
     import requests
 
     from .config import load_config
 
     cfg = load_config()
-    end = datetime.now(timezone.utc) - timedelta(minutes=20)
+    end = datetime.now(timezone.utc) - timedelta(minutes=20) - timedelta(days=int(skip_months * 30.5))
     start = end - timedelta(days=int(months * 30.5))
     headers = {"APCA-API-KEY-ID": cfg.alpaca_api_key, "APCA-API-SECRET-KEY": cfg.alpaca_secret_key}
     news: list[dict] = []
