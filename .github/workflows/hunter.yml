@@ -52,6 +52,9 @@ jobs:
           args=""
           [ "${{ inputs.dry_run }}" = "true" ] && args="--dry-run"
           python -m trader.main news $args
+      - name: Rule-only twin on paper (no Claude, no real money)
+        if: always()
+        run: python -m trader.paper_hunter || echo "paper twin failed"
       - name: Save journal for the dashboard
         if: always()
         run: |
