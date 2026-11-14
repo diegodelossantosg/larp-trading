@@ -143,3 +143,20 @@ Dos ficheros nuevos de noticias, con el dinero parado en SPY (así no hay apalan
 - La regla actual sale positiva en los tres cortes, pero ninguno es estadísticamente sólido. Mejor estimación honesta: +2 a +4 puntos al año, con mucho margen de error.
 - El suelo de liquidez de 600 M NO aguanta: en los días nuevos (antes de jul-2022) sale -0,4 a -0,9 puntos. Solo funcionaba en los años que ya habíamos mirado. Descartado, no se aplica.
 - Conclusión: se dejan los ajustes actuales. No hay evidencia nueva para cambiar tamaño ni suelo.
+
+## Quinta ronda: ¿se puede mejorar el modelo actual? (T16 a T22)
+
+Todo con el mismo método estricto (diseño 2016-2020 o 2018-2022, validación después), con costes, contra el S&P 500, con el dinero parado en SPY.
+
+| Test | Resultado |
+|---|---|
+| T16 Agente extra que compra caídas grandes (sin noticia) | Por compra a veces gana, como estrategia es errática (−14,6 % a +8,2 % al año, 1-4 de 6 años positivos). No mejora. |
+| T17 Huecos, máximos de 52 semanas, picos de volumen, calendario SPY, modificadores del News Hunter | Nada pasa. Único apoyo: evitar caídas con volumen alto (+0,33 % a +0,53 % por compra, t=2,1). **Aplicado.** |
+| Momento de entrada, plazo y stop del News Hunter | La regla actual (1 h después de la noticia, 10 días, sin stop) es la mejor o está empatada. |
+| T18 Tamaño mínimo de la caída | Más caída = más ventaja por compra (≥4 %: +1,3 % / +1,5 %), pero menos compras: la ganancia anual en cartera queda igual (+5-7 %/año). No mejora. |
+| T19 Compras de directivos (SEC Form 4) | Sin ventaja; con compras grandes de CEO/CFO a 60 días pierde (−1,8 % a −4,3 % en 2021+). |
+| T20 Reglas de tendencia y volatilidad para el SPY | Bajan la rentabilidad (11-13,7 % anual frente a 15,1 %); mejoran caída máxima y Sharpe, no ganan al S&P. |
+| T21 Tamaño de la posición | Escala igual: ganancia y riesgo suben juntos (media/desviación 0,58). 3 compras al día y tope 50 % da 0,64: mejora pequeña, dentro del ruido. |
+| T22 Cambiar a SSO tras pánicos de mercado | Tras caídas de −2 % a −4 % en un día, el S&P rinde igual que cualquier día. Tras caer 8 %+ desde máximos sí rebota, pero son 3-4 episodios (2018, 2020, 2022, 2025). Usa apalancamiento. No aplicado. |
+
+Conclusión: ninguna idea mejora de forma clara el modelo. Queda por medir si Claude, al elegir entre las caídas con noticia, añade valor frente a la regla mecánica: solo se sabe con datos reales.
