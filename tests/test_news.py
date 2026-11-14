@@ -121,3 +121,25 @@ def test_news_buys_skip_calm_stocks(tmp_path, monkeypatch):
     rec = journal.read("decisions.json", [])[-1]
     assert not [o for o in broker.sent if o.side == "buy"]
     assert any("too calm" in n for n in rec["notes"])
+
+
+def test_projected_volume_ratio_scales_a_partial_day():
+    from trader.main import projected_volume_ratio
+    assert abs(projected_volume_ratio(1_000, 1_000, 390) - 1.0) < 1e-9          # a full normal day
+    assert abs(projected_volume_ratio(500, 1_000, 180) - 1.0) < 1e-9            # half the day done, half the usual volume = normal pace
+    assert projected_volume_ratio(1_000, 1_000, 180) >= 2.0 - 1e-9              # already a full day's volume after 3 hours = heavy
+    assert projected_volume_ratio(100, 1_000, 2) is None                        # too early to say
+    assert projected_volume_ratio(100, 0, 200) is None                          # no average to compare with
+
+
+def test_news_buys_skip_heavy_volume_drops(tmp_path, monkeypatch):
+    monkeypatch.setattr(main, "_heavy_volume", lambda df: 3.4)                     # on pace for 3.4x its normal volume
+    broker, rec = run(tmp_path, monkeypatch, [idea("NVDA")])
+    assert not [o for o in rec["orders"] if o["side"] == "buy"]
+    assert any("heavy volume" in n for n in rec["notes"])
+
+
+def test_news_buys_allow_normal_volume(tmp_path, monkeypatch):
+    monkeypatch.setattr(main, "_heavy_volume", lambda df: 1.2)
+    broker, rec = run(tmp_path, monkeypatch, [idea("NVDA")])
+    assert [o for o in rec["orders"] if o["side"] == "buy"]

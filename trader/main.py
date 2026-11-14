@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import dataclasses
 import logging
+import numpy as np
 import sys
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
@@ -645,6 +646,32 @@ def _review(cfg, orders, quotes, positions, acct, candidates):
 NEWS_BUY_SIZE = 0.10  # share of the agent's money per News Hunter buy (audit: more size = more edge, if real)
 NEWS_MIN_ATR_PCT = 3.0  # only stocks whose normal daily swing is at least this: the rebound is in the volatile ones (audit)
 NEWS_MAX_BUYS_PER_DAY = 2
+NEWS_MAX_VOLUME_RATIO = 2.0  # skip a drop on heavy volume (today's volume on pace for 2x the 20-day average or more): they lost in our tests
+# share of a day's volume normally traded by this many minutes after the 9:30 open (rough U-shaped curve)
+_VOLUME_CURVE = [(0, 0.0), (30, 0.15), (60, 0.25), (120, 0.38), (180, 0.50), (240, 0.62), (300, 0.75), (360, 0.88), (390, 1.0)]
+
+
+def _heavy_volume(df) -> float | None:
+    """Projected volume ratio of today's (still open) daily bar, or None if today's bar isn't there."""
+    try:
+        if len(df) < 22 or df.index[-1].date() != datetime.now(ET).date():
+            return None
+        now = datetime.now(ET)
+        minutes = (now - now.replace(hour=9, minute=30, second=0, microsecond=0)).total_seconds() / 60
+        return projected_volume_ratio(float(df["volume"].iloc[-1]), float(df["volume"].iloc[-21:-1].mean()), minutes)
+    except Exception:
+        return None
+
+
+def projected_volume_ratio(volume_so_far: float, avg_daily_volume: float, minutes_since_open: float) -> float | None:
+    """Today's volume projected to the full day, divided by the 20-day average (None when it can't be told)."""
+    if not avg_daily_volume or avg_daily_volume <= 0 or volume_so_far is None:
+        return None
+    m = min(max(minutes_since_open, 0.0), 390.0)
+    frac = np.interp(m, [a for a, _ in _VOLUME_CURVE], [b for _, b in _VOLUME_CURVE])
+    if frac < 0.05:     # too early in the day to say anything
+        return None
+    return float(volume_so_far / frac / avg_daily_volume)
 
 
 def news(cfg, broker: Broker, market: Market, dry_run: bool, force: bool = False) -> int:
@@ -744,6 +771,9 @@ def news(cfg, broker: Broker, market: Market, dry_run: bool, force: bool = False
             elif kind != "etf" and sym not in BIG_STOCKS and t["avg_dollar_vol_m"] < LIQUID_MIN_DOLLAR_VOLUME_M:
                 ok, why = False, (f"trades ${t['avg_dollar_vol_m']}M/day; drops on news only beat chance above "
                                   f"${LIQUID_MIN_DOLLAR_VOLUME_M:.0f}M/day in our test")
+            elif kind != "etf" and (vr := _heavy_volume(df)) is not None and vr >= NEWS_MAX_VOLUME_RATIO:
+                ok, why = False, (f"heavy volume today (on pace for {vr:.1f}x its normal): a sell-off with this much volume "
+                                  "usually means serious news, and these lost in our tests")
         if ok and idea.get("idea_type") == "earnings_beat":   # tested: no edge outside today's big winners
             ok, why = False, "earnings-beat buys are switched off (no edge in our wider test)"
         next_er = idea.get("next_earnings", "")

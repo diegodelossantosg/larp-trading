@@ -164,5 +164,5 @@ Not financial advice.
 
 - The 2x fund (SSO) beats the S&P 500 only by leverage when the market rises, so the idle money now sits in plain SPY.
 - Claude's daily ideas are switched off (`DAILY_IDEAS` unset): the audit found no edge. With `DAILY_IDEAS=true` they are tracked on paper (`IDEAS_SHARE=0`) until they show about +5% a year over SPY; ideas no better than chance lose to the S&P 500.
-- The News Hunter is the only part with a measured edge (about +3 to +4 points a year over the S&P 500 on the most cautious reading). It buys only volatile stocks (daily swing 3%+), where the rebound after a news drop was found in both company groups.
+- The News Hunter is the only part with a measured edge (about +3 to +4 points a year over the S&P 500 on the most cautious reading). It buys only volatile stocks (daily swing 3%+), where the rebound after a news drop was found in both company groups. It skips drops on heavy volume (today's volume on pace for 2x its 20-day average or more, a sign of serious news): those lost in the audit, and leaving them out raised the edge per buy from +0.33% to +0.53% (small, t=2.1).
 - Tight stops cost 1-2.5 points a year, so stops are wide (20%).
