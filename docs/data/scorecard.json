@@ -6,8 +6,8 @@
   "amount": 99.96,
   "entry": 191.155,
   "spy_entry": 752.34,
-  "last": 171.43,
-  "spy_last": 753.99,
+  "last": 165.35,
+  "spy_last": 748.54,
   "open": true
  },
  {
@@ -17,8 +17,8 @@
   "amount": 98.98,
   "entry": 786.03,
   "spy_entry": 749.35,
-  "last": 804.08,
-  "spy_last": 753.99,
+  "last": 796.24,
+  "spy_last": 748.54,
   "open": true
  },
  {
@@ -28,8 +28,8 @@
   "amount": 98.87,
   "entry": 343.05,
   "spy_entry": 752.345,
-  "last": 344.88,
-  "spy_last": 753.99,
+  "last": 327.37,
+  "spy_last": 748.54,
   "open": true
  }
 ]
