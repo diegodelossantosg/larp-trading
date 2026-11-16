@@ -1026,5 +1026,20 @@
   "plain_summary": "The whole market fell today in a broad AI and chip selloff tied to Nvidia's CEO scandal and fears of higher interest rates, so I bought nothing and found no events that affect what we own.",
   "ideas": [],
   "holdings_alerts": []
+ },
+ {
+  "date": "2026-11-16",
+  "time": "15:21",
+  "source": "news",
+  "dry_run": false,
+  "orders": [],
+  "notes": [
+   "\u26a0\ufe0f DELL: new US rules on AI chip exports may hit its AI servers; it's down 24% in November, and results are expected around Nov 24 (unconfirmed)."
+  ],
+  "plain_summary": "Chip and AI stocks fell sharply today after the Nvidia CEO scandal and new US chip export rules, but I'm suggesting no buys this hour.",
+  "ideas": [],
+  "holdings_alerts": [
+   "DELL: new US rules on AI chip exports may hit its AI servers; it's down 24% in November, and results are expected around Nov 24 (unconfirmed)."
+  ]
  }
 ]
