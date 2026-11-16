@@ -1,11 +1,11 @@
 {
- "updated": "2026-11-16T13:45-05:00",
+ "updated": "2026-11-16T14:01-05:00",
  "mode": "paper",
  "capital": 1000.0,
  "spy_start": 752.668,
  "idle_asset": "SPY",
  "model": "opus",
- "equity": 964.33,
+ "equity": 965.76,
  "cash": -0.07,
  "performance": {
   "since": "2026-11-09",
@@ -17,11 +17,11 @@
  "scorecard": {
   "news": {
    "buys": 3,
-   "avg_return_pct": -7.87,
-   "avg_vs_spy_pct": -6.4,
+   "avg_return_pct": -7.61,
+   "avg_vs_spy_pct": -6.25,
    "beat_spy": 0,
-   "dollars": -23.49,
-   "dollars_vs_spy": -19.13
+   "dollars": -22.73,
+   "dollars_vs_spy": -18.68
   }
  },
  "health": {
@@ -64,50 +64,50 @@
   {
    "symbol": "SPY",
    "qty": 0.9322,
-   "market_value": 690.1142,
+   "market_value": 690.9253,
    "avg_entry_price": 752.668,
-   "current_price": 740.28,
-   "unrealized_pl": -11.5485,
-   "unrealized_plpc": -0.0165,
-   "change_today_usd": -13.1352,
+   "current_price": 741.15,
+   "unrealized_pl": -10.7375,
+   "unrealized_plpc": -0.0153,
+   "change_today_usd": -12.3241,
    "name": "S&P 500",
-   "weight": 0.7156
+   "weight": 0.7154
   },
   {
    "symbol": "GEV",
    "qty": 0.1258,
-   "market_value": 96.3399,
+   "market_value": 96.4531,
    "avg_entry_price": 786.85,
-   "current_price": 765.94,
-   "unrealized_pl": -2.6301,
-   "unrealized_plpc": -0.0266,
-   "change_today_usd": -4.6778,
+   "current_price": 766.84,
+   "unrealized_pl": -2.5169,
+   "unrealized_plpc": -0.0254,
+   "change_today_usd": -4.5646,
    "name": "",
    "weight": 0.0999
   },
   {
    "symbol": "DELL",
    "qty": 0.2883,
-   "market_value": 92.3443,
+   "market_value": 92.598,
    "avg_entry_price": 342.932,
-   "current_price": 320.33,
-   "unrealized_pl": -6.5157,
-   "unrealized_plpc": -0.0659,
-   "change_today_usd": -6.9763,
+   "current_price": 321.21,
+   "unrealized_pl": -6.262,
+   "unrealized_plpc": -0.0633,
+   "change_today_usd": -6.7227,
    "name": "",
-   "weight": 0.0958
+   "weight": 0.0959
   },
   {
    "symbol": "FSLR",
    "qty": 0.5222,
-   "market_value": 85.6023,
+   "market_value": 85.8529,
    "avg_entry_price": 191.412,
-   "current_price": 163.935,
-   "unrealized_pl": -14.3477,
-   "unrealized_plpc": -0.1436,
-   "change_today_usd": -3.8928,
+   "current_price": 164.415,
+   "unrealized_pl": -14.0971,
+   "unrealized_plpc": -0.141,
+   "change_today_usd": -3.6421,
    "name": "",
-   "weight": 0.0888
+   "weight": 0.0889
   }
  ]
 }
