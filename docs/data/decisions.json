@@ -967,5 +967,20 @@
   "final_targets": {
    "SPY": 1.0
   }
+ },
+ {
+  "date": "2026-11-16",
+  "time": "10:21",
+  "source": "news",
+  "dry_run": false,
+  "orders": [],
+  "notes": [
+   "\u26a0\ufe0f DELL fell about 6% more today: banned Nvidia chips in Dell servers turned up in China, and a new US export rule landed. Earnings due Nov 24."
+  ],
+  "plain_summary": "AI and chip stocks are falling hard after the Nvidia CEO scandal and a new chip-export rule, so I flagged our Dell shares and bought nothing while the drop is still moving fast.",
+  "ideas": [],
+  "holdings_alerts": [
+   "DELL fell about 6% more today: banned Nvidia chips in Dell servers turned up in China, and a new US export rule landed. Earnings due Nov 24."
+  ]
  }
 ]
