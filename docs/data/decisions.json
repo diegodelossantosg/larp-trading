@@ -982,5 +982,16 @@
   "holdings_alerts": [
    "DELL fell about 6% more today: banned Nvidia chips in Dell servers turned up in China, and a new US export rule landed. Earnings due Nov 24."
   ]
+ },
+ {
+  "date": "2026-11-16",
+  "time": "11:21",
+  "source": "news",
+  "dry_run": false,
+  "orders": [],
+  "notes": [],
+  "plain_summary": "AI, chip and crypto stocks fell broadly today after the Nvidia CEO scandal, a new US rule on China chip access and Bitcoin's slide, but none was a clear overreaction worth buying, so I made no buys.",
+  "ideas": [],
+  "holdings_alerts": []
  }
 ]

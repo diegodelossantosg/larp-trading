@@ -9,7 +9,7 @@
    "entry_date": "2026-11-16",
    "entry_price": 118.38,
    "shares": 0.8443149180604832,
-   "high": 118.38,
+   "high": 119.15,
    "spy_entry": 744.3,
    "why": "Bitcoin\u2019s Chart Is Flashing Red \u2014 One Strategist Sees $38,000",
    "vs_spy_drop_pct": -5.9
@@ -19,7 +19,7 @@
    "entry_date": "2026-11-16",
    "entry_price": 49.675,
    "shares": 2.012078510317061,
-   "high": 49.675,
+   "high": 51.15,
    "spy_entry": 744.3,
    "why": "'US moves to tighten AI chip export rules' - Financial Times",
    "vs_spy_drop_pct": -5.14
@@ -34,7 +34,12 @@
    "t": "2026-11-16T10:21-05:00",
    "equity": 999.9,
    "spy": 744.3
+  },
+  {
+   "t": "2026-11-16T11:21-05:00",
+   "equity": 1003.52,
+   "spy": 746.17
   }
  ],
- "updated": "2026-11-16T10:21-05:00"
+ "updated": "2026-11-16T11:21-05:00"
 }
