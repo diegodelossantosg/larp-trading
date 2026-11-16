@@ -1004,5 +1004,16 @@
   "plain_summary": "Markets fell on an AI and chip selloff; the biggest drops came from bad results or a selloff still under way, so I bought nothing.",
   "ideas": [],
   "holdings_alerts": []
+ },
+ {
+  "date": "2026-11-16",
+  "time": "13:21",
+  "source": "news",
+  "dry_run": false,
+  "orders": [],
+  "notes": [],
+  "plain_summary": "The whole market is falling, with chip and AI stocks hit hardest after Nvidia's CEO left and a new US chip rule. I bought nothing because the selling hasn't stopped and Nvidia reports earnings tomorrow.",
+  "ideas": [],
+  "holdings_alerts": []
  }
 ]
