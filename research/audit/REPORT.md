@@ -185,3 +185,8 @@ Conclusión: la ventaja existe en empresas grandes y líquidas, no más abajo. S
 | early (2016-18) | +2,18% (105) | +1,20% (40) | +2,79% | +5,43% (18) | +1,51% |
 Más caída / más volatilidad rinde más en 3 de 4 archivos (incluido mid, empresas distintas); en early (n pequeño) no. t individuales 1-2: indicio, no prueba. Los archivos se solapan (643 duplicados), por eso los totales conjuntos se calculan sin duplicados.
 Descargas events_wide_a/b (2018-2023): salieron SIN noticias. Sonda (news_probe.yml): el feed de noticias de Alpaca ahora solo devuelve los últimos ~12 meses; el 14 nov aún llegaba a 2016. No es un fallo del código. No se puede descargar más historia de noticias; ya tenemos los 4 archivos.
+
+## Novena ronda (T28): el filtro de caída >= 4% en la cartera real (2 compras/día, 10%, tope 30%, la mayor caída primero)
+Ganancia extra por año sobre SPY (suma de compras x 10%), por archivo: actual 2% -> 4%:
+long +2,85 -> +4,49; wide +6,74 -> +5,37; mid +7,18 -> +0,02; early +3,13 -> +1,54. Media de los cuatro: +4,98% -> +2,86%.
+Conclusión: el filtro NO mejora la cartera. La regla actual ya ordena por mayor caída primero, así que las caídas grandes ya tienen prioridad cuando hay cupo; al endurecer solo se compran menos veces. La ventaja por compra de T27 no se traduce en más ganancia por año. No aplicar.
