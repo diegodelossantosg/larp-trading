@@ -32,5 +32,16 @@
   "last": 313.71,
   "spy_last": 731.5,
   "open": true
+ },
+ {
+  "date": "2026-11-17",
+  "source": "news",
+  "symbol": "CRM",
+  "amount": 95.24,
+  "entry": 194.52,
+  "spy_entry": 733.59,
+  "last": 194.52,
+  "spy_last": 733.59,
+  "open": true
  }
 ]

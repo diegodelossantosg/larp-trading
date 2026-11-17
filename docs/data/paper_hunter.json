@@ -29,7 +29,7 @@
    "entry_date": "2026-11-17",
    "entry_price": 444.13,
    "shares": 0.22449535849349586,
-   "high": 444.13,
+   "high": 444.62,
    "spy_entry": 732.1,
    "why": "Humana Foundation Announces $13.93 Million in Fall 2026 Grants",
    "vs_spy_drop_pct": -2.59
@@ -74,7 +74,12 @@
    "t": "2026-11-17T11:20-05:00",
    "equity": 997.5,
    "spy": 732.1
+  },
+  {
+   "t": "2026-11-17T12:19-05:00",
+   "equity": 999.04,
+   "spy": 734.14
   }
  ],
- "updated": "2026-11-17T11:20-05:00"
+ "updated": "2026-11-17T12:19-05:00"
 }

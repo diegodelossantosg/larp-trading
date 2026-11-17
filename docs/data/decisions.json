@@ -1105,5 +1105,45 @@
   "plain_summary": "Software stocks like Salesforce and ServiceNow are falling hard today on fears about AI and tighter tech budgets, and they are still sliding, so I'm waiting another hour before buying anything; our own holdings had no important news.",
   "ideas": [],
   "holdings_alerts": []
+ },
+ {
+  "date": "2026-11-17",
+  "time": "12:19",
+  "source": "news",
+  "dry_run": false,
+  "orders": [
+   {
+    "symbol": "SPY",
+    "side": "sell",
+    "notional": 14.93,
+    "reason": "funding the buys",
+    "status": "pending_new",
+    "order_id": "685a4cb0-fa7c-4cb4-a0f9-e8e8294a04fa"
+   },
+   {
+    "symbol": "CRM",
+    "side": "buy",
+    "notional": 95.24,
+    "reason": "Funds sold software stocks to buy Anthropic shares; Salesforce's business didn't change today.",
+    "status": "pending_new",
+    "order_id": "835c530c-4b89-4de1-a298-f19aef18d263",
+    "hold_days": 10
+   }
+  ],
+  "notes": [
+   "earnings dates checked on Nasdaq's calendar"
+  ],
+  "plain_summary": "Software stocks fell hard today as investors sold them to make room for Anthropic's upcoming stock market debut. I picked Salesforce as a possible overreaction, and nothing important happened to Dell or GE Vernova.",
+  "ideas": [
+   {
+    "symbol": "CRM",
+    "headline": "Salesforce sinks ~9% (about -8.6% vs S&P 500) as software slides ahead of Anthropic IPO, Nov 17 2026, morning session",
+    "why_not_priced_in": "Salesforce had no bad news of its own. The drop looks like funds selling across software (Workday, Intuit and Adobe fell too) to make room for Anthropic's offering, plus general worry about AI. One possible extra cause is a small data breach at Optimizely, an outside website tool company; some reports say it added to the fall and others say it didn't. Salesforce is large and profitable, and today's selling didn't change its sales or customers. The stock fell about 5% at the open and has held near -9% since mid-morning, so it seems to have stopped sliding. Its next earnings report is Dec 2 after the close, more than 3 trading days away.",
+    "plain_reason": "Funds sold software stocks to buy Anthropic shares; Salesforce's business didn't change today.",
+    "next_earnings": "2026-12-02",
+    "idea_type": "overreaction"
+   }
+  ],
+  "holdings_alerts": []
  }
 ]
