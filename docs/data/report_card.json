@@ -1,30 +1,40 @@
 {
  "all": {
   "picks": 6,
-  "vs_spy_so_far_avg_pct": 1.37,
+  "vs_spy_5d_avg_pct": 3.02,
+  "vs_spy_5d_beat_rate": 1.0,
+  "vs_spy_so_far_avg_pct": 3.02,
   "vs_spy_so_far_beat_rate": 1.0
  },
  "by_trade_type": {
   "defensive_hedge": {
    "picks": 2,
-   "vs_spy_so_far_avg_pct": 0.56,
+   "vs_spy_5d_avg_pct": 1.65,
+   "vs_spy_5d_beat_rate": 1.0,
+   "vs_spy_so_far_avg_pct": 1.65,
    "vs_spy_so_far_beat_rate": 1.0
   },
   "trend_momentum": {
    "picks": 4,
-   "vs_spy_so_far_avg_pct": 1.77,
+   "vs_spy_5d_avg_pct": 3.71,
+   "vs_spy_5d_beat_rate": 1.0,
+   "vs_spy_so_far_avg_pct": 3.71,
    "vs_spy_so_far_beat_rate": 1.0
   }
  },
  "by_kind": {
   "ETF": {
    "picks": 1,
-   "vs_spy_so_far_avg_pct": 0.05,
+   "vs_spy_5d_avg_pct": 1.45,
+   "vs_spy_5d_beat_rate": 1.0,
+   "vs_spy_so_far_avg_pct": 1.45,
    "vs_spy_so_far_beat_rate": 1.0
   },
   "stock": {
    "picks": 5,
-   "vs_spy_so_far_avg_pct": 1.63,
+   "vs_spy_5d_avg_pct": 3.34,
+   "vs_spy_5d_beat_rate": 1.0,
+   "vs_spy_so_far_avg_pct": 3.34,
    "vs_spy_so_far_beat_rate": 1.0
   }
  },
@@ -35,11 +45,11 @@
    "trade_type": "defensive_hedge",
    "kind": "ETF",
    "reason": "Health care companies keep selling when the economy and tech stocks wobble.",
-   "vs_spy_5d_pct": null,
+   "vs_spy_5d_pct": 1.45,
    "vs_spy_20d_pct": null,
    "vs_spy_60d_pct": null,
-   "vs_spy_so_far_pct": 0.05,
-   "days_held_so_far": 4
+   "vs_spy_so_far_pct": 1.45,
+   "days_held_so_far": 5
   },
   {
    "date": "2026-11-09",
@@ -47,11 +57,11 @@
    "trade_type": "trend_momentum",
    "kind": "stock",
    "reason": "Its weight-loss drugs are in huge demand and sales keep growing.",
-   "vs_spy_5d_pct": null,
+   "vs_spy_5d_pct": 3.21,
    "vs_spy_20d_pct": null,
    "vs_spy_60d_pct": null,
-   "vs_spy_so_far_pct": 2.14,
-   "days_held_so_far": 4
+   "vs_spy_so_far_pct": 3.21,
+   "days_held_so_far": 5
   },
   {
    "date": "2026-11-09",
@@ -59,11 +69,11 @@
    "trade_type": "trend_momentum",
    "kind": "stock",
    "reason": "It earns a small fee on every card purchase, and higher prices lift that fee.",
-   "vs_spy_5d_pct": null,
+   "vs_spy_5d_pct": 2.9,
    "vs_spy_20d_pct": null,
    "vs_spy_60d_pct": null,
-   "vs_spy_so_far_pct": 0.82,
-   "days_held_so_far": 4
+   "vs_spy_so_far_pct": 2.9,
+   "days_held_so_far": 5
   },
   {
    "date": "2026-11-09",
@@ -71,11 +81,11 @@
    "trade_type": "trend_momentum",
    "kind": "stock",
    "reason": "Like Visa, it profits from everyday spending even when prices rise.",
-   "vs_spy_5d_pct": null,
+   "vs_spy_5d_pct": 2.59,
    "vs_spy_20d_pct": null,
    "vs_spy_60d_pct": null,
-   "vs_spy_so_far_pct": 0.6,
-   "days_held_so_far": 4
+   "vs_spy_so_far_pct": 2.59,
+   "days_held_so_far": 5
   },
   {
    "date": "2026-11-09",
@@ -83,11 +93,11 @@
    "trade_type": "defensive_hedge",
    "kind": "stock",
    "reason": "A steady medicine and medical-device maker that holds up in rough markets.",
-   "vs_spy_5d_pct": null,
+   "vs_spy_5d_pct": 1.85,
    "vs_spy_20d_pct": null,
    "vs_spy_60d_pct": null,
-   "vs_spy_so_far_pct": 1.07,
-   "days_held_so_far": 4
+   "vs_spy_so_far_pct": 1.85,
+   "days_held_so_far": 5
   },
   {
    "date": "2026-11-09",
@@ -95,12 +105,12 @@
    "trade_type": "trend_momentum",
    "kind": "stock",
    "reason": "Shoppers flock to its bargains when prices rise, and members pay yearly fees.",
-   "vs_spy_5d_pct": null,
+   "vs_spy_5d_pct": 6.15,
    "vs_spy_20d_pct": null,
    "vs_spy_60d_pct": null,
-   "vs_spy_so_far_pct": 3.53,
-   "days_held_so_far": 4
+   "vs_spy_so_far_pct": 6.15,
+   "days_held_so_far": 5
   }
  ],
- "updated": "2026-11-13"
+ "updated": "2026-11-16"
 }
