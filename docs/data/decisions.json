@@ -1075,5 +1075,24 @@
   "plain_summary": "Software and health-insurance stocks fell hard today, but those drops look like real business risks rather than overreactions, so I'm not buying anything this hour.",
   "ideas": [],
   "holdings_alerts": []
+ },
+ {
+  "date": "2026-11-17",
+  "time": "10:47",
+  "source": "watch",
+  "dry_run": false,
+  "orders": [
+   {
+    "symbol": "FSLR",
+    "side": "sell",
+    "notional": 80.39,
+    "reason": "trailing stop: 20.2% below its high of $193.06",
+    "status": "pending_new",
+    "order_id": "9577ed09-bef6-44ad-8827-37a9b7f34ebf"
+   }
+  ],
+  "notes": [
+   "sell FSLR: trailing stop: 20.2% below its high of $193.06"
+  ]
  }
 ]
