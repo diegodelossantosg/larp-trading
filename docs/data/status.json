@@ -1,11 +1,11 @@
 {
- "updated": "2026-11-17T13:14-05:00",
+ "updated": "2026-11-17T13:30-05:00",
  "mode": "paper",
  "capital": 1000.0,
  "spy_start": 752.668,
  "idle_asset": "SPY",
  "model": "opus",
- "equity": 949.24,
+ "equity": 954.2,
  "cash": 0.01,
  "performance": {
   "since": "2026-11-09",
@@ -17,11 +17,11 @@
  "scorecard": {
   "news": {
    "buys": 4,
-   "avg_return_pct": -7.46,
-   "avg_vs_spy_pct": -5.29,
+   "avg_return_pct": -6.7,
+   "avg_vs_spy_pct": -4.74,
    "beat_spy": 1,
-   "dollars": -29.74,
-   "dollars_vs_spy": -21.11
+   "dollars": -26.79,
+   "dollars_vs_spy": -18.97
   }
  },
  "health": {
@@ -64,50 +64,50 @@
   {
    "symbol": "SPY",
    "qty": 0.9119,
-   "market_value": 666.7685,
+   "market_value": 668.7109,
    "avg_entry_price": 752.668,
-   "current_price": 731.19,
-   "unrealized_pl": -19.5857,
-   "unrealized_plpc": -0.0285,
-   "change_today_usd": -7.9882,
+   "current_price": 733.32,
+   "unrealized_pl": -17.6433,
+   "unrealized_plpc": -0.0257,
+   "change_today_usd": -6.0459,
    "name": "S&P 500",
-   "weight": 0.7024
-  },
-  {
-   "symbol": "GEV",
-   "qty": 0.1258,
-   "market_value": 96.2167,
-   "avg_entry_price": 786.85,
-   "current_price": 764.96,
-   "unrealized_pl": -2.7533,
-   "unrealized_plpc": -0.0278,
-   "change_today_usd": 0.1748,
-   "name": "",
-   "weight": 0.1014
+   "weight": 0.7008
   },
   {
    "symbol": "CRM",
    "qty": 0.489,
-   "market_value": 95.6097,
+   "market_value": 96.8681,
    "avg_entry_price": 194.75,
-   "current_price": 195.5266,
-   "unrealized_pl": 0.3797,
-   "unrealized_plpc": 0.004,
-   "change_today_usd": 0.3797,
+   "current_price": 198.1,
+   "unrealized_pl": 1.6381,
+   "unrealized_plpc": 0.0172,
+   "change_today_usd": 1.6381,
    "name": "Salesforce",
-   "weight": 0.1007
+   "weight": 0.1015
+  },
+  {
+   "symbol": "GEV",
+   "qty": 0.1258,
+   "market_value": 96.7248,
+   "avg_entry_price": 786.85,
+   "current_price": 769.0,
+   "unrealized_pl": -2.2452,
+   "unrealized_plpc": -0.0227,
+   "change_today_usd": 0.683,
+   "name": "",
+   "weight": 0.1014
   },
   {
    "symbol": "DELL",
    "qty": 0.2883,
-   "market_value": 90.6319,
+   "market_value": 91.8831,
    "avg_entry_price": 342.932,
-   "current_price": 314.39,
-   "unrealized_pl": -8.2281,
-   "unrealized_plpc": -0.0832,
-   "change_today_usd": -1.7758,
+   "current_price": 318.73,
+   "unrealized_pl": -6.9769,
+   "unrealized_plpc": -0.0706,
+   "change_today_usd": -0.5247,
    "name": "",
-   "weight": 0.0955
+   "weight": 0.0963
   }
  ]
 }
