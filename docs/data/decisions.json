@@ -1064,5 +1064,16 @@
   "final_targets": {
    "SPY": 1.0
   }
+ },
+ {
+  "date": "2026-11-17",
+  "time": "10:19",
+  "source": "news",
+  "dry_run": false,
+  "orders": [],
+  "notes": [],
+  "plain_summary": "Software and health-insurance stocks fell hard today, but those drops look like real business risks rather than overreactions, so I'm not buying anything this hour.",
+  "ideas": [],
+  "holdings_alerts": []
  }
 ]
