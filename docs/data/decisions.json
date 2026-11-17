@@ -1094,5 +1094,16 @@
   "notes": [
    "sell FSLR: trailing stop: 20.2% below its high of $193.06"
   ]
+ },
+ {
+  "date": "2026-11-17",
+  "time": "11:19",
+  "source": "news",
+  "dry_run": false,
+  "orders": [],
+  "notes": [],
+  "plain_summary": "Software stocks like Salesforce and ServiceNow are falling hard today on fears about AI and tighter tech budgets, and they are still sliding, so I'm waiting another hour before buying anything; our own holdings had no important news.",
+  "ideas": [],
+  "holdings_alerts": []
  }
 ]

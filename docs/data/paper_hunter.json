@@ -1,7 +1,7 @@
 {
  "started": "2026-11-16",
  "capital": 1000.0,
- "cash": 800.0,
+ "cash": 700.2449989317496,
  "spy_start": 744.3,
  "positions": [
   {
@@ -23,11 +23,21 @@
    "spy_entry": 744.3,
    "why": "'US moves to tighten AI chip export rules' - Financial Times",
    "vs_spy_drop_pct": -5.14
+  },
+  {
+   "symbol": "HUM",
+   "entry_date": "2026-11-17",
+   "entry_price": 444.13,
+   "shares": 0.22449535849349586,
+   "high": 444.13,
+   "spy_entry": 732.1,
+   "why": "Humana Foundation Announces $13.93 Million in Fall 2026 Grants",
+   "vs_spy_drop_pct": -2.59
   }
  ],
  "closed": [],
  "buys": {
-  "2026-11-17": 0
+  "2026-11-17": 1
  },
  "curve": [
   {
@@ -59,7 +69,12 @@
    "t": "2026-11-17T10:19-05:00",
    "equity": 999.93,
    "spy": 736.52
+  },
+  {
+   "t": "2026-11-17T11:20-05:00",
+   "equity": 997.5,
+   "spy": 732.1
   }
  ],
- "updated": "2026-11-17T10:19-05:00"
+ "updated": "2026-11-17T11:20-05:00"
 }
