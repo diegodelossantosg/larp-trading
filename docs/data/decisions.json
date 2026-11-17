@@ -1177,5 +1177,20 @@
   "holdings_alerts": [
    "Salesforce (CRM) fell about 8-9% today in a software-wide selloff over AI fears and funds raising cash for Anthropic's IPO; no Salesforce-specific bad news."
   ]
+ },
+ {
+  "date": "2026-11-17",
+  "time": "15:19",
+  "source": "news",
+  "dry_run": false,
+  "orders": [],
+  "notes": [
+   "\u26a0\ufe0f Salesforce (CRM) fell about 9% today in a wide software selloff tied to Anthropic's IPO. No company-specific bad news was found; we keep holding."
+  ],
+  "plain_summary": "The market fell sharply and Salesforce, which we own, dropped about 9% in a software selloff, but its business didn't change, so we're holding and not buying anything because the stock limit is full.",
+  "ideas": [],
+  "holdings_alerts": [
+   "Salesforce (CRM) fell about 9% today in a wide software selloff tied to Anthropic's IPO. No company-specific bad news was found; we keep holding."
+  ]
  }
 ]
