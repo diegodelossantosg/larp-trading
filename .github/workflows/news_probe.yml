@@ -1,0 +1,40 @@
+name: "Probe: how far back does the news feed go"
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      ALPACA_API_KEY: ${{ secrets.ALPACA_API_KEY }}
+      ALPACA_SECRET_KEY: ${{ secrets.ALPACA_SECRET_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: ./setup.sh
+      - run: |
+          python - <<'PY'
+          import requests, os
+          from datetime import datetime, timedelta, timezone
+          h = {"APCA-API-KEY-ID": os.environ["ALPACA_API_KEY"], "APCA-API-SECRET-KEY": os.environ["ALPACA_SECRET_KEY"]}
+          from trader.audit_backtest import universe_2018
+          from trader.main import BIG_STOCKS
+          mid = [s for s in universe_2018(top=600)[100:] if s not in BIG_STOCKS][:10]
+          big = ["AAPL", "MSFT", "NVDA", "TSLA", "AMZN"]
+          now = datetime.now(timezone.utc)
+          def q(label, syms, start, end):
+              p = {"symbols": ",".join(syms), "start": start, "end": end, "limit": 50, "sort": "asc", "include_content": "false"}
+              r = requests.get("https://data.alpaca.markets/v1beta1/news", params=p, headers=h, timeout=30)
+              print(label, r.status_code, len(r.json().get("news", [])) if r.ok else r.text[:120], flush=True)
+          q("big last 7d", big, (now - timedelta(days=7)).isoformat(), now.isoformat())
+          for months in (1, 6, 12, 24, 36, 48, 72, 96, 120):
+              e = now - timedelta(days=int(months * 30.5)); s = e - timedelta(days=60)
+              q(f"big window ending {months}m ago", big, s.isoformat(), e.isoformat())
+              q(f"ranks100-600 window ending {months}m ago", mid, s.isoformat(), e.isoformat())
+          PY
