@@ -163,3 +163,15 @@ Conclusión: ninguna idea mejora de forma clara el modelo. Queda por medir si Cl
 
 | T23 Reglas de salida del News Hunter: tomar ganancias al día 5, cortar pérdidas a los días 1 o 5, alargar a 20 días solo si va ganando o perdiendo | Ninguna mejora de forma consistente. Tomar ganancias gana en el diseño (+0,26 a +0,36) y pierde algo en la validación (−0,04 a −0,08). Aguantar 20 días es mejor en el diseño (+0,74) y peor en la validación (−0,21). La salida actual (10 días, sin stop de tiempo) sigue siendo la mejor. |
 | T24 Esperar confirmación antes de comprar (comprar al cierre solo si ya se recuperó, o solo si sigue cayendo) | Rinde menos que comprar una hora después de la noticia (+0,44 % y +0,38 % frente a +0,53 % en validación). Las filas "solo si luego se recuperó" muestran +1,45 %, pero eso es mirar al futuro y no se puede operar. |
+
+## Sexta ronda (T25): datos nuevos, prueba fuera de muestra
+Regla actual del News Hunter (caída 1h >= 2%, ATR >= 3%, volumen en $ >= 20M), costes 0,1%, ganancia sobre SPY.
+- events_early (2016-2018, ~190 empresas grandes): 105 operaciones, +2,2% de media a 10 días, ventaja sobre control +2,1% (t=2,7), gana los 3 años. Volumen normal +3,5% (n=71) vs volumen alto -0,5% (n=34): confirma la exclusión por volumen. Pocas operaciones; no esperar esa cifra.
+- events_mid (rangos 701-1100, 2022-2026): 835 operaciones, +0,02% a 10 días, ventaja -0,35% (t=0,0). Sin ventaja en empresas pequeñas: mantener el filtro de liquidez.
+Conclusión: la ventaja existe en empresas grandes y líquidas, no más abajo. Sin cambios en el modelo.
+
+## Séptima ronda (T26): reducir pérdidas grandes y nichos (4 archivos juntos, 3.473 operaciones, regla actual)
+- Salidas anticipadas (cortar a 5d si <-5/-8/-10%; salir a 1d si <0/-3%): bajan las pérdidas >15% (4,4% -> 1,9-3,9%) pero recortan también los rebotes: la media cae de +0,42% a +0,06-0,25%. No mejoran.
+- Noticias de analistas vs otras: sin diferencia (+0,46% vs +0,21%).
+- Nichos: caída 1h >= 4%: +1,13% (n=1064), ATR >= 6%: +1,33% (n=836), ambas: +1,42% (n=827); el resto (caída<4% y ATR<6%): -0,03% (n=1994). Consistente en 2020-22, 2023-24, 2025-26; no en 2016-19 (n pequeño, negativo).
+- CAUTIÓN: nicho encontrado mirando varios cortes sobre los mismos datos. Pendiente validar con datos nuevos (events_wide_a: 2021-2023, events_wide_b: 2018-2021, rangos 100-600).
