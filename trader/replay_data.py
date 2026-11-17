@@ -229,54 +229,74 @@ def needed(out: str) -> None:
 
 # ---------------- hourly prices at the check times ----------------
 
-def hourly(needed_path: str, chunk: int, chunks: int, out: str) -> None:
-    from alpaca.data.enums import Adjustment, DataFeed
-    from alpaca.data.historical import StockHistoricalDataClient
-    from alpaca.data.requests import StockBarsRequest
-    from alpaca.data.timeframe import TimeFrame
+def _bars_rest(sym: str, headers: dict, pause: float = 0.4) -> pd.DataFrame:
+    """Every hourly bar of one symbol since START, page by page, slowly (the live agents share this API key)."""
+    import requests
+    params = {"symbols": sym, "timeframe": "1Hour", "start": f"{START}T00:00:00Z", "limit": 10000,
+              "adjustment": "all", "feed": "sip", "sort": "asc",
+              "end": (datetime.now(timezone.utc) - timedelta(minutes=20)).strftime("%Y-%m-%dT%H:%M:%SZ")}
+    bars = []
+    while True:
+        for attempt in range(8):
+            _time.sleep(pause)
+            try:
+                r = requests.get("https://data.alpaca.markets/v2/stocks/bars", params=params, headers=headers, timeout=60)
+            except Exception as e:
+                log.warning("%s: %s", sym, e)
+                _time.sleep(5 * (attempt + 1))
+                continue
+            if r.status_code == 429:
+                _time.sleep(10 * (attempt + 1))
+                continue
+            break
+        else:
+            log.warning("%s: gave up after repeated refusals", sym)
+            return pd.DataFrame()
+        if r.status_code != 200:
+            log.warning("%s: HTTP %s %s", sym, r.status_code, r.text[:120])
+            return pd.DataFrame()
+        body = r.json()
+        bars += (body.get("bars") or {}).get(sym, [])
+        if not body.get("next_page_token"):
+            break
+        params["page_token"] = body["next_page_token"]
+    return pd.DataFrame(bars)
 
+
+def hourly(needed_path: str, chunk: int, chunks: int, out: str) -> None:
     from .config import load_config
     cfg = load_config()
-    client = StockHistoricalDataClient(cfg.alpaca_api_key, cfg.alpaca_secret_key)
+    headers = {"APCA-API-KEY-ID": cfg.alpaca_api_key, "APCA-API-SECRET-KEY": cfg.alpaca_secret_key}
     need = pd.read_csv(needed_path, dtype=str)
-    syms = sorted(need.symbol.unique())
-    if chunk == 0:
-        syms = ["SPY"] + syms                       # SPY: every day
+    syms = ["SPY"] + sorted(need.symbol.unique())          # SPY: every day
     mine = [s for k, s in enumerate(syms) if k % chunks == chunk]
     want = need.groupby("symbol").day.apply(set).to_dict()
-    rows = []
-    for k in range(0, len(mine), 10):
-        batch = mine[k:k + 10]
-        try:
-            df = client.get_stock_bars(StockBarsRequest(symbol_or_symbols=batch, timeframe=TimeFrame.Hour,
-                                                        start=pd.Timestamp(START, tz="UTC"),
-                                                        end=datetime.now(timezone.utc) - timedelta(minutes=20),
-                                                        adjustment=Adjustment.ALL, feed=DataFeed.SIP)).df
-        except Exception as e:
-            log.warning("hourly batch %s: %s", batch[:3], e)
-            continue
+    rows, empty = [], []
+    for k, sym in enumerate(mine):
+        df = _bars_rest(sym, headers)
         if df.empty:
+            empty.append(sym)
             continue
-        df = df.reset_index()
-        t = df["timestamp"].dt.tz_convert(ET)
-        df["day"], df["hour"] = t.dt.strftime("%Y-%m-%d"), t.dt.hour
+        t = pd.to_datetime(df["t"], utc=True).dt.tz_convert(ET)
+        df = pd.DataFrame({"day": t.dt.strftime("%Y-%m-%d"), "hour": t.dt.hour, "close": df["c"], "volume": df["v"]})
         df = df[(df.hour >= 9) & (df.hour <= 15)]       # the 9:00 bar holds 9:30-10:00 (plus 30 minutes before the open)
-        for sym, g in df.groupby("symbol"):
-            days = want.get(sym)
-            if sym != "SPY":
-                g = g[g.day.isin(days)]
-            for day, d in g.groupby("day"):
-                d = d.sort_values("hour")
-                cum = d.volume.cumsum().to_numpy()
-                row = {"symbol": sym, "day": day}
-                # the price at HH:00 is the close of the bar that started an hour earlier
-                for hh in CHECKS:
-                    m = (d.hour < hh).to_numpy()
-                    row[f"p{hh}"] = round(float(d.close.to_numpy()[m][-1]), 4) if m.any() else ""
-                    row[f"v{hh}"] = int(cum[m][-1]) if m.any() else ""
-                rows.append(row)
-        log.info("hourly chunk %d: %d/%d symbols, %d rows", chunk, min(k + 10, len(mine)), len(mine), len(rows))
+        if sym != "SPY":
+            df = df[df.day.isin(want.get(sym, set()))]
+        for day, d in df.groupby("day"):
+            d = d.sort_values("hour")
+            cum = d.volume.cumsum().to_numpy()
+            row = {"symbol": sym, "day": day}
+            # the price at HH:00 is the close of the bar that started an hour earlier
+            for hh in CHECKS:
+                m = (d.hour < hh).to_numpy()
+                row[f"p{hh}"] = round(float(d.close.to_numpy()[m][-1]), 4) if m.any() else ""
+                row[f"v{hh}"] = int(cum[m][-1]) if m.any() else ""
+            rows.append(row)
+        if k % 25 == 0 or k == len(mine) - 1:
+            log.info("hourly: %d/%d symbols, %d rows, %d without data", k + 1, len(mine), len(rows), len(empty))
+            pd.DataFrame(rows).to_csv(out, index=False, compression="gzip")     # keep what we have if the job stops
     pd.DataFrame(rows).to_csv(out, index=False, compression="gzip")
+    log.info("hourly done: %d rows; no data for %d symbols %s", len(rows), len(empty), empty[:20])
 
 
 def main() -> None:
