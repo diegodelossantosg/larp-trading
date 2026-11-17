@@ -1,27 +1,27 @@
 {
- "updated": "2026-11-13T20:32-05:00",
+ "updated": "2026-11-16T23:02-05:00",
  "mode": "paper",
  "capital": 1000.0,
  "spy_start": 752.668,
  "idle_asset": "SPY",
  "model": "opus",
- "equity": 988.84,
- "cash": -0.05,
+ "equity": 964.1,
+ "cash": -0.07,
  "performance": {
   "since": "2026-11-09",
-  "days_tracked": 5,
-  "agent_return_pct": -1.09,
-  "spy_return_pct": 0.22,
-  "excess_vs_spy_pct": -1.31
+  "days_tracked": 6,
+  "agent_return_pct": -3.56,
+  "spy_return_pct": -1.69,
+  "excess_vs_spy_pct": -1.87
  },
  "scorecard": {
   "news": {
    "buys": 3,
-   "avg_return_pct": -2.5,
-   "avg_vs_spy_pct": -2.85,
-   "beat_spy": 2,
-   "dollars": -7.51,
-   "dollars_vs_spy": -8.56
+   "avg_return_pct": -8.42,
+   "avg_vs_spy_pct": -6.83,
+   "beat_spy": 0,
+   "dollars": -25.15,
+   "dollars_vs_spy": -20.4
   }
  },
  "health": {
@@ -30,84 +30,84 @@
   "gauges": {
    "fear": {
     "title": "Fear (VIX)",
-    "display": "18.7",
-    "value": 18.7,
-    "change_5d": -9.48,
+    "display": "19.3",
+    "value": 19.3,
+    "change_5d": -6.34,
     "label": "normal",
     "source": "Cboe VIX"
    },
    "rates": {
     "title": "Bonds (rates)",
-    "display": "-0.1%",
-    "ief_return_20d_pct": -0.11,
+    "display": "+0.5%",
+    "ief_return_20d_pct": 0.51,
     "label": "stable",
     "source": "IEF 7-10y Treasury ETF, 20-day change"
    },
    "credit": {
     "title": "Credit stress",
-    "display": "+0.8%",
-    "hyg_vs_ief_20d_pct": 0.81,
-    "label": "relaxed",
+    "display": "+0.2%",
+    "hyg_vs_ief_20d_pct": 0.16,
+    "label": "normal",
     "source": "high-yield (HYG) vs Treasuries (IEF), 20 days"
    },
    "breadth": {
     "title": "ETFs in uptrend",
-    "display": "49%",
-    "above_200d_pct": 49,
+    "display": "45%",
+    "above_200d_pct": 45,
     "above_50d_pct": 39,
     "label": "mixed"
    }
   },
-  "checked": "2026-11-13T14:39"
+  "checked": "2026-11-16T14:41"
  },
  "positions": [
   {
    "symbol": "SPY",
    "qty": 0.9322,
-   "market_value": 703.2494,
+   "market_value": 689.5736,
    "avg_entry_price": 752.668,
-   "current_price": 754.37,
-   "unrealized_pl": 1.5867,
-   "unrealized_plpc": 0.0023,
-   "change_today_usd": -2.5636,
+   "current_price": 739.7,
+   "unrealized_pl": -12.0892,
+   "unrealized_plpc": -0.0172,
+   "change_today_usd": -0.2331,
    "name": "S&P 500",
-   "weight": 0.7112
+   "weight": 0.7153
   },
   {
    "symbol": "GEV",
    "qty": 0.1258,
-   "market_value": 99.3675,
+   "market_value": 95.9701,
    "avg_entry_price": 786.85,
-   "current_price": 790.01,
-   "unrealized_pl": 0.3975,
-   "unrealized_plpc": 0.004,
-   "change_today_usd": -3.5822,
+   "current_price": 763.0,
+   "unrealized_pl": -2.9999,
+   "unrealized_plpc": -0.0303,
+   "change_today_usd": -0.0717,
    "name": "",
-   "weight": 0.1005
+   "weight": 0.0995
   },
   {
    "symbol": "DELL",
    "qty": 0.2883,
-   "market_value": 97.764,
+   "market_value": 93.9789,
    "avg_entry_price": 342.932,
-   "current_price": 339.13,
-   "unrealized_pl": -1.096,
-   "unrealized_plpc": -0.0111,
-   "change_today_usd": -9.2364,
+   "current_price": 326.0,
+   "unrealized_pl": -4.8811,
+   "unrealized_plpc": -0.0494,
+   "change_today_usd": 1.5711,
    "name": "",
-   "weight": 0.0989
+   "weight": 0.0975
   },
   {
    "symbol": "FSLR",
    "qty": 0.5222,
-   "market_value": 88.5134,
+   "market_value": 84.6441,
    "avg_entry_price": 191.412,
-   "current_price": 169.51,
-   "unrealized_pl": -11.4366,
-   "unrealized_plpc": -0.1144,
-   "change_today_usd": -1.4569,
+   "current_price": 162.1,
+   "unrealized_pl": -15.3059,
+   "unrealized_plpc": -0.1531,
+   "change_today_usd": -0.1828,
    "name": "",
-   "weight": 0.0895
+   "weight": 0.0878
   }
  ]
 }
