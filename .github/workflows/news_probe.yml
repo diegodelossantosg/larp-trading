@@ -26,11 +26,15 @@ jobs:
           from trader.audit_backtest import universe_2018
           from trader.main import BIG_STOCKS
           mid = [s for s in universe_2018(top=600)[100:] if s not in BIG_STOCKS][:10]
-          sets = {"big": sorted(BIG_STOCKS)[:10], "ranks100-600": mid}
+          big = ["AAPL", "MSFT", "NVDA", "TSLA", "AMZN"]
           now = datetime.now(timezone.utc)
-          for name, syms in sets.items():
-              for y in (2016, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025):
-                  p = {"symbols": ",".join(syms), "start": f"{y}-01-01T00:00:00Z", "end": f"{y}-12-31T00:00:00Z", "limit": 50, "sort": "asc"}
-                  r = requests.get("https://data.alpaca.markets/v1beta1/news", params=p, headers=h, timeout=30)
-                  print(name, y, r.status_code, len(r.json().get("news", [])) if r.ok else r.text[:100], flush=True)
+          def q(label, syms, start, end):
+              p = {"symbols": ",".join(syms), "start": start, "end": end, "limit": 50, "sort": "asc", "include_content": "false"}
+              r = requests.get("https://data.alpaca.markets/v1beta1/news", params=p, headers=h, timeout=30)
+              print(label, r.status_code, len(r.json().get("news", [])) if r.ok else r.text[:120], flush=True)
+          q("big last 7d", big, (now - timedelta(days=7)).isoformat(), now.isoformat())
+          for months in (1, 6, 12, 24, 36, 48, 72, 96, 120):
+              e = now - timedelta(days=int(months * 30.5)); s = e - timedelta(days=60)
+              q(f"big window ending {months}m ago", big, s.isoformat(), e.isoformat())
+              q(f"ranks100-600 window ending {months}m ago", mid, s.isoformat(), e.isoformat())
           PY
