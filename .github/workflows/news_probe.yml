@@ -23,7 +23,7 @@ jobs:
           import requests, os
           from datetime import datetime, timedelta, timezone
           h = {"APCA-API-KEY-ID": os.environ["ALPACA_API_KEY"], "APCA-API-SECRET-KEY": os.environ["ALPACA_SECRET_KEY"]}
-          from trader.event_dataset import universe_2018
+          from trader.audit_backtest import universe_2018
           from trader.main import BIG_STOCKS
           mid = [s for s in universe_2018(top=600)[100:] if s not in BIG_STOCKS][:10]
           sets = {"big": sorted(BIG_STOCKS)[:10], "ranks100-600": mid}
