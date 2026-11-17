@@ -1,0 +1,135 @@
+name: "Replay data: news with exact times + hourly prices (2016 on)"
+
+# Downloads everything the realistic News Hunter replay needs into research/replay/ (see trader/replay_data.py).
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  ALPACA_API_KEY: ${{ secrets.ALPACA_API_KEY }}
+  ALPACA_SECRET_KEY: ${{ secrets.ALPACA_SECRET_KEY }}
+
+jobs:
+  source:
+    strategy:
+      fail-fast: false
+      matrix:
+        what: [edgar, news12, daily]
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: ./setup.sh
+      - run: mkdir -p research/replay
+      - run: |
+          case "${{ matrix.what }}" in
+            daily) out=research/replay/daily.npz ;;
+            edgar) out=research/replay/edgar_8k.csv.gz ;;
+            news12) out=research/replay/news_12m.csv.gz ;;
+          esac
+          python -m trader.replay_data ${{ matrix.what }} --out $out
+      - uses: actions/upload-artifact@v4
+        with:
+          name: src-${{ matrix.what }}
+          path: research/replay/
+
+  needed:
+    needs: source
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: ./setup.sh
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: src-*
+          path: research/replay/
+          merge-multiple: true
+      - run: python -m trader.replay_data needed --out research/replay/needed.csv.gz
+      - uses: actions/upload-artifact@v4
+        with:
+          name: needed
+          path: research/replay/needed.csv.gz
+
+  hourly:
+    needs: needed
+    strategy:
+      fail-fast: false
+      matrix:
+        chunk: [0, 1, 2, 3, 4, 5, 6, 7]
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: ./setup.sh
+      - uses: actions/download-artifact@v4
+        with:
+          name: needed
+          path: research/replay/
+      - run: python -m trader.replay_data hourly --needed research/replay/needed.csv.gz --chunk ${{ matrix.chunk }} --chunks 8 --out hourly_${{ matrix.chunk }}.csv.gz
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hourly-${{ matrix.chunk }}
+          path: hourly_${{ matrix.chunk }}.csv.gz
+
+  save:
+    needs: [source, needed, hourly]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install pandas
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: src-*
+          path: research/replay/
+          merge-multiple: true
+      - uses: actions/download-artifact@v4
+        with:
+          name: needed
+          path: research/replay/
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: hourly-*
+          path: parts/
+          merge-multiple: true
+      - run: |
+          python - <<'PY'
+          import glob, pandas as pd
+          parts = [pd.read_csv(p, dtype=str) for p in sorted(glob.glob("parts/*.csv.gz"))]
+          parts = [p for p in parts if len(p)]
+          if parts:
+              pd.concat(parts).to_csv("research/replay/hourly.csv.gz", index=False, compression="gzip")
+          print("hourly parts:", len(parts))
+          PY
+          ls -la research/replay/
+      - name: Save results
+        run: |
+          git config user.name "trading-agent"
+          git config user.email "trading-agent@users.noreply.github.com"
+          git add research/replay/
+          git commit -q -m "Research: replay data"
+          for i in 1 2 3 4 5; do git pull -q --rebase -X theirs origin main && git push -q origin HEAD:main && exit 0; sleep 7; done
+          exit 1
