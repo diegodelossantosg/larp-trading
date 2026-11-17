@@ -31,7 +31,7 @@ log = logging.getLogger("replay_data")
 ET = ZoneInfo("America/New_York")
 START = "2016-01-01"
 CHECKS = (10, 11, 12, 13, 14, 15)          # hours (ET) at which the replayed hunter looks
-SEC_UA = "larp-trading paper-trading research github.com/diegodelossantosg/larp-trading"
+SEC_UA = "larp-trading research bot trading-agent@users.noreply.github.com"   # SEC wants a name and an e-mail
 EVENT_FILES = ("events_long", "events_wide", "events_early", "events_mid", "events")
 
 
@@ -58,6 +58,7 @@ def _sec_get(url: str):
         if r.status_code == 404:
             return None
         if r.status_code in (403, 429, 503):
+            log.warning("SEC %s for %s", r.status_code, url)
             _time.sleep(2 ** attempt + 1)
             continue
         r.raise_for_status()
@@ -67,7 +68,9 @@ def _sec_get(url: str):
 
 
 def edgar(out: str) -> None:
-    tickers = _sec_get("https://www.sec.gov/files/company_tickers.json") or {}
+    tickers = _sec_get("https://www.sec.gov/files/company_tickers.json")
+    if not tickers:
+        raise SystemExit("SEC ticker list unavailable")
     cik = {v["ticker"].upper(): int(v["cik_str"]) for v in tickers.values()}
     rows, missing = [], []
     syms = universe()
