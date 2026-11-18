@@ -65,3 +65,13 @@ a 4.462 $ del S&P (reglas de antes: 5.083 $).
 8 reglas, mismas 30 historias (reglas actuales: 22/30 ganan al S&P, +0,85/año). Arreglan 2018 (palabras de peligro: -2,7 -> -0,6;
 no comprar si cayó 10%+ en 5 días: -1,1) pero ninguna mejora el conjunto: mejores que hoy en 4-16 de 30 historias
 (moneda al aire o peor), porque también saltan caídas que luego rebotaron. No se aplica ninguna.
+
+## Cuarta ronda (18 nov): ¿con qué frecuencia mirar las noticias?
+Corrección: hasta ahora, cuando el bot miraba solo algunas horas ("solo mañanas", "solo tardes"), el simulador tomaba el
+precio de otra hora. Arreglado; el resultado de las reglas actuales no cambia (+2,64%/año).
+30 historias con la mitad de las noticias (reglas actuales: 22/30 ganan al S&P, +0,85/año):
+- cada 2 horas: igual (14/30 mejor); una vez a las 13:00: igual (16/30); una vez a las 11:00: peor (7/30);
+  solo mañanas: peor (7/30); solo tardes: peor (10/30).
+- cada media hora (precios cada 30 min, comparado con cada hora sobre los mismos datos): no mejora. Cada hora +1,11/año
+  (24/30); cada media hora +0,84 (20/30), mejor solo en 13/30; cada media hora leyendo 1 h de noticias: peor (10/30).
+Conclusión: mirar cada hora está bien; mirar más a menudo no ayuda. Sin cambios.
