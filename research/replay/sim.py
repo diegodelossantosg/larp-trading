@@ -47,7 +47,8 @@ class Params:
     sources: tuple = ("sec_8k", "alpaca_events", "alpaca_12m")
     headline_limit: int | None = 50   # live: the 50 latest headlines (alpaca_12m only; the other sources are pre-filtered)
     mention_limit: int | None = 40    # live: the first 40 symbols (alphabetical) of those headlines
-    hours: tuple = CHECKS
+    hours: tuple = CHECKS         # hours to look at (any of 10..15); with half_hours, minutes after midnight instead
+    half_hours: bool = False      # look every 30 minutes (10:00 ... 15:30), from research/replay/halfhour.csv.gz
     earnings_news: bool = False   # also buy drops right after an earnings release
     stock_cost: float = 0.0005
     spy_cost: float = 0.0001
@@ -97,6 +98,16 @@ class Data:
             key = (r.symbol, r.day)
             self.hp[key] = tuple(getattr(r, f"p{x}") for x in CHECKS)
             self.hv[key] = tuple(getattr(r, f"v{x}") for x in CHECKS)
+        self.hp30, self.hv30 = {}, {}
+        try:
+            from trader.replay_data import HALF_CHECKS
+            h30 = pd.read_csv(f"{folder}/halfhour.csv.gz")
+            tags = [f"{c // 60:02d}{c % 60:02d}" for c in HALF_CHECKS]
+            for r in h30.itertuples(index=False):
+                self.hp30[(r.symbol, r.day)] = tuple(getattr(r, f"p{t}") for t in tags)
+                self.hv30[(r.symbol, r.day)] = tuple(getattr(r, f"v{t}") for t in tags)
+        except FileNotFoundError:
+            pass
         from trader.replay_data import news_times
         news = news_times()
         news = news[news.symbol.isin(self.col)]
@@ -255,15 +266,23 @@ def run(D: Data, P: Params = Params(), seed: int = 0) -> Result:
         g12 = n12_day.get(day)
         if (g is not None or g12 is not None) and i > 20:
             prev_c = D.c[i - 1]
-            for k, hh in enumerate(P.hours):
+            if P.half_hours:
+                from trader.replay_data import HALF_CHECKS
+                slots = [(HALF_CHECKS.index(m), m) for m in (P.hours if P.hours != CHECKS else HALF_CHECKS)]
+                HP, HV = D.hp30, D.hv30
+            else:
+                slots = [(CHECKS.index(h), h * 60) for h in P.hours]     # index into the stored 10:00..15:00 prices
+                HP, HV = D.hp, D.hv
+            for k, mins in slots:
+                hh = mins // 60
                 if bought_today >= P.per_day:
                     break
-                spy_hp = D.hp.get(("SPY", day))
+                spy_hp = HP.get(("SPY", day))
                 if not spy_hp or not np.isfinite(spy_hp[k]):
                     continue
                 spy_px = spy_hp[k]
                 spy_move = spy_px / prev_c[S] - 1
-                now = pd.Timestamp(f"{day} {hh:02d}:00")
+                now = pd.Timestamp(f"{day} {mins // 60:02d}:{mins % 60:02d}")
                 lo = now - pd.Timedelta(hours=P.window_h)
                 syms: dict[str, str] = {}
                 if g is not None:
@@ -288,7 +307,7 @@ def run(D: Data, P: Params = Params(), seed: int = 0) -> Result:
                 eq_spy = spy_sh * spy_px
                 vals = {}
                 for p in pos:
-                    hp = D.hp.get((p.sym, day))
+                    hp = HP.get((p.sym, day))
                     px = hp[k] if hp and np.isfinite(hp[k]) else (D.c[i - 1, p.j] if np.isfinite(D.c[i - 1, p.j]) else p.entry)
                     vals[p.sym] = p.shares * px
                 equity = eq_spy + sum(vals.values())
@@ -299,7 +318,7 @@ def run(D: Data, P: Params = Params(), seed: int = 0) -> Result:
                     j = D.col.get(s)
                     if j is None or j == S or s in held:
                         continue
-                    hp = D.hp.get((s, day))
+                    hp = HP.get((s, day))
                     if not hp or not np.isfinite(hp[k]) or not np.isfinite(prev_c[j]):
                         continue
                     px = hp[k]
@@ -325,8 +344,8 @@ def run(D: Data, P: Params = Params(), seed: int = 0) -> Result:
                     if not (D.atr_prev[i, j] >= P.atr_min):
                         continue
                     if P.max_vr is not None:
-                        fr = _frac(hh * 60 - 9 * 60 - 30)
-                        vol = D.hv[(s, day)][k]
+                        fr = _frac(mins - 9 * 60 - 30)
+                        vol = HV[(s, day)][k]
                         if fr >= 0.05 and np.isfinite(vol) and D.av_prev[i, j] > 0 and vol / fr / D.av_prev[i, j] >= P.max_vr:
                             continue
                     ed = earn.get(s)
