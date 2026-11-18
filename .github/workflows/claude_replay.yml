@@ -1,0 +1,48 @@
+name: "Replay: ask Claude what the News Hunter would have bought (Jul-Nov 2026)"
+
+# Research only: no orders. Saves research/replay/claude_decisions.json (see research/replay/claude_replay.py).
+on:
+  workflow_dispatch:
+    inputs:
+      max_calls:
+        description: "Most Claude calls in this run"
+        default: "200"
+
+permissions:
+  contents: write
+
+jobs:
+  replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 345
+    env:
+      CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      CLAUDE_MODEL: ${{ vars.CLAUDE_MODEL }}
+      ALPACA_API_KEY: ${{ secrets.ALPACA_API_KEY }}
+      ALPACA_SECRET_KEY: ${{ secrets.ALPACA_SECRET_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: ./setup.sh
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm install -g @anthropic-ai/claude-code@2.1.296
+      - run: python -m research.replay.claude_replay names
+      - timeout-minutes: 320
+        run: python -m research.replay.claude_replay ask --max ${{ inputs.max_calls }}
+      - name: Save the decisions
+        if: always()
+        run: |
+          git config user.name "trading-agent"
+          git config user.email "trading-agent@users.noreply.github.com"
+          git add research/replay/claude_decisions.json research/replay/names.json || true
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -q -m "Research: Claude replay decisions"
+          for i in 1 2 3 4 5; do git pull -q --rebase -X theirs origin main && git push -q origin HEAD:main && exit 0; sleep 7; done
+          exit 1
