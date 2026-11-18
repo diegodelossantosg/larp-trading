@@ -47,7 +47,7 @@ def reset_data(capital: float = 1000.0, spy: float | None = None) -> list[str]:
     for name, content in files.items():
         journal.write(name, content)
     removed = []
-    for name in ("capital.json", "paper_hunter.json"):   # the rule-only paper twin starts over too
+    for name in ("capital.json",):
         f = journal._path(name)
         if f.exists():
             f.unlink()
