@@ -60,6 +60,10 @@ class Params:
     market_up_only: bool = False  # buy only while SPY is up today (the stock fell on its own)
     spy_trend_only: bool = False  # buy only when SPY is above its 200-day average
     below_sma50_only: bool = False     # buy only stocks already below their 50-day average
+    prior_drop: float | None = None    # skip a stock that already fell this much over the 5 days before today
+    cooldown: int = 0             # no new buy of a stock within this many trading days after selling it at a loss
+    max_drop: float | None = None # skip falls bigger than this today (real disasters)
+    danger_words: bool = False    # skip headlines with words of real trouble (fire, bankruptcy, fraud, probe...)
     start: str = "2016-03-01"
     end: str = "2099-01-01"
 
@@ -196,6 +200,11 @@ def run(D: Data, P: Params = Params(), seed: int = 0) -> Result:
             for sym in v.get("ideas", []):
                 picks.setdefault(d, []).append((int(hh), sym))
     points = []
+    last_loss: dict[str, int] = {}
+    import re as _re
+    DANGER = _re.compile(r"wildfire|\bfire|bankrupt|chapter 11|fraud|probe|investigat|subpoena|indict|recall|crackdown|"
+                         r"\bban\b|banned|halt|delist|default|restat|short seller|short-seller|lawsuit|sued|guidance cut|"
+                         r"cuts guidance|lowers guidance|warns|outbreak|explosion|accident|crash|death|killed", _re.I)
     earn = D.earn
 
     def sell(p: Pos, px: float, i: int, reason: str):
@@ -205,6 +214,8 @@ def run(D: Data, P: Params = Params(), seed: int = 0) -> Result:
         spy_sh += val * (1 - P.spy_cost) / spy_px
         r = px / p.entry - 1
         sr = spy_px / p.spy_entry - 1
+        if r - sr < 0:
+            last_loss[p.sym] = i
         trades.append({"symbol": p.sym, "buy_day": p.entry_day, "sell_day": D.days[i], "reason": reason,
                        "ret": r - 2 * P.stock_cost, "vs_spy": r - sr - 2 * P.stock_cost, "why": p.why})
 
@@ -296,6 +307,14 @@ def run(D: Data, P: Params = Params(), seed: int = 0) -> Result:
                     if (vs > -P.drop and not P.claude) or px < 5:
                         continue
                     if P.market_up_only and spy_move <= 0:
+                        continue
+                    if P.prior_drop is not None and i > 6 and np.isfinite(D.c[i - 6, j]) and prev_c[j] / D.c[i - 6, j] - 1 <= -P.prior_drop:
+                        continue
+                    if P.cooldown and s in last_loss and i - last_loss[s] <= P.cooldown:
+                        continue
+                    if P.max_drop is not None and vs < -P.max_drop:
+                        continue
+                    if P.danger_words and DANGER.search(txt or ""):
                         continue
                     if P.spy_trend_only and not (prev_c[S] > D.sma200_prev[i, S]):
                         continue
