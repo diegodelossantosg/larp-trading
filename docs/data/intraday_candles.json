@@ -1,0 +1,246 @@
+{
+ "period": "2021-11-19 to 2026-11-18",
+ "validation_starts": "2024-11-18",
+ "validation_days": 502,
+ "rules_tested": 768,
+ "picked_in_design": [],
+ "passing": [],
+ "best_in_design": [
+  {
+   "timeframe": "30 min",
+   "pattern": "bearish_engulfing",
+   "side": "sell (short)",
+   "context": "high volume",
+   "exit": "hold to the close",
+   "design": {
+    "trades": 1212,
+    "avg_net_pct": 0.0321,
+    "edge_vs_control_pct": 0.1384,
+    "win_rate": 0.463,
+    "t_net": 0.99
+   }
+  },
+  {
+   "timeframe": "1 hour",
+   "pattern": "bearish_engulfing",
+   "side": "sell (short)",
+   "context": "high volume",
+   "exit": "2:1 target",
+   "design": {
+    "trades": 503,
+    "avg_net_pct": 0.02,
+    "edge_vs_control_pct": 0.1111,
+    "win_rate": 0.491,
+    "t_net": 0.51
+   }
+  },
+  {
+   "timeframe": "30 min",
+   "pattern": "dragonfly_doji",
+   "side": "buy",
+   "context": "high volume",
+   "exit": "2:1 target",
+   "design": {
+    "trades": 198,
+    "avg_net_pct": 0.0195,
+    "edge_vs_control_pct": 0.121,
+    "win_rate": 0.465,
+    "t_net": 0.25
+   }
+  },
+  {
+   "timeframe": "30 min",
+   "pattern": "bearish_engulfing",
+   "side": "sell (short)",
+   "context": "high volume",
+   "exit": "hold 1 hour",
+   "design": {
+    "trades": 1212,
+    "avg_net_pct": 0.0182,
+    "edge_vs_control_pct": 0.111,
+    "win_rate": 0.45,
+    "t_net": 0.79
+   }
+  },
+  {
+   "timeframe": "1 hour",
+   "pattern": "bearish_engulfing",
+   "side": "sell (short)",
+   "context": "high volume",
+   "exit": "hold 1 hour",
+   "design": {
+    "trades": 504,
+    "avg_net_pct": 0.0148,
+    "edge_vs_control_pct": 0.1084,
+    "win_rate": 0.494,
+    "t_net": 0.61
+   }
+  },
+  {
+   "timeframe": "1 hour",
+   "pattern": "bearish_engulfing",
+   "side": "sell (short)",
+   "context": "high volume",
+   "exit": "hold to the close",
+   "design": {
+    "trades": 504,
+    "avg_net_pct": 0.0121,
+    "edge_vs_control_pct": 0.1091,
+    "win_rate": 0.502,
+    "t_net": 0.3
+   }
+  },
+  {
+   "timeframe": "30 min",
+   "pattern": "dragonfly_doji",
+   "side": "buy",
+   "context": "high volume",
+   "exit": "hold to the close",
+   "design": {
+    "trades": 199,
+    "avg_net_pct": 0.0117,
+    "edge_vs_control_pct": 0.1713,
+    "win_rate": 0.487,
+    "t_net": 0.12
+   }
+  },
+  {
+   "timeframe": "1 hour",
+   "pattern": "piercing_line",
+   "side": "buy",
+   "context": "against the trend",
+   "exit": "hold to the close",
+   "design": {
+    "trades": 2458,
+    "avg_net_pct": 0.0052,
+    "edge_vs_control_pct": 0.082,
+    "win_rate": 0.461,
+    "t_net": 0.28
+   }
+  },
+  {
+   "timeframe": "1 hour",
+   "pattern": "hammer",
+   "side": "buy",
+   "context": "high volume",
+   "exit": "hold to the close",
+   "design": {
+    "trades": 652,
+    "avg_net_pct": 0.0043,
+    "edge_vs_control_pct": 0.0987,
+    "win_rate": 0.483,
+    "t_net": 0.1
+   }
+  },
+  {
+   "timeframe": "1 hour",
+   "pattern": "dark_cloud_cover",
+   "side": "sell (short)",
+   "context": "high volume",
+   "exit": "hold 1 hour",
+   "design": {
+    "trades": 144,
+    "avg_net_pct": 0.0024,
+    "edge_vs_control_pct": 0.0467,
+    "win_rate": 0.375,
+    "t_net": 0.05
+   }
+  }
+ ],
+ "spy_hold_validation_on_1000": 1275.81,
+ "symbols": [
+  "AAPL",
+  "ABBV",
+  "ABT",
+  "ADBE",
+  "AMAT",
+  "AMD",
+  "AMZN",
+  "ASML",
+  "AVGO",
+  "AXP",
+  "BA",
+  "BAC",
+  "CAT",
+  "COP",
+  "COST",
+  "CRM",
+  "CSCO",
+  "CVX",
+  "DIA",
+  "DIS",
+  "GE",
+  "GLD",
+  "GOOGL",
+  "GS",
+  "HD",
+  "HON",
+  "IBM",
+  "INTC",
+  "IWM",
+  "JNJ",
+  "JPM",
+  "KO",
+  "LIN",
+  "LLY",
+  "LMT",
+  "MA",
+  "MCD",
+  "META",
+  "MRK",
+  "MS",
+  "MSFT",
+  "MU",
+  "NFLX",
+  "NKE",
+  "NOW",
+  "NVDA",
+  "NVO",
+  "ORCL",
+  "PEP",
+  "PFE",
+  "PG",
+  "PLTR",
+  "QCOM",
+  "QQQ",
+  "RTX",
+  "SBUX",
+  "SMH",
+  "SPY",
+  "T",
+  "TLT",
+  "TMO",
+  "TSLA",
+  "TSM",
+  "TXN",
+  "UBER",
+  "UNH",
+  "UPS",
+  "V",
+  "VZ",
+  "WFC",
+  "WMT",
+  "XBI",
+  "XLE",
+  "XLF",
+  "XLI",
+  "XLK",
+  "XLP",
+  "XLU",
+  "XLV",
+  "XLY",
+  "XOM"
+ ],
+ "costs_round_trip_pct": {
+  "SPY/QQQ": 0.04,
+  "IWM/DIA": 0.06,
+  "others": 0.1
+ },
+ "timeframes": [
+  "5 min",
+  "15 min",
+  "30 min",
+  "1 hour"
+ ],
+ "generated": "2026-11-18T18:17+00:00"
+}
