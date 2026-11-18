@@ -1,0 +1,287 @@
+{
+ "current": {
+  "full": {
+   "years": 10.7,
+   "ai_total_pct": 489.8,
+   "spy_total_pct": 346.2,
+   "extra_per_year_pct": 2.64,
+   "worst_drop_pct": -40.3,
+   "buys_per_year": 39.1,
+   "avg_vs_spy_pct": 0.81,
+   "win_vs_spy_pct": 53,
+   "stops_pct": 0,
+   "extra_by_year_pct": {
+    "2016": 0.13,
+    "2017": -0.88,
+    "2018": -2.68,
+    "2019": 7.57,
+    "2020": 1.24,
+    "2021": -0.55,
+    "2022": 2.2,
+    "2023": 3.78,
+    "2024": 8.65,
+    "2025": 8.06,
+    "2026": 1.46
+   },
+   "years_ahead": "8/11"
+  },
+  "halves_avg": 0.8526666666666666,
+  "beats_spy": 22
+ },
+ "skip if already down 10%+ in the 5 days before": {
+  "full": {
+   "years": 10.7,
+   "ai_total_pct": 479.3,
+   "spy_total_pct": 346.2,
+   "extra_per_year_pct": 2.47,
+   "worst_drop_pct": -42.2,
+   "buys_per_year": 38.6,
+   "avg_vs_spy_pct": 0.81,
+   "win_vs_spy_pct": 52,
+   "stops_pct": 0,
+   "extra_by_year_pct": {
+    "2016": 0.13,
+    "2017": -0.88,
+    "2018": -1.11,
+    "2019": 7.57,
+    "2020": 15.25,
+    "2021": -1.57,
+    "2022": 7.96,
+    "2023": 5.48,
+    "2024": 6.16,
+    "2025": -0.16,
+    "2026": -10.19
+   },
+   "years_ahead": "6/11"
+  },
+  "halves_avg": 0.5626666666666666,
+  "gain": -0.2900000000000001,
+  "wins": 14,
+  "beats_spy": 20,
+  "pcg_2018_buys": 2
+ },
+ "skip if already down 15%+ in the 5 days before": {
+  "full": {
+   "years": 10.7,
+   "ai_total_pct": 570.6,
+   "spy_total_pct": 346.2,
+   "extra_per_year_pct": 3.88,
+   "worst_drop_pct": -42.0,
+   "buys_per_year": 38.6,
+   "avg_vs_spy_pct": 1.14,
+   "win_vs_spy_pct": 54,
+   "stops_pct": 0,
+   "extra_by_year_pct": {
+    "2016": 0.13,
+    "2017": -0.88,
+    "2018": -0.88,
+    "2019": 7.57,
+    "2020": 4.1,
+    "2021": -1.7,
+    "2022": 3.79,
+    "2023": 3.44,
+    "2024": 7.88,
+    "2025": 8.44,
+    "2026": 10.5
+   },
+   "years_ahead": "8/11"
+  },
+  "halves_avg": 0.40099999999999997,
+  "gain": -0.4516666666666667,
+  "wins": 10,
+  "beats_spy": 20,
+  "pcg_2018_buys": 2
+ },
+ "no re-buy for 20 days after a loss": {
+  "full": {
+   "years": 10.7,
+   "ai_total_pct": 674.8,
+   "spy_total_pct": 346.2,
+   "extra_per_year_pct": 5.29,
+   "worst_drop_pct": -39.8,
+   "buys_per_year": 38.4,
+   "avg_vs_spy_pct": 1.5,
+   "win_vs_spy_pct": 56,
+   "stops_pct": 0,
+   "extra_by_year_pct": {
+    "2016": 0.0,
+    "2017": -0.88,
+    "2018": -2.39,
+    "2019": 7.57,
+    "2020": 18.12,
+    "2021": -2.48,
+    "2022": 5.83,
+    "2023": 7.61,
+    "2024": 8.12,
+    "2025": 6.44,
+    "2026": 10.5
+   },
+   "years_ahead": "7/11"
+  },
+  "halves_avg": 0.7476666666666667,
+  "gain": -0.10500000000000002,
+  "wins": 11,
+  "beats_spy": 23,
+  "pcg_2018_buys": 2
+ },
+ "no re-buy for 60 days after a loss": {
+  "full": {
+   "years": 10.7,
+   "ai_total_pct": 494.2,
+   "spy_total_pct": 346.2,
+   "extra_per_year_pct": 2.71,
+   "worst_drop_pct": -39.9,
+   "buys_per_year": 37.8,
+   "avg_vs_spy_pct": 0.81,
+   "win_vs_spy_pct": 52,
+   "stops_pct": 0,
+   "extra_by_year_pct": {
+    "2016": 0.0,
+    "2017": -0.88,
+    "2018": -2.39,
+    "2019": 7.28,
+    "2020": -0.63,
+    "2021": -3.4,
+    "2022": 1.69,
+    "2023": 3.43,
+    "2024": 19.31,
+    "2025": 3.89,
+    "2026": 2.5
+   },
+   "years_ahead": "6/11"
+  },
+  "halves_avg": 0.7799999999999999,
+  "gain": -0.07266666666666668,
+  "wins": 16,
+  "beats_spy": 22,
+  "pcg_2018_buys": 2
+ },
+ "skip falls of more than 10% today": {
+  "full": {
+   "years": 10.7,
+   "ai_total_pct": 492.7,
+   "spy_total_pct": 346.2,
+   "extra_per_year_pct": 2.69,
+   "worst_drop_pct": -40.3,
+   "buys_per_year": 39.1,
+   "avg_vs_spy_pct": 0.82,
+   "win_vs_spy_pct": 54,
+   "stops_pct": 0,
+   "extra_by_year_pct": {
+    "2016": 0.13,
+    "2017": -0.88,
+    "2018": -2.68,
+    "2019": 7.57,
+    "2020": 1.24,
+    "2021": -0.55,
+    "2022": 2.2,
+    "2023": 3.78,
+    "2024": 8.65,
+    "2025": 8.06,
+    "2026": 1.96
+   },
+   "years_ahead": "8/11"
+  },
+  "halves_avg": 0.9069999999999999,
+  "gain": 0.054333333333333324,
+  "wins": 14,
+  "beats_spy": 24,
+  "pcg_2018_buys": 3
+ },
+ "skip falls of more than 15% today": {
+  "full": {
+   "years": 10.7,
+   "ai_total_pct": 489.8,
+   "spy_total_pct": 346.2,
+   "extra_per_year_pct": 2.64,
+   "worst_drop_pct": -40.3,
+   "buys_per_year": 39.1,
+   "avg_vs_spy_pct": 0.81,
+   "win_vs_spy_pct": 53,
+   "stops_pct": 0,
+   "extra_by_year_pct": {
+    "2016": 0.13,
+    "2017": -0.88,
+    "2018": -2.68,
+    "2019": 7.57,
+    "2020": 1.24,
+    "2021": -0.55,
+    "2022": 2.2,
+    "2023": 3.78,
+    "2024": 8.65,
+    "2025": 8.06,
+    "2026": 1.46
+   },
+   "years_ahead": "8/11"
+  },
+  "halves_avg": 0.849,
+  "gain": -0.0036666666666666627,
+  "wins": 4,
+  "beats_spy": 22,
+  "pcg_2018_buys": 3
+ },
+ "skip headlines with danger words": {
+  "full": {
+   "years": 10.7,
+   "ai_total_pct": 532.7,
+   "spy_total_pct": 346.2,
+   "extra_per_year_pct": 3.32,
+   "worst_drop_pct": -40.3,
+   "buys_per_year": 38.1,
+   "avg_vs_spy_pct": 1.0,
+   "win_vs_spy_pct": 55,
+   "stops_pct": 0,
+   "extra_by_year_pct": {
+    "2016": 0.13,
+    "2017": -1.22,
+    "2018": -0.59,
+    "2019": 7.4,
+    "2020": -0.49,
+    "2021": -0.55,
+    "2022": 7.39,
+    "2023": 3.83,
+    "2024": 11.17,
+    "2025": 8.06,
+    "2026": 1.31
+   },
+   "years_ahead": "7/11"
+  },
+  "halves_avg": 0.81,
+  "gain": -0.04266666666666671,
+  "wins": 14,
+  "beats_spy": 22,
+  "pcg_2018_buys": 1
+ },
+ "all three: 5-day 10%, 60-day cooldown, danger words": {
+  "full": {
+   "years": 10.7,
+   "ai_total_pct": 478.0,
+   "spy_total_pct": 346.2,
+   "extra_per_year_pct": 2.45,
+   "worst_drop_pct": -38.8,
+   "buys_per_year": 36.3,
+   "avg_vs_spy_pct": 0.78,
+   "win_vs_spy_pct": 50,
+   "stops_pct": 0,
+   "extra_by_year_pct": {
+    "2016": 0.0,
+    "2017": -1.22,
+    "2018": -0.81,
+    "2019": 7.4,
+    "2020": 10.21,
+    "2021": -1.39,
+    "2022": 11.29,
+    "2023": 2.18,
+    "2024": 12.06,
+    "2025": -0.35,
+    "2026": -10.81
+   },
+   "years_ahead": "5/11"
+  },
+  "halves_avg": 0.7826666666666667,
+  "gain": -0.07000000000000003,
+  "wins": 15,
+  "beats_spy": 20,
+  "pcg_2018_buys": 1
+ }
+}

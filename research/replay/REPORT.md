@@ -60,3 +60,8 @@ empresas (sin el filtro de nombres). Con todo activado: 30 historias con la mita
 **22 de 30**, de media **+0,85 puntos al año**; cuando pierde, 494 $ menos de media sobre 1.000 $ iniciales en 10,7 años
 (peor caso 1.233 $ menos); cuando gana, 831 $ más de media (mejor caso 1.966 $ más). Simulación completa: 5.898 $ frente
 a 4.462 $ del S&P (reglas de antes: 5.083 $).
+
+## Tercera ronda (18 nov): ¿se pueden evitar casos como PG&E (2018)?
+8 reglas, mismas 30 historias (reglas actuales: 22/30 ganan al S&P, +0,85/año). Arreglan 2018 (palabras de peligro: -2,7 -> -0,6;
+no comprar si cayó 10%+ en 5 días: -1,1) pero ninguna mejora el conjunto: mejores que hoy en 4-16 de 30 historias
+(moneda al aire o peor), porque también saltan caídas que luego rebotaron. No se aplica ninguna.
