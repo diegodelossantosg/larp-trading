@@ -41,7 +41,7 @@ class Params:
     size: float = 0.10
     per_day: int = 2
     cap: float = 0.30
-    stop: float | None = 0.20
+    stop: float | None = None     # live since 2026-11-18: News Hunter buys have no trailing stop (sold after 10 days)
     hold: int = 10                # business days
     window_h: float = 2.0         # hours of news the hunter reads
     sources: tuple = ("sec_8k", "alpaca_events", "alpaca_12m")
@@ -53,6 +53,9 @@ class Params:
     spy_cost: float = 0.0001
     order: str = "biggest_fall"   # or "smallest_fall", "random"
     keep: float = 1.0             # robustness check: use a random share of the news (same seed = same share)
+    name_check: bool = True       # live since 2026-11: a symbol counts only if the headline names the company
+    claude: str | None = None     # Claude's replay decisions (research/replay/claude_decisions.json): buy only its picks
+    collect: bool = False         # record every check with candidates (to know when to ask Claude)
     start: str = "2016-03-01"
     end: str = "2099-01-01"
 
@@ -93,6 +96,13 @@ class Data:
         try:   # whole-market headlines (to copy the live "50 latest headlines" limit)
             n12 = pd.read_csv(f"{folder}/news_12m.csv.gz", dtype=str).dropna(subset=["symbols"])
             n12["t"] = pd.to_datetime(n12.time_et)
+            try:
+                import json
+                from trader.name_check import mentions_company
+                self.names = json.load(open(f"{folder}/names.json"))
+                n12["named"] = [mentions_company(h or "", s, self.names.get(s)) for h, s in zip(n12.headline, n12.symbols)]
+            except FileNotFoundError:
+                self.names = {}
             self.n12 = n12.sort_values("t").reset_index(drop=True)
         except FileNotFoundError:
             self.n12 = None
@@ -168,7 +178,18 @@ def run(D: Data, P: Params = Params(), seed: int = 0) -> Result:
     if not P.earnings_news:
         news = news[~news.text.fillna("").str.fullmatch(r"8-K items (2\.02|9\.01|,)+")]
     by_day = {d: g for d, g in news.groupby(news.t.dt.strftime("%Y-%m-%d"))}
-    n12_day = {d: g for d, g in D.n12.groupby(D.n12.t.dt.strftime("%Y-%m-%d"))} if (D.n12 is not None and "alpaca_12m" in P.sources) else {}
+    n12 = D.n12
+    if n12 is not None and P.name_check and "named" in n12:
+        n12 = n12[n12.named]
+    n12_day = {d: g for d, g in n12.groupby(n12.t.dt.strftime("%Y-%m-%d"))} if (n12 is not None and "alpaca_12m" in P.sources) else {}
+    picks: dict[str, list[tuple[int, str]]] = {}
+    if P.claude:
+        import json
+        for key, v in json.load(open(P.claude)).items():
+            d, hh = key.split(" ")
+            for sym in v.get("ideas", []):
+                picks.setdefault(d, []).append((int(hh), sym))
+    points = []
     earn = D.earn
 
     def sell(p: Pos, px: float, i: int, reason: str):
@@ -249,6 +270,8 @@ def run(D: Data, P: Params = Params(), seed: int = 0) -> Result:
                     vals[p.sym] = p.shares * px
                 equity = eq_spy + sum(vals.values())
                 cands = []
+                if P.claude:     # Claude's picks so far today replace the headline list; the drop rule is Claude's call
+                    syms = {sym: "Claude's pick" for h0, sym in picks.get(day, []) if h0 <= hh}
                 for s, txt in syms.items():
                     j = D.col.get(s)
                     if j is None or j == S or s in held:
@@ -258,7 +281,7 @@ def run(D: Data, P: Params = Params(), seed: int = 0) -> Result:
                         continue
                     px = hp[k]
                     vs = px / prev_c[j] - 1 - spy_move
-                    if vs > -P.drop or px < 5:
+                    if (vs > -P.drop and not P.claude) or px < 5:
                         continue
                     if not D.big[j] and not (D.dv_prev[i, j] >= P.liquid_m):
                         continue
@@ -277,7 +300,12 @@ def run(D: Data, P: Params = Params(), seed: int = 0) -> Result:
                         if nxt is not None and nxt - i <= P.blackout:
                             continue
                     cands.append((vs, s, j, px, txt))
-                if P.order == "random":
+                if P.collect and cands:
+                    points.append({"day": day, "hour": hh, "candidates": [c[1] for c in sorted(cands)]})
+                if P.claude:
+                    order = [sym for _, sym in picks.get(day, [])]
+                    cands.sort(key=lambda c: order.index(c[1]))
+                elif P.order == "random":
                     rng.shuffle(cands)
                 else:
                     cands.sort(reverse=(P.order == "smallest_fall"))
@@ -299,7 +327,7 @@ def run(D: Data, P: Params = Params(), seed: int = 0) -> Result:
         stock_val = sum(p.shares * (D.c[i, p.j] if np.isfinite(D.c[i, p.j]) else p.entry) for p in pos)
         curve.append({"day": day, "equity": spy_sh * D.c[i, S] + stock_val, "spy": bench_sh * D.c[i, S],
                       "in_stocks": stock_val})
-    return Result(P, pd.DataFrame(curve), pd.DataFrame(trades))
+    return Result(P, pd.DataFrame(curve), pd.DataFrame(trades), extra={"points": points})
 
 
 def summary(res: Result) -> dict:
