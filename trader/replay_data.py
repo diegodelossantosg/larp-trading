@@ -229,54 +229,92 @@ def needed(out: str) -> None:
 
 # ---------------- hourly prices at the check times ----------------
 
-def hourly(needed_path: str, chunk: int, chunks: int, out: str) -> None:
-    from alpaca.data.enums import Adjustment, DataFeed
-    from alpaca.data.historical import StockHistoricalDataClient
-    from alpaca.data.requests import StockBarsRequest
-    from alpaca.data.timeframe import TimeFrame
+def _get_rest(params: dict, headers: dict, pause: float = 0.3) -> dict | None:
+    import requests
+    for attempt in range(8):
+        _time.sleep(pause)
+        try:
+            r = requests.get("https://data.alpaca.markets/v2/stocks/bars", params=params, headers=headers, timeout=60)
+        except Exception as e:
+            log.warning("bars request: %s", e)
+            _time.sleep(5 * (attempt + 1))
+            continue
+        if r.status_code == 429:
+            _time.sleep(10 * (attempt + 1))
+            continue
+        if r.status_code != 200:
+            log.warning("bars HTTP %s %s", r.status_code, r.text[:120])
+            return None
+        return r.json()
+    return None
 
+
+def _rows_from_bars(sym: str, bars: list[dict]) -> list[dict]:
+    if not bars:
+        return []
+    df = pd.DataFrame(bars)
+    t = pd.to_datetime(df["t"], utc=True).dt.tz_convert(ET)
+    df = pd.DataFrame({"day": t.dt.strftime("%Y-%m-%d"), "hour": t.dt.hour, "close": df["c"], "volume": df["v"]})
+    df = df[(df.hour >= 9) & (df.hour <= 15)]       # the 9:00 bar holds 9:30-10:00 (plus 30 minutes before the open)
+    rows = []
+    for day, d in df.groupby("day"):
+        d = d.sort_values("hour")
+        cum = d.volume.cumsum().to_numpy()
+        row = {"symbol": sym, "day": day}
+        # the price at HH:00 is the close of the bar that started an hour earlier
+        for hh in CHECKS:
+            m = (d.hour < hh).to_numpy()
+            row[f"p{hh}"] = round(float(d.close.to_numpy()[m][-1]), 4) if m.any() else ""
+            row[f"v{hh}"] = int(cum[m][-1]) if m.any() else ""
+        rows.append(row)
+    return rows
+
+
+def hourly(needed_path: str, chunk: int, chunks: int, out: str) -> None:
+    """Hourly prices for exactly the needed (symbol, day) pairs, one request per day for all its symbols.
+
+    Rows already in research/replay/hourly.csv.gz are kept and not asked again."""
     from .config import load_config
     cfg = load_config()
-    client = StockHistoricalDataClient(cfg.alpaca_api_key, cfg.alpaca_secret_key)
+    headers = {"APCA-API-KEY-ID": cfg.alpaca_api_key, "APCA-API-SECRET-KEY": cfg.alpaca_secret_key}
     need = pd.read_csv(needed_path, dtype=str)
-    syms = sorted(need.symbol.unique())
-    if chunk == 0:
-        syms = ["SPY"] + syms                       # SPY: every day
-    mine = [s for k, s in enumerate(syms) if k % chunks == chunk]
-    want = need.groupby("symbol").day.apply(set).to_dict()
+    try:
+        have = pd.read_csv("research/replay/hourly.csv.gz", dtype=str)
+    except FileNotFoundError:
+        have = pd.DataFrame(columns=["symbol", "day"])
+    got = set(zip(have.symbol, have.day))
+    days = sorted(set(need.day))
+    spy_need = pd.DataFrame({"symbol": "SPY", "day": days})
+    need = pd.concat([need, spy_need]).drop_duplicates()
+    need = need[[(s, d) not in got for s, d in zip(need.symbol, need.day)]]
+    by_day = need.groupby("day").symbol.apply(sorted).to_dict()
+    mine = [d for k, d in enumerate(sorted(by_day)) if k % chunks == chunk]
+    log.info("hourly: %d rows already, %d symbol-days to fetch over %d days", len(have), len(need), len(mine))
     rows = []
-    for k in range(0, len(mine), 10):
-        batch = mine[k:k + 10]
-        try:
-            df = client.get_stock_bars(StockBarsRequest(symbol_or_symbols=batch, timeframe=TimeFrame.Hour,
-                                                        start=pd.Timestamp(START, tz="UTC"),
-                                                        end=datetime.now(timezone.utc) - timedelta(minutes=20),
-                                                        adjustment=Adjustment.ALL, feed=DataFeed.SIP)).df
-        except Exception as e:
-            log.warning("hourly batch %s: %s", batch[:3], e)
-            continue
-        if df.empty:
-            continue
-        df = df.reset_index()
-        t = df["timestamp"].dt.tz_convert(ET)
-        df["day"], df["hour"] = t.dt.strftime("%Y-%m-%d"), t.dt.hour
-        df = df[(df.hour >= 9) & (df.hour <= 15)]       # the 9:00 bar holds 9:30-10:00 (plus 30 minutes before the open)
-        for sym, g in df.groupby("symbol"):
-            days = want.get(sym)
-            if sym != "SPY":
-                g = g[g.day.isin(days)]
-            for day, d in g.groupby("day"):
-                d = d.sort_values("hour")
-                cum = d.volume.cumsum().to_numpy()
-                row = {"symbol": sym, "day": day}
-                # the price at HH:00 is the close of the bar that started an hour earlier
-                for hh in CHECKS:
-                    m = (d.hour < hh).to_numpy()
-                    row[f"p{hh}"] = round(float(d.close.to_numpy()[m][-1]), 4) if m.any() else ""
-                    row[f"v{hh}"] = int(cum[m][-1]) if m.any() else ""
-                rows.append(row)
-        log.info("hourly chunk %d: %d/%d symbols, %d rows", chunk, min(k + 10, len(mine)), len(mine), len(rows))
-    pd.DataFrame(rows).to_csv(out, index=False, compression="gzip")
+    for k, day in enumerate(mine):
+        syms = by_day[day]
+        start = pd.Timestamp(f"{day} 09:00", tz=ET).tz_convert("UTC")
+        end = pd.Timestamp(f"{day} 16:00", tz=ET).tz_convert("UTC")
+        for i in range(0, len(syms), 100):
+            params = {"symbols": ",".join(syms[i:i + 100]), "timeframe": "1Hour", "limit": 10000, "adjustment": "all",
+                      "feed": "sip", "start": start.strftime("%Y-%m-%dT%H:%M:%SZ"), "end": end.strftime("%Y-%m-%dT%H:%M:%SZ")}
+            bars: dict[str, list] = {}
+            while True:
+                body = _get_rest(params, headers)
+                if body is None:
+                    break
+                for s, b in (body.get("bars") or {}).items():
+                    bars.setdefault(s, []).extend(b)
+                if not body.get("next_page_token"):
+                    break
+                params["page_token"] = body["next_page_token"]
+            for s, b in bars.items():
+                rows += _rows_from_bars(s, b)
+        if k % 100 == 0 or k == len(mine) - 1:
+            log.info("hourly: %d/%d days, %d new rows", k + 1, len(mine), len(rows))
+            pd.concat([have, pd.DataFrame(rows)]).to_csv(out, index=False, compression="gzip")   # keep what we have
+    pd.concat([have, pd.DataFrame(rows)]).to_csv(out, index=False, compression="gzip")
+    log.info("hourly done: %d rows in total", len(have) + len(rows))
 
 
 def main() -> None:
