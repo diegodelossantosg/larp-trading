@@ -46,10 +46,13 @@ def reset_data(capital: float = 1000.0, spy: float | None = None) -> list[str]:
     files = empty_files(now, capital, spy)
     for name, content in files.items():
         journal.write(name, content)
-    cap = journal._path("capital.json")
-    if cap.exists():
-        cap.unlink()
-    return sorted(files) + ["capital.json (removed)"]
+    removed = []
+    for name in ("capital.json", "paper_hunter.json"):   # the rule-only paper twin starts over too
+        f = journal._path(name)
+        if f.exists():
+            f.unlink()
+        removed.append(f"{name} (removed)")
+    return sorted(files) + removed
 
 
 def liquidate(broker, wait_seconds: int = 120) -> int:
