@@ -132,12 +132,21 @@ class Market:
                 for sym in df.index.get_level_values("symbol").unique()}
 
     def minute_closes(self, symbol: str, days: int = 8) -> "pd.Series":
-        """1-minute closes (IEX feed, real time) for the last few days."""
-        try:
-            df = self.bars_client.get_stock_bars(StockBarsRequest(
-                symbol_or_symbols=symbol, timeframe=TimeFrame.Minute,
-                start=datetime.now(timezone.utc) - timedelta(days=days), feed=DataFeed.IEX)).df
-        except APIError as e:
-            log.warning("minute bars failed: %s", e)
+        """1-minute closes for the last few days: the whole market's prices (SIP, which the free plan gives with a
+        15-minute delay, the same prices Alpaca values the account with), and IEX only for the newest minutes."""
+        now = datetime.now(timezone.utc)
+        start, cut = now - timedelta(days=days), now - timedelta(minutes=16)
+        parts = []
+        for feed, kw in ((DataFeed.SIP, {"start": start, "end": cut}), (DataFeed.IEX, {"start": cut})):
+            try:
+                df = self.bars_client.get_stock_bars(StockBarsRequest(
+                    symbol_or_symbols=symbol, timeframe=TimeFrame.Minute, feed=feed, **kw)).df
+            except APIError as e:
+                log.warning("minute bars (%s) failed: %s", feed, e)
+                continue
+            if not df.empty:
+                parts.append(df.xs(symbol, level="symbol")["close"])
+        if not parts:
             return pd.Series(dtype=float)
-        return df.xs(symbol, level="symbol")["close"].sort_index() if not df.empty else pd.Series(dtype=float)
+        s = pd.concat(parts).sort_index()
+        return s[~s.index.duplicated(keep="first")]

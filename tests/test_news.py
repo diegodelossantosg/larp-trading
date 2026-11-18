@@ -164,3 +164,26 @@ def test_wrong_company_tags_are_removed_before_claude_reads_the_headlines():
     kept, dropped = filter_headlines([{"headline": "Tesco PLC Announces Total Voting Rights", "symbols": ["TSCO"]}],
                                      {"TSCO": "Tractor Supply Company"})
     assert kept == [] and dropped
+
+
+def test_minute_closes_use_whole_market_prices_and_iex_only_for_the_newest_minutes():
+    import pandas as pd
+    from alpaca.data.enums import DataFeed
+    from trader.market import Market
+
+    class Bars:
+        def __init__(self):
+            self.feeds = []
+
+        def get_stock_bars(self, req):
+            self.feeds.append(req.feed)
+            t = pd.Timestamp("2026-11-18 16:00", tz="UTC") if req.feed == DataFeed.SIP else pd.Timestamp("2026-11-18 16:20", tz="UTC")
+            idx = pd.MultiIndex.from_tuples([("SPY", t), ("SPY", t + pd.Timedelta(minutes=1))], names=["symbol", "timestamp"])
+            price = 700.0 if req.feed == DataFeed.SIP else 701.0
+            return type("R", (), {"df": pd.DataFrame({"close": [price, price + 0.5]}, index=idx)})()
+
+    m = Market.__new__(Market)
+    m.bars_client = Bars()
+    s = m.minute_closes("SPY")
+    assert m.bars_client.feeds == [DataFeed.SIP, DataFeed.IEX]
+    assert list(s) == [700.0, 700.5, 701.0, 701.5]
