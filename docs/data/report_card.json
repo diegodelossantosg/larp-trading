@@ -3,7 +3,7 @@
   "picks": 6,
   "vs_spy_5d_avg_pct": 3.02,
   "vs_spy_5d_beat_rate": 1.0,
-  "vs_spy_so_far_avg_pct": 3.02,
+  "vs_spy_so_far_avg_pct": 2.53,
   "vs_spy_so_far_beat_rate": 1.0
  },
  "by_trade_type": {
@@ -11,14 +11,14 @@
    "picks": 2,
    "vs_spy_5d_avg_pct": 1.65,
    "vs_spy_5d_beat_rate": 1.0,
-   "vs_spy_so_far_avg_pct": 1.65,
+   "vs_spy_so_far_avg_pct": 1.27,
    "vs_spy_so_far_beat_rate": 1.0
   },
   "trend_momentum": {
    "picks": 4,
    "vs_spy_5d_avg_pct": 3.71,
    "vs_spy_5d_beat_rate": 1.0,
-   "vs_spy_so_far_avg_pct": 3.71,
+   "vs_spy_so_far_avg_pct": 3.16,
    "vs_spy_so_far_beat_rate": 1.0
   }
  },
@@ -27,14 +27,14 @@
    "picks": 1,
    "vs_spy_5d_avg_pct": 1.45,
    "vs_spy_5d_beat_rate": 1.0,
-   "vs_spy_so_far_avg_pct": 1.45,
+   "vs_spy_so_far_avg_pct": 1.05,
    "vs_spy_so_far_beat_rate": 1.0
   },
   "stock": {
    "picks": 5,
    "vs_spy_5d_avg_pct": 3.34,
    "vs_spy_5d_beat_rate": 1.0,
-   "vs_spy_so_far_avg_pct": 3.34,
+   "vs_spy_so_far_avg_pct": 2.82,
    "vs_spy_so_far_beat_rate": 1.0
   }
  },
@@ -48,8 +48,8 @@
    "vs_spy_5d_pct": 1.45,
    "vs_spy_20d_pct": null,
    "vs_spy_60d_pct": null,
-   "vs_spy_so_far_pct": 1.45,
-   "days_held_so_far": 5
+   "vs_spy_so_far_pct": 1.05,
+   "days_held_so_far": 6
   },
   {
    "date": "2026-11-09",
@@ -60,8 +60,8 @@
    "vs_spy_5d_pct": 3.21,
    "vs_spy_20d_pct": null,
    "vs_spy_60d_pct": null,
-   "vs_spy_so_far_pct": 3.21,
-   "days_held_so_far": 5
+   "vs_spy_so_far_pct": 3.07,
+   "days_held_so_far": 6
   },
   {
    "date": "2026-11-09",
@@ -72,8 +72,8 @@
    "vs_spy_5d_pct": 2.9,
    "vs_spy_20d_pct": null,
    "vs_spy_60d_pct": null,
-   "vs_spy_so_far_pct": 2.9,
-   "days_held_so_far": 5
+   "vs_spy_so_far_pct": 1.6,
+   "days_held_so_far": 6
   },
   {
    "date": "2026-11-09",
@@ -84,8 +84,8 @@
    "vs_spy_5d_pct": 2.59,
    "vs_spy_20d_pct": null,
    "vs_spy_60d_pct": null,
-   "vs_spy_so_far_pct": 2.59,
-   "days_held_so_far": 5
+   "vs_spy_so_far_pct": 1.15,
+   "days_held_so_far": 6
   },
   {
    "date": "2026-11-09",
@@ -96,8 +96,8 @@
    "vs_spy_5d_pct": 1.85,
    "vs_spy_20d_pct": null,
    "vs_spy_60d_pct": null,
-   "vs_spy_so_far_pct": 1.85,
-   "days_held_so_far": 5
+   "vs_spy_so_far_pct": 1.48,
+   "days_held_so_far": 6
   },
   {
    "date": "2026-11-09",
@@ -108,9 +108,9 @@
    "vs_spy_5d_pct": 6.15,
    "vs_spy_20d_pct": null,
    "vs_spy_60d_pct": null,
-   "vs_spy_so_far_pct": 6.15,
-   "days_held_so_far": 5
+   "vs_spy_so_far_pct": 6.81,
+   "days_held_so_far": 6
   }
  ],
- "updated": "2026-11-16"
+ "updated": "2026-11-17"
 }
