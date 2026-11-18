@@ -72,6 +72,15 @@ def _write_intraday(cfg, broker: Broker, market: Market) -> None:
     started_at = (state or {}).get("started_at")
     if started_at:
         points = [p for p in points if p[0] >= started_at]      # nothing before the money was really invested
+    if points:
+        # The newest S&P price from the same source Alpaca values our money with (our own SPY holding), so the
+        # header compares like with like: with only SPY held, the AI and the S&P 500 show the same value.
+        try:
+            spy_pos = broker.positions().get("SPY")
+            if spy_pos and spy_pos.get("current_price"):
+                points[-1][2] = round(float(spy_pos["current_price"]), 2)
+        except Exception as e:
+            log.warning("SPY holding price for the chart failed: %s", e)
     days = sorted({p[0][:10] for p in points})[-5:]
     journal.write("intraday.json", {"points": [p for p in points if p[0][:10] in days]})
     if state is not None and state.get("spy_start_from") != "fill":
