@@ -17,7 +17,7 @@ import sys
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
-from . import journal
+from . import journal, name_check
 from .brain import claude_available, decide, hunt_news, review_buys
 from .broker import Broker
 from .config import load_config
@@ -177,6 +177,15 @@ def _recent_watch_buys(days: int, news_days: int | None = None) -> set[str]:
             if d["date"] > cutoff(n):
                 out.add(o["symbol"])
     return out
+
+
+def _recent_news_buys(days: int) -> set[str]:
+    """What the News Hunter bought within `days` trading days (still inside its holding period)."""
+    import pandas as pd
+    cutoff = (pd.Timestamp(_today()) - pd.offsets.BDay(days)).strftime("%Y-%m-%d")
+    return {o["symbol"] for d in journal.read("decisions.json", []) if d.get("source") == "news" and not d.get("dry_run")
+            and d["date"] > cutoff for o in d.get("orders", [])
+            if o["side"] == "buy" and o.get("status") not in ("error", "skipped")}
 
 
 def _performance(rows: list[dict]) -> dict:
@@ -533,7 +542,12 @@ def watch(cfg, broker: Broker, market: Market, dry_run: bool, force: bool = Fals
     stocks = set(BIG_STOCKS) | {s for s in set(positions) - set(CORE_ETFS) - set(BIG_STOCKS)
                                 if broker.vet(s)[2] in ("big", "small")}
 
-    orders = rules.stop_orders(positions, highs, quotes, cfg.idle_asset, cfg.stop_trail_pct,
+    # News Hunter buys keep no trailing stop while inside their holding period (the replay: stops cut rebounds)
+    no_stop = set() if cfg.news_trailing_stop else _recent_news_buys(cfg.news_min_hold_days) & set(positions)
+    if no_stop:
+        log.info("no trailing stop for News Hunter buys %s (sold after %d days)", sorted(no_stop), cfg.news_min_hold_days)
+    orders = rules.stop_orders({s: p for s, p in positions.items() if s not in no_stop}, highs, quotes,
+                               cfg.idle_asset, cfg.stop_trail_pct,
                                stocks=stocks, stock_trail_pct=cfg.stop_trail_pct_stock,
                                stock_atr_mult=cfg.stop_atr_mult_stock, stock_min=cfg.stop_stock_min,
                                stock_max=cfg.stop_stock_max)
@@ -701,6 +715,14 @@ def news(cfg, broker: Broker, market: Market, dry_run: bool, force: bool = False
     extra, sources = feeds.fetch_all(hours=2)
     log.info("news sources: Alpaca/Benzinga %d, %s", len(headlines), sources)
     headlines += extra
+    # the news feed tags some headlines with the wrong company (e.g. "Tesco" as TSCO, Tractor Supply): keep a symbol
+    # only on a headline that names the company or writes its ticker
+    tagged = sorted({s for h in headlines for s in h.get("symbols", [])})
+    lookup = getattr(broker, "asset", lambda _s: None)
+    names = {s: getattr(lookup(s), "name", None) for s in tagged}
+    headlines, wrong_tags = name_check.filter_headlines(headlines, names)
+    if wrong_tags:
+        log.info("dropped %d wrong company tags, e.g. %s", len(wrong_tags), wrong_tags[:3])
     held = sorted(s for s in positions if s.isalpha())
     # Also read everything about what we already own (even with no buys left today): splits,
     # mergers, lawsuits... and Alpaca's official list of corporate actions for those holdings.
