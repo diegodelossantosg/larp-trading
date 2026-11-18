@@ -1,1 +1,29 @@
-[]
+[
+ {
+  "date": "2026-11-18",
+  "time": "11:25",
+  "equity": 1000.0,
+  "dry_run": false,
+  "orders": [
+   {
+    "symbol": "SPY",
+    "side": "buy",
+    "notional": 1000.0,
+    "reason": "",
+    "status": "pending_new",
+    "order_id": "6373f5d4-8f75-4f71-87be-2e30c23eb0aa"
+   }
+  ],
+  "notes": [],
+  "market_view": "Money kept in the S&P 500 index fund; the daily Claude ideas are switched off.",
+  "key_drivers": [],
+  "trade_today": true,
+  "confidence": "low",
+  "watchlist": [],
+  "positions": [],
+  "no_claude": true,
+  "final_targets": {
+   "SPY": 1.0
+  }
+ }
+]
