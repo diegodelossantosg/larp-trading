@@ -40,3 +40,17 @@ nada que ver con la noticia y pierde. El bot real depende de que Claude detecte 
 2. La única mejora que resiste las pruebas es quitar el stop del 20% (unos +1%/año), y aun así pequeña.
 3. Arreglar la calidad de las noticias (verificar que la empresa del titular es la del símbolo) es más urgente que
    ajustar parámetros.
+
+## Segunda ronda (18 nov): con las reglas nuevas, con Claude y 7 ideas más
+**Reglas actuales (sin stop, filtro de nombres):** +3,0%/año sobre el S&P en 10,7 años (8 de 11 años por delante);
+con la mitad de las noticias al azar, +1,05%/año y gana al S&P en 25 de 30 repeticiones.
+
+**Con el criterio de Claude** (jul-nov 2026, después de lo que conoce el modelo; sin búsqueda web para no hacer trampa;
+119 horas con candidatos): Claude solo eligió 3 compras (la regla sola, 25). Las 2 que pasaron los filtros ganaron
+(ASML +4,9%, APP +2,3% sobre el S&P). Total: Claude -1,0% vs S&P -1,7%; regla sola -1,8%. Muy pocas operaciones para
+concluir nada; sin búsqueda web Claude casi nunca se atreve ("no puedo confirmar el motivo").
+**Filtro de nombres:** en esos mismos meses, la regla sola pasó de -0,65% a -0,10% por compra con el filtro.
+
+**Ideas nuevas (30 mitades, emparejadas con las reglas actuales):** recoger ganancias a +5/+10/+15% (peor / peor / igual),
+solo con el S&P subiendo ese día (peor, 2/30), solo con el S&P sobre su media de 200 días (peor, 6/30), solo acciones bajo
+su media de 50 días (igual, 11/30), stop 30% en vez de ninguno (peor, 3/30). Ninguna mejora.

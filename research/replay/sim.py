@@ -56,6 +56,10 @@ class Params:
     name_check: bool = True       # live since 2026-11: a symbol counts only if the headline names the company
     claude: str | None = None     # Claude's replay decisions (research/replay/claude_decisions.json): buy only its picks
     collect: bool = False         # record every check with candidates (to know when to ask Claude)
+    take_profit: float | None = None   # sell when the price reaches this gain over the buy price
+    market_up_only: bool = False  # buy only while SPY is up today (the stock fell on its own)
+    spy_trend_only: bool = False  # buy only when SPY is above its 200-day average
+    below_sma50_only: bool = False     # buy only stocks already below their 50-day average
     start: str = "2016-03-01"
     end: str = "2099-01-01"
 
@@ -78,6 +82,8 @@ class Data:
         # known before day t's open: values of day t-1
         sh = lambda a: np.vstack([np.full((1, a.shape[1]), np.nan), a[:-1]])
         self.atr_prev, self.dv_prev, self.av_prev = sh(atr), sh(dv), sh(av)
+        self.sma50_prev = sh(pd.DataFrame(c).rolling(50).mean().to_numpy())
+        self.sma200_prev = sh(pd.DataFrame(c).rolling(200).mean().to_numpy())
         self.spy = self.col["SPY"]
         from trader.universe import BIG_STOCKS
         self.big = np.array([s in BIG_STOCKS for s in self.symbols])
@@ -222,6 +228,12 @@ def run(D: Data, P: Params = Params(), seed: int = 0) -> Result:
                     sell(p, o, i, "stop"); continue
                 if l <= lvl:
                     sell(p, lvl, i, "stop"); continue
+            if P.take_profit and p.entry_i < i and np.isfinite(h):
+                tgt = p.entry * (1 + P.take_profit)
+                if o >= tgt:
+                    sell(p, o, i, "target"); continue
+                if h >= tgt:
+                    sell(p, tgt, i, "target"); continue
             if p.entry_i < i and np.isfinite(h):
                 p.high = max(p.high, h)
             keep.append(p)
@@ -282,6 +294,12 @@ def run(D: Data, P: Params = Params(), seed: int = 0) -> Result:
                     px = hp[k]
                     vs = px / prev_c[j] - 1 - spy_move
                     if (vs > -P.drop and not P.claude) or px < 5:
+                        continue
+                    if P.market_up_only and spy_move <= 0:
+                        continue
+                    if P.spy_trend_only and not (prev_c[S] > D.sma200_prev[i, S]):
+                        continue
+                    if P.below_sma50_only and not (prev_c[j] < D.sma50_prev[i, j]):
                         continue
                     if not D.big[j] and not (D.dv_prev[i, j] >= P.liquid_m):
                         continue

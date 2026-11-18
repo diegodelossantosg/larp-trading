@@ -1,0 +1,241 @@
+{
+ "current": {
+  "full": {
+   "years": 10.7,
+   "ai_total_pct": 512.4,
+   "spy_total_pct": 346.2,
+   "extra_per_year_pct": 3.0,
+   "worst_drop_pct": -40.3,
+   "buys_per_year": 39.1,
+   "avg_vs_spy_pct": 0.9,
+   "win_vs_spy_pct": 54,
+   "stops_pct": 0,
+   "extra_by_year_pct": {
+    "2016": 0.13,
+    "2017": -0.88,
+    "2018": -2.68,
+    "2019": 7.57,
+    "2020": 1.24,
+    "2021": -0.55,
+    "2022": 2.2,
+    "2023": 3.78,
+    "2024": 8.65,
+    "2025": 8.06,
+    "2026": 5.36
+   },
+   "years_ahead": "8/11"
+  },
+  "halves_avg": 1.0503333333333333,
+  "halves_beat_spy": 25
+ },
+ "take profit at +5%": {
+  "full": {
+   "years": 10.7,
+   "ai_total_pct": 323.1,
+   "spy_total_pct": 346.2,
+   "extra_per_year_pct": -0.5,
+   "worst_drop_pct": -42.0,
+   "buys_per_year": 59.3,
+   "avg_vs_spy_pct": -0.05,
+   "win_vs_spy_pct": 64,
+   "stops_pct": 0,
+   "extra_by_year_pct": {
+    "2016": 0.76,
+    "2017": -0.51,
+    "2018": -0.72,
+    "2019": 2.51,
+    "2020": -1.17,
+    "2021": -10.3,
+    "2022": -5.24,
+    "2023": 3.55,
+    "2024": 1.88,
+    "2025": 2.47,
+    "2026": 2.35
+   },
+   "years_ahead": "6/11"
+  },
+  "halves_avg": -0.9713333333333334,
+  "gain": -2.021666666666667,
+  "wins": 1
+ },
+ "take profit at +10%": {
+  "full": {
+   "years": 10.7,
+   "ai_total_pct": 379.6,
+   "spy_total_pct": 346.2,
+   "extra_per_year_pct": 0.68,
+   "worst_drop_pct": -42.0,
+   "buys_per_year": 46.9,
+   "avg_vs_spy_pct": 0.24,
+   "win_vs_spy_pct": 54,
+   "stops_pct": 0,
+   "extra_by_year_pct": {
+    "2016": 0.47,
+    "2017": -0.88,
+    "2018": -0.63,
+    "2019": 4.41,
+    "2020": -0.32,
+    "2021": -8.12,
+    "2022": -0.91,
+    "2023": -1.37,
+    "2024": 11.83,
+    "2025": 0.82,
+    "2026": 3.09
+   },
+   "years_ahead": "5/11"
+  },
+  "halves_avg": 0.213,
+  "gain": -0.8373333333333334,
+  "wins": 6
+ },
+ "take profit at +15%": {
+  "full": {
+   "years": 10.7,
+   "ai_total_pct": 493.6,
+   "spy_total_pct": 346.2,
+   "extra_per_year_pct": 2.7,
+   "worst_drop_pct": -41.6,
+   "buys_per_year": 43.1,
+   "avg_vs_spy_pct": 0.73,
+   "win_vs_spy_pct": 55,
+   "stops_pct": 0,
+   "extra_by_year_pct": {
+    "2016": 0.22,
+    "2017": -0.88,
+    "2018": -2.68,
+    "2019": 5.31,
+    "2020": 5.1,
+    "2021": -1.44,
+    "2022": 7.67,
+    "2023": 2.92,
+    "2024": -2.28,
+    "2025": 6.17,
+    "2026": 9.74
+   },
+   "years_ahead": "7/11"
+  },
+  "halves_avg": 1.2223333333333335,
+  "gain": 0.17199999999999996,
+  "wins": 15
+ },
+ "only while SPY is up today": {
+  "full": {
+   "years": 10.7,
+   "ai_total_pct": 308.5,
+   "spy_total_pct": 346.2,
+   "extra_per_year_pct": -0.82,
+   "worst_drop_pct": -40.5,
+   "buys_per_year": 31.7,
+   "avg_vs_spy_pct": -0.17,
+   "win_vs_spy_pct": 49,
+   "stops_pct": 0,
+   "extra_by_year_pct": {
+    "2016": -0.42,
+    "2017": -0.83,
+    "2018": -2.29,
+    "2019": 1.25,
+    "2020": 3.55,
+    "2021": -11.48,
+    "2022": 6.33,
+    "2023": -2.87,
+    "2024": 2.65,
+    "2025": -1.61,
+    "2026": -2.0
+   },
+   "years_ahead": "4/11"
+  },
+  "halves_avg": -0.8476666666666666,
+  "gain": -1.898,
+  "wins": 2
+ },
+ "only when SPY is above its 200-day average": {
+  "full": {
+   "years": 10.7,
+   "ai_total_pct": 537.0,
+   "spy_total_pct": 346.2,
+   "extra_per_year_pct": 3.38,
+   "worst_drop_pct": -35.2,
+   "buys_per_year": 31.8,
+   "avg_vs_spy_pct": 1.15,
+   "win_vs_spy_pct": 56,
+   "stops_pct": 0,
+   "extra_by_year_pct": {
+    "2016": -0.55,
+    "2017": -0.88,
+    "2018": -0.42,
+    "2019": 2.86,
+    "2020": 12.09,
+    "2021": -0.55,
+    "2022": -1.14,
+    "2023": 7.94,
+    "2024": 8.65,
+    "2025": -1.55,
+    "2026": 11.11
+   },
+   "years_ahead": "5/11"
+  },
+  "halves_avg": 0.42866666666666664,
+  "gain": -0.6216666666666666,
+  "wins": 6
+ },
+ "only stocks below their 50-day average": {
+  "full": {
+   "years": 10.7,
+   "ai_total_pct": 463.9,
+   "spy_total_pct": 346.2,
+   "extra_per_year_pct": 2.21,
+   "worst_drop_pct": -40.1,
+   "buys_per_year": 29.3,
+   "avg_vs_spy_pct": 0.9,
+   "win_vs_spy_pct": 53,
+   "stops_pct": 0,
+   "extra_by_year_pct": {
+    "2016": -0.42,
+    "2017": 0.22,
+    "2018": -2.5,
+    "2019": -0.13,
+    "2020": 0.89,
+    "2021": -4.62,
+    "2022": 8.09,
+    "2023": 3.67,
+    "2024": 3.89,
+    "2025": -2.01,
+    "2026": 18.48
+   },
+   "years_ahead": "6/11"
+  },
+  "halves_avg": 0.9760000000000001,
+  "gain": -0.07433333333333336,
+  "wins": 11
+ },
+ "stop 30% (instead of none)": {
+  "full": {
+   "years": 10.7,
+   "ai_total_pct": 537.7,
+   "spy_total_pct": 346.2,
+   "extra_per_year_pct": 3.39,
+   "worst_drop_pct": -41.7,
+   "buys_per_year": 39.2,
+   "avg_vs_spy_pct": 0.98,
+   "win_vs_spy_pct": 54,
+   "stops_pct": 2,
+   "extra_by_year_pct": {
+    "2016": 0.13,
+    "2017": -0.88,
+    "2018": -3.78,
+    "2019": 7.57,
+    "2020": 10.19,
+    "2021": -1.77,
+    "2022": 0.67,
+    "2023": 3.78,
+    "2024": 8.65,
+    "2025": 7.47,
+    "2026": 5.36
+   },
+   "years_ahead": "8/11"
+  },
+  "halves_avg": 0.5003333333333333,
+  "gain": -0.55,
+  "wins": 3
+ }
+}
