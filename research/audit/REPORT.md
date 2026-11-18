@@ -175,3 +175,18 @@ Conclusión: la ventaja existe en empresas grandes y líquidas, no más abajo. S
 - Noticias de analistas vs otras: sin diferencia (+0,46% vs +0,21%).
 - Nichos: caída 1h >= 4%: +1,13% (n=1064), ATR >= 6%: +1,33% (n=836), ambas: +1,42% (n=827); el resto (caída<4% y ATR<6%): -0,03% (n=1994). Consistente en 2020-22, 2023-24, 2025-26; no en 2016-19 (n pequeño, negativo).
 - CAUTIÓN: nicho encontrado mirando varios cortes sobre los mismos datos. Pendiente validar con datos nuevos (events_wide_a: 2021-2023, events_wide_b: 2018-2021, rangos 100-600).
+
+## Octava ronda (T27): ¿caída >= 4% / ATR >= 6%? por archivo (regla actual, venta a 10d, costes 0,1%)
+| archivo | todas | caída>=4% | caída<4% | ATR>=6 | ATR<6 |
+|---|---|---|---|---|---|
+| long (2018-26, grandes) | +0,62% (1537) | +0,94% (461) | +0,49% | +1,33% (383) | +0,39% |
+| wide (2023-26, 100-600) | +0,41% (1639) | +1,06% (468) | +0,15% | +1,02% (278) | +0,29% |
+| mid (2023-26, 700-1100) | +0,02% (835) | +1,48% (265) | -0,66% | +1,41% (242) | -0,55% |
+| early (2016-18) | +2,18% (105) | +1,20% (40) | +2,79% | +5,43% (18) | +1,51% |
+Más caída / más volatilidad rinde más en 3 de 4 archivos (incluido mid, empresas distintas); en early (n pequeño) no. t individuales 1-2: indicio, no prueba. Los archivos se solapan (643 duplicados), por eso los totales conjuntos se calculan sin duplicados.
+Descargas events_wide_a/b (2018-2023): salieron SIN noticias. Sonda (news_probe.yml): el feed de noticias de Alpaca ahora solo devuelve los últimos ~12 meses; el 14 nov aún llegaba a 2016. No es un fallo del código. No se puede descargar más historia de noticias; ya tenemos los 4 archivos.
+
+## Novena ronda (T28): el filtro de caída >= 4% en la cartera real (2 compras/día, 10%, tope 30%, la mayor caída primero)
+Ganancia extra por año sobre SPY (suma de compras x 10%), por archivo: actual 2% -> 4%:
+long +2,85 -> +4,49; wide +6,74 -> +5,37; mid +7,18 -> +0,02; early +3,13 -> +1,54. Media de los cuatro: +4,98% -> +2,86%.
+Conclusión: el filtro NO mejora la cartera. La regla actual ya ordena por mayor caída primero, así que las caídas grandes ya tienen prioridad cuando hay cupo; al endurecer solo se compran menos veces. La ventaja por compra de T27 no se traduce en más ganancia por año. No aplicar.
