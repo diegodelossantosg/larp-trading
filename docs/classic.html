@@ -187,7 +187,6 @@ details.old-logs > summary { cursor: pointer; font-weight: 600; color: var(--ink
 .bottom-grid > .card:first-child, #log-card { grid-column: 1 / -1; }
 .hero .versus:empty { display: none; }
 .story { margin: 8px 0 0; font-size: 14px; color: var(--ink); }
-#paper-card { grid-column: 1 / -1; }
 .bar { display: inline-block; height: 6px; border-radius: 3px; background: var(--c, var(--series-1)); vertical-align: middle; margin-right: 6px; opacity: .85; }
 h2::before { content: ""; width: 4px; height: 18px; border-radius: 2px; background: var(--h, var(--series-1)); }
 </style>
@@ -238,11 +237,6 @@ h2::before { content: ""; width: 4px; height: 18px; border-radius: 2px; backgrou
     <section class="card">
       <h2 style="--h: var(--c4)">How the News Hunter's buys are doing</h2>
       <div class="table-scroll" id="scorecard"></div>
-    </section>
-
-    <section class="card" id="paper-card">
-      <h2 style="--h: var(--c8)">Rule-only twin <span class="small">(paper test: same plan as the News Hunter, no Claude)</span></h2>
-      <div id="paper"></div>
     </section>
 
     <details class="card log" id="log-card" open>
@@ -598,24 +592,6 @@ function scorecardView(status) {
   </tbody></table>`;
 }
 
-// The rule-only twin: the same plan as the News Hunter but picked by fixed rules, to see whether Claude's judgement adds anything.
-function paperView(p) {
-  if (!p || !(p.curve || []).length) { $("paper").innerHTML = `<div class="empty">Starts with the next News Hunter run. It buys on paper only, with fixed rules and no Claude, to compare with the real News Hunter.</div>`; return; }
-  const last = p.curve.at(-1), cap = p.capital, spyMoney = p.spy_start ? cap * last.spy / p.spy_start : null;
-  const tile = (label, value, c = "") => `<div class="stat"><div class="small">${label}</div><b class="${c}">${value}</b></div>`;
-  const gain = last.equity - cap, closed = p.closed || [];
-  const wins = closed.filter((c) => c.return_pct > 0).length;
-  const open = (p.positions || []).map((x) => {
-    return `${esc(x.symbol)} <span class="small">(bought ${esc(x.entry_date)})</span>`;
-  }).join(", ");
-  $("paper").innerHTML = `<div class="stats">
-    ${tile("Twin's money", `${usd(last.equity)} <span class="small ${cls(gain)}">${signedUsd(gain)}</span>`)}
-    ${tile("Same money in the S&amp;P 500", spyMoney != null ? usd(spyMoney) : "–")}
-    ${tile("Finished buys", `${closed.length}${closed.length ? ` <span class="small">(${wins} gained)</span>` : ""}`)}
-  </div>
-  <p class="small">${open ? `Holding now: ${open}.` : "Not holding anything right now."} It never uses real money.</p>`;
-}
-
 function describeOrders(orders) {
   const ok = (orders || []).filter((o) => !["error", "skipped"].includes(o.status));
   if (!ok.length) return `<span class="tag hold">Nothing done</span>`;
@@ -751,7 +727,7 @@ setInterval(refreshLive, 61000);
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") refreshLive(); });
 setTimeout(() => location.reload(), 15 * 60000);  // full reload now and then for everything else
 (async () => {
-  const [status, equity, decisions, trades, intraday, sales, paper] = await Promise.all([load("status.json", {}), load("equity.json", []), load("decisions.json", []), load("scorecard.json", []), load("intraday.json", {}), load("sales.json", null), load("paper_hunter.json", null)]);
+  const [status, equity, decisions, trades, intraday, sales] = await Promise.all([load("status.json", {}), load("equity.json", []), load("decisions.json", []), load("scorecard.json", []), load("intraday.json", {}), load("sales.json", null)]);
   Object.assign(DATA, { status, equity, intraday });
   document.querySelectorAll("#intervals button").forEach((b) => b.addEventListener("click", () => {
     interval = b.dataset.iv;
@@ -767,7 +743,6 @@ setTimeout(() => location.reload(), 15 * 60000);  // full reload now and then fo
   holdings(status);
   refreshLive();
   scorecardView(status);
-  paperView(paper);
   if (sales && sales.rows && sales.rows.length) closedFromSales(sales); else closedView(trades, decisions);
   soldView(sales, decisions);
   syncSoldHeight();
