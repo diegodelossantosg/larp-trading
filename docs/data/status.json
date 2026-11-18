@@ -1,11 +1,11 @@
 {
- "updated": "2026-11-18T13:21-05:00",
+ "updated": "2026-11-18T13:38-05:00",
  "mode": "paper",
  "capital": 1000.0,
  "spy_start": 728.876,
  "idle_asset": "SPY",
  "model": "opus",
- "equity": 1003.15,
+ "equity": 1005.23,
  "cash": 0.01,
  "performance": {
   "days_tracked": 0
@@ -51,12 +51,12 @@
   {
    "symbol": "SPY",
    "qty": 1.372,
-   "market_value": 1003.1373,
+   "market_value": 1005.2227,
    "avg_entry_price": 728.876,
-   "current_price": 731.17,
-   "unrealized_pl": 3.1473,
-   "unrealized_plpc": 0.0032,
-   "change_today_usd": 3.1473,
+   "current_price": 732.69,
+   "unrealized_pl": 5.2327,
+   "unrealized_plpc": 0.0052,
+   "change_today_usd": 5.2327,
    "name": "S&P 500",
    "weight": 1.0
   }
