@@ -25,7 +25,8 @@ ET = ZoneInfo("America/New_York")
 FILE = "paper_hunter.json"
 CAPITAL = 1000.0
 SIZE, MAX_BUYS, CAP = 0.10, 2, 0.30
-HOLD_DAYS, STOP, MIN_DROP, HALF_COST = 10, 0.20, 0.02, 0.0005     # 0.05% each way = 0.1% round trip
+HOLD_DAYS, MIN_DROP, HALF_COST = 10, 0.02, 0.0005     # 0.05% each way = 0.1% round trip
+STOP: float | None = None    # no trailing stop, like the real News Hunter buys (hour-by-hour replay)
 CURVE_KEEP = 3000
 
 
@@ -51,7 +52,7 @@ def apply_exits(state: dict, prices: dict[str, float], spy_price: float | None, 
             keep.append(p)
             continue
         p["high"] = max(p["high"], px)
-        reason = ("stop: fell 20% from its best" if px <= p["high"] * (1 - STOP)
+        reason = ("stop: fell 20% from its best" if STOP and px <= p["high"] * (1 - STOP)
                   else f"{HOLD_DAYS} trading days" if business_days(p["entry_date"], today) >= HOLD_DAYS else None)
         if reason is None:
             keep.append(p)
@@ -102,6 +103,10 @@ def run(cfg, broker, market) -> int:
         return 0
     today = datetime.now(ET).strftime("%Y-%m-%d")
     headlines = market.news(hours=2, limit=50)
+    from .name_check import filter_headlines
+    lookup = getattr(broker, "asset", lambda _s: None)
+    headlines, _ = filter_headlines(headlines, {s: getattr(lookup(s), "name", None)
+                                                for s in {s for h in headlines for s in h["symbols"]}})
     first = {}
     for h in headlines:
         for s in h["symbols"]:

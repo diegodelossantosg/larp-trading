@@ -25,7 +25,15 @@ def test_total_exposure_is_capped_at_30_percent():
     assert len(s["positions"]) == 3                                              # 3 x 10% = 30% and no more
 
 
-def test_exit_after_ten_trading_days_and_on_the_stop():
+def test_no_stop_by_default_only_the_ten_day_exit():
+    s = state()
+    ph.pick_buys(s, [cand("B", -0.04, 50.0)], {}, 500.0, "2026-11-02")
+    assert ph.apply_exits(s, {"B": 30.0}, 520.0, "2026-11-04") == []                  # down 40%: still held
+    assert [c["symbol"] for c in ph.apply_exits(s, {"B": 30.0}, 520.0, "2026-11-16")] == ["B"]
+
+
+def test_exit_after_ten_trading_days_and_on_the_stop(monkeypatch):
+    monkeypatch.setattr(ph, "STOP", 0.20)
     s = state()
     ph.pick_buys(s, [cand("A", -0.05, 100.0), cand("B", -0.04, 50.0)], {}, 500.0, "2026-11-02")
     closed = ph.apply_exits(s, {"A": 110.0, "B": 39.0}, 520.0, "2026-11-04")    # B fell 22% from 50: stop

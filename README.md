@@ -53,6 +53,7 @@ After the close, a second job records portfolio value against SPY so the dashboa
 | No buying a stock this close to its earnings report (trading days; unknown date = no buy) | 3 | `EARNINGS_BLACKOUT_DAYS` |
 | Watcher: trailing stop for single stocks | 4x daily swing, 20%-20% (fixed 20%) | `STOP_ATR_MULT_STOCK` / `STOP_STOCK_MIN` / `STOP_STOCK_MAX` |
 | News Hunter buys kept at least (trading days) | 10 | `NEWS_MIN_HOLD_DAYS` |
+| Trailing stop on News Hunter buys while held | off (sold after 10 days) | `NEWS_TRAILING_STOP` |
 | Max total in leveraged/inverse ETFs | 10% | `MAX_LEVERAGED_WEIGHT` |
 | Max traded per day (one-way) | 50% of equity | `MAX_DAILY_TURNOVER` |
 | Ignore weight changes smaller than | 2% of equity | `REBALANCE_BAND` |
@@ -165,4 +166,5 @@ Not financial advice.
 - The 2x fund (SSO) beats the S&P 500 only by leverage when the market rises, so the idle money now sits in plain SPY.
 - Claude's daily ideas are switched off (`DAILY_IDEAS` unset): the audit found no edge. With `DAILY_IDEAS=true` they are tracked on paper (`IDEAS_SHARE=0`) until they show about +5% a year over SPY; ideas no better than chance lose to the S&P 500.
 - The News Hunter is the only part with a measured edge (about +3 to +4 points a year over the S&P 500 on the most cautious reading). It buys only volatile stocks (daily swing 3%+), where the rebound after a news drop was found in both company groups. It skips drops on heavy volume (today's volume on pace for 2x its 20-day average or more, a sign of serious news): those lost in the audit, and leaving them out raised the edge per buy from +0.33% to +0.53% (small, t=2.1).
+- Hour-by-hour replay 2016-2026 (`research/replay`, report in `research/replay/REPORT.md`): the rule alone, without Claude, about ties the S&P 500. Of 40 changes, only removing the trailing stop on News Hunter buys held up against luck (about +1 point a year), so these buys now have no stop and are sold after 10 trading days. The replay also found that the news feed tags some foreign companies with someone else's ticker ("Tesco" as TSCO, Tractor Supply); a symbol now only counts for a headline that names the company or writes its ticker (`trader/name_check.py`).
 - Tight stops cost 1-2.5 points a year, so stops are wide (20%).

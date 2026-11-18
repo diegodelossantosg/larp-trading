@@ -143,3 +143,24 @@ def test_news_buys_allow_normal_volume(tmp_path, monkeypatch):
     monkeypatch.setattr(main, "_heavy_volume", lambda df: 1.2)
     broker, rec = run(tmp_path, monkeypatch, [idea("NVDA")])
     assert [o for o in rec["orders"] if o["side"] == "buy"]
+
+
+def test_recent_news_buys_are_the_hunters_buys_inside_the_holding_period(tmp_path, monkeypatch):
+    from trader import journal, main
+    monkeypatch.setattr(journal, "DATA_DIR", tmp_path)
+    monkeypatch.setattr(main, "_today", lambda: "2026-11-18")
+    journal.write("decisions.json", [
+        {"date": "2026-11-17", "source": "news", "orders": [{"symbol": "FSLR", "side": "buy", "status": "filled"},
+                                                            {"symbol": "SPY", "side": "sell", "status": "filled"}]},
+        {"date": "2026-10-20", "source": "news", "orders": [{"symbol": "OLD", "side": "buy", "status": "filled"}]},
+        {"date": "2026-11-17", "source": "watch", "orders": [{"symbol": "WCH", "side": "buy", "status": "filled"}]},
+        {"date": "2026-11-17", "source": "news", "dry_run": True, "orders": [{"symbol": "DRY", "side": "buy"}]},
+    ])
+    assert main._recent_news_buys(10) == {"FSLR"}
+
+
+def test_wrong_company_tags_are_removed_before_claude_reads_the_headlines():
+    from trader.name_check import filter_headlines
+    kept, dropped = filter_headlines([{"headline": "Tesco PLC Announces Total Voting Rights", "symbols": ["TSCO"]}],
+                                     {"TSCO": "Tractor Supply Company"})
+    assert kept == [] and dropped
