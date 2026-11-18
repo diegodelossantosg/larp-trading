@@ -317,10 +317,77 @@ def hourly(needed_path: str, chunk: int, chunks: int, out: str) -> None:
     log.info("hourly done: %d rows in total", len(have) + len(rows))
 
 
+HALF_CHECKS = tuple(range(10 * 60, 16 * 60, 30))     # 10:00, 10:30, ... 15:30 (minutes after midnight, ET)
+
+
+def _half_rows(sym: str, bars: list[dict]) -> list[dict]:
+    """Price and volume so far at every half hour from 10:00 to 15:30 (from 30-minute bars)."""
+    if not bars:
+        return []
+    df = pd.DataFrame(bars)
+    t = pd.to_datetime(df["t"], utc=True).dt.tz_convert(ET)
+    df = pd.DataFrame({"day": t.dt.strftime("%Y-%m-%d"), "m": t.dt.hour * 60 + t.dt.minute, "close": df["c"], "volume": df["v"]})
+    df = df[(df.m >= 9 * 60 + 30) & (df.m < 16 * 60)]
+    rows = []
+    for day, d in df.groupby("day"):
+        d = d.sort_values("m")
+        ends = (d.m + 30).to_numpy()            # a bar's close is the price at the end of its 30 minutes
+        cum = d.volume.cumsum().to_numpy()
+        row = {"symbol": sym, "day": day}
+        for c in HALF_CHECKS:
+            k = ends <= c
+            tag = f"{c // 60:02d}{c % 60:02d}"
+            row[f"p{tag}"] = round(float(d.close.to_numpy()[k][-1]), 4) if k.any() else ""
+            row[f"v{tag}"] = int(cum[k][-1]) if k.any() else ""
+        rows.append(row)
+    return rows
+
+
+def halfhour(needed_path: str, out: str) -> None:
+    """Like hourly(), with 30-minute bars: prices at every half hour, for the days some news could be seen."""
+    from .config import load_config
+    cfg = load_config()
+    headers = {"APCA-API-KEY-ID": cfg.alpaca_api_key, "APCA-API-SECRET-KEY": cfg.alpaca_secret_key}
+    need = pd.read_csv(needed_path, dtype=str)
+    try:
+        have = pd.read_csv(out, dtype=str)
+    except FileNotFoundError:
+        have = pd.DataFrame(columns=["symbol", "day"])
+    got = set(zip(have.symbol, have.day))
+    need = pd.concat([need, pd.DataFrame({"symbol": "SPY", "day": sorted(set(need.day))})]).drop_duplicates()
+    need = need[[(s, d) not in got for s, d in zip(need.symbol, need.day)]]
+    by_day = need.groupby("day").symbol.apply(sorted).to_dict()
+    log.info("half-hour: %d rows already, %d symbol-days over %d days", len(have), len(need), len(by_day))
+    rows = []
+    for k, day in enumerate(sorted(by_day)):
+        syms = by_day[day]
+        start = pd.Timestamp(f"{day} 09:30", tz=ET).tz_convert("UTC")
+        end = pd.Timestamp(f"{day} 16:00", tz=ET).tz_convert("UTC")
+        for i in range(0, len(syms), 100):
+            params = {"symbols": ",".join(syms[i:i + 100]), "timeframe": "30Min", "limit": 10000, "adjustment": "all",
+                      "feed": "sip", "start": start.strftime("%Y-%m-%dT%H:%M:%SZ"), "end": end.strftime("%Y-%m-%dT%H:%M:%SZ")}
+            bars: dict[str, list] = {}
+            while True:
+                body = _get_rest(params, headers)
+                if body is None:
+                    break
+                for s, b in (body.get("bars") or {}).items():
+                    bars.setdefault(s, []).extend(b)
+                if not body.get("next_page_token"):
+                    break
+                params["page_token"] = body["next_page_token"]
+            for s, b in bars.items():
+                rows += _half_rows(s, b)
+        if k % 100 == 0 or k == len(by_day) - 1:
+            log.info("half-hour: %d/%d days, %d new rows", k + 1, len(by_day), len(rows))
+            pd.concat([have, pd.DataFrame(rows)]).to_csv(out, index=False, compression="gzip")
+    pd.concat([have, pd.DataFrame(rows)]).to_csv(out, index=False, compression="gzip")
+
+
 def main() -> None:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
     ap = argparse.ArgumentParser()
-    ap.add_argument("what", choices=["edgar", "news12", "daily", "needed", "hourly"])
+    ap.add_argument("what", choices=["edgar", "news12", "daily", "needed", "hourly", "halfhour"])
     ap.add_argument("--out", required=True)
     ap.add_argument("--needed", default="research/replay/needed.csv.gz")
     ap.add_argument("--chunk", type=int, default=0)
@@ -334,6 +401,8 @@ def main() -> None:
         daily(a.out)
     elif a.what == "needed":
         needed(a.out)
+    elif a.what == "halfhour":
+        halfhour(a.needed, a.out)
     else:
         hourly(a.needed, a.chunk, a.chunks, a.out)
 
