@@ -52,6 +52,7 @@ class Params:
     stock_cost: float = 0.0005
     spy_cost: float = 0.0001
     order: str = "biggest_fall"   # or "smallest_fall", "random"
+    keep: float = 1.0             # robustness check: use a random share of the news (same seed = same share)
     start: str = "2016-03-01"
     end: str = "2099-01-01"
 
@@ -162,6 +163,8 @@ def run(D: Data, P: Params = Params(), seed: int = 0) -> Result:
     pos: list[Pos] = []
     trades, curve = [], []
     news = D.news[D.news.source.isin(P.sources)]
+    if P.keep < 1:
+        news = news.sample(frac=P.keep, random_state=seed)
     if not P.earnings_news:
         news = news[~news.text.fillna("").str.fullmatch(r"8-K items (2\.02|9\.01|,)+")]
     by_day = {d: g for d, g in news.groupby(news.t.dt.strftime("%Y-%m-%d"))}
