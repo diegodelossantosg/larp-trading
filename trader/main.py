@@ -53,8 +53,10 @@ def _write_intraday(cfg, broker: Broker, market: Market) -> None:
     state = journal.read("capital.json", None)
     if not hist or (cfg.capital_usd and state is None):
         return
+    equity_now = None
     try:
-        hist = _repair_history(hist, broker.account()["equity"])
+        equity_now = broker.account()["equity"]
+        hist = _repair_history(hist, equity_now)
     except Exception as e:
         log.warning("account check for the chart failed: %s", e)
     offset = cfg.capital_usd - state["baseline_equity"] if cfg.capital_usd else 0.0
@@ -79,6 +81,8 @@ def _write_intraday(cfg, broker: Broker, market: Market) -> None:
             spy_pos = broker.positions().get("SPY")
             if spy_pos and spy_pos.get("current_price"):
                 points[-1][2] = round(float(spy_pos["current_price"]), 2)
+                if equity_now:     # our money read at the same moment as that price
+                    points[-1][1] = round(equity_now + offset, 2)
         except Exception as e:
             log.warning("SPY holding price for the chart failed: %s", e)
     days = sorted({p[0][:10] for p in points})[-5:]
