@@ -61,6 +61,8 @@ def _write_intraday(cfg, broker: Broker, market: Market) -> None:
         log.warning("account check for the chart failed: %s", e)
     offset = cfg.capital_usd - state["baseline_equity"] if cfg.capital_usd else 0.0
     spy = market.minute_closes("SPY")
+    if len(spy):
+        spy.index = spy.index + pd.Timedelta(minutes=1)   # a minute bar's close is the price at the END of that minute
     ts = pd.to_datetime([t for t, _ in hist], unit="s", utc=True)
     spy_at = spy.reindex(spy.index.union(ts)).ffill().reindex(ts) if len(spy) else pd.Series(index=ts, dtype=float)
     points = [[t.isoformat(timespec="minutes"), round(e + offset, 2), None if pd.isna(p) else round(float(p), 2)]

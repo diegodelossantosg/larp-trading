@@ -268,7 +268,9 @@ async function load(name, fallback) {
 
 function hero(status, equity) {
   const capital = status.capital || equity[0]?.equity || null;
-  const now = status.equity ?? equity.at(-1)?.equity ?? capital;
+  // Both sides from the newest chart point when there is one: our money and SPY's price read at the same moment.
+  const lastPt = (DATA.intraday.points || []).filter((p) => p[1] != null && p[2] != null).at(-1);
+  const now = lastPt?.[1] ?? status.equity ?? equity.at(-1)?.equity ?? capital;
   if (now == null) {
     $("hero").innerHTML = `<p class="small">Waiting for the first run.</p>`;
     return;
