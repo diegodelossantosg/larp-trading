@@ -57,15 +57,22 @@ jobs:
         run: |
           git config user.name "trading-agent"
           git config user.email "trading-agent@users.noreply.github.com"
+          # Backup relay: even if a step below hangs and GitHub stops this job at its time limit, the next
+          # watcher run is still started (it waits in line until this one ends). On 2026-11-18 a hung step
+          # stopped the whole chain for a day. A second start while one is already waiting does no harm.
+          ( sleep 20880
+            if [ "$AGENTS_ON" = "true" ] || timeout 120 python -m trader.main market-open; then
+              echo "backup relay: starting the next watcher run"; gh workflow run watch.yml --ref main
+            fi ) &
           # Check every minute. Changes are folded into one local commit and published every
           # 15 minutes, or right away after a trade, so GitHub Pages can finish publishing the page
           # between data commits (every commit restarts and cancels the previous publish).
           sync() {
-            git pull -q --rebase -X theirs origin main || { git rebase --abort; echo "sync failed"; }
+            timeout 120 git pull -q --rebase -X theirs origin main || { git rebase --abort 2>/dev/null; echo "sync failed"; }
           }
           publish() {
             [ -n "$(git log origin/main..HEAD --oneline)" ] || return 0
-            for j in 1 2 3; do sync; git push -q origin HEAD:main && return 0; sleep 5; done
+            for j in 1 2 3; do sync; timeout 120 git push -q origin HEAD:main && return 0; sleep 5; done
             echo "push failed"
           }
           # Every minute: a tiny live.json (value, holdings, latest chart points) is force-pushed as
@@ -74,20 +81,20 @@ jobs:
           publish_live() {
             # live.json for the GitHub API (always fresh, 60 requests/hour per visitor) plus one copy per
             # minute, m-HHMM.json, for plain file links (cached 5 minutes, but each minute has a new name).
-            python -m trader.live > /tmp/live.json || return 0
+            timeout 120 python -m trader.live > /tmp/live.json || return 0
             mkdir -p /tmp/livem && cp /tmp/live.json "/tmp/livem/m-$(date -u +%H%M).json"
             ls -1 /tmp/livem | sort | head -n -10 | while read -r old; do rm -f "/tmp/livem/$old"; done
             tree=$( { printf "100644 blob %s\tlive.json\n" "$(git hash-object -w /tmp/live.json)"
                       for f in /tmp/livem/*.json; do printf "100644 blob %s\t%s\n" "$(git hash-object -w "$f")" "$(basename "$f")"; done
                     } | git mktree)
             commit=$(git commit-tree "$tree" -m "live $(date -u +%H:%M)")
-            git push -q -f origin "$commit:refs/heads/live" || echo "live push failed"
+            timeout 120 git push -q -f origin "$commit:refs/heads/live" || echo "live push failed"
           }
           # The supervisor part: every 5 minutes ask the watchdog which agents should be running by now
           # but aren't (daily decision, News Hunter every hour, the one-time sale) and start them. This
           # job runs all day and night, so none of it depends on GitHub's unreliable timer.
           supervise() {
-            missing=$(python -m trader.watchdog | tail -n 1)
+            missing=$(timeout 120 python -m trader.watchdog | tail -n 1)
             echo "supervisor: missing $missing"
             for agent in $(echo "$missing" | python -c "import json,sys; print(' '.join(json.load(sys.stdin)))"); do
               case "$agent" in
@@ -97,14 +104,14 @@ jobs:
                 *) continue ;;
               esac
               echo "supervisor: starting $agent ($wf)"
-              gh workflow run "$wf" --ref main || echo "could not start $wf"
+              timeout 60 gh workflow run "$wf" --ref main || echo "could not start $wf"
             done
           }
           i=0
           while true; do
-            if python -m trader.main market-open; then
+            if timeout 120 python -m trader.main market-open; then
               before=$(md5sum docs/data/decisions.json 2>/dev/null)
-              python -m trader.main watch || echo "watch run failed"
+              timeout 600 python -m trader.main watch || echo "watch run failed (or took over 10 minutes)"
               publish_live
               git add docs/data
               if ! git diff --cached --quiet; then
@@ -129,7 +136,7 @@ jobs:
           publish
           # Always start the successor, so the supervisor never stops (it waits in line until this one ends).
           # To stop everything on purpose, set the repository variable AGENTS_ON_GITHUB to anything but "true".
-          if [ "$AGENTS_ON" = "true" ] || python -m trader.main market-open; then
+          if [ "$AGENTS_ON" = "true" ] || timeout 120 python -m trader.main market-open; then
             echo "starting the next watcher run"
             gh workflow run watch.yml --ref main
           else
