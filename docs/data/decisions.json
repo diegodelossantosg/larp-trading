@@ -131,5 +131,27 @@
    }
   ],
   "holdings_alerts": []
+ },
+ {
+  "date": "2026-11-19",
+  "time": "12:17",
+  "source": "news",
+  "dry_run": false,
+  "orders": [],
+  "notes": [
+   "skipped AMD: heavy volume today (on pace for 2.4x its normal): a sell-off with this much volume usually means serious news, and these lost in our tests"
+  ],
+  "plain_summary": "AMD fell about 8% on a short-seller's report that admits it proves no wrongdoing, so I suggest one AMD buy; nothing to flag on SPY.",
+  "ideas": [
+   {
+    "symbol": "AMD",
+    "headline": "2026-11-19 16:53 UTC (CNBC): AMD falls on short-seller report of alleged China exposure; Hunterbrook says AMD firmware showed up at blacklisted IEIT Systems.",
+    "why_not_priced_in": "The ~8% drop vs SPY comes from a short-seller's report that says itself it does not prove AMD broke export laws. It shows no lost sales, profit problem, guidance cut or official probe. AMD reported on Nov 3 and is not due again until about early February. This is the kind of thin-evidence short report about a big profitable company that bounced back in our tests. Risk: about 22% of AMD's sales come from China, so a real U.S. export-control investigation would change the picture.",
+    "plain_reason": "A short seller's claims, with no proof of wrongdoing, scared investors out of a strong company.",
+    "next_earnings": "unknown",
+    "idea_type": "overreaction"
+   }
+  ],
+  "holdings_alerts": []
  }
 ]
