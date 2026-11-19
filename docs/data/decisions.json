@@ -153,5 +153,27 @@
    }
   ],
   "holdings_alerts": []
+ },
+ {
+  "date": "2026-11-19",
+  "time": "13:16",
+  "source": "news",
+  "dry_run": false,
+  "orders": [],
+  "notes": [
+   "skipped AMD: heavy volume today (on pace for 2.2x its normal): a sell-off with this much volume usually means serious news, and these lost in our tests"
+  ],
+  "plain_summary": "Nothing to report on our S&P 500 fund. I suggest one buy: AMD, which fell about 8% more than the market after a short-seller's report that doesn't prove any wrongdoing.",
+  "ideas": [
+   {
+    "symbol": "AMD",
+    "headline": "AMD falls on short-seller report of alleged China exposure (CNBC, 2026-11-19 16:53 UTC). Hunterbrook, a short seller, says newer AMD server software turned up at IEIT Systems, a Chinese server maker the U.S. blacklisted. AMD is down about 8% more than the S&P 500 today.",
+    "why_not_priced_in": "This is a short seller's claim with weak evidence. Hunterbrook itself says its records don't prove AMD broke export laws, and it couldn't confirm how IEIT got the software. The report is about server software showing up, not about AMD selling chips to the blacklisted company, and it can be passed along by third parties. Even a fine would be small for a profitable company worth hundreds of billions. AMD reported earnings on Nov 3, so there's no earnings report behind this drop. Its next report is only estimated (around Feb 2, 2027), so the date is listed as unknown. The fall is within the 3-10% range we prefer, AMD normally swings a lot from day to day, and the selling has slowed since late morning (about -8% at 11 a.m., roughly -9.6% now while the whole market is down). Risk: if U.S. regulators open a formal investigation, that would be real bad news, and the 20% trailing stop is our protection.",
+    "plain_reason": "An unproven claim from people betting against AMD; the business itself hasn't changed.",
+    "next_earnings": "unknown",
+    "idea_type": "overreaction"
+   }
+  ],
+  "holdings_alerts": []
  }
 ]
