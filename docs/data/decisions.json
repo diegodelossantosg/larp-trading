@@ -175,5 +175,27 @@
    }
   ],
   "holdings_alerts": []
+ },
+ {
+  "date": "2026-11-19",
+  "time": "14:15",
+  "source": "news",
+  "dry_run": false,
+  "orders": [],
+  "notes": [
+   "skipped AMD: heavy volume today (on pace for 2.0x its normal): a sell-off with this much volume usually means serious news, and these lost in our tests"
+  ],
+  "plain_summary": "AMD fell about 9% on a short-seller report that the seller itself says doesn't prove AMD broke any rules, so I suggested buying AMD; nothing important happened to our SPY fund.",
+  "ideas": [
+   {
+    "symbol": "AMD",
+    "headline": "2026-11-19 18:24 UTC (CNBC): AMD dives on short-seller report of alleged China exposure. Hunterbrook says AMD firmware showed up in BIOS updates from IEIT, a Chinese server maker the US blacklisted.",
+    "why_not_priced_in": "AMD is down about 9% today, or 7.6% worse than the S&P 500, on a report from Hunterbrook, which is betting against the stock. Hunterbrook admits its records do not prove any export-law violation on their own. It also says it does not know how IEIT got the code, and a former Commerce official said AMD may have had a license. Firmware like this is often passed along by server-board vendors, and sales to one blacklisted Chinese server maker would be tiny next to AMD's revenue. AMD denies the claims. No regulator has acted, and AMD has not lost sales or customers. Part of the drop is also today's wider tech sell-off (Dow down 800). The early fall of up to 13% has partly recovered, so the stock is no longer dropping fast. Q3 results came out in early November. The next report is expected around 2027-02-02 (an estimate based on past timing, not confirmed by AMD), well outside the 3-day window. Risk: if the Commerce Department opens a formal probe, that would change the picture.",
+    "plain_reason": "A short-seller's claim with weak proof scared investors away from a strong chipmaker.",
+    "next_earnings": "2027-02-02",
+    "idea_type": "overreaction"
+   }
+  ],
+  "holdings_alerts": []
  }
 ]
