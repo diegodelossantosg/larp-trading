@@ -5,8 +5,8 @@
  "spy_start": 728.876,
  "idle_asset": "SPY",
  "model": "opus",
- "equity": 1010.28,
- "cash": 0.1,
+ "equity": 1009.21,
+ "cash": -0.02,
  "performance": {
   "days_tracked": 1
  },
@@ -51,14 +51,14 @@
   {
    "symbol": "SPY",
    "qty": 1.372,
-   "market_value": 1010.1754,
+   "market_value": 1009.2288,
    "avg_entry_price": 728.876,
-   "current_price": 736.3,
-   "unrealized_pl": 10.1854,
-   "unrealized_plpc": 0.0102,
-   "change_today_usd": 8.369,
+   "current_price": 735.61,
+   "unrealized_pl": 9.2388,
+   "unrealized_plpc": 0.0092,
+   "change_today_usd": 7.4223,
    "name": "S&P 500",
-   "weight": 0.9999
+   "weight": 1.0
   }
  ]
 }
