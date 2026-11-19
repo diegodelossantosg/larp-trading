@@ -1,11 +1,11 @@
 {
- "updated": "2026-11-19T09:36-05:00",
+ "updated": "2026-11-19T09:40-05:00",
  "mode": "paper",
  "capital": 1000.0,
  "spy_start": 728.876,
  "idle_asset": "SPY",
  "model": "opus",
- "equity": 1013.42,
+ "equity": 1009.77,
  "cash": -0.02,
  "performance": {
   "days_tracked": 1
@@ -17,46 +17,46 @@
   "gauges": {
    "fear": {
     "title": "Fear (VIX)",
-    "display": "25.5",
-    "value": 25.46,
-    "change_5d": 6.0,
+    "display": "24.6",
+    "value": 24.56,
+    "change_5d": 7.07,
     "label": "nervous",
     "source": "Cboe VIX"
    },
    "rates": {
     "title": "Bonds (rates)",
-    "display": "+0.8%",
-    "ief_return_20d_pct": 0.77,
+    "display": "-0.4%",
+    "ief_return_20d_pct": -0.44,
     "label": "stable",
     "source": "IEF 7-10y Treasury ETF, 20-day change"
    },
    "credit": {
     "title": "Credit stress",
-    "display": "-0.7%",
-    "hyg_vs_ief_20d_pct": -0.73,
+    "display": "+0.5%",
+    "hyg_vs_ief_20d_pct": 0.47,
     "label": "normal",
     "source": "high-yield (HYG) vs Treasuries (IEF), 20 days"
    },
    "breadth": {
     "title": "ETFs in uptrend",
-    "display": "30%",
-    "above_200d_pct": 30,
-    "above_50d_pct": 29,
+    "display": "31%",
+    "above_200d_pct": 31,
+    "above_50d_pct": 28,
     "label": "weak"
    }
   },
-  "checked": "2026-11-18T16:26"
+  "checked": "2026-11-19T14:40"
  },
  "positions": [
   {
    "symbol": "SPY",
    "qty": 1.372,
-   "market_value": 1013.4407,
+   "market_value": 1009.7913,
    "avg_entry_price": 728.876,
-   "current_price": 738.68,
-   "unrealized_pl": 13.4507,
-   "unrealized_plpc": 0.0135,
-   "change_today_usd": 11.6342,
+   "current_price": 736.02,
+   "unrealized_pl": 9.8013,
+   "unrealized_plpc": 0.0098,
+   "change_today_usd": 7.9848,
    "name": "S&P 500",
    "weight": 1.0
   }

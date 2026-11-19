@@ -80,5 +80,23 @@
   "plain_summary": "Health insurers, gold miners and Qualcomm fell hard today, but each drop comes from real changes to their business, so we stay in the S&P 500 fund.",
   "ideas": [],
   "holdings_alerts": []
+ },
+ {
+  "date": "2026-11-19",
+  "time": "09:39",
+  "equity": 1010.9900000000052,
+  "dry_run": false,
+  "orders": [],
+  "notes": [],
+  "market_view": "Money kept in the S&P 500 index fund; the daily Claude ideas are switched off.",
+  "key_drivers": [],
+  "trade_today": true,
+  "confidence": "low",
+  "watchlist": [],
+  "positions": [],
+  "no_claude": true,
+  "final_targets": {
+   "SPY": 1.0
+  }
  }
 ]
