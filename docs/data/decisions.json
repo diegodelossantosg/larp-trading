@@ -109,5 +109,27 @@
   "plain_summary": "No buys this hour: today's big drops are tied to real profit threats (a new Medicare audit rule for health insurers, a weak outlook from Nike), earnings reports, or no clear news, and there is nothing to report about our S&P 500 fund.",
   "ideas": [],
   "holdings_alerts": []
+ },
+ {
+  "date": "2026-11-19",
+  "time": "11:19",
+  "source": "news",
+  "dry_run": false,
+  "orders": [],
+  "notes": [
+   "skipped AMD: heavy volume today (on pace for 2.4x its normal): a sell-off with this much volume usually means serious news, and these lost in our tests"
+  ],
+  "plain_summary": "AMD is down about 6.5% vs the market because a short-seller says it has ties to China, but the evidence looks weak, so I'm suggesting one buy, AMD; there was no news on SPY, our only holding.",
+  "ideas": [
+   {
+    "symbol": "AMD",
+    "headline": "2026-11-19 (morning, NY): Hunterbrook Capital said it is betting against AMD (a short position) and published a report claiming a blacklisted Chinese server maker, IEIT Systems, kept getting newer AMD firmware. AMD fell as much as about 10% during the day and is now about 6.5% below the S&P 500.",
+    "why_not_priced_in": "The report has gaps: Hunterbrook admits it could not find out how IEIT got the firmware or whether AMD holds export licenses, and no rule-breaking has been proven. No regulator has opened an investigation. Firmware updates that reach a blacklisted company through other server makers would mean little to AMD's big data-center and AI chip business, even in the worst case. The drop did not come from earnings or a forecast change; it was one short-seller's claim. The stock has already climbed back from about $477 at its low to about $497, so it is no longer falling fast. AMD normally swings a lot each day and trades billions of dollars a day. Risk: AMD has not yet replied, and a government export-control probe would change the picture.",
+    "plain_reason": "A short-seller's unproven China claim hit AMD, but its main chip business is unchanged.",
+    "next_earnings": "2027-02-02",
+    "idea_type": "overreaction"
+   }
+  ],
+  "holdings_alerts": []
  }
 ]
