@@ -197,5 +197,45 @@
    }
   ],
   "holdings_alerts": []
+ },
+ {
+  "date": "2026-11-19",
+  "time": "15:13",
+  "source": "news",
+  "dry_run": false,
+  "orders": [
+   {
+    "symbol": "SPY",
+    "side": "sell",
+    "notional": 98.27,
+    "reason": "funding the buys",
+    "status": "pending_new",
+    "order_id": "ce181287-08b8-46d5-854f-2a0e29eeeff4"
+   },
+   {
+    "symbol": "AMD",
+    "side": "buy",
+    "notional": 98.27,
+    "reason": "An unproven claim from someone betting against AMD; its business is still booming.",
+    "status": "pending_new",
+    "order_id": "8de9471c-0c36-49cf-bbd0-be2bec31009c",
+    "hold_days": 10
+   }
+  ],
+  "notes": [
+   "earnings dates checked on Nasdaq's calendar"
+  ],
+  "plain_summary": "The market is down about 2% today, and AMD fell about 9% because of a report from a short seller (someone betting the stock will drop) that nobody has confirmed, so I suggest one buy: AMD.",
+  "ideas": [
+   {
+    "symbol": "AMD",
+    "headline": "AMD dives on short-seller report of alleged China exposure (CNBC, 2026-11-19 18:24 UTC). Hunterbrook, which is betting against AMD, says a blacklisted Chinese server maker kept using newer AMD firmware.",
+    "why_not_priced_in": "AMD is down about 9.5% today, about 7.5% worse than the S&P 500. That is a lot for a report whose authors are betting against the stock and admit they don't know how IEIT got the code or whether anyone had a license. Reuters and CNBC could not confirm the main claim. AMD says it follows U.S. law and that the claims misrepresent its business. No regulator investigation has been announced. AMD's China sales were already public. The business is strong: on Nov 3 it reported $13.4B in quarterly sales (up 45%), $2.4B in profit, and a forecast of about $17B for next quarter. A lot of the drop looks like fear spreading in a weak market, not damage to the business. Risk: if U.S. regulators open an export investigation, this becomes a real problem, and the stop protects us then. Earnings are not close: the next report is expected around early February 2027, but AMD has not confirmed the date.",
+    "plain_reason": "An unproven claim from someone betting against AMD; its business is still booming.",
+    "next_earnings": "unknown",
+    "idea_type": "overreaction"
+   }
+  ],
+  "holdings_alerts": []
  }
 ]
