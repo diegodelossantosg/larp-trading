@@ -377,5 +377,20 @@
    "AMD fell about 6% more today after yesterday's short-seller report on its China firmware; lawyers are circling, but no government probe exists so far.",
    "Micron fell about 11-13% on forecasts of weaker memory-chip prices and its $1B Anthropic stake sliding; next earnings December 17, 2026."
   ]
+ },
+ {
+  "date": "2026-11-20",
+  "time": "16:00",
+  "source": "news",
+  "dry_run": false,
+  "orders": [],
+  "notes": [
+   "\u26a0\ufe0f AMD: law firms opened shareholder investigations after a short-seller report said AMD kept supplying firmware to a blacklisted Chinese company. No regulator probe confirmed yet."
+  ],
+  "plain_summary": "The whole market fell hard today in an AI and chip sell-off, so we added no new buys and flagged one legal worry about AMD, which we own.",
+  "ideas": [],
+  "holdings_alerts": [
+   "AMD: law firms opened shareholder investigations after a short-seller report said AMD kept supplying firmware to a blacklisted Chinese company. No regulator probe confirmed yet."
+  ]
  }
 ]
