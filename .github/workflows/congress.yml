@@ -1,0 +1,57 @@
+name: "Research: Congress stock trades (House PTRs)"
+
+# Research only. One job per year downloads the House Clerk's transaction reports and saves
+# research/congress/trades_<year>.csv.gz (see research/congress/fetch.py).
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  year:
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        year: [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026]
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: sudo apt-get install -y -q poppler-utils
+      - timeout-minutes: 320
+        run: python research/congress/fetch.py ${{ matrix.year }} --out trades_${{ matrix.year }}.csv.gz
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: congress-${{ matrix.year }}
+          path: trades_${{ matrix.year }}.csv.gz
+
+  save:
+    needs: year
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: congress-*
+          path: research/congress/
+          merge-multiple: true
+      - run: |
+          ls -la research/congress/
+          git config user.name "trading-agent"
+          git config user.email "trading-agent@users.noreply.github.com"
+          git add research/congress/*.csv.gz || true
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -q -m "Research: Congress stock trades"
+          for i in 1 2 3 4 5; do git pull -q --rebase -X theirs origin main && git push -q origin HEAD:main && exit 0; sleep 7; done
+          exit 1
