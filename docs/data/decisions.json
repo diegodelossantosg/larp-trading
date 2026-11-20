@@ -328,5 +328,22 @@
   "holdings_alerts": [
    "AMD: short-seller Hunterbrook says AMD chips and firmware reach blacklisted Chinese firms; AMD denies it, and US regulators could look into it."
   ]
+ },
+ {
+  "date": "2026-11-20",
+  "time": "13:21",
+  "source": "news",
+  "dry_run": false,
+  "orders": [],
+  "notes": [
+   "\u26a0\ufe0f Micron (MU) is down about 12% today on a memory-price warning and the AI sell-off; nothing broke in the business, and earnings are due December 17.",
+   "\u26a0\ufe0f AMD has fallen about 18% since a short-seller's report claimed a US-banned Chinese firm got AMD chip software; AMD denies it, and no investigation has been announced."
+  ],
+  "plain_summary": "The market is in a sharp AI and chip sell-off. I flagged news on our Micron and AMD shares and bought nothing, because the drop is still accelerating and we already own two chip stocks.",
+  "ideas": [],
+  "holdings_alerts": [
+   "Micron (MU) is down about 12% today on a memory-price warning and the AI sell-off; nothing broke in the business, and earnings are due December 17.",
+   "AMD has fallen about 18% since a short-seller's report claimed a US-banned Chinese firm got AMD chip software; AMD denies it, and no investigation has been announced."
+  ]
  }
 ]
