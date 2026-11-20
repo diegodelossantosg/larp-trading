@@ -345,5 +345,20 @@
    "Micron (MU) is down about 12% today on a memory-price warning and the AI sell-off; nothing broke in the business, and earnings are due December 17.",
    "AMD has fallen about 18% since a short-seller's report claimed a US-banned Chinese firm got AMD chip software; AMD denies it, and no investigation has been announced."
   ]
+ },
+ {
+  "date": "2026-11-20",
+  "time": "14:21",
+  "source": "news",
+  "dry_run": false,
+  "orders": [],
+  "notes": [
+   "\u26a0\ufe0f AMD: law firms opened investigations after Hunterbrook's China report; AMD denies it, and no government probe is known yet."
+  ],
+  "plain_summary": "The whole market is down sharply in an AI sell-off that is still going, so I bought nothing and flagged that law firms are now looking into AMD.",
+  "ideas": [],
+  "holdings_alerts": [
+   "AMD: law firms opened investigations after Hunterbrook's China report; AMD denies it, and no government probe is known yet."
+  ]
  }
 ]
