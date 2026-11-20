@@ -1,6 +1,6 @@
 {
- "date": "2026-11-19",
+ "date": "2026-11-20",
  "asset": "SPY",
- "why": "S&P 500 730.20 is above its 200-day average 730.02: idle money in SPY",
+ "why": "S&P 500 715.87 is below its 200-day average 730.19: idle money in SPY (no 2x)",
  "setting": "SPY/SPY"
 }

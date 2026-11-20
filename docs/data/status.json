@@ -1,12 +1,12 @@
 {
- "updated": "2026-11-19T15:59-05:00",
+ "updated": "2026-11-20T09:42-05:00",
  "mode": "paper",
  "capital": 1000.0,
  "spy_start": 728.876,
  "idle_asset": "SPY",
  "model": "opus",
- "equity": 984.31,
- "cash": -0.01,
+ "equity": 974.07,
+ "cash": -0.03,
  "performance": {
   "since": "2026-11-18",
   "days_tracked": 2,
@@ -17,11 +17,11 @@
  "scorecard": {
   "news": {
    "buys": 1,
-   "avg_return_pct": 1.92,
-   "avg_vs_spy_pct": 1.93,
-   "beat_spy": 1,
-   "dollars": 1.88,
-   "dollars_vs_spy": 1.9
+   "avg_return_pct": -5.09,
+   "avg_vs_spy_pct": -4.53,
+   "beat_spy": 0,
+   "dollars": -5.0,
+   "dollars_vs_spy": -4.45
   }
  },
  "health": {
@@ -30,60 +30,60 @@
   "gauges": {
    "fear": {
     "title": "Fear (VIX)",
-    "display": "24.6",
-    "value": 24.56,
-    "change_5d": 7.07,
+    "display": "28.4",
+    "value": 28.44,
+    "change_5d": 9.74,
     "label": "nervous",
     "source": "Cboe VIX"
    },
    "rates": {
     "title": "Bonds (rates)",
-    "display": "-0.4%",
-    "ief_return_20d_pct": -0.44,
+    "display": "+0.6%",
+    "ief_return_20d_pct": 0.62,
     "label": "stable",
     "source": "IEF 7-10y Treasury ETF, 20-day change"
    },
    "credit": {
     "title": "Credit stress",
-    "display": "+0.5%",
-    "hyg_vs_ief_20d_pct": 0.47,
+    "display": "-0.7%",
+    "hyg_vs_ief_20d_pct": -0.75,
     "label": "normal",
     "source": "high-yield (HYG) vs Treasuries (IEF), 20 days"
    },
    "breadth": {
     "title": "ETFs in uptrend",
-    "display": "31%",
-    "above_200d_pct": 31,
+    "display": "26%",
+    "above_200d_pct": 26,
     "above_50d_pct": 28,
     "label": "weak"
    }
   },
-  "checked": "2026-11-19T14:40"
+  "checked": "2026-11-20T14:42"
  },
  "positions": [
   {
    "symbol": "SPY",
    "qty": 1.2349,
-   "market_value": 884.4018,
+   "market_value": 880.0736,
    "avg_entry_price": 728.876,
-   "current_price": 716.195,
-   "unrealized_pl": -15.6593,
-   "unrealized_plpc": -0.0174,
-   "change_today_usd": -17.2942,
+   "current_price": 712.69,
+   "unrealized_pl": -19.9875,
+   "unrealized_plpc": -0.0222,
+   "change_today_usd": -3.9269,
    "name": "S&P 500",
-   "weight": 0.8985
+   "weight": 0.9035
   },
   {
    "symbol": "AMD",
    "qty": 0.2041,
-   "market_value": 99.9162,
+   "market_value": 94.0258,
    "avg_entry_price": 481.504,
-   "current_price": 489.62,
-   "unrealized_pl": 1.6562,
-   "unrealized_plpc": 0.0169,
-   "change_today_usd": 1.6562,
+   "current_price": 460.755,
+   "unrealized_pl": -4.2342,
+   "unrealized_plpc": -0.0431,
+   "change_today_usd": -5.8027,
    "name": "AMD",
-   "weight": 0.1015
+   "weight": 0.0965
   }
  ]
 }
