@@ -1,12 +1,12 @@
 {
- "updated": "2026-11-20T12:11-05:00",
+ "updated": "2026-11-20T12:28-05:00",
  "mode": "paper",
  "capital": 1000.0,
  "spy_start": 728.876,
  "idle_asset": "SPY",
  "model": "opus",
- "equity": 954.51,
- "cash": -0.02,
+ "equity": 950.01,
+ "cash": 0.01,
  "performance": {
   "since": "2026-11-18",
   "days_tracked": 2,
@@ -17,11 +17,11 @@
  "scorecard": {
   "news": {
    "buys": 2,
-   "avg_return_pct": -6.69,
-   "avg_vs_spy_pct": -5.13,
+   "avg_return_pct": -7.51,
+   "avg_vs_spy_pct": -5.57,
    "beat_spy": 0,
-   "dollars": -13.11,
-   "dollars_vs_spy": -10.05
+   "dollars": -14.72,
+   "dollars_vs_spy": -10.91
   }
  },
  "health": {
@@ -64,38 +64,38 @@
   {
    "symbol": "SPY",
    "qty": 1.0981,
-   "market_value": 772.0035,
+   "market_value": 769.0717,
    "avg_entry_price": 728.876,
-   "current_price": 703.06,
-   "unrealized_pl": -28.3476,
-   "unrealized_plpc": -0.0354,
-   "change_today_usd": -14.0662,
+   "current_price": 700.39,
+   "unrealized_pl": -31.2794,
+   "unrealized_plpc": -0.0391,
+   "change_today_usd": -16.998,
    "name": "S&P 500",
-   "weight": 0.8088
+   "weight": 0.8095
   },
   {
    "symbol": "MU",
    "qty": 0.154,
-   "market_value": 93.5002,
+   "market_value": 92.8446,
    "avg_entry_price": 631.684,
-   "current_price": 607.14,
-   "unrealized_pl": -3.7798,
-   "unrealized_plpc": -0.0389,
-   "change_today_usd": -3.7798,
+   "current_price": 602.8831,
+   "unrealized_pl": -4.4354,
+   "unrealized_plpc": -0.0456,
+   "change_today_usd": -4.4354,
    "name": "Micron",
-   "weight": 0.098
+   "weight": 0.0977
   },
   {
    "symbol": "AMD",
    "qty": 0.2041,
-   "market_value": 89.0291,
+   "market_value": 88.081,
    "avg_entry_price": 481.504,
-   "current_price": 436.27,
-   "unrealized_pl": -9.2309,
-   "unrealized_plpc": -0.0939,
-   "change_today_usd": -10.7993,
+   "current_price": 431.6236,
+   "unrealized_pl": -10.179,
+   "unrealized_plpc": -0.1036,
+   "change_today_usd": -11.7475,
    "name": "AMD",
-   "weight": 0.0933
+   "weight": 0.0927
   }
  ]
 }
