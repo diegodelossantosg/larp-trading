@@ -9,5 +9,16 @@
   "last": 462.0,
   "spy_last": 713.93,
   "open": true
+ },
+ {
+  "date": "2026-11-20",
+  "source": "news",
+  "symbol": "MU",
+  "amount": 97.29,
+  "entry": 634.27,
+  "spy_entry": 712.195,
+  "last": 634.27,
+  "spy_last": 712.195,
+  "open": true
  }
 ]

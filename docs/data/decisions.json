@@ -258,5 +258,45 @@
   "final_targets": {
    "SPY": 1.0
   }
+ },
+ {
+  "date": "2026-11-20",
+  "time": "10:20",
+  "source": "news",
+  "dry_run": false,
+  "orders": [
+   {
+    "symbol": "SPY",
+    "side": "sell",
+    "notional": 97.29,
+    "reason": "funding the buys",
+    "status": "pending_new",
+    "order_id": "1dfc3fc2-a166-4a99-9849-ea1c161514c2"
+   },
+   {
+    "symbol": "MU",
+    "side": "buy",
+    "notional": 97.29,
+    "reason": "Whole chip sector fell on fears and money flows; Micron's own business didn't change.",
+    "status": "pending_new",
+    "order_id": "7e632cc6-1286-4c26-a46b-ef34bc64d611",
+    "hold_days": 10
+   }
+  ],
+  "notes": [
+   "earnings dates checked on Nasdaq's calendar"
+  ],
+  "plain_summary": "AI chip and hardware stocks are falling across the board today because of jitters over Nvidia's CEO change and Anthropic's big IPO, so I suggest buying Micron, which has dropped about 8% with no bad news of its own.",
+  "ideas": [
+   {
+    "symbol": "MU",
+    "headline": "2026-11-20 ~10:15 ET: Chip and optical stocks sell off (Micron about -7.6% vs S&P 500) after Nvidia's CEO left over his personal conduct and Anthropic's record IPO pulled money out of AI stocks",
+    "why_not_priced_in": "Micron has no news of its own today. This is a sector-wide scare caused by Jensen Huang's exit over personal conduct (Nvidia's latest results still beat forecasts) and by Anthropic's $93.5B IPO soaking up investor money. Neither cuts demand for memory chips. Micron is a big, profitable, volatile company, and after falling from about $719 on Nov 16 it is probably below its 50-day average. Next earnings are around Dec 17, well outside the 3-day window. Risks: it was still falling at the open, and we already own AMD, another chip stock, so this adds to our chip exposure.",
+    "plain_reason": "Whole chip sector fell on fears and money flows; Micron's own business didn't change.",
+    "next_earnings": "2026-12-17",
+    "idea_type": "overreaction"
+   }
+  ],
+  "holdings_alerts": []
  }
 ]
