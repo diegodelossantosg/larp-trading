@@ -1,12 +1,12 @@
 {
- "updated": "2026-11-20T12:28-05:00",
+ "updated": "2026-11-20T12:44-05:00",
  "mode": "paper",
  "capital": 1000.0,
  "spy_start": 728.876,
  "idle_asset": "SPY",
  "model": "opus",
- "equity": 950.01,
- "cash": 0.01,
+ "equity": 951.46,
+ "cash": -0.02,
  "performance": {
   "since": "2026-11-18",
   "days_tracked": 2,
@@ -17,11 +17,11 @@
  "scorecard": {
   "news": {
    "buys": 2,
-   "avg_return_pct": -7.51,
-   "avg_vs_spy_pct": -5.57,
+   "avg_return_pct": -6.9,
+   "avg_vs_spy_pct": -4.97,
    "beat_spy": 0,
-   "dollars": -14.72,
-   "dollars_vs_spy": -10.91
+   "dollars": -13.51,
+   "dollars_vs_spy": -9.75
   }
  },
  "health": {
@@ -64,38 +64,38 @@
   {
    "symbol": "SPY",
    "qty": 1.0981,
-   "market_value": 769.0717,
+   "market_value": 769.2145,
    "avg_entry_price": 728.876,
-   "current_price": 700.39,
-   "unrealized_pl": -31.2794,
-   "unrealized_plpc": -0.0391,
-   "change_today_usd": -16.998,
+   "current_price": 700.52,
+   "unrealized_pl": -31.1366,
+   "unrealized_plpc": -0.0389,
+   "change_today_usd": -16.8553,
    "name": "S&P 500",
-   "weight": 0.8095
+   "weight": 0.8085
   },
   {
    "symbol": "MU",
    "qty": 0.154,
-   "market_value": 92.8446,
+   "market_value": 93.5164,
    "avg_entry_price": 631.684,
-   "current_price": 602.8831,
-   "unrealized_pl": -4.4354,
-   "unrealized_plpc": -0.0456,
-   "change_today_usd": -4.4354,
+   "current_price": 607.245,
+   "unrealized_pl": -3.7636,
+   "unrealized_plpc": -0.0387,
+   "change_today_usd": -3.7636,
    "name": "Micron",
-   "weight": 0.0977
+   "weight": 0.0983
   },
   {
    "symbol": "AMD",
    "qty": 0.2041,
-   "market_value": 88.081,
+   "market_value": 88.7455,
    "avg_entry_price": 481.504,
-   "current_price": 431.6236,
-   "unrealized_pl": -10.179,
-   "unrealized_plpc": -0.1036,
-   "change_today_usd": -11.7475,
+   "current_price": 434.88,
+   "unrealized_pl": -9.5145,
+   "unrealized_plpc": -0.0968,
+   "change_today_usd": -11.083,
    "name": "AMD",
-   "weight": 0.0927
+   "weight": 0.0933
   }
  ]
 }
