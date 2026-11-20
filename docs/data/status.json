@@ -1,12 +1,12 @@
 {
- "updated": "2026-11-20T13:01-05:00",
+ "updated": "2026-11-20T13:17-05:00",
  "mode": "paper",
  "capital": 1000.0,
  "spy_start": 728.876,
  "idle_asset": "SPY",
  "model": "opus",
- "equity": 950.54,
- "cash": -0.02,
+ "equity": 951.42,
+ "cash": -0.06,
  "performance": {
   "since": "2026-11-18",
   "days_tracked": 2,
@@ -17,11 +17,11 @@
  "scorecard": {
   "news": {
    "buys": 2,
-   "avg_return_pct": -7.34,
-   "avg_vs_spy_pct": -5.42,
+   "avg_return_pct": -7.0,
+   "avg_vs_spy_pct": -5.12,
    "beat_spy": 0,
-   "dollars": -14.37,
-   "dollars_vs_spy": -10.63
+   "dollars": -13.71,
+   "dollars_vs_spy": -10.04
   }
  },
  "health": {
@@ -64,38 +64,38 @@
   {
    "symbol": "SPY",
    "qty": 1.0981,
-   "market_value": 769.2913,
+   "market_value": 769.4505,
    "avg_entry_price": 728.876,
-   "current_price": 700.59,
-   "unrealized_pl": -31.0598,
-   "unrealized_plpc": -0.0388,
-   "change_today_usd": -16.7784,
+   "current_price": 700.735,
+   "unrealized_pl": -30.9006,
+   "unrealized_plpc": -0.0386,
+   "change_today_usd": -16.6192,
    "name": "S&P 500",
-   "weight": 0.8093
+   "weight": 0.8087
   },
   {
    "symbol": "MU",
    "qty": 0.154,
-   "market_value": 92.5423,
+   "market_value": 93.0759,
    "avg_entry_price": 631.684,
-   "current_price": 600.92,
-   "unrealized_pl": -4.7377,
-   "unrealized_plpc": -0.0487,
-   "change_today_usd": -4.7377,
+   "current_price": 604.385,
+   "unrealized_pl": -4.2041,
+   "unrealized_plpc": -0.0432,
+   "change_today_usd": -4.2041,
    "name": "Micron",
-   "weight": 0.0974
+   "weight": 0.0978
   },
   {
    "symbol": "AMD",
    "qty": 0.2041,
-   "market_value": 88.7281,
+   "market_value": 88.9547,
    "avg_entry_price": 481.504,
-   "current_price": 434.795,
-   "unrealized_pl": -9.5319,
-   "unrealized_plpc": -0.097,
-   "change_today_usd": -11.1003,
+   "current_price": 435.905,
+   "unrealized_pl": -9.3053,
+   "unrealized_plpc": -0.0947,
+   "change_today_usd": -10.8738,
    "name": "AMD",
-   "weight": 0.0933
+   "weight": 0.0935
   }
  ]
 }
