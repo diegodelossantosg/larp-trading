@@ -313,5 +313,20 @@
   "holdings_alerts": [
    "AMD fell about 8% Nov 19 after short-seller Hunterbrook said its firmware reached a blacklisted Chinese firm; AMD denies it, and no official probe yet."
   ]
+ },
+ {
+  "date": "2026-11-20",
+  "time": "12:20",
+  "source": "news",
+  "dry_run": false,
+  "orders": [],
+  "notes": [
+   "\u26a0\ufe0f AMD: short-seller Hunterbrook says AMD chips and firmware reach blacklisted Chinese firms; AMD denies it, and US regulators could look into it."
+  ],
+  "plain_summary": "AI and chip stocks are in a broad sell-off that is still getting worse (S&P 500 down 2%), and we already own two chipmakers, so I flagged a short-seller report on AMD and bought nothing.",
+  "ideas": [],
+  "holdings_alerts": [
+   "AMD: short-seller Hunterbrook says AMD chips and firmware reach blacklisted Chinese firms; AMD denies it, and US regulators could look into it."
+  ]
  }
 ]
