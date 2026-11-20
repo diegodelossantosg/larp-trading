@@ -75,3 +75,13 @@ precio de otra hora. Arreglado; el resultado de las reglas actuales no cambia (+
 - cada media hora (precios cada 30 min, comparado con cada hora sobre los mismos datos): no mejora. Cada hora +1,11/año
   (24/30); cada media hora +0,84 (20/30), mejor solo en 13/30; cada media hora leyendo 1 h de noticias: peor (10/30).
 Conclusión: mirar cada hora está bien; mirar más a menudo no ayuda. Sin cambios.
+
+## Quinta ronda (20 nov): ¿copiar a los congresistas?
+19.972 operaciones declaradas por miembros de la Cámara (2016-2026; unas 2 de cada 3 declaraciones legibles), 7.934
+compras. Comprando al día siguiente de publicarse, frente al S&P, costes incluidos (research/congress/results.csv):
+- todas las compras: 0,0% a -0,2% a 5, 20, 60 y 120 días; igual que días al azar de esas acciones.
+- compras de 50.000 $+: +1,5-1,8% a 60-120 días, pero solo en 2016-2020 (+4-6%); en 2021-2026, +0,7% / -0,8%, y nada
+  frente a días al azar de esas mismas acciones. No aguanta.
+- varios congresistas comprando la misma acción, compras declaradas en 7 días, ventas: nada.
+- ni siquiera desde el día real de su compra ganan al S&P de media (-0,2% a +0,2%).
+Conclusión: copiar a los congresistas no mejora el modelo. Sin cambios.
