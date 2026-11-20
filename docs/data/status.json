@@ -1,12 +1,12 @@
 {
- "updated": "2026-11-20T14:07-05:00",
+ "updated": "2026-11-20T14:23-05:00",
  "mode": "paper",
  "capital": 1000.0,
  "spy_start": 728.876,
  "idle_asset": "SPY",
  "model": "opus",
- "equity": 951.39,
- "cash": -0.02,
+ "equity": 946.24,
+ "cash": 0.02,
  "performance": {
   "since": "2026-11-18",
   "days_tracked": 2,
@@ -17,11 +17,11 @@
  "scorecard": {
   "news": {
    "buys": 2,
-   "avg_return_pct": -6.85,
-   "avg_vs_spy_pct": -4.91,
+   "avg_return_pct": -7.67,
+   "avg_vs_spy_pct": -5.28,
    "beat_spy": 0,
-   "dollars": -13.42,
-   "dollars_vs_spy": -9.63
+   "dollars": -15.04,
+   "dollars_vs_spy": -10.35
   }
  },
  "health": {
@@ -64,38 +64,38 @@
   {
    "symbol": "SPY",
    "qty": 1.0981,
-   "market_value": 769.1156,
+   "market_value": 765.5305,
    "avg_entry_price": 728.876,
-   "current_price": 700.43,
-   "unrealized_pl": -31.2355,
-   "unrealized_plpc": -0.039,
-   "change_today_usd": -16.9541,
+   "current_price": 697.165,
+   "unrealized_pl": -34.8206,
+   "unrealized_plpc": -0.0435,
+   "change_today_usd": -20.5393,
    "name": "S&P 500",
-   "weight": 0.8084
+   "weight": 0.809
   },
   {
    "symbol": "MU",
    "qty": 0.154,
-   "market_value": 93.8991,
+   "market_value": 92.9883,
    "avg_entry_price": 631.684,
-   "current_price": 609.73,
-   "unrealized_pl": -3.3809,
-   "unrealized_plpc": -0.0348,
-   "change_today_usd": -3.3809,
+   "current_price": 603.8158,
+   "unrealized_pl": -4.2917,
+   "unrealized_plpc": -0.0441,
+   "change_today_usd": -4.2917,
    "name": "Micron",
-   "weight": 0.0987
+   "weight": 0.0983
   },
   {
    "symbol": "AMD",
    "qty": 0.2041,
-   "market_value": 88.3965,
+   "market_value": 87.7031,
    "avg_entry_price": 481.504,
-   "current_price": 433.17,
-   "unrealized_pl": -9.8635,
-   "unrealized_plpc": -0.1004,
-   "change_today_usd": -11.4319,
+   "current_price": 429.7721,
+   "unrealized_pl": -10.5569,
+   "unrealized_plpc": -0.1074,
+   "change_today_usd": -12.1253,
    "name": "AMD",
-   "weight": 0.0929
+   "weight": 0.0927
   }
  ]
 }
