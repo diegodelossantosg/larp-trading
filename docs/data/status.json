@@ -1,12 +1,12 @@
 {
- "updated": "2026-11-20T11:38-05:00",
+ "updated": "2026-11-20T11:55-05:00",
  "mode": "paper",
  "capital": 1000.0,
  "spy_start": 728.876,
  "idle_asset": "SPY",
  "model": "opus",
- "equity": 955.57,
- "cash": -0.02,
+ "equity": 953.24,
+ "cash": -0.0,
  "performance": {
   "since": "2026-11-18",
   "days_tracked": 2,
@@ -17,11 +17,11 @@
  "scorecard": {
   "news": {
    "buys": 2,
-   "avg_return_pct": -6.7,
-   "avg_vs_spy_pct": -5.27,
+   "avg_return_pct": -7.1,
+   "avg_vs_spy_pct": -5.46,
    "beat_spy": 0,
-   "dollars": -13.12,
-   "dollars_vs_spy": -10.33
+   "dollars": -13.91,
+   "dollars_vs_spy": -10.69
   }
  },
  "health": {
@@ -64,38 +64,38 @@
   {
    "symbol": "SPY",
    "qty": 1.0981,
-   "market_value": 773.0357,
+   "market_value": 771.3776,
    "avg_entry_price": 728.876,
-   "current_price": 704.0,
-   "unrealized_pl": -27.3154,
-   "unrealized_plpc": -0.0341,
-   "change_today_usd": -13.034,
+   "current_price": 702.49,
+   "unrealized_pl": -28.9735,
+   "unrealized_plpc": -0.0362,
+   "change_today_usd": -14.6921,
    "name": "S&P 500",
-   "weight": 0.809
+   "weight": 0.8092
   },
   {
    "symbol": "MU",
    "qty": 0.154,
-   "market_value": 93.4449,
+   "market_value": 93.0374,
    "avg_entry_price": 631.684,
-   "current_price": 606.7812,
-   "unrealized_pl": -3.8351,
-   "unrealized_plpc": -0.0394,
-   "change_today_usd": -3.8351,
+   "current_price": 604.135,
+   "unrealized_pl": -4.2426,
+   "unrealized_plpc": -0.0436,
+   "change_today_usd": -4.2426,
    "name": "Micron",
-   "weight": 0.0978
+   "weight": 0.0976
   },
   {
    "symbol": "AMD",
    "qty": 0.2041,
-   "market_value": 89.1113,
+   "market_value": 88.8291,
    "avg_entry_price": 481.504,
-   "current_price": 436.6725,
-   "unrealized_pl": -9.1487,
-   "unrealized_plpc": -0.0931,
-   "change_today_usd": -10.7172,
+   "current_price": 435.2898,
+   "unrealized_pl": -9.4309,
+   "unrealized_plpc": -0.096,
+   "change_today_usd": -10.9994,
    "name": "AMD",
-   "weight": 0.0933
+   "weight": 0.0932
   }
  ]
 }
