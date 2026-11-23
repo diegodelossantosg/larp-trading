@@ -458,5 +458,16 @@
   "plain_summary": "Stocks jumped about 5% after Nvidia brought back its CEO; the only big drop, CrowdStrike, came from a huge share-paid takeover plus its results, so we buy nothing.",
   "ideas": [],
   "holdings_alerts": []
+ },
+ {
+  "date": "2026-11-23",
+  "time": "14:17",
+  "source": "news",
+  "dry_run": false,
+  "orders": [],
+  "notes": [],
+  "plain_summary": "The market jumped almost 5% on Nvidia's CEO coming back; the big drops were either real business news (CrowdStrike's huge deal on its earnings day, a Medicare pay cut for health insurers) or money moving into tech, so I bought nothing.",
+  "ideas": [],
+  "holdings_alerts": []
  }
 ]
