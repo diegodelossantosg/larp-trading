@@ -425,5 +425,16 @@
   "plain_summary": "Stocks jumped on Nvidia's CEO news; today's biggest fallers were tied to earnings or real business problems, so I bought nothing.",
   "ideas": [],
   "holdings_alerts": []
+ },
+ {
+  "date": "2026-11-23",
+  "time": "11:20",
+  "source": "news",
+  "dry_run": false,
+  "orders": [],
+  "notes": [],
+  "plain_summary": "The market jumped 5% after Nvidia brought back its CEO; today's biggest losers are falling on results day, a huge merger or government pressure, so I bought nothing.",
+  "ideas": [],
+  "holdings_alerts": []
  }
 ]
