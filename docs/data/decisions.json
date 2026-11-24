@@ -539,5 +539,20 @@
   "plain_summary": "Chip stocks gave back much of Monday's big jump on an analyst downgrade, tariff talk and earnings letdowns, so I found nothing worth buying and made no buys.",
   "ideas": [],
   "holdings_alerts": []
+ },
+ {
+  "date": "2026-11-24",
+  "time": "13:21",
+  "source": "news",
+  "dry_run": false,
+  "orders": [],
+  "notes": [
+   "\u26a0\ufe0f AMD and Micron are down about 10% today as chip stocks give back Monday's 14% rally. Weak Analog Devices and HPE forecasts and tariff fears added to it."
+  ],
+  "plain_summary": "Chip stocks, including our AMD and Micron, are falling hard as they give back Monday's big jump, so we're buying nothing this hour.",
+  "ideas": [],
+  "holdings_alerts": [
+   "AMD and Micron are down about 10% today as chip stocks give back Monday's 14% rally. Weak Analog Devices and HPE forecasts and tariff fears added to it."
+  ]
  }
 ]
