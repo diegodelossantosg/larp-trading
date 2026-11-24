@@ -1,12 +1,12 @@
 {
- "updated": "2026-11-24T09:33-05:00",
+ "updated": "2026-11-24T09:34-05:00",
  "mode": "paper",
  "capital": 1000.0,
  "spy_start": 728.876,
  "idle_asset": "SPY",
  "model": "opus",
- "equity": 968.56,
- "cash": -0.04,
+ "equity": 966.8,
+ "cash": -0.12,
  "performance": {
   "since": "2026-11-18",
   "days_tracked": 4,
@@ -17,11 +17,11 @@
  "scorecard": {
   "news": {
    "buys": 2,
-   "avg_return_pct": -5.25,
-   "avg_vs_spy_pct": -5.09,
+   "avg_return_pct": -5.92,
+   "avg_vs_spy_pct": -5.74,
    "beat_spy": 1,
-   "dollars": -10.36,
-   "dollars_vs_spy": -10.04
+   "dollars": -11.66,
+   "dollars_vs_spy": -11.31
   }
  },
  "health": {
@@ -64,38 +64,38 @@
   {
    "symbol": "SPY",
    "qty": 1.0981,
-   "market_value": 783.1269,
+   "market_value": 782.8853,
    "avg_entry_price": 728.876,
-   "current_price": 713.19,
-   "unrealized_pl": -17.2242,
-   "unrealized_plpc": -0.0215,
-   "change_today_usd": -9.9924,
+   "current_price": 712.97,
+   "unrealized_pl": -17.4658,
+   "unrealized_plpc": -0.0218,
+   "change_today_usd": -10.2339,
    "name": "S&P 500",
-   "weight": 0.8085
+   "weight": 0.8098
   },
   {
    "symbol": "MU",
    "qty": 0.154,
-   "market_value": 100.7798,
+   "market_value": 100.0037,
    "avg_entry_price": 631.684,
-   "current_price": 654.41,
-   "unrealized_pl": 3.4998,
-   "unrealized_plpc": 0.036,
-   "change_today_usd": -8.2067,
+   "current_price": 649.37,
+   "unrealized_pl": 2.7237,
+   "unrealized_plpc": 0.028,
+   "change_today_usd": -8.9829,
    "name": "Micron",
-   "weight": 0.1041
+   "weight": 0.1034
   },
   {
    "symbol": "AMD",
    "qty": 0.2041,
-   "market_value": 84.6896,
+   "market_value": 84.0346,
    "avg_entry_price": 481.504,
-   "current_price": 415.005,
-   "unrealized_pl": -13.5704,
-   "unrealized_plpc": -0.1381,
-   "change_today_usd": -7.8475,
+   "current_price": 411.795,
+   "unrealized_pl": -14.2254,
+   "unrealized_plpc": -0.1448,
+   "change_today_usd": -8.5025,
    "name": "AMD",
-   "weight": 0.0874
+   "weight": 0.0869
   }
  ]
 }
