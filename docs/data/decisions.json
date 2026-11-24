@@ -554,5 +554,16 @@
   "holdings_alerts": [
    "AMD and Micron are down about 10% today as chip stocks give back Monday's 14% rally. Weak Analog Devices and HPE forecasts and tariff fears added to it."
   ]
+ },
+ {
+  "date": "2026-11-24",
+  "time": "14:21",
+  "source": "news",
+  "dry_run": false,
+  "orders": [],
+  "notes": [],
+  "plain_summary": "Chip stocks fell hard today, mostly on other companies' earnings warnings, so I bought nothing and kept the money in the S&P 500 fund.",
+  "ideas": [],
+  "holdings_alerts": []
  }
 ]
