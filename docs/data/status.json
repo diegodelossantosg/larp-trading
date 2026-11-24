@@ -1,12 +1,12 @@
 {
- "updated": "2026-11-24T11:45-05:00",
+ "updated": "2026-11-24T12:01-05:00",
  "mode": "paper",
  "capital": 1000.0,
  "spy_start": 728.876,
  "idle_asset": "SPY",
  "model": "opus",
- "equity": 963.84,
- "cash": -0.05,
+ "equity": 963.83,
+ "cash": -0.04,
  "performance": {
   "since": "2026-11-18",
   "days_tracked": 4,
@@ -17,11 +17,11 @@
  "scorecard": {
   "news": {
    "buys": 2,
-   "avg_return_pct": -8.47,
-   "avg_vs_spy_pct": -8.53,
+   "avg_return_pct": -8.57,
+   "avg_vs_spy_pct": -8.66,
    "beat_spy": 0,
-   "dollars": -16.64,
-   "dollars_vs_spy": -16.75
+   "dollars": -16.83,
+   "dollars_vs_spy": -17.0
   }
  },
  "health": {
@@ -64,38 +64,38 @@
   {
    "symbol": "SPY",
    "qty": 1.0981,
-   "market_value": 784.763,
+   "market_value": 784.9716,
    "avg_entry_price": 728.876,
-   "current_price": 714.68,
-   "unrealized_pl": -15.5881,
-   "unrealized_plpc": -0.0195,
-   "change_today_usd": -8.3563,
+   "current_price": 714.87,
+   "unrealized_pl": -15.3795,
+   "unrealized_plpc": -0.0192,
+   "change_today_usd": -8.1476,
    "name": "S&P 500",
-   "weight": 0.8142
+   "weight": 0.8144
   },
   {
    "symbol": "MU",
    "qty": 0.154,
-   "market_value": 96.7192,
+   "market_value": 96.3215,
    "avg_entry_price": 631.684,
-   "current_price": 628.0424,
-   "unrealized_pl": -0.5608,
-   "unrealized_plpc": -0.0058,
-   "change_today_usd": -12.2674,
+   "current_price": 625.46,
+   "unrealized_pl": -0.9585,
+   "unrealized_plpc": -0.0098,
+   "change_today_usd": -12.665,
    "name": "Micron",
-   "weight": 0.1003
+   "weight": 0.0999
   },
   {
    "symbol": "AMD",
    "qty": 0.2041,
-   "market_value": 82.4112,
+   "market_value": 82.5744,
    "avg_entry_price": 481.504,
-   "current_price": 403.84,
-   "unrealized_pl": -15.8488,
-   "unrealized_plpc": -0.1613,
-   "change_today_usd": -10.1259,
+   "current_price": 404.64,
+   "unrealized_pl": -15.6856,
+   "unrealized_plpc": -0.1596,
+   "change_today_usd": -9.9626,
    "name": "AMD",
-   "weight": 0.0855
+   "weight": 0.0857
   }
  ]
 }
