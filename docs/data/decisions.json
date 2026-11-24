@@ -513,5 +513,20 @@
   "plain_summary": "Chip stocks, including our Micron, are falling as they give back Monday's rally, and the biggest drops come from earnings reports, so I bought nothing.",
   "ideas": [],
   "holdings_alerts": []
+ },
+ {
+  "date": "2026-11-24",
+  "time": "11:21",
+  "source": "news",
+  "dry_run": false,
+  "orders": [],
+  "notes": [
+   "\u26a0\ufe0f AMD registered about 337 million shares (~20% of the company) for possible resale, mostly OpenAI/Meta warrants; this could weigh on the price."
+  ],
+  "plain_summary": "Chip stocks, including our AMD and Micron, fell hard today after Monday's rally; nothing looked like a clean buy, so I suggested none.",
+  "ideas": [],
+  "holdings_alerts": [
+   "AMD registered about 337 million shares (~20% of the company) for possible resale, mostly OpenAI/Meta warrants; this could weigh on the price."
+  ]
  }
 ]
