@@ -4,33 +4,33 @@
  "gauges": {
   "fear": {
    "title": "Fear (VIX)",
-   "display": "35.9",
-   "value": 35.89,
-   "change_5d": 16.59,
-   "label": "panic",
+   "display": "26.6",
+   "value": 26.62,
+   "change_5d": 3.71,
+   "label": "nervous",
    "source": "Cboe VIX"
   },
   "rates": {
    "title": "Bonds (rates)",
-   "display": "+0.6%",
-   "ief_return_20d_pct": 0.64,
+   "display": "+1.1%",
+   "ief_return_20d_pct": 1.08,
    "label": "stable",
    "source": "IEF 7-10y Treasury ETF, 20-day change"
   },
   "credit": {
    "title": "Credit stress",
-   "display": "-0.9%",
-   "hyg_vs_ief_20d_pct": -0.87,
-   "label": "normal",
+   "display": "-2.1%",
+   "hyg_vs_ief_20d_pct": -2.13,
+   "label": "stressed",
    "source": "high-yield (HYG) vs Treasuries (IEF), 20 days"
   },
   "breadth": {
    "title": "ETFs in uptrend",
-   "display": "26%",
-   "above_200d_pct": 26,
-   "above_50d_pct": 24,
+   "display": "29%",
+   "above_200d_pct": 29,
+   "above_50d_pct": 28,
    "label": "weak"
   }
  },
- "checked": "2026-11-23T14:39"
+ "checked": "2026-11-24T14:38"
 }
