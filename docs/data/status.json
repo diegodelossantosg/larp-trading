@@ -1,12 +1,12 @@
 {
- "updated": "2026-11-25T15:55-05:00",
+ "updated": "2026-11-25T15:59-05:00",
  "mode": "paper",
  "capital": 1000.0,
  "spy_start": 728.876,
  "idle_asset": "SPY",
  "model": "opus",
- "equity": 962.88,
- "cash": -0.03,
+ "equity": 963.04,
+ "cash": -0.05,
  "performance": {
   "since": "2026-11-18",
   "days_tracked": 4,
@@ -17,11 +17,11 @@
  "scorecard": {
   "news": {
    "buys": 2,
-   "avg_return_pct": -10.77,
-   "avg_vs_spy_pct": -11.27,
+   "avg_return_pct": -10.09,
+   "avg_vs_spy_pct": -10.46,
    "beat_spy": 0,
-   "dollars": -21.12,
-   "dollars_vs_spy": -22.08
+   "dollars": -19.78,
+   "dollars_vs_spy": -20.5
   }
  },
  "health": {
@@ -64,38 +64,38 @@
   {
    "symbol": "SPY",
    "qty": 1.0981,
-   "market_value": 788.309,
+   "market_value": 787.1678,
    "avg_entry_price": 728.876,
-   "current_price": 717.9093,
-   "unrealized_pl": -12.0421,
-   "unrealized_plpc": -0.015,
-   "change_today_usd": -0.9561,
+   "current_price": 716.87,
+   "unrealized_pl": -13.1833,
+   "unrealized_plpc": -0.0165,
+   "change_today_usd": -2.0973,
    "name": "S&P 500",
-   "weight": 0.8187
+   "weight": 0.8174
   },
   {
    "symbol": "MU",
    "qty": 0.154,
-   "market_value": 92.2135,
+   "market_value": 92.8803,
    "avg_entry_price": 631.684,
-   "current_price": 598.785,
-   "unrealized_pl": -5.0665,
-   "unrealized_plpc": -0.0521,
-   "change_today_usd": -4.7748,
+   "current_price": 603.115,
+   "unrealized_pl": -4.3997,
+   "unrealized_plpc": -0.0452,
+   "change_today_usd": -4.108,
    "name": "Micron",
-   "weight": 0.0958
+   "weight": 0.0964
   },
   {
    "symbol": "AMD",
    "qty": 0.2041,
-   "market_value": 82.3887,
+   "market_value": 83.0397,
    "avg_entry_price": 481.504,
-   "current_price": 403.7298,
-   "unrealized_pl": -15.8713,
-   "unrealized_plpc": -0.1615,
-   "change_today_usd": -1.9469,
+   "current_price": 406.92,
+   "unrealized_pl": -15.2203,
+   "unrealized_plpc": -0.1549,
+   "change_today_usd": -1.2958,
    "name": "AMD",
-   "weight": 0.0856
+   "weight": 0.0862
   }
  ]
 }
