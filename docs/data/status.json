@@ -1,11 +1,11 @@
 {
- "updated": "2026-11-25T09:35-05:00",
+ "updated": "2026-11-25T09:39-05:00",
  "mode": "paper",
  "capital": 1000.0,
  "spy_start": 728.876,
  "idle_asset": "SPY",
  "model": "opus",
- "equity": 932.51,
+ "equity": 931.0,
  "cash": -0.04,
  "performance": {
   "since": "2026-11-18",
@@ -17,11 +17,11 @@
  "scorecard": {
   "news": {
    "buys": 2,
-   "avg_return_pct": -16.32,
-   "avg_vs_spy_pct": -14.34,
+   "avg_return_pct": -16.45,
+   "avg_vs_spy_pct": -14.41,
    "beat_spy": 0,
-   "dollars": -31.97,
-   "dollars_vs_spy": -28.1
+   "dollars": -32.23,
+   "dollars_vs_spy": -28.23
   }
  },
  "health": {
@@ -30,72 +30,72 @@
   "gauges": {
    "fear": {
     "title": "Fear (VIX)",
-    "display": "26.6",
-    "value": 26.62,
-    "change_5d": 3.71,
+    "display": "26.4",
+    "value": 26.36,
+    "change_5d": 0.9,
     "label": "nervous",
     "source": "Cboe VIX"
    },
    "rates": {
     "title": "Bonds (rates)",
-    "display": "+1.1%",
-    "ief_return_20d_pct": 1.08,
+    "display": "+1.9%",
+    "ief_return_20d_pct": 1.95,
     "label": "stable",
     "source": "IEF 7-10y Treasury ETF, 20-day change"
    },
    "credit": {
     "title": "Credit stress",
-    "display": "-2.1%",
-    "hyg_vs_ief_20d_pct": -2.13,
+    "display": "-3.2%",
+    "hyg_vs_ief_20d_pct": -3.21,
     "label": "stressed",
     "source": "high-yield (HYG) vs Treasuries (IEF), 20 days"
    },
    "breadth": {
     "title": "ETFs in uptrend",
-    "display": "29%",
-    "above_200d_pct": 29,
-    "above_50d_pct": 28,
+    "display": "28%",
+    "above_200d_pct": 28,
+    "above_50d_pct": 25,
     "label": "weak"
    }
   },
-  "checked": "2026-11-24T14:38"
+  "checked": "2026-11-25T14:39"
  },
  "positions": [
   {
    "symbol": "SPY",
    "qty": 1.0981,
-   "market_value": 768.8082,
+   "market_value": 767.6003,
    "avg_entry_price": 728.876,
-   "current_price": 700.15,
-   "unrealized_pl": -31.5429,
-   "unrealized_plpc": -0.0394,
-   "change_today_usd": -20.4569,
+   "current_price": 699.05,
+   "unrealized_pl": -32.7508,
+   "unrealized_plpc": -0.0409,
+   "change_today_usd": -21.6648,
    "name": "S&P 500",
    "weight": 0.8245
   },
   {
    "symbol": "MU",
    "qty": 0.154,
-   "market_value": 87.1954,
+   "market_value": 86.785,
    "avg_entry_price": 631.684,
-   "current_price": 566.2,
-   "unrealized_pl": -10.0846,
-   "unrealized_plpc": -0.1037,
-   "change_today_usd": -9.7929,
+   "current_price": 563.535,
+   "unrealized_pl": -10.495,
+   "unrealized_plpc": -0.1079,
+   "change_today_usd": -10.2033,
    "name": "Micron",
-   "weight": 0.0935
+   "weight": 0.0932
   },
   {
    "symbol": "AMD",
    "qty": 0.2041,
-   "market_value": 76.5503,
+   "market_value": 76.6544,
    "avg_entry_price": 481.504,
-   "current_price": 375.12,
-   "unrealized_pl": -21.7097,
-   "unrealized_plpc": -0.2209,
-   "change_today_usd": -7.7852,
+   "current_price": 375.63,
+   "unrealized_pl": -21.6056,
+   "unrealized_plpc": -0.2199,
+   "change_today_usd": -7.6812,
    "name": "AMD",
-   "weight": 0.0821
+   "weight": 0.0823
   }
  ]
 }
