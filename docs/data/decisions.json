@@ -598,5 +598,16 @@
   "final_targets": {
    "SPY": 1.0
   }
+ },
+ {
+  "date": "2026-11-25",
+  "time": "10:17",
+  "source": "news",
+  "dry_run": false,
+  "orders": [],
+  "notes": [],
+  "plain_summary": "Chip and AI stocks, including ours, are falling for a second day on real worries about AI spending, so I bought nothing new.",
+  "ideas": [],
+  "holdings_alerts": []
  }
 ]
