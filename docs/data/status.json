@@ -1,12 +1,12 @@
 {
- "updated": "2026-11-25T09:52-05:00",
+ "updated": "2026-11-25T10:08-05:00",
  "mode": "paper",
  "capital": 1000.0,
  "spy_start": 728.876,
  "idle_asset": "SPY",
  "model": "opus",
- "equity": 930.67,
- "cash": -0.04,
+ "equity": 938.74,
+ "cash": -0.02,
  "performance": {
   "since": "2026-11-18",
   "days_tracked": 4,
@@ -17,11 +17,11 @@
  "scorecard": {
   "news": {
    "buys": 2,
-   "avg_return_pct": -16.23,
-   "avg_vs_spy_pct": -13.96,
+   "avg_return_pct": -15.07,
+   "avg_vs_spy_pct": -13.58,
    "beat_spy": 0,
-   "dollars": -31.78,
-   "dollars_vs_spy": -27.34
+   "dollars": -29.53,
+   "dollars_vs_spy": -26.6
   }
  },
  "health": {
@@ -64,38 +64,38 @@
   {
    "symbol": "SPY",
    "qty": 1.0981,
-   "market_value": 766.6615,
+   "market_value": 772.6184,
    "avg_entry_price": 728.876,
-   "current_price": 698.195,
-   "unrealized_pl": -33.6896,
-   "unrealized_plpc": -0.0421,
-   "change_today_usd": -22.6036,
+   "current_price": 703.62,
+   "unrealized_pl": -27.7327,
+   "unrealized_plpc": -0.0347,
+   "change_today_usd": -16.6466,
    "name": "S&P 500",
-   "weight": 0.8238
+   "weight": 0.823
   },
   {
    "symbol": "MU",
    "qty": 0.154,
-   "market_value": 86.6299,
+   "market_value": 88.3027,
    "avg_entry_price": 631.684,
-   "current_price": 562.528,
-   "unrealized_pl": -10.6501,
-   "unrealized_plpc": -0.1095,
-   "change_today_usd": -10.3584,
+   "current_price": 573.39,
+   "unrealized_pl": -8.9773,
+   "unrealized_plpc": -0.0923,
+   "change_today_usd": -8.6857,
    "name": "Micron",
-   "weight": 0.0931
+   "weight": 0.0941
   },
   {
    "symbol": "AMD",
    "qty": 0.2041,
-   "market_value": 77.4156,
+   "market_value": 77.837,
    "avg_entry_price": 481.504,
-   "current_price": 379.36,
-   "unrealized_pl": -20.8444,
-   "unrealized_plpc": -0.2121,
-   "change_today_usd": -6.92,
+   "current_price": 381.425,
+   "unrealized_pl": -20.423,
+   "unrealized_plpc": -0.2079,
+   "change_today_usd": -6.4986,
    "name": "AMD",
-   "weight": 0.0832
+   "weight": 0.0829
   }
  ]
 }
