@@ -1,11 +1,11 @@
 {
- "updated": "2026-11-25T11:47-05:00",
+ "updated": "2026-11-25T12:04-05:00",
  "mode": "paper",
  "capital": 1000.0,
  "spy_start": 728.876,
  "idle_asset": "SPY",
  "model": "opus",
- "equity": 928.47,
+ "equity": 935.97,
  "cash": -0.04,
  "performance": {
   "since": "2026-11-18",
@@ -17,11 +17,11 @@
  "scorecard": {
   "news": {
    "buys": 2,
-   "avg_return_pct": -17.67,
-   "avg_vs_spy_pct": -15.54,
+   "avg_return_pct": -16.28,
+   "avg_vs_spy_pct": -14.73,
    "beat_spy": 0,
-   "dollars": -34.61,
-   "dollars_vs_spy": -30.43
+   "dollars": -31.89,
+   "dollars_vs_spy": -28.85
   }
  },
  "health": {
@@ -64,38 +64,38 @@
   {
    "symbol": "SPY",
    "qty": 1.0981,
-   "market_value": 767.4576,
+   "market_value": 772.1353,
    "avg_entry_price": 728.876,
-   "current_price": 698.92,
-   "unrealized_pl": -32.8935,
-   "unrealized_plpc": -0.0411,
-   "change_today_usd": -21.8075,
+   "current_price": 703.18,
+   "unrealized_pl": -28.2158,
+   "unrealized_plpc": -0.0352,
+   "change_today_usd": -17.1298,
    "name": "S&P 500",
-   "weight": 0.8266
+   "weight": 0.825
   },
   {
    "symbol": "MU",
    "qty": 0.154,
-   "market_value": 84.8831,
+   "market_value": 86.1482,
    "avg_entry_price": 631.684,
-   "current_price": 551.185,
-   "unrealized_pl": -12.3969,
-   "unrealized_plpc": -0.1274,
-   "change_today_usd": -12.1053,
+   "current_price": 559.3999,
+   "unrealized_pl": -11.1318,
+   "unrealized_plpc": -0.1144,
+   "change_today_usd": -10.8401,
    "name": "Micron",
-   "weight": 0.0914
+   "weight": 0.092
   },
   {
    "symbol": "AMD",
    "qty": 0.2041,
-   "market_value": 76.1728,
+   "market_value": 77.7278,
    "avg_entry_price": 481.504,
-   "current_price": 373.27,
-   "unrealized_pl": -22.0872,
-   "unrealized_plpc": -0.2248,
-   "change_today_usd": -8.1628,
+   "current_price": 380.89,
+   "unrealized_pl": -20.5322,
+   "unrealized_plpc": -0.209,
+   "change_today_usd": -6.6078,
    "name": "AMD",
-   "weight": 0.082
+   "weight": 0.083
   }
  ]
 }
