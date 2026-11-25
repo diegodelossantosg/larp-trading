@@ -631,5 +631,16 @@
   "plain_summary": "Chip stocks, including our AMD and Micron, are falling hard on AI-spending worries, possible China export limits and rate fears. None of the drops looked like a clear overreaction, so I bought nothing this hour.",
   "ideas": [],
   "holdings_alerts": []
+ },
+ {
+  "date": "2026-11-25",
+  "time": "14:19",
+  "source": "news",
+  "dry_run": false,
+  "orders": [],
+  "notes": [],
+  "plain_summary": "Chip stocks fell broadly on worries about inflation and higher interest rates, but nothing important happened to our holdings and daily ideas are switched off, so I bought nothing.",
+  "ideas": [],
+  "holdings_alerts": []
  }
 ]
