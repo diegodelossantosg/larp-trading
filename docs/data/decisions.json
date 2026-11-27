@@ -697,5 +697,27 @@
    }
   ],
   "holdings_alerts": []
+ },
+ {
+  "date": "2026-11-27",
+  "time": "11:16",
+  "source": "news",
+  "dry_run": false,
+  "orders": [],
+  "notes": [
+   "skipped VRTX: heavy volume today (on pace for 2.3x its normal): a sell-off with this much volume usually means serious news, and these lost in our tests"
+  ],
+  "plain_summary": "Vertex fell about 6% because the FDA needs three more months to review its kidney drug, which looks like an overreaction for a company this big, so I suggest one buy; nothing important happened to the stocks we own.",
+  "ideas": [
+   {
+    "symbol": "VRTX",
+    "headline": "2026-11-27 pre-market: FDA extends review of Vertex's kidney drug povetacicept (IgA nephropathy) by up to 3 months, from Nov 30, 2026 to no later than Feb 28, 2027, after treating Vertex's reply to an FDA question as a 'major amendment'",
+    "why_not_priced_in": "The stock is down about 6% (about 7.3% worse than the S&P 500), wiping out roughly $9B in value over a delay of up to three months. The drug has not been rejected, and no safety or effectiveness problem was reported. Most of Vertex's profit comes from its cystic fibrosis drugs, which this does not touch. JPMorgan kept its Overweight rating and $570 target, calling the delay disappointing but not a change to its longer-term view. The stock fell 7-8% before the open and has recovered a little since, so it is not still dropping fast. This is a regulatory delay, not an earnings report or a guidance change. Caveats: Vertex's normal daily swing may be under our 3% cut-off, and the stock hit a 52-week high earlier this week, so it may not be below its 50-day average.",
+    "plain_reason": "Big, profitable drugmaker; a three-month review delay is not a rejection.",
+    "next_earnings": "unknown",
+    "idea_type": "overreaction"
+   }
+  ],
+  "holdings_alerts": []
  }
 ]
