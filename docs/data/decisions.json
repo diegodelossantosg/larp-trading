@@ -675,5 +675,27 @@
   "final_targets": {
    "SPY": 1.0
   }
+ },
+ {
+  "date": "2026-11-27",
+  "time": "10:16",
+  "source": "news",
+  "dry_run": false,
+  "orders": [],
+  "notes": [
+   "skipped VRTX: heavy volume today (on pace for 2.8x its normal): a sell-off with this much volume usually means serious news, and these lost in our tests"
+  ],
+  "plain_summary": "Nothing important for our holdings; Vertex fell about 8% on a three-month FDA delay for one drug, so it's proposed as an overreaction buy.",
+  "ideas": [
+   {
+    "symbol": "VRTX",
+    "headline": "Vertex falls on 'disappointing' FDA delay on kidney drug review; Vera rises (Seeking Alpha, 2026-11-27 09:50 UTC)",
+    "why_not_priced_in": "The FDA only extended the review of povetacicept (IgA nephropathy) by up to 3 months, to Feb 28, 2027, after asking for more information late in the review. It is not a rejection. Vertex is a large, profitable company whose cystic fibrosis drugs, its main source of money, are untouched. Losing about 8% vs SPY (over $10B of market value) for a short delay of one pipeline drug looks too much. JPMorgan said the long-term case is unchanged. This is a product delay, not an earnings report or guidance cut.",
+    "plain_reason": "Strong company; one new drug's approval decision was only pushed back three months.",
+    "next_earnings": "unknown",
+    "idea_type": "overreaction"
+   }
+  ],
+  "holdings_alerts": []
  }
 ]
